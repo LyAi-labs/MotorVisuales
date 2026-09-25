@@ -1,13 +1,48 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MotorVisuales - Motor 3D Audiovisual, DSP Stems, IA & Grabación</title>
+    <title>MotorVisuales • Motor de Síntesis Audiovisual, DSP Stems & Shaders GLSL</title>
+    
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+                    },
+                    colors: {
+                        obsidian: {
+                            base: '#07090e',
+                            surface: '#0c101a',
+                            surface2: '#111726',
+                            card: '#141b2d',
+                            border: 'rgba(255, 255, 255, 0.07)',
+                            borderLight: 'rgba(255, 255, 255, 0.14)'
+                        },
+                        cyanAccent: {
+                            DEFAULT: '#06b6d4',
+                            glow: 'rgba(6, 182, 212, 0.4)'
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+    
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <!-- Three.js (Local & CDN Fallback) -->
     <script src="three.min.js"></script>
     <script>
@@ -15,6 +50,7 @@
             document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
         }
     </script>
+    
     <!-- Three.js r128 Post-Processing Passes & Shaders -->
     <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
@@ -22,696 +58,691 @@
     <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
     <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    
     <style>
+        :root {
+            color-scheme: dark;
+        }
+        body {
+            background-color: #07090e;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(6, 182, 212, 0.04) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.04) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 650px;
-            height: 300px;
-            max-height: 350px;
-            margin-left: auto;
-            margin-right: auto;
+            height: 220px;
         }
         .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 5px;
+            height: 5px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: rgba(255, 255, 255, 0.02);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 3px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(6, 182, 212, 0.4);
         }
         @keyframes pulse-rec {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.4; transform: scale(1.15); }
+            50% { opacity: 0.3; transform: scale(1.2); }
         }
         .rec-dot {
             animation: pulse-rec 1s infinite ease-in-out;
         }
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+        }
+        .glow-red {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.35);
+        }
+        .glass-panel {
+            background-color: rgba(12, 16, 26, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+<body class="text-zinc-200 font-sans antialiased min-h-screen flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
 
     <!-- Header / Navigation & Global Recorder Controls -->
-    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
+    <header class="glass-panel sticky top-0 z-50 border-b border-white/[0.08] shadow-2xl">
+        <div class="max-w-[1720px] mx-auto px-4 sm:px-6">
+            <div class="flex items-center justify-between h-14">
+                
+                <!-- Brand & System Telemetry Status -->
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 rounded bg-gradient-to-tr from-indigo-500 via-purple-500 to-amber-500 flex items-center justify-center font-bold text-white text-lg shadow">
-                        ♪
+                    <div class="relative flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 shadow-md">
+                        <span class="text-xs font-black text-black">MV</span>
+                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping opacity-75"></span>
+                        <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
                     </div>
-                    <div>
-                        <h1 class="text-base font-bold tracking-tight leading-none text-white flex items-center gap-2">
-                            MotorVisuales
-                            <span id="badge-source" class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">En espera</span>
+                    <div class="flex items-center gap-2.5">
+                        <h1 class="text-xs font-black tracking-widest text-zinc-100 uppercase flex items-center gap-2">
+                            MOTOR<span class="text-cyan-400">VISUALES</span>
                         </h1>
-                        <p class="text-[11px] text-slate-400">DSP Stems • Three.js 3D • Director IA • Grabador 60 FPS</p>
+                        <div class="hidden sm:flex items-center gap-1.5 font-mono text-[10px]">
+                            <span id="badge-source" class="px-2 py-0.5 rounded bg-zinc-900 text-zinc-400 border border-white/[0.08]">EN ESPERA</span>
+                            <span class="px-2 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-500/30 flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>60 FPS
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Video Recording Quick Action Bar -->
-                <div class="flex items-center space-x-2">
-                    <button onclick="toggleVideoRecording()" id="btn-record" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition">
-                        <span id="rec-dot" class="w-2.5 h-2.5 rounded-full bg-white"></span>
-                        <span id="txt-record">Grabar Vídeo (60 FPS + Audio)</span>
-                    </button>
-                    <span id="rec-timer" class="hidden font-mono text-xs font-bold text-red-400 bg-slate-800 px-2 py-1 rounded border border-red-900/50">00:00</span>
-                </div>
-
-                <nav class="hidden lg:flex space-x-1">
-                    <button onclick="scrollToSection('sec-audio-bar')" class="px-2.5 py-1.5 rounded text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition">Audio</button>
-                    <button onclick="scrollToSection('sec-stems')" class="px-2.5 py-1.5 rounded text-xs font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">Stems DSP</button>
-                    <button onclick="scrollToSection('sec-viewport-3d')" class="px-2.5 py-1.5 rounded text-xs font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white transition shadow">Motor 3D</button>
-                    <button onclick="scrollToSection('sec-shader-editor'); openShaderEditorTab('frag');" class="px-2.5 py-1.5 rounded text-xs font-bold bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white transition shadow flex items-center gap-1"><span>⚡</span><span>Shaders GLSL</span></button>
-                    <button onclick="scrollToSection('sec-ia-director')" class="px-2.5 py-1.5 rounded text-xs font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">Director IA</button>
-                    <button onclick="scrollToSection('sec-frecuencial')" class="px-2.5 py-1.5 rounded text-xs font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">Espectro</button>
-                </nav>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Container -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
-
-        <!-- 1. AUDIO INPUT & SOURCE CONTROL -->
-        <section id="sec-audio-bar" class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-xl shadow-lg border border-indigo-900/40 p-5 text-white">
-            <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
-                <div class="space-y-1 text-center lg:text-left">
-                    <div class="inline-flex items-center space-x-2 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
-                        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
-                        <span>Canal de Ingesta DSP Multi-Fuente</span>
-                    </div>
-                    <h2 class="text-base font-bold text-white">Entrada de Audio y Osciloscopio</h2>
-                    <p class="text-xs text-slate-300 max-w-xl">
-                        Alimenta la FFT de 2048 puntos, el banco de filtros de stems y el motor gráfico con tu micrófono, una canción local o el sintetizador procedural integrado.
-                    </p>
-                </div>
-
-                <!-- Input Action Buttons -->
-                <div class="flex flex-wrap items-center justify-center gap-2">
-                    <button onclick="playUserUploadedTrack()" id="btn-user-track" class="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 active:scale-95 text-white font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-purple-900/50 transition transform hover:-translate-y-0.5">
-                        <span>🔥</span>
-                        <span>Reproducir Mi Tema ("Mordaza")</span>
-                    </button>
-
-                    <button onclick="startMicrophone()" id="btn-mic" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
-                        <span>🎙️</span>
-                        <span>Micrófono</span>
-                    </button>
-
-                    <button onclick="startTabCapture()" id="btn-tab" class="px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
-                        <span>🖥️</span>
-                        <span>Capturar Pestaña</span>
-                    </button>
-
-                    <label class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow cursor-pointer transition">
-                        <span>📁</span>
-                        <span>Cargar Otro Audio</span>
-                        <input type="file" id="file-input" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
-                    </label>
-
-                    <button onclick="toggleSynthDemo()" id="btn-synth" class="px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
-                        <span>⚡</span>
-                        <span id="txt-synth">Demo Synth Beat</span>
-                    </button>
-
-                    <button onclick="stopAudio()" id="btn-stop" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700 transition">
-                        <span>⏹️</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- HTML5 Audio Element persistente en DOM -->
-            <audio id="html5-audio-player" preload="auto" crossorigin="anonymous" class="hidden"></audio>
-
-            <!-- Dedicated Track Scrubber & Controls -->
-            <div id="track-player-controls" class="hidden mt-3 p-2.5 bg-slate-950/90 rounded-lg border border-indigo-900/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-                <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <button onclick="togglePlayPauseUserTrack()" id="btn-play-pause-track" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-500 flex items-center justify-center font-bold text-white shadow transition">▶</button>
-                    <span id="track-title" class="font-semibold text-indigo-300 truncate max-w-[220px]">tema.mp3</span>
-                </div>
-                <div class="flex items-center gap-2 w-full sm:flex-1">
-                    <span id="track-current-time" class="font-mono text-[11px] text-slate-400">00:00</span>
-                    <input type="range" id="track-progress" min="0" max="100" value="0" step="0.1" oninput="seekUserTrack(this.value)" class="w-full accent-indigo-500 h-1.5 cursor-pointer">
-                    <span id="track-duration" class="font-mono text-[11px] text-slate-400">03:18</span>
-                </div>
-                <div class="flex items-center gap-2 text-slate-400 text-[11px]">
-                    <label for="track-loop" class="cursor-pointer">Bucle</label>
-                    <input type="checkbox" id="track-loop" checked onchange="toggleTrackLoop(this.checked)" class="accent-indigo-500 rounded cursor-pointer">
-                </div>
-            </div>
-
-            <!-- Mini Live Waveform & Telemetry -->
-            <div class="mt-4 pt-3 border-t border-slate-800/80 flex flex-col md:flex-row items-center gap-4">
-                <div class="w-full md:w-1/2 h-10 bg-slate-950/90 rounded border border-slate-800 overflow-hidden relative">
-                    <canvas id="miniWaveCanvas" class="w-full h-full"></canvas>
-                    <div class="absolute right-2 top-1 text-[9px] font-mono text-slate-500">Osciloscopio PCM</div>
-                </div>
-                <div class="w-full md:w-2/3 grid grid-cols-3 md:grid-cols-6 gap-2 text-center text-xs font-mono">
-                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40">
-                        <span class="text-[9px] text-slate-400 block font-sans">RMS</span>
-                        <span id="tele-rms" class="text-indigo-400 font-bold">0.00</span>
-                    </div>
-                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40">
-                        <span class="text-[9px] text-slate-400 block font-sans">Centroide</span>
-                        <span id="tele-centroid" class="text-amber-400 font-bold">0 Hz</span>
-                    </div>
-                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40">
-                        <span class="text-[9px] text-slate-400 block font-sans">Flujo</span>
-                        <span id="tele-flux" class="text-purple-400 font-bold">0.00</span>
-                    </div>
-                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40">
-                        <span class="text-[9px] text-slate-400 block font-sans">ZCR</span>
-                        <span id="tele-zcr" class="text-emerald-400 font-bold">0</span>
-                    </div>
-                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40">
-                        <span class="text-[9px] text-slate-400 block font-sans">Rolloff</span>
-                        <span id="tele-rolloff" class="text-cyan-400 font-bold">0 Hz</span>
-                    </div>
-                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40 flex flex-col items-center justify-center">
-                        <span class="text-[9px] text-slate-400 block font-sans">Onset</span>
-                        <span id="tele-beat-indicator" class="w-3 h-3 rounded-full bg-slate-600 mt-0.5 transition-all"></span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2. PASO 1: SEPARADOR DE STEMS MULTICANAL (BIQUAD DSP) -->
-        <section id="sec-stems" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                <div>
-                    <div class="inline-flex items-center space-x-2 bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
-                        <span>Paso 1</span>
-                        <span>•</span>
-                        <span>Banco de Filtros Multicanal (Biquad DSP)</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-900">Separación de Stems en Tiempo Real</h3>
-                    <p class="text-xs text-slate-500">
-                        Aísla la pista en 8 bandas espectrales independientes para modular transformaciones 3D y post-procesado FX.
-                    </p>
-                </div>
-                <div class="flex flex-wrap items-center gap-3 text-xs">
-                    <!-- Presets Acústicos JSON -->
-                    <div class="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-lg border border-slate-200">
-                        <span class="text-slate-600 font-semibold text-[11px]">Preset:</span>
-                        <select id="preset-selector" onchange="loadSelectedPreset(this.value)" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-[11px] font-medium text-slate-700">
-                            <option value="custom">-- Personalizado --</option>
-                            <option value="balanced" selected>Equilibrado (Hi-Fi)</option>
-                            <option value="club_sub">Club / Bass Boost</option>
-                            <option value="acoustic_vocal">Acústico / Voces & Aire</option>
-                            <option value="cyber_glitch">Cyberpunk / Glitch FX</option>
+                <!-- Center: Preset Quick Selector & Master Sensitivity -->
+                <div class="hidden md:flex items-center gap-2.5 text-xs">
+                    <div class="flex items-center gap-1.5 bg-zinc-900/90 px-2.5 py-1 rounded-lg border border-white/[0.08]">
+                        <span class="text-zinc-400 text-[10px] font-mono uppercase tracking-wider">Preset:</span>
+                        <select id="preset-selector" onchange="loadSelectedPreset(this.value)" class="bg-transparent text-cyan-300 font-medium text-[11px] focus:outline-none cursor-pointer">
+                            <option value="custom" class="bg-zinc-900 text-zinc-300">-- Personalizado --</option>
+                            <option value="balanced" selected class="bg-zinc-900 text-zinc-100">Equilibrado (Hi-Fi)</option>
+                            <option value="club_sub" class="bg-zinc-900 text-zinc-100">Club / Bass Boost</option>
+                            <option value="acoustic_vocal" class="bg-zinc-900 text-zinc-100">Acústico / Voces & Aire</option>
+                            <option value="cyber_glitch" class="bg-zinc-900 text-zinc-100">Cyberpunk / Glitch FX</option>
                         </select>
-                        <button onclick="exportCurrentPreset()" class="px-2 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[10px] font-bold shadow-sm transition" title="Exportar configuración a JSON">
-                            💾 Exportar
-                        </button>
-                        <label class="px-2 py-0.5 bg-slate-700 hover:bg-slate-600 text-white rounded text-[10px] font-bold shadow-sm cursor-pointer transition" title="Importar configuración desde JSON">
-                            📂 Importar
+                        <button onclick="exportCurrentPreset()" class="px-1.5 py-0.5 text-[10px] text-zinc-400 hover:text-cyan-300 hover:bg-white/5 rounded transition font-mono" title="Exportar JSON">💾</button>
+                        <label class="px-1.5 py-0.5 text-[10px] text-zinc-400 hover:text-cyan-300 hover:bg-white/5 rounded cursor-pointer transition font-mono" title="Importar JSON">
+                            📂
                             <input type="file" id="preset-file-input" accept=".json" class="hidden" onchange="importPresetFile(event)">
                         </label>
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500 font-medium">Sensibilidad General:</span>
-                        <input type="range" id="input-gain" min="0.5" max="4.0" step="0.1" value="1.5" oninput="updateGain()" class="w-20 accent-indigo-600">
+                    <div class="flex items-center gap-2 bg-zinc-900/90 px-2.5 py-1 rounded-lg border border-white/[0.08]">
+                        <span class="text-zinc-400 text-[10px] font-mono uppercase">Ganancia:</span>
+                        <input type="range" id="input-gain" min="0.5" max="4.0" step="0.1" value="1.5" oninput="updateGain()" class="w-16 accent-cyan-400 h-1 cursor-pointer" title="Sensibilidad DSP">
                     </div>
                 </div>
-            </div>
 
-            <!-- Stems Meters & Controls Grid -->
-            <div id="stems-ui-container" class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <!-- Se inyecta dinámicamente desde JS para los 8 stems -->
-            </div>
-        </section>
-
-        <!-- 3. PASO 2: MOTOR GRÁFICO 3D REACTIVO (THREE.JS VIEWPORT) -->
-        <section id="sec-viewport-3d" class="bg-slate-950 rounded-2xl p-5 border border-slate-800 shadow-2xl text-white space-y-4">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                <div>
-                    <div class="inline-flex items-center space-x-2 bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
-                        <span>Paso 2</span>
-                        <span>•</span>
-                        <span>Motor Gráfico 3D WebGL (Three.js)</span>
-                    </div>
-                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                        Escena Volumétrica 3D en Tiempo Real
-                        <span id="viewport-fps" class="text-xs font-mono text-emerald-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">60 FPS</span>
-                    </h3>
-                </div>
-
-                <!-- 3D Controls & Scene Selector -->
-                <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <span class="text-slate-400 font-medium">Escena 3D:</span>
-                    <select id="three-scene-mode" onchange="switchThreeScene(this.value)" class="bg-slate-900 border border-slate-700 text-white rounded px-2.5 py-1.5 font-medium focus:outline-none focus:border-indigo-500">
-                        <option value="nebula">1. Nebulosa de 30.000 Partículas Volumétricas</option>
-                        <option value="tunnel">2. Túnel Cilíndrico Infinito Deformado por FFT</option>
-                        <option value="monolith">3. Monolito Icosaédrico Wireframe con Dispersión</option>
-                        <option value="custom_shader">4. ⚡ Shader GLSL en Vivo (Custom ShaderMaterial)</option>
-                    </select>
-                    <div class="flex items-center gap-1.5 border-l border-slate-800 pl-2">
-                        <button id="btn-camera-orbit" onclick="toggleCameraOrbit()" class="px-2.5 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 rounded flex items-center gap-1.5 font-medium transition" title="Activar/Desactivar Cámara Cinemática Automática">
-                            <span id="orbit-indicator" class="w-2 h-2 rounded-full bg-indigo-400"></span>
-                            <span>Órbita Auto</span>
-                        </button>
-                        <select id="camera-orbit-mode" onchange="changeCameraOrbitMode(this.value)" class="bg-slate-900 border border-slate-700 text-slate-300 rounded px-2 py-1.5 font-medium focus:outline-none focus:border-indigo-500" title="Patrón de trayectoria de cámara">
-                            <option value="circle">Órbita Circular</option>
-                            <option value="spiral">Espiral Reactiva</option>
-                            <option value="lemniscate">Infinito / Ocho (∞)</option>
-                            <option value="dramatic">Fly-by Cinemático</option>
-                        </select>
-                        <select id="camera-orbit-speed" onchange="changeCameraOrbitSpeed(this.value)" class="bg-slate-900 border border-slate-700 text-slate-300 rounded px-2 py-1.5 font-medium focus:outline-none focus:border-indigo-500" title="Velocidad orbital">
-                            <option value="0.5">0.5x Lento</option>
-                            <option value="1.0" selected>1.0x Normal</option>
-                            <option value="1.8">1.8x Rápido</option>
-                        </select>
-                    </div>
-                    <button onclick="resetThreeCamera()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 text-slate-300">Reset Cámara</button>
-                    <button onclick="toggleFullscreen()" id="btn-fullscreen" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 text-slate-300 flex items-center gap-1" title="Pantalla Completa">
+                <!-- Right Actions: Record & Fullscreen -->
+                <div class="flex items-center space-x-2">
+                    <button onclick="toggleVideoRecording()" id="btn-record" class="px-3 py-1.5 rounded-lg bg-red-600/90 hover:bg-red-500 active:bg-red-700 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition border border-red-500/30">
+                        <span id="rec-dot" class="w-2 h-2 rounded-full bg-white"></span>
+                        <span id="txt-record" class="hidden sm:inline">Grabar 60 FPS</span>
+                    </button>
+                    <span id="rec-timer" class="hidden font-mono text-xs font-bold text-red-400 bg-zinc-900 px-2 py-1 rounded border border-red-900/50">00:00</span>
+                    <button onclick="toggleFullscreen()" id="btn-fullscreen" class="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] text-xs transition" title="Pantalla Completa">
                         <span id="fullscreen-icon">⛶</span>
-                        <span class="hidden sm:inline text-[11px]">Pantalla Completa</span>
                     </button>
                 </div>
             </div>
+        </div>
+    </header>
 
-            <!-- POST-PROCESSING SHADERS FX MASTER SUITE (9 EFECTOS REACTIVOS) -->
-            <div class="bg-slate-900/95 border border-slate-800 rounded-xl p-3.5 space-y-3 text-xs shadow-lg">
-                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
-                    <div class="flex items-center gap-2 font-bold text-slate-200">
-                        <span class="text-indigo-400">✨ Suite de Post-Procesado WebGL FX</span>
-                        <span class="text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">9 Passes Reactivos</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 text-[11px]">
-                        <button onclick="enableAllFX()" class="px-2 py-0.5 bg-indigo-600/30 hover:bg-indigo-600/60 text-indigo-300 rounded border border-indigo-500/40 transition">Todo ON</button>
-                        <button onclick="disableAllFX()" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded border border-slate-700 transition">Todo OFF</button>
-                        <button onclick="resetAllFX()" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded border border-slate-700 transition">Reset</button>
-                    </div>
-                </div>
+    <!-- Main Content Workstation Layout -->
+    <main class="flex-grow max-w-[1720px] w-full mx-auto px-3 sm:px-5 lg:px-6 py-4 space-y-4">
 
-                <!-- Grid de los 9 Efectos de Post-Procesado -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <!-- 1. Unreal Bloom -->
-                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
-                            <input type="checkbox" id="fx-bloom-enable" checked onchange="toggleBloomPass(this.checked)" class="accent-indigo-500 rounded">
-                            <span>🌸 Bloom Glow</span>
-                        </label>
-                        <div class="flex items-center gap-1.5">
-                            <input type="range" id="fx-bloom-strength" min="0.1" max="3.0" step="0.1" value="1.2" oninput="updateBloomParams()" class="w-14 accent-indigo-500 cursor-pointer" title="Intensidad Bloom">
-                            <span id="fx-bloom-val" class="font-mono text-[10px] text-indigo-300 w-5 text-right">1.2</span>
+        <!-- TIER 1: AUDIO DECK & DSP 8-STEMS (LEFT) + MASTER WEBGL VIEWPORT & POST-PROCESSING (RIGHT) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+            
+            <!-- LEFT COLUMN: AUDIO INGESTION & 8-STEM BIQUAD DSP RACK -->
+            <div class="lg:col-span-4 xl:col-span-4 space-y-4">
+                
+                <!-- 1. AUDIO INGESTION DECK -->
+                <section id="sec-audio-bar" class="glass-panel rounded-xl p-4 space-y-3 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-white/[0.06] pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                            <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-200">Ingesta de Audio & Osciloscopio</h2>
+                        </div>
+                        <span class="text-[9px] font-mono text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-white/[0.06]">FFT 2048</span>
+                    </div>
+
+                    <!-- Primary Ingest Actions -->
+                    <div class="space-y-2">
+                        <!-- Hero User Track Button -->
+                        <button onclick="playUserUploadedTrack()" id="btn-user-track" class="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 active:scale-[0.99] text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg glow-cyan transition">
+                            <span>🔥</span>
+                            <span>Reproducir Mi Tema ("Mordaza")</span>
+                        </button>
+
+                        <!-- Secondary Sources Grid -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs font-medium">
+                            <button onclick="startMicrophone()" id="btn-mic" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
+                                <span>🎙️</span><span>Micrófono</span>
+                            </button>
+                            <button onclick="startTabCapture()" id="btn-tab" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
+                                <span>🖥️</span><span>Pestaña</span>
+                            </button>
+                            <label class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 cursor-pointer transition">
+                                <span>📁</span><span>Archivo</span>
+                                <input type="file" id="file-input" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
+                            </label>
+                            <button onclick="toggleSynthDemo()" id="btn-synth" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
+                                <span>⚡</span><span id="txt-synth">Synth Beat</span>
+                            </button>
+                            <button onclick="stopAudio()" id="btn-stop" class="col-span-2 sm:col-span-2 py-1.5 px-2 bg-zinc-900/90 hover:bg-rose-950/60 text-zinc-400 hover:text-rose-300 rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
+                                <span>⏹️</span><span>Detener Audio</span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 2. Aberración Cromática -->
-                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
-                            <input type="checkbox" id="fx-chroma-enable" checked onchange="toggleChromaPass(this.checked)" class="accent-pink-500 rounded">
-                            <span>🎨 Aberración RGB</span>
-                        </label>
-                        <div class="flex items-center gap-1.5">
-                            <input type="range" id="fx-chroma-amount" min="0.0" max="0.03" step="0.001" value="0.005" oninput="updateChromaParams()" class="w-14 accent-pink-500 cursor-pointer" title="Distorsión RGB">
-                            <span id="fx-chroma-val" class="font-mono text-[10px] text-pink-300 w-7 text-right">0.005</span>
+                    <!-- HTML5 Audio Element persistente en DOM -->
+                    <audio id="html5-audio-player" preload="auto" crossorigin="anonymous" class="hidden"></audio>
+
+                    <!-- Dedicated Track Scrubber & Controls -->
+                    <div id="track-player-controls" class="hidden p-2.5 bg-black/60 rounded-lg border border-white/[0.08] space-y-1.5 text-xs">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-2 truncate">
+                                <button onclick="togglePlayPauseUserTrack()" id="btn-play-pause-track" class="w-6 h-6 rounded-full bg-cyan-500 hover:bg-cyan-400 flex items-center justify-center font-bold text-black shadow transition">▶</button>
+                                <span id="track-title" class="font-mono text-[11px] text-cyan-300 truncate max-w-[180px]">tema.mp3</span>
+                            </div>
+                            <label class="flex items-center gap-1.5 text-[10px] text-zinc-400 font-mono cursor-pointer">
+                                <span>LOOP</span>
+                                <input type="checkbox" id="track-loop" checked onchange="toggleTrackLoop(this.checked)" class="accent-cyan-400 rounded">
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="track-current-time" class="font-mono text-[10px] text-zinc-500 w-8">00:00</span>
+                            <input type="range" id="track-progress" min="0" max="100" value="0" step="0.1" oninput="seekUserTrack(this.value)" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-800 rounded-lg">
+                            <span id="track-duration" class="font-mono text-[10px] text-zinc-500 w-8 text-right">03:18</span>
                         </div>
                     </div>
 
-                    <!-- 3. Audio Glitch & Block Displacement -->
-                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
-                            <input type="checkbox" id="fx-glitch-enable" onchange="toggleGlitchPass(this.checked)" class="accent-red-500 rounded">
-                            <span>💥 Audio Glitch</span>
-                        </label>
-                        <div class="flex items-center gap-1.5">
-                            <input type="range" id="fx-glitch-amount" min="0.0" max="1.0" step="0.05" value="0.25" oninput="updateGlitchParams()" class="w-14 accent-red-500 cursor-pointer" title="Fuerza del Glitch">
-                            <span id="fx-glitch-val" class="font-mono text-[10px] text-red-300 w-5 text-right">0.25</span>
+                    <!-- Mini Live Waveform & Telemetry Rack -->
+                    <div class="space-y-2 pt-1 border-t border-white/[0.06]">
+                        <div class="w-full h-11 bg-black rounded-lg border border-white/[0.08] overflow-hidden relative">
+                            <canvas id="miniWaveCanvas" class="w-full h-full"></canvas>
+                            <div class="absolute right-2 top-1 text-[8px] font-mono uppercase text-cyan-500/70 tracking-widest">PCM OSCILLOSCOPE</div>
+                        </div>
+                        
+                        <!-- 6-Metric Telemetry Grid -->
+                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-xs font-mono">
+                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05]">
+                                <span class="text-[8px] text-zinc-500 block uppercase">RMS</span>
+                                <span id="tele-rms" class="text-cyan-400 font-bold text-[11px]">0.00</span>
+                            </div>
+                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05]">
+                                <span class="text-[8px] text-zinc-500 block uppercase">Centroide</span>
+                                <span id="tele-centroid" class="text-amber-400 font-bold text-[10px]">0 Hz</span>
+                            </div>
+                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05]">
+                                <span class="text-[8px] text-zinc-500 block uppercase">Flujo</span>
+                                <span id="tele-flux" class="text-indigo-400 font-bold text-[11px]">0.00</span>
+                            </div>
+                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05]">
+                                <span class="text-[8px] text-zinc-500 block uppercase">ZCR</span>
+                                <span id="tele-zcr" class="text-emerald-400 font-bold text-[11px]">0</span>
+                            </div>
+                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05]">
+                                <span class="text-[8px] text-zinc-500 block uppercase">Rolloff</span>
+                                <span id="tele-rolloff" class="text-blue-400 font-bold text-[10px]">0 Hz</span>
+                            </div>
+                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05] flex flex-col items-center justify-center">
+                                <span class="text-[8px] text-zinc-500 block uppercase">Onset</span>
+                                <span id="tele-beat-indicator" class="w-2.5 h-2.5 rounded-full bg-zinc-700 mt-0.5 transition-all"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. SEPARADOR DE STEMS MULTICANAL (8-CHANNEL BIQUAD DSP RACK) -->
+                <section id="sec-stems" class="glass-panel rounded-xl p-4 space-y-3 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-white/[0.06] pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-200">Banco de Filtros 8 Stems DSP</h3>
+                        </div>
+                        <span class="text-[9px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">ACTIVO</span>
+                    </div>
+
+                    <!-- Stems Meters & Controls Grid -->
+                    <div id="stems-ui-container" class="grid grid-cols-2 gap-2">
+                        <!-- Se inyecta dinámicamente desde JS para los 8 stems con estilos nativos oscuros -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- RIGHT COLUMN: MASTER 3D WEBGL VIEWPORT & 9-PASS POST-PROCESSING SUITE -->
+            <div class="lg:col-span-8 xl:col-span-8 space-y-4">
+                
+                <!-- 3. MOTOR GRÁFICO 3D REACTIVO (THREE.JS VIEWPORT) -->
+                <section id="sec-viewport-3d" class="glass-panel rounded-xl p-4 space-y-3 shadow-2xl relative">
+                    
+                    <!-- Viewport Header & Scene Mode -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-2.5">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-200 flex items-center gap-2">
+                                Viewport 3D WebGL
+                                <span id="viewport-fps" class="text-[10px] font-mono text-cyan-400 bg-cyan-950/70 px-2 py-0.5 rounded border border-cyan-500/30">60 FPS</span>
+                            </h3>
+                        </div>
+
+                        <!-- 3D Scene Selector & Orbit Camera -->
+                        <div class="flex flex-wrap items-center gap-2 text-xs">
+                            <select id="three-scene-mode" onchange="switchThreeScene(this.value)" class="bg-zinc-900 border border-white/[0.08] text-zinc-100 rounded-lg px-2.5 py-1 text-xs font-semibold focus:outline-none focus:border-cyan-500 cursor-pointer">
+                                <option value="nebula">1. Nebulosa de 30.000 Partículas Volumétricas</option>
+                                <option value="tunnel">2. Túnel Cilíndrico Infinito Deformado por FFT</option>
+                                <option value="monolith">3. Monolito Icosaédrico Wireframe con Dispersión</option>
+                                <option value="custom_shader">4. ⚡ Shader GLSL en Vivo (Custom ShaderMaterial)</option>
+                            </select>
+
+                            <div class="flex items-center gap-1.5 border-l border-white/[0.08] pl-2">
+                                <button id="btn-camera-orbit" onclick="toggleCameraOrbit()" class="px-2.5 py-1 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 rounded-lg flex items-center gap-1.5 font-medium text-xs transition" title="Activar/Desactivar Cámara Cinemática">
+                                    <span id="orbit-indicator" class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+                                    <span>Órbita</span>
+                                </button>
+                                <select id="camera-orbit-mode" onchange="changeCameraOrbitMode(this.value)" class="bg-zinc-900 border border-white/[0.08] text-zinc-300 rounded-lg px-2 py-1 text-[11px] font-medium focus:outline-none cursor-pointer">
+                                    <option value="circle">Circular</option>
+                                    <option value="spiral">Espiral</option>
+                                    <option value="lemniscate">Infinito (∞)</option>
+                                    <option value="dramatic">Fly-by</option>
+                                </select>
+                                <select id="camera-orbit-speed" onchange="changeCameraOrbitSpeed(this.value)" class="bg-zinc-900 border border-white/[0.08] text-zinc-300 rounded-lg px-2 py-1 text-[11px] font-mono focus:outline-none cursor-pointer">
+                                    <option value="0.5">0.5x</option>
+                                    <option value="1.0" selected>1.0x</option>
+                                    <option value="1.8">1.8x</option>
+                                </select>
+                                <button onclick="resetThreeCamera()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-white/[0.08] text-zinc-400 hover:text-white text-[11px] transition">Reset</button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 4. Radial Zoom Shockwave -->
-                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
-                            <input type="checkbox" id="fx-blur-enable" onchange="toggleRadialBlurPass(this.checked)" class="accent-amber-500 rounded">
-                            <span>🌀 Zoom Shockwave</span>
-                        </label>
-                        <div class="flex items-center gap-1.5">
-                            <input type="range" id="fx-blur-strength" min="0.0" max="0.5" step="0.02" value="0.15" oninput="updateRadialBlurParams()" class="w-14 accent-amber-500 cursor-pointer" title="Onda de choque radial">
-                            <span id="fx-blur-val" class="font-mono text-[10px] text-amber-300 w-6 text-right">0.15</span>
+                    <!-- THREE.JS CANVAS CONTAINER -->
+                    <div class="relative w-full h-[460px] sm:h-[520px] lg:h-[580px] bg-black rounded-xl overflow-hidden border border-white/[0.08] shadow-inner flex items-center justify-center">
+                        <canvas id="threeCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+                        
+                        <!-- Floating Glass HUD Overlay -->
+                        <div class="absolute top-3 left-3 bg-black/70 backdrop-blur-md px-3 py-2 rounded-lg border border-white/[0.08] text-[10px] font-mono space-y-0.5 pointer-events-none text-zinc-300">
+                            <div>MODO: <span id="hud-camera-mode" class="text-cyan-400 font-semibold">Manual (Arrastrar / Zoom)</span></div>
+                            <div>DISTANCIA: <span id="hud-camera-zoom" class="text-amber-400">400</span></div>
+                            <div id="hud-stem-status" class="text-zinc-500">Stems activos: Sub, Bass, Treble</div>
                         </div>
+
+                        <!-- Beat Impact Indicator Flash Overlay -->
+                        <div id="three-beat-flash" class="absolute inset-0 bg-cyan-500/10 pointer-events-none opacity-0 transition-opacity duration-75"></div>
                     </div>
 
-                    <!-- 5. Monitor CRT & Scanlines -->
-                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
-                            <input type="checkbox" id="fx-crt-enable" onchange="toggleCRTPass(this.checked)" class="accent-emerald-500 rounded">
-                            <span>📺 Monitor CRT/VHS</span>
-                        </label>
-                        <div class="flex items-center gap-1.5">
-                            <input type="range" id="fx-crt-intensity" min="0.0" max="1.0" step="0.05" value="0.6" oninput="updateCRTParams()" class="w-14 accent-emerald-500 cursor-pointer" title="Intensidad Scanline/Tubo">
-                            <span id="fx-crt-val" class="font-mono text-[10px] text-emerald-300 w-5 text-right">0.6</span>
+                    <!-- 4. POST-PROCESSING SHADERS FX MASTER SUITE (9 PASSES REACTIVOS) -->
+                    <div class="bg-zinc-950/80 border border-white/[0.06] rounded-xl p-3.5 space-y-2.5 text-xs shadow-lg">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-2">
+                            <div class="flex items-center gap-2 font-bold text-zinc-200">
+                                <span class="text-cyan-400">✨ Suite de Post-Procesado WebGL FX</span>
+                                <span class="text-[9px] font-mono text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-white/[0.08]">9 Passes Reactivos</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-[10px]">
+                                <button onclick="enableAllFX()" class="px-2 py-0.5 bg-cyan-950/80 hover:bg-cyan-900/90 text-cyan-300 rounded border border-cyan-500/30 transition">Todo ON</button>
+                                <button onclick="disableAllFX()" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 rounded border border-white/[0.08] transition">Todo OFF</button>
+                                <button onclick="resetAllFX()" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 rounded border border-white/[0.08] transition">Reset</button>
+                            </div>
+                        </div>
+
+                        <!-- Grid de los 9 Efectos de Post-Procesado -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            <!-- 1. Unreal Bloom -->
+                            <div class="flex items-center justify-between bg-zinc-900/90 p-2 rounded-lg border border-white/[0.06] hover:border-white/10 transition">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-zinc-200 text-[11px]">
+                                    <input type="checkbox" id="fx-bloom-enable" checked onchange="toggleBloomPass(this.checked)" class="accent-cyan-400 rounded">
+                                    <span>🌸 Bloom Glow</span>
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="range" id="fx-bloom-strength" min="0.1" max="3.0" step="0.1" value="1.2" oninput="updateBloomParams()" class="w-12 accent-cyan-400 cursor-pointer h-1" title="Intensidad Bloom">
+                                    <span id="fx-bloom-val" class="font-mono text-[10px] text-cyan-300 w-5 text-right">1.2</span>
+                                </div>
+                            </div>
+
+                            <!-- 2. Aberración Cromática -->
+                            <div class="flex items-center justify-between bg-zinc-900/90 p-2 rounded-lg border border-white/[0.06] hover:border-white/10 transition">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-zinc-200 text-[11px]">
+                                    <input type="checkbox" id="fx-chroma-enable" checked onchange="toggleChromaPass(this.checked)" class="accent-pink-400 rounded">
+                                    <span>🎨 Aberración RGB</span>
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="range" id="fx-chroma-amount" min="0.0" max="0.03" step="0.001" value="0.005" oninput="updateChromaParams()" class="w-12 accent-pink-400 cursor-pointer h-1" title="Distorsión RGB">
+                                    <span id="fx-chroma-val" class="font-mono text-[10px] text-pink-300 w-7 text-right">0.005</span>
+                                </div>
+                            </div>
+
+                            <!-- 3. Audio Glitch & Block Displacement -->
+                            <div class="flex items-center justify-between bg-zinc-900/90 p-2 rounded-lg border border-white/[0.06] hover:border-white/10 transition">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-zinc-200 text-[11px]">
+                                    <input type="checkbox" id="fx-glitch-enable" onchange="toggleGlitchPass(this.checked)" class="accent-red-400 rounded">
+                                    <span>💥 Audio Glitch</span>
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="range" id="fx-glitch-amount" min="0.0" max="1.0" step="0.05" value="0.25" oninput="updateGlitchParams()" class="w-12 accent-red-400 cursor-pointer h-1" title="Fuerza del Glitch">
+                                    <span id="fx-glitch-val" class="font-mono text-[10px] text-red-300 w-5 text-right">0.25</span>
+                                </div>
+                            </div>
+
+                            <!-- 4. Radial Zoom Shockwave -->
+                            <div class="flex items-center justify-between bg-zinc-900/90 p-2 rounded-lg border border-white/[0.06] hover:border-white/10 transition">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-zinc-200 text-[11px]">
+                                    <input type="checkbox" id="fx-blur-enable" onchange="toggleRadialBlurPass(this.checked)" class="accent-amber-400 rounded">
+                                    <span>🌀 Zoom Shockwave</span>
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="range" id="fx-blur-strength" min="0.0" max="0.5" step="0.02" value="0.15" oninput="updateRadialBlurParams()" class="w-12 accent-amber-400 cursor-pointer h-1" title="Onda de choque radial">
+                                    <span id="fx-blur-val" class="font-mono text-[10px] text-amber-300 w-6 text-right">0.15</span>
+                                </div>
+                            </div>
+
+                            <!-- 5. Monitor CRT & Scanlines -->
+                            <div class="flex items-center justify-between bg-zinc-900/90 p-2 rounded-lg border border-white/[0.06] hover:border-white/10 transition">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-zinc-200 text-[11px]">
+                                    <input type="checkbox" id="fx-crt-enable" onchange="toggleCRTPass(this.checked)" class="accent-emerald-400 rounded">
+                                    <span>📺 Monitor CRT/VHS</span>
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="range" id="fx-crt-intensity" min="0.0" max="1.0" step="0.05" value="0.6" oninput="updateCRTParams()" class="w-12 accent-emerald-400 cursor-pointer h-1" title="Intensidad Scanline">
+                                    <span id="fx-crt-val" class="font-mono text-[10px] text-emerald-300 w-5 text-right">0.6</span>
+                                </div>
+                            </div>
+
+                            <!-- 6. Caleidoscopio Master -->
+                            <div class="flex items-center justify-between bg-zinc-900/90 p-2 rounded-lg border border-white/[0.06] hover:border-white/10 transition">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-zinc-200 text-[11px]">
+                                    <input type="checkbox" id="fx-kaleido-enable" onchange="toggleKaleidoPass(this.checked)" class="accent-purple-400 rounded">
+                                    <span>🔮 Caleidoscopio</span>
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <select id="fx-kaleido-sides" onchange="updateKaleidoParams()" class="bg-black border border-white/[0.08] text-purple-300 rounded px-1.5 py-0.5 text-[10px] font-mono cursor-pointer">
+                                        <option value="6">6 caras</option>
+                                        <option value="8" selected>8 caras</option>
+                                        <option value="12">12 caras</option>
+                                        <option value="16">16 caras</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 7. Film Grain & Viñeta -->
+                            <div class="flex items-center justify-between bg-zinc-900/90 p-2 rounded-lg border border-white/[0.06] hover:border-white/10 transition">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-zinc-200 text-[11px]">
+                                    <input type="checkbox" id="fx-film-enable" onchange="toggleFilmPass(this.checked)" class="accent-yellow-400 rounded">
+                                    <span>🎞️ Cine 35mm / Viñeta</span>
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="range" id="fx-film-grain" min="0.0" max="1.0" step="0.05" value="0.35" oninput="updateFilmParams()" class="w-12 accent-yellow-400 cursor-pointer h-1" title="Grano de película">
+                                    <span id="fx-film-val" class="font-mono text-[10px] text-yellow-300 w-5 text-right">0.35</span>
+                                </div>
+                            </div>
+
+                            <!-- 8. Inversor Negativo / Flash -->
+                            <div class="flex items-center justify-between bg-zinc-900/90 p-2 rounded-lg border border-white/[0.06] hover:border-white/10 transition">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-zinc-200 text-[11px]">
+                                    <input type="checkbox" id="fx-invert-enable" onchange="toggleInvertPass(this.checked)" class="accent-cyan-400 rounded">
+                                    <span>⚡ Inversor Negativo</span>
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="range" id="fx-invert-amount" min="0.0" max="1.0" step="0.1" value="0.0" oninput="updateInvertParams()" class="w-12 accent-cyan-400 cursor-pointer h-1" title="Inversión RGB">
+                                    <span id="fx-invert-val" class="font-mono text-[10px] text-cyan-300 w-5 text-right">0.0</span>
+                                </div>
+                            </div>
+
+                            <!-- 9. Pixelación Retro 8-Bit -->
+                            <div class="flex items-center justify-between bg-zinc-900/90 p-2 rounded-lg border border-white/[0.06] hover:border-white/10 transition">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-zinc-200 text-[11px]">
+                                    <input type="checkbox" id="fx-pixel-enable" onchange="togglePixelPass(this.checked)" class="accent-fuchsia-400 rounded">
+                                    <span>👾 Pixelación 8-Bit</span>
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="range" id="fx-pixel-size" min="2" max="32" step="2" value="8" oninput="updatePixelParams()" class="w-12 accent-fuchsia-400 cursor-pointer h-1" title="Tamaño de bloque">
+                                    <span id="fx-pixel-val" class="font-mono text-[10px] text-fuchsia-300 w-5 text-right">8px</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </section>
+            </div>
+        </div>
 
-                    <!-- 6. Caleidoscopio Master -->
-                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
-                            <input type="checkbox" id="fx-kaleido-enable" onchange="toggleKaleidoPass(this.checked)" class="accent-purple-500 rounded">
-                            <span>🔮 Caleidoscopio</span>
-                        </label>
-                        <div class="flex items-center gap-1.5">
-                            <select id="fx-kaleido-sides" onchange="updateKaleidoParams()" class="bg-slate-900 border border-slate-700 text-purple-300 rounded px-1.5 py-0.5 text-[10px] font-mono">
-                                <option value="6">6 caras</option>
-                                <option value="8" selected>8 caras</option>
-                                <option value="12">12 caras</option>
-                                <option value="16">16 caras</option>
+        <!-- TIER 2: BOTTOM CREATIVE STUDIOS (GLSL SHADERS TERMINAL + AI ART DIRECTOR + SPECTRUM/MER) -->
+        <div class="space-y-4">
+
+            <!-- 5. EDITOR DE SHADERS GLSL EN VIVO (LIVE SHADER STUDIO / MONACO STYLE) -->
+            <section id="sec-shader-editor" class="glass-panel rounded-xl p-4 space-y-3 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-white/[0.06] pb-2.5">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-200 flex items-center gap-2">
+                                Laboratorio GLSL • Hot-Reload WebGL
+                                <span id="shader-compile-status" class="text-[10px] font-mono text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/40">✓ Compilado OK</span>
+                            </h3>
+                        </div>
+                        <p class="text-[11px] text-zinc-400 mt-0.5">
+                            Programa shaders procedurales en tiempo real vinculados a los 8 stems Biquad DSP y telemetría acústica.
+                        </p>
+                    </div>
+
+                    <!-- Shader Presets, Actions & Buttons -->
+                    <div class="flex flex-wrap items-center gap-2 text-xs">
+                        <div class="flex items-center gap-1.5 bg-zinc-900 px-2 py-1 rounded-lg border border-white/[0.08]">
+                            <span class="text-pink-400 font-mono text-[10px] uppercase">Preset:</span>
+                            <select id="shader-preset-select" onchange="loadShaderPreset(this.value)" class="bg-transparent text-zinc-100 rounded text-[11px] font-medium focus:outline-none cursor-pointer">
+                                <option value="plasma" class="bg-zinc-900">1. Plasma Psicodélico Reactivo</option>
+                                <option value="raymarch" class="bg-zinc-900">2. Raymarching Túnel Fractal (SDF)</option>
+                                <option value="spectral_waves" class="bg-zinc-900">3. Ondas de Luz & Malla Espectral</option>
+                                <option value="voronoi" class="bg-zinc-900">4. Bio-Voronoi Pulsante (Beat Spike)</option>
+                                <option value="synthwave_grid" class="bg-zinc-900">5. Synthwave Neon Grid 80s (Retro Horizon)</option>
+                                <option value="blackhole" class="bg-zinc-900">6. Agujero Negro & Lente Gravitacional</option>
+                                <option value="kaleidoscope" class="bg-zinc-900">7. Caleidoscopio Hiperdimensional Fractal</option>
+                                <option value="tesla_orb" class="bg-zinc-900">8. Esfera de Plasma Eléctrico (Arcos Tesla)</option>
+                                <option value="matrix_landscape" class="bg-zinc-900">9. Campo Topográfico Cuántico (Isolíneas)</option>
+                                <option value="cyber_tunnel" class="bg-zinc-900">10. Túnel Hexagonal Sci-Fi (Warp Drive)</option>
                             </select>
                         </div>
-                    </div>
 
-                    <!-- 7. Film Grain & Viñeta -->
-                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
-                            <input type="checkbox" id="fx-film-enable" onchange="toggleFilmPass(this.checked)" class="accent-yellow-500 rounded">
-                            <span>🎞️ Cine 35mm / Viñeta</span>
+                        <button onclick="compileUserShaderFromUI()" class="px-3 py-1 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white rounded-lg font-bold shadow-md transition flex items-center gap-1.5 text-xs">
+                            <span>▶</span>
+                            <span>Compilar</span>
+                            <span class="text-[9px] opacity-75 font-mono">(Ctrl+Enter)</span>
+                        </button>
+
+                        <button onclick="resetShaderToCurrentPreset()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-white/[0.08] text-zinc-400 hover:text-white transition text-xs" title="Restaurar código del preset">
+                            ↺ Reset
+                        </button>
+
+                        <button onclick="exportCurrentShaderFile()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-white/[0.08] text-zinc-400 hover:text-white transition text-xs" title="Descargar shader (.glsl)">
+                            💾 Exportar
+                        </button>
+
+                        <label class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-white/[0.08] text-zinc-400 hover:text-white cursor-pointer transition text-xs" title="Cargar fragment shader (.glsl / .frag / .txt)">
+                            📂 Importar
+                            <input type="file" id="shader-file-import" accept=".glsl,.frag,.txt" class="hidden" onchange="importShaderFile(event)">
                         </label>
-                        <div class="flex items-center gap-1.5">
-                            <input type="range" id="fx-film-grain" min="0.0" max="1.0" step="0.05" value="0.35" oninput="updateFilmParams()" class="w-14 accent-yellow-500 cursor-pointer" title="Grano de película">
-                            <span id="fx-film-val" class="font-mono text-[10px] text-yellow-300 w-5 text-right">0.35</span>
-                        </div>
-                    </div>
-
-                    <!-- 8. Inversor Negativo / Flash -->
-                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
-                            <input type="checkbox" id="fx-invert-enable" onchange="toggleInvertPass(this.checked)" class="accent-cyan-500 rounded">
-                            <span>⚡ Inversor Negativo</span>
-                        </label>
-                        <div class="flex items-center gap-1.5">
-                            <input type="range" id="fx-invert-amount" min="0.0" max="1.0" step="0.1" value="0.0" oninput="updateInvertParams()" class="w-14 accent-cyan-500 cursor-pointer" title="Inversión RGB">
-                            <span id="fx-invert-val" class="font-mono text-[10px] text-cyan-300 w-5 text-right">0.0</span>
-                        </div>
-                    </div>
-
-                    <!-- 9. Pixelación Retro 8-Bit -->
-                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
-                            <input type="checkbox" id="fx-pixel-enable" onchange="togglePixelPass(this.checked)" class="accent-fuchsia-500 rounded">
-                            <span>👾 Pixelación 8-Bit</span>
-                        </label>
-                        <div class="flex items-center gap-1.5">
-                            <input type="range" id="fx-pixel-size" min="2" max="32" step="2" value="8" oninput="updatePixelParams()" class="w-14 accent-fuchsia-500 cursor-pointer" title="Tamaño de bloque de píxel">
-                            <span id="fx-pixel-val" class="font-mono text-[10px] text-fuchsia-300 w-5 text-right">8px</span>
-                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- THREE.JS CANVAS CONTAINER -->
-            <div class="relative w-full h-[420px] md:h-[480px] bg-black rounded-xl overflow-hidden border border-slate-800 shadow-inner flex items-center justify-center">
-                <canvas id="threeCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
-                
-                <!-- HUD Overlay in 3D Canvas -->
-                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-800/80 text-[11px] font-mono space-y-1 pointer-events-none">
-                    <div>Cámara: <span id="hud-camera-mode" class="text-indigo-400 font-semibold">Manual (Arrastrar / Zoom)</span></div>
-                    <div>Zoom / Rango: <span id="hud-camera-zoom" class="text-amber-400">400</span></div>
-                    <div id="hud-stem-status" class="text-slate-400">Stems activos: Bass, Mid, Treble</div>
-                </div>
-
-                <!-- Beat Impact Indicator -->
-                <div id="three-beat-flash" class="absolute inset-0 bg-indigo-500/10 pointer-events-none opacity-0 transition-opacity duration-75"></div>
-            </div>
-        </section>
-
-        <!-- 3.5. EDITOR DE SHADERS GLSL EN VIVO (LIVE SHADER STUDIO) -->
-        <section id="sec-shader-editor" class="bg-slate-900 rounded-2xl p-5 border border-pink-900/50 shadow-2xl text-white space-y-4">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                <div>
-                    <div class="inline-flex items-center space-x-2 bg-pink-500/20 text-pink-300 border border-pink-500/30 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
-                        <span>Laboratorio GLSL</span>
-                        <span>•</span>
-                        <span>Editor de Shaders en Caliente (Hot-Reload WebGL)</span>
+                <!-- Tabs: Fragment Shader vs Vertex Shader -->
+                <div class="flex items-center justify-between border-b border-white/[0.06] pb-2">
+                    <div class="flex space-x-1.5">
+                        <button id="tab-btn-frag" onclick="openShaderEditorTab('frag')" class="px-3 py-1 rounded-lg bg-pink-600/90 text-white font-bold text-xs flex items-center gap-1.5 transition">
+                            <span>Fragment (gl_FragColor)</span>
+                        </button>
+                        <button id="tab-btn-vert" onclick="openShaderEditorTab('vert')" class="px-3 py-1 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
+                            <span>Vertex (gl_Position)</span>
+                        </button>
                     </div>
-                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                        Editor de Shaders GLSL en Tiempo Real
-                        <span id="shader-compile-status" class="text-xs font-mono text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/40">✓ Compilado OK</span>
-                    </h3>
-                    <p class="text-xs text-slate-400">
-                        Programa tus propios Vertex y Fragment Shaders interactivos reactivos a los 8 stems DSP y telemetría de audio.
-                    </p>
-                </div>
-
-                <!-- Shader Presets, Actions & Buttons -->
-                <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <div class="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800">
-                        <span class="text-pink-400 font-semibold text-[11px]">Preset GLSL:</span>
-                        <select id="shader-preset-select" onchange="loadShaderPreset(this.value)" class="bg-slate-900 border border-slate-700 text-white rounded px-2 py-1 text-[11px] font-medium focus:outline-none focus:border-pink-500">
-                            <option value="plasma">1. Plasma Psicodélico Reactivo</option>
-                            <option value="raymarch">2. Raymarching Túnel Fractal (SDF)</option>
-                            <option value="spectral_waves">3. Ondas de Luz & Malla Espectral</option>
-                            <option value="voronoi">4. Bio-Voronoi Pulsante (Beat Spike)</option>
-                            <option value="synthwave_grid">5. Synthwave Neon Grid 80s (Retro Horizon)</option>
-                            <option value="blackhole">6. Agujero Negro & Lente Gravitacional</option>
-                            <option value="kaleidoscope">7. Caleidoscopio Hiperdimensional Fractal</option>
-                            <option value="tesla_orb">8. Esfera de Plasma Eléctrico (Arcos Tesla)</option>
-                            <option value="matrix_landscape">9. Campo Topográfico Cuántico (Isolíneas)</option>
-                            <option value="cyber_tunnel">10. Túnel Hexagonal Sci-Fi (Warp Drive)</option>
-                        </select>
+                    <div class="text-[11px] text-zinc-400 flex items-center gap-2.5">
+                        <button onclick="toggleUniformCheatSheet()" class="text-pink-400 hover:underline flex items-center gap-1 font-mono text-[10px]">
+                            <span>ℹ️</span><span>Ver Uniforms DSP</span>
+                        </button>
+                        <button onclick="activateCustomShaderScene()" class="bg-indigo-600/30 hover:bg-indigo-600/60 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/40 text-[10px] font-bold transition">
+                            Activar Escena ↗
+                        </button>
                     </div>
-
-                    <button onclick="compileUserShaderFromUI()" class="px-3.5 py-1.5 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white rounded-lg font-bold shadow-md transition flex items-center gap-1.5" title="Compilar shader actual (Ctrl + Enter)">
-                        <span>▶</span>
-                        <span>Compilar & Aplicar</span>
-                        <span class="text-[9px] opacity-75 font-mono">(Ctrl+Enter)</span>
-                    </button>
-
-                    <button onclick="resetShaderToCurrentPreset()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 text-slate-300 transition" title="Restaurar código del preset">
-                        ↺ Reset
-                    </button>
-
-                    <button onclick="exportCurrentShaderFile()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 text-slate-300 transition" title="Descargar shader (.glsl)">
-                        💾 Exportar
-                    </button>
-
-                    <label class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 text-slate-300 cursor-pointer transition" title="Cargar fragment shader (.glsl / .frag / .txt)">
-                        📂 Importar
-                        <input type="file" id="shader-file-import" accept=".glsl,.frag,.txt" class="hidden" onchange="importShaderFile(event)">
-                    </label>
                 </div>
-            </div>
 
-            <!-- Tabs: Fragment Shader vs Vertex Shader -->
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                <div class="flex space-x-2">
-                    <button id="tab-btn-frag" onclick="openShaderEditorTab('frag')" class="px-3 py-1 rounded-t-lg bg-pink-600 text-white font-bold text-xs flex items-center gap-1.5 transition">
-                        <span>Pixel / Fragment (gl_FragColor)</span>
-                    </button>
-                    <button id="tab-btn-vert" onclick="openShaderEditorTab('vert')" class="px-3 py-1 rounded-t-lg bg-slate-800 text-slate-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
-                        <span>Vertex (gl_Position)</span>
-                    </button>
+                <!-- Quick Uniforms Reference Cheat Sheet Drawer (Colapsable) -->
+                <div id="shader-uniforms-drawer" class="hidden bg-black/80 border border-white/[0.08] rounded-xl p-3 text-[10px] font-mono grid grid-cols-1 md:grid-cols-3 gap-2.5">
+                    <div class="space-y-1 bg-zinc-950 p-2 rounded-lg border border-white/[0.05]">
+                        <div class="text-pink-400 font-bold mb-1">Entornos y Coordenadas</div>
+                        <div><span class="text-indigo-300">uniform float</span> <span class="text-amber-300 font-bold">uTime</span>;</div>
+                        <div><span class="text-indigo-300">uniform vec2</span> <span class="text-amber-300 font-bold">uResolution</span>;</div>
+                        <div><span class="text-indigo-300">uniform vec2</span> <span class="text-amber-300 font-bold">uMouse</span>;</div>
+                        <div><span class="text-indigo-300">varying vec2</span> <span class="text-amber-300 font-bold">vUv</span>;</div>
+                    </div>
+                    <div class="space-y-1 bg-zinc-950 p-2 rounded-lg border border-white/[0.05]">
+                        <div class="text-pink-400 font-bold mb-1">8 Stems DSP (0.0 a 1.0)</div>
+                        <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uSub</span>, <span class="text-emerald-300 font-bold">uBass</span>;</div>
+                        <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uLowmid</span>, <span class="text-emerald-300 font-bold">uMid</span>;</div>
+                        <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uHighmid</span>, <span class="text-emerald-300 font-bold">uPresence</span>;</div>
+                        <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uTreble</span>, <span class="text-emerald-300 font-bold">uAir</span>;</div>
+                    </div>
+                    <div class="space-y-1 bg-zinc-950 p-2 rounded-lg border border-white/[0.05]">
+                        <div class="text-pink-400 font-bold mb-1">Métricas & Paleta IA</div>
+                        <div><span class="text-indigo-300">uniform float</span> <span class="text-cyan-300 font-bold">uRms</span>, <span class="text-cyan-300 font-bold">uFlux</span>;</div>
+                        <div><span class="text-indigo-300">uniform float</span> <span class="text-cyan-300 font-bold">uCentroid</span>, <span class="text-cyan-300 font-bold">uIsOnset</span>;</div>
+                        <div><span class="text-indigo-300">uniform vec3</span> <span class="text-purple-300 font-bold">uColor1</span>, <span class="text-purple-300 font-bold">uColor2</span>, <span class="text-purple-300 font-bold">uColor3</span>;</div>
+                    </div>
                 </div>
-                <div class="text-[11px] text-slate-400 flex items-center gap-3">
-                    <button onclick="toggleUniformCheatSheet()" class="text-pink-400 hover:underline flex items-center gap-1 font-mono">
-                        <span>ℹ️</span><span>Ver Uniforms Disponibles</span>
-                    </button>
-                    <button onclick="activateCustomShaderScene()" class="bg-indigo-600/30 hover:bg-indigo-600/60 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/40 text-[10px] font-bold transition">
-                        Ver Escena en Pantalla ↗
-                    </button>
-                </div>
-            </div>
 
-            <!-- Quick Uniforms Reference Cheat Sheet Drawer (Colapsable) -->
-            <div id="shader-uniforms-drawer" class="hidden bg-slate-950/95 border border-slate-800 rounded-xl p-3.5 text-[11px] font-mono grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div class="space-y-1 bg-slate-900/60 p-2.5 rounded border border-slate-800">
-                    <div class="text-pink-400 font-bold mb-1">Entornos y Coordenadas</div>
-                    <div><span class="text-indigo-300">uniform float</span> <span class="text-amber-300 font-bold">uTime</span>; <span class="text-slate-500">// Segundos</span></div>
-                    <div><span class="text-indigo-300">uniform vec2</span> <span class="text-amber-300 font-bold">uResolution</span>; <span class="text-slate-500">// W x H px</span></div>
-                    <div><span class="text-indigo-300">uniform vec2</span> <span class="text-amber-300 font-bold">uMouse</span>; <span class="text-slate-500">// [0..1] pos</span></div>
-                    <div><span class="text-indigo-300">varying vec2</span> <span class="text-amber-300 font-bold">vUv</span>; <span class="text-slate-500">// UV coord [0..1]</span></div>
-                </div>
-                <div class="space-y-1 bg-slate-900/60 p-2.5 rounded border border-slate-800">
-                    <div class="text-pink-400 font-bold mb-1">8 Stems DSP (0.0 a 1.0)</div>
-                    <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uSub</span>, <span class="text-emerald-300 font-bold">uBass</span>;</div>
-                    <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uLowmid</span>, <span class="text-emerald-300 font-bold">uMid</span>;</div>
-                    <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uHighmid</span>, <span class="text-emerald-300 font-bold">uPresence</span>;</div>
-                    <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uTreble</span>, <span class="text-emerald-300 font-bold">uAir</span>;</div>
-                </div>
-                <div class="space-y-1 bg-slate-900/60 p-2.5 rounded border border-slate-800">
-                    <div class="text-pink-400 font-bold mb-1">Métricas & Paleta IA</div>
-                    <div><span class="text-indigo-300">uniform float</span> <span class="text-cyan-300 font-bold">uRms</span>, <span class="text-cyan-300 font-bold">uFlux</span>;</div>
-                    <div><span class="text-indigo-300">uniform float</span> <span class="text-cyan-300 font-bold">uCentroid</span>, <span class="text-cyan-300 font-bold">uIsOnset</span>;</div>
-                    <div><span class="text-indigo-300">uniform vec3</span> <span class="text-purple-300 font-bold">uColor1</span>, <span class="text-purple-300 font-bold">uColor2</span>, <span class="text-purple-300 font-bold">uColor3</span>;</div>
-                </div>
-            </div>
-
-            <!-- Code Editor Workspace -->
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                <!-- Textarea Editor Area -->
-                <div class="lg:col-span-12 space-y-2">
-                    <div class="relative bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-inner">
+                <!-- Code Editor Workspace -->
+                <div class="space-y-2">
+                    <div class="relative bg-black rounded-xl border border-white/[0.08] overflow-hidden shadow-inner">
                         <!-- Fragment Shader Textarea -->
-                        <textarea id="shader-code-frag" spellcheck="false" class="w-full h-80 bg-transparent text-pink-200 font-mono text-xs p-4 focus:outline-none resize-y leading-relaxed" placeholder="// Escribe tu Fragment Shader GLSL aquí..."></textarea>
+                        <textarea id="shader-code-frag" spellcheck="false" class="w-full h-72 bg-transparent text-pink-200 font-mono text-xs p-3.5 focus:outline-none resize-y leading-relaxed" placeholder="// Escribe tu Fragment Shader GLSL aquí..."></textarea>
                         
                         <!-- Vertex Shader Textarea (Oculto inicialmente) -->
-                        <textarea id="shader-code-vert" spellcheck="false" class="hidden w-full h-80 bg-transparent text-emerald-200 font-mono text-xs p-4 focus:outline-none resize-y leading-relaxed" placeholder="// Escribe tu Vertex Shader GLSL aquí..."></textarea>
+                        <textarea id="shader-code-vert" spellcheck="false" class="hidden w-full h-72 bg-transparent text-emerald-200 font-mono text-xs p-3.5 focus:outline-none resize-y leading-relaxed" placeholder="// Escribe tu Vertex Shader GLSL aquí..."></textarea>
 
                         <!-- Line indicator badge -->
-                        <div class="absolute bottom-2 right-3 pointer-events-none text-[10px] font-mono text-slate-500 bg-slate-900/80 px-2 py-0.5 rounded border border-slate-800">
+                        <div class="absolute bottom-2 right-3 pointer-events-none text-[9px] font-mono text-zinc-500 bg-zinc-900/90 px-2 py-0.5 rounded border border-white/[0.06]">
                             GLSL ES 1.00 • WebGL
                         </div>
                     </div>
 
                     <!-- Compiler Log Output Console -->
-                    <div id="shader-console-panel" class="bg-slate-950 rounded-xl border border-slate-800 p-3 font-mono text-xs space-y-1">
-                        <div class="flex items-center justify-between text-[11px] pb-1 border-b border-slate-900">
-                            <span class="text-slate-400 flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-emerald-400" id="shader-console-indicator"></span>
-                                <span>Salida del Compilador GLSL:</span>
+                    <div id="shader-console-panel" class="bg-black/90 rounded-xl border border-white/[0.08] p-2.5 font-mono text-xs space-y-1">
+                        <div class="flex items-center justify-between text-[10px] pb-1 border-b border-white/[0.05]">
+                            <span class="text-zinc-400 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400" id="shader-console-indicator"></span>
+                                <span>Salida del Compilador WebGL:</span>
                             </span>
-                            <span id="shader-console-time" class="text-slate-500 text-[10px]">Listo</span>
+                            <span id="shader-console-time" class="text-zinc-500 text-[9px]">Listo</span>
                         </div>
-                        <div id="shader-console-log" class="text-emerald-400 text-[11px] max-h-24 overflow-y-auto custom-scrollbar whitespace-pre-wrap">✓ Shader compilado y vinculado exitosamente con WebGL. No se detectaron advertencias ni errores.</div>
+                        <div id="shader-console-log" class="text-emerald-400 text-[10px] max-h-20 overflow-y-auto custom-scrollbar whitespace-pre-wrap">✓ Shader compilado y vinculado exitosamente con WebGL. No se detectaron advertencias ni errores.</div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- 4. PASO 3: DIRECTOR DE ARTE IA GENERATIVA (GEMINI PROMPT ENGINE) -->
-        <section id="sec-ia-director" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                <div>
-                    <div class="inline-flex items-center space-x-2 bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
-                        <span>Paso 3</span>
-                        <span>•</span>
-                        <span>Dirección Artística por Inteligencia Artificial</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-900">Agente "Director de Arte" Multimodal en Vivo</h3>
-                    <p class="text-xs text-slate-500">
-                        Infiere el estado afectivo (Valencia / Arousal), el timbre y el tempo para sintetizar directivas artísticas y paletas que mutan la escena 3D.
-                    </p>
-                </div>
-                <button onclick="triggerAiArtDirectionNow()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-indigo-600 text-white font-bold text-xs flex items-center gap-1.5 shadow hover:opacity-90 transition">
-                    <span>✨</span>
-                    <span>Actualizar Directiva IA Ahora</span>
-                </button>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- AI Generated Prompt Output Card -->
-                <div class="lg:col-span-8 bg-slate-900 rounded-xl p-4 text-white space-y-3 border border-slate-800">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                        <span class="text-xs font-bold text-amber-400 flex items-center gap-2">
-                            <span>🎨 Prompt Generativo Activo (Diffusion / Veo3 / Shaders)</span>
-                        </span>
-                        <span id="ai-cycle-countdown" class="text-[10px] font-mono text-slate-400">Próximo ciclo: 15s</span>
-                    </div>
-
-                    <p id="ai-generated-prompt" class="text-xs font-mono text-indigo-200 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800">
-                        "Cosmic floating monolith with iridescent crystalline refraction, volumetric ultraviolet glow, particles drifting to ambient rhythm, 8k cinematic lighting, moody dark cyberpunk aesthetics."
-                    </p>
-
-                    <!-- Color Palette Generated by AI -->
-                    <div class="flex items-center gap-3 text-xs pt-1">
-                        <span class="text-slate-400 text-[11px]">Paleta Cromática Inyectada en Three.js:</span>
-                        <div class="flex items-center gap-1.5" id="ai-palette-swatches">
-                            <span class="w-5 h-5 rounded-full bg-indigo-500 border border-white/20 shadow" title="Primario"></span>
-                            <span class="w-5 h-5 rounded-full bg-amber-400 border border-white/20 shadow" title="Acento"></span>
-                            <span class="w-5 h-5 rounded-full bg-purple-600 border border-white/20 shadow" title="Niebla"></span>
+            <!-- 6. DIRECTOR DE ARTE IA (GEMINI ENGINE) & ESPECTROGRAMA + MER (GRID DE 2 PANELES) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                
+                <!-- AI ART DIRECTOR PANEL (GEMINI 2.5 FLASH) -->
+                <section id="sec-ia-director" class="lg:col-span-6 glass-panel rounded-xl p-4 space-y-3 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-white/[0.06] pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-200">Director de Arte IA Multimodal</h3>
                         </div>
+                        <button onclick="triggerAiArtDirectionNow()" class="px-2.5 py-1 rounded-lg bg-amber-600/80 hover:bg-amber-500 text-white font-bold text-[10px] flex items-center gap-1 transition shadow">
+                            <span>✨</span><span>Actualizar Directiva</span>
+                        </button>
                     </div>
-                </div>
 
-                <!-- AI Parameters & Optional Gemini API Key -->
-                <div class="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 text-xs">
-                    <div class="flex items-center justify-between font-bold text-slate-800">
-                        <span>Configuración del Motor IA</span>
-                        <span class="text-emerald-600 text-[10px] font-mono">Modo Inteligente Activo</span>
-                    </div>
-                    <div class="space-y-2">
-                        <label class="block font-medium text-slate-700">Modo de Síntesis:</label>
-                        <select id="ai-engine-mode" class="w-full border border-slate-300 rounded p-1.5 bg-white font-medium">
-                            <option value="heuristic">Heurístico Avanzado (Local & Cero Latencia)</option>
-                            <option value="gemini">Google Gemini API (Cloud LLM)</option>
-                        </select>
+                    <div class="space-y-2.5">
+                        <!-- AI Generated Prompt Output Card -->
+                        <div class="bg-black/70 rounded-xl p-3 border border-white/[0.06] space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] font-mono text-amber-400 uppercase">Directiva Semántica Activa:</span>
+                                <span id="ai-cycle-countdown" class="text-[9px] font-mono text-zinc-500">Ciclo: 60s</span>
+                            </div>
+                            <p id="ai-generated-prompt" class="text-[11px] font-mono text-zinc-300 leading-relaxed bg-zinc-950 p-2.5 rounded-lg border border-white/[0.05]">
+                                "Cosmic floating monolith with iridescent crystalline refraction, volumetric ultraviolet glow, particles drifting to ambient rhythm, 8k cinematic lighting, moody dark cyberpunk aesthetics."
+                            </p>
+                            <!-- Color Palette Generated by AI -->
+                            <div class="flex items-center justify-between pt-1">
+                                <span class="text-zinc-400 text-[10px]">Paleta Inyectada:</span>
+                                <div class="flex items-center gap-1.5" id="ai-palette-swatches">
+                                    <span class="w-4 h-4 rounded-full bg-indigo-500 border border-white/20 shadow" title="Primario"></span>
+                                    <span class="w-4 h-4 rounded-full bg-amber-400 border border-white/20 shadow" title="Acento"></span>
+                                    <span class="w-4 h-4 rounded-full bg-purple-600 border border-white/20 shadow" title="Niebla"></span>
+                                </div>
+                            </div>
+                        </div>
 
+                        <!-- AI Configuration Controls -->
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <div class="space-y-1">
+                                <label class="text-[10px] text-zinc-400 font-medium">Modo de Síntesis:</label>
+                                <select id="ai-engine-mode" class="w-full bg-zinc-900 border border-white/[0.08] text-zinc-200 rounded-lg p-1.5 text-[11px]">
+                                    <option value="heuristic">Heurístico (Local / Cero Latencia)</option>
+                                    <option value="gemini">Google Gemini API (Cloud LLM)</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] text-zinc-400 font-medium">Intervalo del Ciclo:</label>
+                                <select id="ai-interval-select" onchange="updateAiInterval()" class="w-full bg-zinc-900 border border-white/[0.08] text-zinc-200 rounded-lg p-1.5 text-[11px]">
+                                    <option value="15">15s (Agresivo)</option>
+                                    <option value="30">30s (Recomendado)</option>
+                                    <option value="60" selected>60s (Conservador)</option>
+                                    <option value="120">120s (Mínimo consumo)</option>
+                                </select>
+                            </div>
+                        </div>
                         <div id="gemini-key-container" class="hidden space-y-1 pt-1">
-                            <label class="block font-medium text-slate-700">Gemini API Key (Opcional):</label>
-                            <input type="password" id="gemini-api-key" placeholder="AIzaSy..." class="w-full border border-slate-300 rounded p-1.5 font-mono text-[11px]">
-                            <p class="text-[10px] text-slate-500">Se guarda únicamente en el localStorage de tu navegador.</p>
-                        </div>
-
-                        <div class="space-y-1 pt-1 border-t border-slate-200">
-                            <label class="block font-medium text-slate-700">Intervalo del Ciclo IA:</label>
-                            <select id="ai-interval-select" onchange="updateAiInterval()" class="w-full border border-slate-300 rounded p-1.5 bg-white font-medium">
-                                <option value="15">15s (Agresivo — puede dar 429)</option>
-                                <option value="30">30s (Recomendado)</option>
-                                <option value="60" selected>60s (Conservador)</option>
-                                <option value="120">120s (Mínimo consumo)</option>
-                            </select>
+                            <label class="text-[10px] text-zinc-400 font-medium">Gemini API Key (Opcional):</label>
+                            <input type="password" id="gemini-api-key" placeholder="AIzaSy..." class="w-full bg-zinc-900 border border-white/[0.08] text-zinc-200 rounded-lg p-1.5 font-mono text-[10px]">
                         </div>
                     </div>
-                </div>
+                </section>
+
+                <!-- SPECTRUM & RUSSELL MER AFFECTIVE MODEL -->
+                <section id="sec-frecuencial" class="lg:col-span-6 glass-panel rounded-xl p-4 space-y-3 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-white/[0.06] pb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-200">Análisis Espectral & Modelo MER</h3>
+                        </div>
+                        <select id="select-arch-dropdown" onchange="selectArch(this.value)" class="bg-zinc-900 border border-white/[0.08] text-zinc-300 rounded-lg p-1 text-[10px] font-mono">
+                            <option value="mel">Banco Mel (24 Bandas)</option>
+                            <option value="triad">Tríada (3 Bandas)</option>
+                            <option value="cqt">CQT (36 Semitonos)</option>
+                            <option value="fft">FFT Lineal (48 Bins)</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                        <!-- Frequency Spectrum Chart -->
+                        <div class="sm:col-span-7 bg-black/60 p-2 rounded-xl border border-white/[0.06] flex items-center justify-center">
+                            <div class="chart-container">
+                                <canvas id="frequencyChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Russell MER Pad -->
+                        <div class="sm:col-span-5 bg-black/60 p-2.5 rounded-xl border border-white/[0.06] flex flex-col justify-between">
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-mono text-zinc-400 uppercase">Radar MER (Russell)</span>
+                                    <label class="text-[9px] flex items-center gap-1 text-zinc-400 cursor-pointer">
+                                        <input type="checkbox" id="mer-auto-track" checked class="accent-cyan-400 rounded">
+                                        <span>Auto</span>
+                                    </label>
+                                </div>
+                                <div class="relative w-full aspect-square max-w-[140px] mx-auto bg-zinc-950 border border-white/[0.08] rounded-lg shadow-inner cursor-crosshair" id="mer-pad" onclick="handleMerClick(event)">
+                                    <canvas id="merCanvas" class="w-full h-full rounded-lg"></canvas>
+                                </div>
+                            </div>
+                            <div class="bg-zinc-900/90 p-1.5 rounded-lg border border-white/[0.05] text-[10px] mt-1">
+                                <div class="flex justify-between font-mono">
+                                    <span class="text-zinc-500">ESTADO:</span>
+                                    <span id="mer-emotion-label" class="text-cyan-400 font-bold truncate max-w-[100px]">Alegre / Energético</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
-        </section>
-
-        <!-- 5. PASO 4: ESPECTROGRAMA & MODELO MER RUSSELL -->
-        <section id="sec-frecuencial" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
-            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                <div>
-                    <div class="inline-flex items-center space-x-2 bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
-                        <span>Módulo DSP</span>
-                        <span>•</span>
-                        <span>Análisis Espectral & Modelo Afectivo MER</span>
-                    </div>
-                    <h3 class="text-lg font-bold text-slate-900">Descomposición Espectral y Posicionamiento Emocional</h3>
-                </div>
-                <div class="flex items-center gap-2 text-xs">
-                    <span class="text-slate-500">Transformada:</span>
-                    <select id="select-arch-dropdown" onchange="selectArch(this.value)" class="border border-slate-300 rounded p-1 font-medium bg-white">
-                        <option value="mel">Banco Mel / Escala Bark (24 Bandas)</option>
-                        <option value="triad">Tríada Tradicional (3 Bandas)</option>
-                        <option value="cqt">Transformada CQT (36 Semitonos)</option>
-                        <option value="fft">FFT Lineal Uniforme (48 Bins)</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                <!-- Spectrum Chart -->
-                <div class="lg:col-span-7 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <div class="chart-container">
-                        <canvas id="frequencyChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- MER Russell Pad -->
-                <div class="lg:col-span-5 bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <h4 class="text-xs font-bold text-slate-800">Modelo MER 2D (Russell Circumplex)</h4>
-                            <label class="text-[10px] flex items-center gap-1 text-slate-600 font-medium cursor-pointer">
-                                <input type="checkbox" id="mer-auto-track" checked class="accent-indigo-600 rounded">
-                                <span>Seguir Audio</span>
-                            </label>
-                        </div>
-                        <div class="relative w-full aspect-square max-w-[220px] mx-auto bg-white border border-slate-300 rounded-lg shadow-inner cursor-crosshair" id="mer-pad" onclick="handleMerClick(event)">
-                            <canvas id="merCanvas" class="w-full h-full rounded-lg"></canvas>
-                        </div>
-                    </div>
-                    <div class="mt-2 bg-white p-2.5 rounded-lg border border-slate-200 text-xs">
-                        <div class="flex justify-between font-bold text-slate-800">
-                            <span>Estado Afectivo:</span>
-                            <span id="mer-emotion-label" class="text-amber-600">Energía Elevada / Alegre</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-6 text-center text-xs">
-        <div class="max-w-7xl mx-auto px-4">
-            <p>Motor de Visualización y Síntesis Gráfica <b>MotorVisuales</b>.</p>
-            <p class="mt-1 text-slate-500">Pipeline integrado: Web Audio DSP • Three.js WebGL • IA Generativa • MediaRecorder 60 FPS.</p>
+    <footer class="glass-panel text-zinc-500 border-t border-white/[0.06] py-4 text-center text-[11px] font-mono mt-4">
+        <div class="max-w-[1720px] mx-auto px-4">
+            <p>MOTORVISUALES • Sistema de Síntesis Audiovisual Generativa en Tiempo Real</p>
+            <p class="text-[10px] text-zinc-600 mt-0.5">8-Stem Biquad DSP • Three.js WebGL • GLSL ES 1.00 • Google Gemini AI • 60 FPS Video Synthesis</p>
         </div>
     </footer>
 
@@ -814,19 +845,19 @@
                     
                     // UI Setup
                     const html = `
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                        <div class="bg-zinc-900/90 border border-white/[0.06] hover:border-white/15 rounded-lg p-2 space-y-1.5 transition">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-1.5 truncate">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-${conf.color} flex-shrink-0"></span>
-                                    <span class="font-bold text-[10px] text-slate-800 truncate" title="${conf.name}">${conf.name}</span>
+                                    <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: ${conf.hex}; box-shadow: 0 0 8px ${conf.hex}"></span>
+                                    <span class="font-bold text-[10px] text-zinc-200 truncate" title="${conf.name}">${conf.name}</span>
                                 </div>
-                                <span id="meter-val-${conf.id}" class="font-mono text-[10px] font-bold text-${conf.color}">0%</span>
+                                <span id="meter-val-${conf.id}" class="font-mono text-[10px] font-bold" style="color: ${conf.hex}">0%</span>
                             </div>
-                            <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                                <div id="meter-bar-${conf.id}" class="bg-${conf.color} h-full w-0 transition-all duration-75"></div>
+                            <div class="w-full bg-black h-1.5 rounded-full overflow-hidden border border-white/[0.04]">
+                                <div id="meter-bar-${conf.id}" class="h-full w-0 transition-all duration-75 rounded-full" style="background-color: ${conf.hex}; box-shadow: 0 0 6px ${conf.hex}"></div>
                             </div>
-                            <div class="flex justify-end pt-1">
-                                <button onclick="toggleStemMute('${conf.id}')" id="btn-mute-${conf.id}" class="px-2 py-0.5 rounded text-[9px] bg-white border border-slate-300 font-semibold hover:bg-slate-100">Mute</button>
+                            <div class="flex justify-end pt-0.5">
+                                <button onclick="toggleStemMute('${conf.id}')" id="btn-mute-${conf.id}" class="px-2 py-0.5 rounded text-[9px] font-mono bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 transition">Mute</button>
                             </div>
                         </div>
                     `;
@@ -873,11 +904,11 @@
             
             const btn = document.getElementById(`btn-mute-${stemId}`);
             if (data.muted) {
-                btn.className = "px-2 py-0.5 rounded text-[9px] bg-red-600 text-white font-semibold";
+                btn.className = "px-2 py-0.5 rounded text-[9px] font-mono bg-red-600 text-white font-bold glow-red";
                 btn.innerText = "MUTED";
                 data.gain.gain.value = 0;
             } else {
-                btn.className = "px-2 py-0.5 rounded text-[9px] bg-white border border-slate-300 font-semibold hover:bg-slate-100";
+                btn.className = "px-2 py-0.5 rounded text-[9px] font-mono bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 transition";
                 btn.innerText = "Mute";
                 data.gain.gain.value = 1;
             }
@@ -1584,8 +1615,10 @@
 
         function triggerBeatUI() {
             const ind = document.getElementById('tele-beat-indicator');
-            ind.className = "w-3 h-3 rounded-full bg-amber-400 mt-0.5 shadow-[0_0_10px_#f59e0b] scale-125 transition-all";
-            setTimeout(() => { ind.className = "w-3 h-3 rounded-full bg-slate-600 mt-0.5 transition-all"; }, 80);
+            if (ind) {
+                ind.className = "w-2.5 h-2.5 rounded-full bg-cyan-400 mt-0.5 shadow-[0_0_12px_#06b6d4] scale-125 transition-all";
+                setTimeout(() => { ind.className = "w-2.5 h-2.5 rounded-full bg-zinc-700 mt-0.5 transition-all"; }, 80);
+            }
 
             const flash = document.getElementById('three-beat-flash');
             if (flash) {
@@ -1601,8 +1634,19 @@
             const w = canvas.width = canvas.clientWidth;
             const h = canvas.height = canvas.clientHeight;
             ctx.clearRect(0, 0, w, h);
+            
+            // Grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
+            ctx.stroke();
+
+            // Waveform with neon cyan stroke
             ctx.lineWidth = 1.5;
-            ctx.strokeStyle = '#6366f1';
+            ctx.strokeStyle = '#06b6d4';
+            ctx.shadowColor = 'rgba(6, 182, 212, 0.6)';
+            ctx.shadowBlur = 6;
             ctx.beginPath();
             const slice = w / timeDataArray.length;
             let x = 0;
@@ -1613,6 +1657,7 @@
                 x += slice;
             }
             ctx.stroke();
+            ctx.shadowBlur = 0;
         }
 
         // =========================================================================
@@ -2909,9 +2954,9 @@
         async function generateGeminiPrompt(apiKey) {
             try {
                 // Indicador de carga
-                document.getElementById('ai-generated-prompt').innerText = "Generando con Gemini...";
+                document.getElementById('ai-generated-prompt').innerText = "Consultando Director de Arte Gemini...";
 
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`;
                 const bEnergy = (((stemsData['sub']?.value || 0) + (stemsData['bass']?.value || 0)) * 50).toFixed(0);
                 const promptReq = `Act as an expert AI Art Director for live concerts and audio-reactive visuals.
 Audio Metrics:
@@ -2931,7 +2976,9 @@ Write a single concise image prompt (1-2 sentences) for an abstract visualizer. 
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    const errData = await response.json().catch(() => ({}));
+                    const errMsg = errData.error?.message || response.statusText;
+                    throw new Error(`[${response.status}] ${errMsg}`);
                 }
                 
                 const data = await response.json();
@@ -2939,8 +2986,9 @@ Write a single concise image prompt (1-2 sentences) for an abstract visualizer. 
                 const parsed = JSON.parse(rawText);
                 applyAiDirectionToThree(parsed.prompt, parsed.palette);
             } catch (err) {
-                console.warn("Gemini falló:", err);
-                document.getElementById('ai-generated-prompt').innerText = `⚠️ Error de Gemini API: ${err.message}. Revise la consola o su API Key.`;
+                console.warn("Gemini API aviso:", err);
+                document.getElementById('ai-generated-prompt').innerText = `⚠️ Gemini (${err.message.slice(0, 80)}...). Usando motor heurístico local para mutación cromática continua.`;
+                generateHeuristicPrompt();
             }
         }
 
@@ -3140,8 +3188,19 @@ Write a single concise image prompt (1-2 sentences) for an abstract visualizer. 
                     maintainAspectRatio: false,
                     animation: false,
                     scales: {
-                        x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 90 } },
-                        y: { beginAtZero: true, max: 255, grid: { color: '#e2e8f0' } }
+                        x: { 
+                            grid: { display: false }, 
+                            ticks: { font: { size: 9, family: '"JetBrains Mono", monospace' }, color: '#71717a', maxRotation: 90 } 
+                        },
+                        y: { 
+                            beginAtZero: true, 
+                            max: 255, 
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { font: { size: 9, family: '"JetBrains Mono", monospace' }, color: '#71717a' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
                     }
                 }
             });
@@ -3203,23 +3262,45 @@ Write a single concise image prompt (1-2 sentences) for an abstract visualizer. 
             const h = canvas.height = canvas.clientHeight;
 
             ctx.clearRect(0, 0, w, h);
-            ctx.strokeStyle = '#cbd5e1';
+            
+            // Concentric radar rings
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.arc(w/2, h/2, w * 0.22, 0, Math.PI * 2);
+            ctx.arc(w/2, h/2, w * 0.42, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Crosshairs
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
             ctx.beginPath();
             ctx.moveTo(w/2, 0); ctx.lineTo(w/2, h);
             ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
             ctx.stroke();
 
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = '9px sans-serif';
-            ctx.fillText('+ Energía', w/2 + 4, 10);
-            ctx.fillText('+ Valencia', w - 50, h/2 - 4);
+            // Labels
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.font = '8px "JetBrains Mono", monospace';
+            ctx.fillText('+ ENERGÍA', w/2 + 4, 10);
+            ctx.fillText('+ VALENCIA', w - 54, h/2 - 4);
 
             const px = merX * w;
             const py = (1 - merY) * h;
-            ctx.fillStyle = '#f59e0b';
+            
+            // Pulse glow halo
+            ctx.fillStyle = 'rgba(6, 182, 212, 0.25)';
             ctx.beginPath();
-            ctx.arc(px, py, 6, 0, Math.PI * 2);
+            ctx.arc(px, py, 10, 0, Math.PI * 2);
             ctx.fill();
+
+            // Center target orb
+            ctx.fillStyle = '#06b6d4';
+            ctx.shadowColor = '#06b6d4';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(px, py, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
         }
 
         function handleMerClick(e) {
