@@ -65,7 +65,7 @@ Source → masterGainNode → mainAnalyser
 - ✅ Soporte para shaders de post-procesado (UnrealBloomPass reactivo y ChromaticAberration ShaderPass con EffectComposer)
 - ✅ Presets de mapeo acústico (Importación/Exportación JSON con perfiles de fábrica y descarga/carga de presets personalizados)
 - ✅ Cámara orbital cinemática multieje reactiva al audio (modos Círculo, Espiral, Lemniscata ∞ y Fly-by dramático con retroalimentación en HUD y controles interactivos)
-- ✅ Editor de shaders GLSL en vivo con Hot-Reload WebGL, consola de errores en pantalla, 4 presets (Plasma, Raymarching SDF, Espectro, Voronoi), exportación/importación y vinculación a los 8 stems DSP
+- ✅ Editor de shaders GLSL en vivo con Hot-Reload WebGL, consola de errores en pantalla, 10 presets de alta fidelidad (Plasma, Raymarching SDF, Espectro, Voronoi, Synthwave 80s, Agujero Negro, Caleidoscopio, Esfera Tesla, Topografía Cuántica y Túnel Hexagonal Sci-Fi), exportación/importación y vinculación a los 8 stems DSP
 - ✅ Bucle maestro de renderizado (`masterRenderLoop`) unificado a 60 FPS vinculando en tiempo real el análisis DSP (`runAudioDSP`), espectrograma y renderizado Three.js
 - ✅ Enrutamiento persistente de Web Audio API con elemento `<audio id="html5-audio-player">` en el DOM estático, eliminando desconexiones y resolviendo la reactividad de `tema.mp3` y archivos de usuario
 
