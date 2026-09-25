@@ -365,6 +365,12 @@
                             <option value="raymarch">2. Raymarching Túnel Fractal (SDF)</option>
                             <option value="spectral_waves">3. Ondas de Luz & Malla Espectral</option>
                             <option value="voronoi">4. Bio-Voronoi Pulsante (Beat Spike)</option>
+                            <option value="synthwave_grid">5. Synthwave Neon Grid 80s (Retro Horizon)</option>
+                            <option value="blackhole">6. Agujero Negro & Lente Gravitacional</option>
+                            <option value="kaleidoscope">7. Caleidoscopio Hiperdimensional Fractal</option>
+                            <option value="tesla_orb">8. Esfera de Plasma Eléctrico (Arcos Tesla)</option>
+                            <option value="matrix_landscape">9. Campo Topográfico Cuántico (Isolíneas)</option>
+                            <option value="cyber_tunnel">10. Túnel Hexagonal Sci-Fi (Warp Drive)</option>
                         </select>
                     </div>
 
@@ -2725,6 +2731,390 @@ void main() {
 
     // Destello de Onset
     col += vec3(uIsOnset * 0.35);
+
+    gl_FragColor = vec4(col, 1.0);
+}`
+            },
+            synthwave_grid: {
+                name: "Synthwave Neon Grid 80s (Retro Horizon)",
+                vert: DEFAULT_CUSTOM_VERT_SHADER,
+                frag: `// 5. Synthwave Neon Grid 80s (Retro Horizon)
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec2 uMouse;
+uniform float uSub;
+uniform float uBass;
+uniform float uMid;
+uniform float uTreble;
+uniform float uIsOnset;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+varying vec2 vUv;
+
+void main() {
+    vec2 p = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
+    
+    // Cielo degradado con niebla reactiva
+    vec3 col = mix(vec3(0.02, 0.0, 0.08), uColor1 * 0.4, p.y + 0.3);
+
+    // Sol de neón retro
+    vec2 sunPos = vec2(0.0, 0.08);
+    float sunDist = length(p - sunPos);
+    float sunRadius = 0.28 + uSub * 0.12;
+
+    if (sunDist < sunRadius && p.y > -0.02) {
+        // Líneas horizontales de corte del sol retro
+        float cut = sin((p.y - sunPos.y) * 90.0 - uTime * 2.0);
+        if (cut > -0.3 || (p.y - sunPos.y) > 0.08) {
+            float sunGrad = (p.y - sunPos.y + sunRadius) / (sunRadius * 2.0);
+            vec3 sunCol = mix(vec3(1.0, 0.2, 0.5), vec3(1.0, 0.9, 0.1), sunGrad);
+            col = mix(col, sunCol, 0.95);
+        }
+    }
+
+    // Glow alrededor del sol
+    col += vec3(1.0, 0.3, 0.6) * (0.05 / max(sunDist - sunRadius * 0.8, 0.02)) * (0.6 + uBass * 0.8);
+
+    // Suelo de rejilla en perspectiva (Horizonte en y = -0.02)
+    if (p.y < -0.02) {
+        float depth = -0.35 / p.y;
+        float xNorm = p.x * depth * 1.5;
+        float zNorm = depth + uTime * (3.0 + uBass * 4.0);
+
+        // Deformación de ondas del terreno reactivas a medios y agudos
+        float terrain = sin(xNorm * 1.2) * cos(zNorm * 0.8) * (uMid * 0.8 + uSub * 0.5);
+        
+        // Rejilla de neón
+        vec2 grid = abs(fract(vec2(xNorm, zNorm + terrain) - 0.5) - 0.5) / fwidth(vec2(xNorm, zNorm));
+        float line = min(grid.x, grid.y);
+        float gridVal = 1.0 - min(line, 1.0);
+
+        // Intensidad y atenuación por distancia
+        float fade = exp(-depth * 0.12);
+        vec3 gridCol = mix(uColor2, vec3(0.0, 1.0, 0.9), sin(zNorm * 0.2) * 0.5 + 0.5);
+        col = mix(col, gridCol * (1.2 + uTreble * 1.5), gridVal * fade);
+        col += uColor1 * 0.15 * fade;
+    }
+
+    // Flash en transitorios
+    col += vec3(uIsOnset * 0.35);
+
+    gl_FragColor = vec4(col, 1.0);
+}`
+            },
+            blackhole: {
+                name: "Agujero Negro & Lente Gravitacional",
+                vert: DEFAULT_CUSTOM_VERT_SHADER,
+                frag: `// 6. Agujero Negro & Lente Gravitacional
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec2 uMouse;
+uniform float uSub;
+uniform float uBass;
+uniform float uMid;
+uniform float uPresence;
+uniform float uTreble;
+uniform float uAir;
+uniform float uIsOnset;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+varying vec2 vUv;
+
+void main() {
+    vec2 p = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
+    vec2 center = (uMouse - 0.5) * 0.5;
+    vec2 offset = p - center;
+    float r = length(offset);
+    float angle = atan(offset.y, offset.x);
+
+    // Radio de Schwarzschild y curvatura gravitacional
+    float rs = 0.16 + uSub * 0.08;
+    float bend = rs / max(r, 0.01);
+    
+    // Distorsión del espacio-tiempo por lente gravitacional
+    vec2 bentCoord = p + normalize(offset) * bend * (0.12 + uBass * 0.08);
+
+    // Fondo estelar curvado
+    vec3 col = vec3(0.01, 0.015, 0.03);
+    float stars = fract(sin(dot(bentCoord * 200.0, vec2(12.9898, 78.233))) * 43758.5453);
+    if(stars > 0.985) col += vec3(0.8 + uAir * 0.5);
+
+    // Disco de Acreción relativista arremolinado
+    float spinSpeed = uTime * 2.5 + uBass * 3.0;
+    float spiral = sin(angle * 3.0 - spinSpeed + 6.0 / max(r, 0.05));
+    float disk = smoothstep(rs * 1.05, rs * 2.8 + uTreble * 0.4, r) * (1.0 - smoothstep(rs * 2.8, rs * 4.5, r));
+    disk *= max(0.0, spiral * 0.5 + 0.5);
+
+    // Doppler Shift (asimétrico: un lado brilla más que el otro)
+    float doppler = 0.5 + 0.5 * cos(angle);
+    vec3 diskCol = mix(uColor1, uColor2, sin(r * 15.0 - uTime * 3.0) * 0.5 + 0.5);
+    col += diskCol * disk * doppler * (2.5 + uPresence * 3.0);
+
+    // Anillo de Fotones (Photon Ring brillante en el borde)
+    float photonRing = exp(-abs(r - rs * 1.15) * 45.0) * (2.0 + uTreble * 2.0);
+    col += mix(vec3(1.0, 0.9, 0.6), uColor2, 0.4) * photonRing;
+
+    // Sombra del horizonte de sucesos (Interior completamente oscuro)
+    col *= smoothstep(rs * 0.95, rs * 1.05, r);
+
+    // Chorro relativista en transitorios (Relativistic Jet)
+    float jet = exp(-abs(offset.x) * 40.0) * smoothstep(0.05, 0.8, abs(offset.y)) * uIsOnset * 0.8;
+    col += vec3(0.4, 0.8, 1.0) * jet;
+
+    gl_FragColor = vec4(col, 1.0);
+}`
+            },
+            kaleidoscope: {
+                name: "Caleidoscopio Hiperdimensional Fractal",
+                vert: DEFAULT_CUSTOM_VERT_SHADER,
+                frag: `// 7. Caleidoscopio Hiperdimensional Fractal
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec2 uMouse;
+uniform float uSub;
+uniform float uBass;
+uniform float uMid;
+uniform float uHighmid;
+uniform float uTreble;
+uniform float uIsOnset;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+uniform vec3 uColor3;
+varying vec2 vUv;
+
+void main() {
+    vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
+    
+    // Rotación global y simetría polar de 8 sectores
+    float t = uTime * 0.3 + uBass * 0.5;
+    float r = length(uv);
+    float a = atan(uv.y, uv.x) + t;
+
+    float sectors = 8.0;
+    float segment = 6.283185 / sectors;
+    a = mod(a, segment) - segment * 0.5;
+    a = abs(a);
+
+    vec2 p = vec2(cos(a), sin(a)) * r;
+
+    // Pliegues fractales iterativos (IFS Folding)
+    vec3 col = vec3(0.0);
+    float scale = 1.0;
+    for(int i = 0; i < 5; i++) {
+        p = abs(p) - vec2(0.25 + uSub * 0.15, 0.2 + uMid * 0.2);
+        float rotA = 0.5 + float(i) * 0.3 + uTime * 0.15 + uHighmid * 0.4;
+        mat2 rot = mat2(cos(rotA), -sin(rotA), sin(rotA), cos(rotA));
+        p = rot * p;
+        p *= 1.4;
+        scale *= 1.4;
+
+        float d = length(p);
+        float ring = sin(d * 8.0 - uTime * 2.0 + float(i));
+        vec3 layerCol = mix(uColor1, uColor2, float(i) / 4.0);
+        col += layerCol * (0.015 / max(abs(ring), 0.01)) * (0.5 + uTreble * 1.2) / scale;
+    }
+
+    // Centro con aura
+    col += uColor3 * (0.04 / max(r, 0.02)) * (0.6 + uSub * 1.5);
+    col += vec3(uIsOnset * 0.3);
+
+    gl_FragColor = vec4(col, 1.0);
+}`
+            },
+            tesla_orb: {
+                name: "Esfera de Plasma Eléctrico (Arcos Tesla)",
+                vert: DEFAULT_CUSTOM_VERT_SHADER,
+                frag: `// 8. Esfera de Plasma Eléctrico (Arcos Tesla)
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec2 uMouse;
+uniform float uSub;
+uniform float uBass;
+uniform float uMid;
+uniform float uTreble;
+uniform float uAir;
+uniform float uIsOnset;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+varying vec2 vUv;
+
+float hashTesla(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+}
+
+float noiseTesla(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    float a = hashTesla(i);
+    float b = hashTesla(i + vec2(1.0, 0.0));
+    float c = hashTesla(i + vec2(0.0, 1.0));
+    float d = hashTesla(i + vec2(1.0, 1.0));
+    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+}
+
+float fbmTesla(vec2 p) {
+    float v = 0.0;
+    float a = 0.5;
+    for(int i = 0; i < 4; i++) {
+        v += a * noiseTesla(p);
+        p = p * 2.2;
+        a *= 0.5;
+    }
+    return v;
+}
+
+void main() {
+    vec2 p = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
+    vec2 target = (uMouse - 0.5) * (uResolution.xy / uResolution.y);
+
+    float r = length(p);
+    vec3 col = vec3(0.01, 0.02, 0.05);
+
+    // Núcleo central de plasma
+    float core = 0.025 / max(r - 0.05, 0.005);
+    col += uColor1 * core * (1.0 + uSub * 2.0);
+
+    // Arcos voltaicos bifurcados (Tesla lightning)
+    float t = uTime * (4.0 + uBass * 5.0);
+    for(int i = 0; i < 6; i++) {
+        float angle = float(i) * 1.047 + sin(t * 0.5 + float(i)) * 0.4;
+        vec2 dir = vec2(cos(angle), sin(angle));
+        
+        // Atracción sutil hacia el ratón
+        dir = normalize(mix(dir, normalize(target + 0.001), 0.3));
+
+        vec2 arcP = p - dir * dot(p, dir);
+        float arcDist = length(arcP);
+        
+        float turbulence = fbmTesla(p * (8.0 + uTreble * 10.0) + t + float(i) * 5.0) - 0.5;
+        float bolt = abs(arcDist - turbulence * (0.08 + uAir * 0.08));
+        
+        float boltIntensity = 0.006 / max(bolt, 0.002);
+        vec3 boltCol = mix(uColor2, vec3(0.7, 0.9, 1.0), float(i) / 5.0);
+        col += boltCol * boltIntensity * (0.7 + uTreble * 1.5) * smoothstep(0.7, 0.1, r);
+    }
+
+    // Globo de cristal contenedor
+    float glass = abs(r - 0.46);
+    col += vec3(0.3, 0.6, 1.0) * (0.004 / max(glass, 0.003)) * (0.8 + uMid * 0.8);
+
+    col += vec3(uIsOnset * 0.4);
+
+    gl_FragColor = vec4(col, 1.0);
+}`
+            },
+            matrix_landscape: {
+                name: "Campo Topográfico Cuántico (Isolíneas)",
+                vert: DEFAULT_CUSTOM_VERT_SHADER,
+                frag: `// 9. Campo Topográfico Cuántico (Isolíneas de Audio)
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec2 uMouse;
+uniform float uSub;
+uniform float uBass;
+uniform float uLowmid;
+uniform float uMid;
+uniform float uHighmid;
+uniform float uTreble;
+uniform float uRms;
+uniform float uFlux;
+uniform float uIsOnset;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+varying vec2 vUv;
+
+void main() {
+    vec2 p = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
+    
+    // Coordenadas con rotación lenta
+    float angle = uTime * 0.15;
+    mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+    vec2 rp = rot * p * (3.5 + uRms * 2.0);
+
+    // Mapa de altura topográfico procedural
+    float h1 = sin(rp.x * 2.0 + uTime + uSub * 3.0) * cos(rp.y * 2.0 - uTime * 0.8);
+    float h2 = sin(length(rp) * 3.0 - uTime * 2.0 - uFlux * 2.0) * (0.5 + uBass * 0.8);
+    float h3 = sin(rp.x * 5.0 + rp.y * 5.0 + uTime * 1.5) * (0.2 + uTreble * 0.4);
+    float height = h1 + h2 + h3;
+
+    // Isolíneas de contorno topográfico
+    float lines = abs(fract(height * 4.0) - 0.5) / fwidth(height * 4.0);
+    float lineVal = 1.0 - min(lines, 1.0);
+
+    // Coloración por capas y gradiente de elevación
+    vec3 col = vec3(0.01, 0.02, 0.04);
+    vec3 topoColor = mix(uColor1, uColor2, sin(height * 3.1415) * 0.5 + 0.5);
+    col = mix(col, topoColor * (1.2 + uHighmid * 1.5), lineVal);
+
+    // Ondas de radar concéntricas en onsets
+    float radar = abs(sin(length(p) * 15.0 - uTime * 4.0));
+    col += uColor2 * (0.02 / max(radar, 0.01)) * (0.4 + uLowmid * 0.6);
+
+    // Destello de transitorio
+    col += vec3(uIsOnset * 0.3);
+
+    gl_FragColor = vec4(col, 1.0);
+}`
+            },
+            cyber_tunnel: {
+                name: "Túnel Hexagonal Sci-Fi (Warp Drive)",
+                vert: DEFAULT_CUSTOM_VERT_SHADER,
+                frag: `// 10. Túnel Hexagonal Sci-Fi (Warp Drive Strobe)
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec2 uMouse;
+uniform float uSub;
+uniform float uBass;
+uniform float uLowmid;
+uniform float uMid;
+uniform float uHighmid;
+uniform float uTreble;
+uniform float uIsOnset;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+uniform vec3 uColor3;
+varying vec2 vUv;
+
+void main() {
+    vec2 p = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
+    
+    // Coordenadas polares
+    float r = length(p);
+    float a = atan(p.y, p.x);
+
+    // Simetría hexagonal (6 caras)
+    float hex = 6.283185 / 6.0;
+    float segment = floor((a + 3.141592) / hex);
+    float localA = mod(a + 3.141592, hex) - hex * 0.5;
+
+    // Proyección en perspectiva dentro del túnel
+    float depth = 1.0 / max(r, 0.01);
+    float z = depth + uTime * (4.0 + uBass * 6.0);
+
+    // Asignación de cada una de las 6 caras del hexágono a stems diferentes
+    float stemIntensity = 0.0;
+    if (segment == 0.0) stemIntensity = uSub;
+    else if (segment == 1.0) stemIntensity = uBass;
+    else if (segment == 2.0) stemIntensity = uLowmid;
+    else if (segment == 3.0) stemIntensity = uMid;
+    else if (segment == 4.0) stemIntensity = uHighmid;
+    else stemIntensity = uTreble;
+
+    // Rejilla de paneles de neón en las paredes
+    vec2 wallUV = vec2(localA * 6.0, z * 0.5);
+    vec2 grid = abs(fract(wallUV - 0.5) - 0.5) / fwidth(wallUV);
+    float line = 1.0 - min(min(grid.x, grid.y), 1.0);
+
+    // Pulso de luz y color
+    vec3 col = vec3(0.01, 0.01, 0.03);
+    vec3 panelCol = mix(uColor1, uColor2, mod(segment, 3.0) / 2.0);
+    
+    col += panelCol * line * (1.0 + stemIntensity * 3.0) * smoothstep(0.0, 0.4, r);
+    col += uColor3 * (0.015 / max(r, 0.01)) * (0.8 + uSub * 2.0); // Luz en el centro de fuga
+
+    // Estroboscopio en beats
+    col += vec3(uIsOnset * 0.45);
 
     gl_FragColor = vec4(col, 1.0);
 }`
