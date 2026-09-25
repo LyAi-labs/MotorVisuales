@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis y Visualización de Audio Multidimensional</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            height: 320px;
+            max-height: 380px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Warm Tech Neutral (Fondo slate-50, Acentos Indigo #6366f1, Amber #f59e0b, Emerald #10b981) -->
+
+    <!-- Application Structure Plan:
+        1. Encabezado e Índices KPI: Resumen de métricas clave (Bandas, Latencias, Dimensiones).
+        2. Módulo 1: Descomposición Frecuencial Avanzada (Comparador interactivo de espectros: FFT, Mel, CQT, Wavelets con gráfico de barras responsivo).
+        3. Módulo 2: Matriz de Extracción de Datos (Físico, MIR, Semántico, Biométrico) y Canvas interactivo MER 2D (Valence-Arousal).
+        4. Módulo 3: Visualización Generativa por IA en Tiempo Real (Comparativa StreamDiffusion vs Latencias y simulador de parámetros latentes).
+        5. Módulo 4: Live-Coding y Ecuaciones Dinámicas (Simulador de motor gráfico en Canvas en tiempo real modulado por variables frecuenciales).
+    -->
+
+    <!-- Visualization & Content Choices:
+        - Comparación Frecuencial -> Gráfico de Barras Horizontal (Chart.js) -> Selección de filtro -> Permite visualizar la granularidad de bandas.
+        - Mapa de Emoción Musical (MER 2D) -> Canvas Interactivo -> Clic/Hover en el espacio Valencia/Energía -> Muestra cambios visuales/estilísticos.
+        - Latencia de Pipelines IA -> Gráfico de Dispersión / Barras (Chart.js) -> Comparación de FPS vs Latencia en ms.
+        - Motor de Ecuaciones Dinámicas -> Canvas 2D en directo -> Controles de frecuencia y forma -> Renderiza curvas paramétricas y reactividad física.
+        - CONFIRMACIÓN: No se utilizó ningún gráfico SVG ni la librería Mermaid JS. Todo el renderizado gráfico es vía HTML5 Canvas o componentes Tailwind.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Header / Navigation -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded bg-indigo-500 flex items-center justify-center font-bold text-white text-lg">
+                        ♪
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight leading-none text-white">AudioVis Architecture</h1>
+                        <p class="text-xs text-slate-400">Análisis Espectral, MIR, IA & Live-Coding</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex space-x-1">
+                    <button onclick="scrollToSection('sec-kpis')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">Resumen</button>
+                    <button onclick="scrollToSection('sec-frecuencial')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">Espectro</button>
+                    <button onclick="scrollToSection('sec-datos')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">Métricas & MIR</button>
+                    <button onclick="scrollToSection('sec-ia')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">IA Difusión</button>
+                    <button onclick="scrollToSection('sec-live')" class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">Ecuaciones Live</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+        <!-- Executive Summary Banner / KPIs -->
+        <section id="sec-kpis" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-slate-900">Arquitectura Avanzada de Análisis de Audio y Visualización Generativa</h2>
+                <p class="mt-2 text-slate-600 text-sm md:text-base">
+                    Esta plataforma interactiva sintetiza los fundamentos técnicos del procesamiento digital de señales (DSP),
+                    la extracción de métricas perceptuales y biométricas, y la aceleración de modelos de difusión de inteligencia
+                    artificial para la síntesis gráfica en tiempo real. Explora cada sección para comprender la transición
+                    desde ondas sonoras puras hasta entornos visuales autónomos.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-4">
+                    <span class="text-xs font-semibold text-indigo-600 uppercase tracking-wider block">Granularidad Espectral</span>
+                    <span class="text-2xl md:text-3xl font-extrabold text-indigo-900 mt-1 block">1024 Bins</span>
+                    <span class="text-xs text-indigo-700 mt-1 block">Descomposición FFT @ 2048 N</span>
+                </div>
+                <div class="bg-amber-50 border border-amber-100 rounded-lg p-4">
+                    <span class="text-xs font-semibold text-amber-600 uppercase tracking-wider block">Inferencia Latente IA</span>
+                    <span class="text-2xl md:text-3xl font-extrabold text-amber-900 mt-1 block">&lt; 10.6 ms</span>
+                    <span class="text-xs text-amber-700 mt-1 block">Rendimiento StreamDiffusion</span>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-4">
+                    <span class="text-xs font-semibold text-emerald-600 uppercase tracking-wider block">Dimensión Armónica</span>
+                    <span class="text-2xl md:text-3xl font-extrabold text-emerald-900 mt-1 block">12 Pitch</span>
+                    <span class="text-xs text-emerald-700 mt-1 block">Vector de Chromagrama</span>
+                </div>
+                <div class="bg-slate-100 border border-slate-200 rounded-lg p-4">
+                    <span class="text-xs font-semibold text-slate-600 uppercase tracking-wider block">Live-Coding Pipeline</span>
+                    <span class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 block">&lt; 5 ms</span>
+                    <span class="text-xs text-slate-600 mt-1 block">Recompilación GPU/ISF Shader</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: Descomposición Frecuencial -->
+        <section id="sec-frecuencial" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <div>
+                <div class="inline-flex items-center space-x-2 bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-2">
+                    <span>Módulo 1</span>
+                    <span>•</span>
+                    <span>Procesamiento DSP</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Descomposición Frecuencial Más Allá de la Tríada Tradicional</h3>
+                <p class="mt-2 text-slate-600 text-sm leading-relaxed">
+                    La división convencional de tres bandas (graves, medios, agudos) es insuficiente para el control
+                    de entornos gráficos complejos. El procesamiento moderno emplea transformadas matemáticas con resoluciones
+                    adaptadas a la percepción auditiva humana (Escala Mel), las octavas musicales (CQT) o la detección de transitorios (Wavelets).
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- Interactive Controls & Details -->
+                <div class="lg:col-span-5 space-y-4">
+                    <label class="block text-sm font-semibold text-slate-700">Seleccionar Arquitectura de Filtrado:</label>
+                    <div class="space-y-2" id="filter-architecture-selector">
+                        <button onclick="selectArch('triad')" id="btn-triad" class="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-indigo-400 bg-indigo-50/50 transition">
+                            <div class="font-bold text-sm text-slate-900">Tríada Tradicional (3 Bandas)</div>
+                            <div class="text-xs text-slate-500 mt-1">División fija/arbitraria para ecualización elemental.</div>
+                        </button>
+                        <button onclick="selectArch('mel')" id="btn-mel" class="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-indigo-400 bg-white transition">
+                            <div class="font-bold text-sm text-slate-900">Banco de Filtros Mel / Bark (24 - 128)</div>
+                            <div class="text-xs text-slate-500 mt-1">Resolución perceptual basada en la sonoridad percibida por el oído.</div>
+                        </button>
+                        <button onclick="selectArch('cqt')" id="btn-cqt" class="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-indigo-400 bg-white transition">
+                            <div class="font-bold text-sm text-slate-900">Transformada Q Constante - CQT (88 - 120)</div>
+                            <div class="text-xs text-slate-500 mt-1">Espaciado logarítmico musical alineado con semitonos.</div>
+                        </button>
+                        <button onclick="selectArch('fft')" id="btn-fft" class="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-indigo-400 bg-white transition">
+                            <div class="font-bold text-sm text-slate-900">Transformada de Fourier - FFT (512 - 2048)</div>
+                            <div class="text-xs text-slate-500 mt-1">Resolución lineal uniforme. Excelente densidad en agudos.</div>
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Information Panel -->
+                    <div id="arch-info-card" class="bg-slate-50 border border-slate-200 rounded-lg p-4 text-xs space-y-2">
+                        <span class="font-semibold text-slate-800 block text-sm">Fórmula / CaracterísticaClave:</span>
+                        <p id="arch-formula" class="font-mono text-indigo-700 bg-white p-2 rounded border border-slate-200">
+                            M(f) = 2595 * log10(1 + f/700)
+                        </p>
+                        <p id="arch-desc" class="text-slate-600">
+                            Mapea las frecuencias según la respuesta no lineal de la cóclea.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Visualization Container -->
+                <div class="lg:col-span-7 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h4 class="text-sm font-bold text-slate-700 mb-3 text-center">Comparativa de Granularidad por Tipo de Transformada</h4>
+                    <div class="chart-container">
+                        <canvas id="frequencyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Extracción de Datos y Métricas Audiométricas -->
+        <section id="sec-datos" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <div>
+                <div class="inline-flex items-center space-x-2 bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-2">
+                    <span>Módulo 2</span>
+                    <span>•</span>
+                    <span>MIR & Biometría</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Extracción de Métricas: Del Análisis Físico a la Telemetría Corporal</h3>
+                <p class="mt-2 text-slate-600 text-sm leading-relaxed">
+                    Los visualizadores avanzados no solo leen la amplitud del sonido, sino que extraen características tímbricas
+                    de medio nivel, modelos semánticos de emoción musical (Valencia/Activación), aislamientos de canales (Stems)
+                    e incluso datos biométricos de respuestas electrodérmicas (EDA) u ondas cerebrales (EEG).
+                </p>
+            </div>
+
+            <!-- Table / Filter View -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Metrics Table -->
+                <div class="lg:col-span-7 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-sm font-bold text-slate-800">Jerarquía de Descriptores</h4>
+                        <select id="level-filter" onchange="filterMetricsTable()" class="text-xs border border-slate-300 rounded px-2 py-1 bg-white font-medium text-slate-700">
+                            <option value="all">Todos los Niveles</option>
+                            <option value="bajo">Bajo Nivel (Físico)</option>
+                            <option value="medio">Medio Nivel (Timbre/Armonía)</option>
+                            <option value="alto">Alto Nivel / Semántico</option>
+                            <option value="bio">Biométrico / Neuronal</option>
+                        </select>
+                    </div>
+
+                    <div class="overflow-x-auto custom-scrollbar border border-slate-200 rounded-lg">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 font-semibold">
+                                    <th class="p-2.5">Métrica / Descriptor</th>
+                                    <th class="p-2.5">Dimensión</th>
+                                    <th class="p-2.5">Nivel</th>
+                                    <th class="p-2.5">Variable Visual Asociable</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metrics-table-body" class="divide-y divide-slate-200 text-slate-600">
+                                <!-- Populated dynamically by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Interactive MER Valence/Arousal Simulator -->
+                <div class="lg:col-span-5 bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-800 mb-1">Simulador de Reconocimiento Emocional (MER 2D)</h4>
+                        <p class="text-xs text-slate-500 mb-3">Haz clic en el cuadrante para mapear la Valencia (Positividad) y Activación (Energía) hacia parámetros del shader visual.</p>
+                        
+                        <!-- Canvas 2D Pad -->
+                        <div class="relative w-full aspect-square max-w-[280px] mx-auto bg-white border border-slate-300 rounded-lg shadow-inner cursor-crosshair" id="mer-pad" onclick="handleMerClick(event)">
+                            <canvas id="merCanvas" class="w-full h-full rounded-lg"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="mer-output-card" class="mt-4 bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-1">
+                        <div class="flex justify-between font-bold text-slate-800">
+                            <span>Estado Emocional:</span>
+                            <span id="mer-emotion-label" class="text-amber-600">Energía Elevada / Alegre</span>
+                        </div>
+                        <div class="text-slate-500 text-[11px]">
+                            • Paleta Cromática: <span id="mer-color-val" class="font-medium text-slate-700">Cálidos Brillantes (Amarillo/Naranja)</span><br>
+                            • Dinámica de Render: <span id="mer-render-val" class="font-medium text-slate-700">Alta velocidad, partículas expansivas</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Visualización Generativa por IA en Tiempo Real -->
+        <section id="sec-ia" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <div>
+                <div class="inline-flex items-center space-x-2 bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-2">
+                    <span>Módulo 3</span>
+                    <span>•</span>
+                    <span>Modelos de Difusión en Flujo</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Pipelines de Difusión Generativa en Tiempo Real (&lt;20ms)</h3>
+                <p class="mt-2 text-slate-600 text-sm leading-relaxed">
+                    Las arquitecturas modernas como StreamDiffusion y StreamDiffusionV2 superan el renderizado determinista
+                    procesando pasos de desruido en paralelo (*Stream Batch*) e inyectando vectores latentes modulados por el sonido.
+                    Esto permite generar arte estilizado continuo por encima de los 60-90 FPS.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                <!-- Latency & FPS Chart -->
+                <div class="lg:col-span-7 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h4 class="text-sm font-bold text-slate-700 mb-2 text-center">Rendimiento: Latencia de Inferencia (ms) vs Cuadros por Segundo (FPS)</h4>
+                    <div class="chart-container">
+                        <canvas id="aiBenchmarkChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Technical Details Breakdown -->
+                <div class="lg:col-span-5 space-y-4">
+                    <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-3">
+                        <h4 class="font-bold text-slate-800 text-sm border-b border-slate-200 pb-2">Claves Tecnológicas de Aceleración</h4>
+                        
+                        <div class="space-y-2 text-xs">
+                            <div class="p-2 bg-white rounded border border-slate-200">
+                                <span class="font-bold text-slate-900 block">Stream Batching:</span>
+                                <span class="text-slate-600">Procesa pasos de desruido iterativos en paralelo dentro del U-Net/DiT.</span>
+                            </div>
+                            <div class="p-2 bg-white rounded border border-slate-200">
+                                <span class="font-bold text-slate-900 block">TAESD / TAEHV Autoencoders:</span>
+                                <span class="text-xs text-slate-600">Conversión de espacio latente a píxeles en solo ~5 ms.</span>
+                            </div>
+                            <div class="p-2 bg-white rounded border border-slate-200">
+                                <span class="font-bold text-slate-900 block">Modulación Latente Directa:</span>
+                                <span class="font-mono text-emerald-700 block mt-0.5 text-[10px]">z_t = Interp(z_prev, Noise, α_Audio) + W_LoRA · v_MIR</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Live-Coding y Ecuaciones Dinámicas -->
+        <section id="sec-live" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <div>
+                <div class="inline-flex items-center space-x-2 bg-slate-200 text-slate-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-2">
+                    <span>Módulo 4</span>
+                    <span>•</span>
+                    <span>Evaluación Algebraica & Shaders</span>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Evaluación de Ecuaciones Dinámicas y Motor Gráfico en Vivo</h3>
+                <p class="mt-2 text-slate-600 text-sm leading-relaxed">
+                    Más allá de leer variables de audio fijas, los motores modernos (utilizando ExprTk en CPU o ISF/GLSL en GPU)
+                    permiten la modificación matemática en tiempo de ejecución. Interactúa con las variables frecuenciales sintéticas
+                    a continuación para observar la respuesta del algoritmo paramétrico.
+                </p>
+            </div>
+
+            <!-- Canvas Interactive Demo -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <!-- Interactive Controls -->
+                <div class="lg:col-span-4 bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+                    <h4 class="font-bold text-sm text-slate-800">Controles de Audio Sintético</h4>
+                    
+                    <div class="space-y-3 text-xs">
+                        <div>
+                            <div class="flex justify-between font-semibold text-slate-700 mb-1">
+                                <span>Frecuencia Graves (Bass RMS):</span>
+                                <span id="val-bass">1.2</span>
+                            </div>
+                            <input type="range" id="input-bass" min="0.1" max="3.0" step="0.1" value="1.2" oninput="updateLiveEngine()" class="w-full accent-indigo-600">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between font-semibold text-slate-700 mb-1">
+                                <span>Centroide Espectral (Brillo):</span>
+                                <span id="val-treble">2.5</span>
+                            </div>
+                            <input type="range" id="input-treble" min="0.5" max="8.0" step="0.1" value="2.5" oninput="updateLiveEngine()" class="w-full accent-amber-500">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between font-semibold text-slate-700 mb-1">
+                                <span>Modo de Ecuación Paramétrica:</span>
+                            </div>
+                            <select id="equation-mode" onchange="updateLiveEngine()" class="w-full border border-slate-300 rounded p-1.5 bg-white font-medium text-slate-700">
+                                <option value="lissajous">Curvas Harmonic Lissajous</option>
+                                <option value="attractor">Atractor de Fase Espectral</option>
+                                <option value="waveform">Onda Multirresolución DWT</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 text-slate-200 p-3 rounded-lg font-mono text-[11px] space-y-1 overflow-x-auto">
+                        <span class="text-slate-400">// Ecuación Evaluada en Tiempo Real:</span>
+                        <div id="code-snippet" class="text-indigo-300">
+                            x = sin(t * bass) * cos(t * treble);<br>
+                            y = cos(t * bass) * sin(t * treble);
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-time Canvas Renderer -->
+                <div class="lg:col-span-8 bg-slate-950 rounded-xl p-4 border border-slate-800 flex flex-col items-center justify-center min-h-[340px]">
+                    <div class="w-full flex justify-between items-center mb-2 px-2 text-xs text-slate-400">
+                        <span>Lienzo de Renderizado Render-Loop</span>
+                        <span id="live-fps" class="text-emerald-400 font-mono">60 FPS</span>
+                    </div>
+                    <canvas id="liveCanvas" width="500" height="300" class="w-full max-w-[500px] h-[280px] bg-slate-900 rounded border border-slate-800"></canvas>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-6 text-center text-xs">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>Plataforma Interactiva basada en el informe: <i>Arquitectura Avanzada de Análisis de Audio Multidimensional y Visualización Generativa</i>.</p>
+            <p class="mt-1 text-slate-500">Desarrollado con HTML5, Tailwind CSS y Chart.js sin dependencias SVG externas.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic & Chart Configs -->
+    <script>
+        // Data Store for Frequency Architectures
+        const freqArchitectures = {
+            triad: {
+                title: "Tríada Tradicional",
+                formula: "Bandas: Graves [<250Hz], Medios [250-4kHz], Agudos [>4kHz]",
+                desc: "Modelo analógico histórico. Baja resolución que impide mapear la densidad harmónica o tímbrica detallada.",
+                labels: ['Graves', 'Medios', 'Agudos'],
+                values: [1, 1, 1],
+                color: '#6366f1'
+            },
+            mel: {
+                title: "Banco Mel / Escala Bark",
+                formula: "M(f) = 2595 * log10(1 + f / 700)",
+                desc: "Distribuye filtros de forma logarítmica adaptada al sistema auditivo. Típico en modelos con 24 a 128 bandas.",
+                labels: Array.from({length: 24}, (_, i) => `Mel ${i+1}`),
+                values: Array.from({length: 24}, () => Math.floor(Math.random() * 40) + 10),
+                color: '#f59e0b'
+            },
+            cqt: {
+                title: "Transformada Q Constante (CQT)",
+                formula: "Q = f_k / Δf_k  (Relación Ancho de Banda Constante)",
+                desc: "Alinea geométricamente las bandas con los semitonos de la escala musical temperada (88 a 120 bandas).",
+                labels: Array.from({length: 36}, (_, i) => `Nota ${i+1}`),
+                values: Array.from({length: 36}, () => Math.floor(Math.random() * 60) + 5),
+                color: '#10b981'
+            },
+            fft: {
+                title: "Transformada Rápida de Fourier (FFT)",
+                formula: "X(m, ω) = ∑ x[n] * w[n-m] * e^(-jωn)",
+                desc: "División lineal uniforme con 512 a 2048 bins independientes. Alta precisión pero acumula exceso de resolución en agudos.",
+                labels: Array.from({length: 48}, (_, i) => `${(i*450)}Hz`),
+                values: Array.from({length: 48}, () => Math.floor(Math.random() * 80) + 2),
+                color: '#3b82f6'
+            }
+        };
+
+        // Data Store for Audio Metrics
+        const metricsData = [
+            { name: "RMS / Energía", dim: "Scalar 1D", level: "bajo", visual: "Escala espacial, grosor de líneas, desenfoque" },
+            { name: "ZCR (Zero Crossing Rate)", dim: "Scalar 1D", level: "bajo", visual: "Agitación de partículas, ruido en shaders" },
+            { name: "Spectral Centroid", dim: "Scalar 1D", level: "medio", visual: "Brillo tímbrico, temperatura cromática" },
+            { name: "Spectral Flux", dim: "Scalar 1D", level: "medio", visual: "Detección de ataques, pulsos de luz" },
+            { name: "MFCCs (Coeficientes)", dim: "Vector 13-20D", level: "medio", visual: "Deformación de mallas 3D, mapas de normales" },
+            { name: "Chromagrama", dim: "Vector 12D", level: "medio", visual: "Geometría poliédrica, transformaciones" },
+            { name: "MER (Valence / Arousal)", dim: "Espacio 2D", level: "alto", visual: "Dirección artística global, estilo del render" },
+            { name: "Stem Isolation (Voces/Batería)", dim: "Multicanal", level: "alto", visual: "Capas independientes de gráficos" },
+            { name: "Telemetría EEG / SCR EDA", dim: "Biométrica", level: "bio", visual: "Feedback de latencia, distorsiones caóticas" }
+        ];
+
+        // Chart Instance Variables
+        let freqChart = null;
+        let aiBenchmarkChart = null;
+
+        // Page Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            initFrequencyChart();
+            initAiBenchmarkChart();
+            populateMetricsTable();
+            initMerPad();
+            initLiveEngine();
+        });
+
+        // Smooth Scroll Helper
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Section 1: Frequency Chart Configuration
+        function initFrequencyChart() {
+            const ctx = document.getElementById('frequencyChart').getContext('2d');
+            const initialData = freqArchitectures.mel;
+
+            freqChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: initialData.labels,
+                    datasets: [{
+                        label: 'Amplitud de Banda',
+                        data: initialData.values,
+                        backgroundColor: initialData.color,
+                        borderRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ` Intensidad: ${ctx.raw} dB`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 9 }, maxRotation: 90 }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e2e8f0' },
+                            ticks: { font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function selectArch(key) {
+            const arch = freqArchitectures[key];
+            if(!arch) return;
+
+            // Update UI buttons
+            document.querySelectorAll('#filter-architecture-selector button').forEach(btn => {
+                btn.classList.remove('bg-indigo-50/50', 'border-indigo-400');
+                btn.classList.add('bg-white');
+            });
+            document.getElementById(`btn-${key}`).classList.add('bg-indigo-50/50', 'border-indigo-400');
+
+            // Update Info Card
+            document.getElementById('arch-formula').innerText = arch.formula;
+            document.getElementById('arch-desc').innerText = arch.desc;
+
+            // Update Chart
+            freqChart.data.labels = arch.labels;
+            freqChart.data.datasets[0].data = arch.values;
+            freqChart.data.datasets[0].backgroundColor = arch.color;
+            freqChart.update();
+        }
+
+        // Section 2: Metrics Table & MER Interactive Pad
+        function populateMetricsTable() {
+            const tbody = document.getElementById('metrics-table-body');
+            tbody.innerHTML = '';
+
+            metricsData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition metric-row";
+                tr.setAttribute('data-level', item.level);
+
+                let levelBadge = '';
+                if(item.level === 'bajo') levelBadge = '<span class="bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[10px]">Físico</span>';
+                else if(item.level === 'medio') levelBadge = '<span class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-[10px]">Timbre/Armonía</span>';
+                else if(item.level === 'alto') levelBadge = '<span class="bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded text-[10px]">Semántico</span>';
+                else levelBadge = '<span class="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded text-[10px]">Biométrico</span>';
+
+                tr.innerHTML = `
+                    <td class="p-2.5 font-bold text-slate-800">${item.name}</td>
+                    <td class="p-2.5 font-mono text-[11px] text-slate-500">${item.dim}</td>
+                    <td class="p-2.5">${levelBadge}</td>
+                    <td class="p-2.5 text-slate-700">${item.visual}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterMetricsTable() {
+            const filter = document.getElementById('level-filter').value;
+            const rows = document.querySelectorAll('.metric-row');
+
+            rows.forEach(row => {
+                const level = row.getAttribute('data-level');
+                if(filter === 'all' || filter === level) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // MER Quadrant Pad Logic
+        let merX = 0.7; // Valence
+        let merY = 0.8; // Arousal
+
+        function initMerPad() {
+            drawMerPad();
+        }
+
+        function drawMerPad() {
+            const canvas = document.getElementById('merCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = canvas.clientWidth;
+            const h = canvas.height = canvas.clientHeight;
+
+            // Draw Background Axes
+            ctx.clearRect(0, 0, w, h);
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+            ctx.moveTo(w/2, 0); ctx.lineTo(w/2, h);
+            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
+            ctx.stroke();
+
+            // Axis Labels
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '10px sans-serif';
+            ctx.fillText('+ Energía (Arousal)', w/2 + 5, 12);
+            ctx.fillText('+ Valencia', w - 55, h/2 - 5);
+
+            // Draw Target Indicator
+            const px = merX * w;
+            const py = (1 - merY) * h;
+
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(px, py, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#d97706';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function handleMerClick(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+
+            merX = Math.max(0, Math.min(1, clickX / rect.width));
+            merY = Math.max(0, Math.min(1, 1 - (clickY / rect.height)));
+
+            drawMerPad();
+            updateMerInfo();
+        }
+
+        function updateMerInfo() {
+            const emotionLabel = document.getElementById('mer-emotion-label');
+            const colorVal = document.getElementById('mer-color-val');
+            const renderVal = document.getElementById('mer-render-val');
+
+            if(merX >= 0.5 && merY >= 0.5) {
+                emotionLabel.innerText = "Energía Elevada / Alegre / Festivo";
+                emotionLabel.className = "text-amber-600 font-bold";
+                colorVal.innerText = "Cálidos Saturados (Amarillo, Dorado, Carmesí)";
+                renderVal.innerText = "Partículas de rápida expansión, iluminación brillante";
+            } else if(merX < 0.5 && merY >= 0.5) {
+                emotionLabel.innerText = "Tensión / Agitización / Caótico";
+                emotionLabel.className = "text-red-600 font-bold";
+                colorVal.innerText = "Contrastes fríos oscuros (Violeta, Rojo Neón)";
+                renderVal.innerText = "Distorsión estroboscópica, vectores fractales agudos";
+            } else if(merX < 0.5 && merY < 0.5) {
+                emotionLabel.innerText = "Melancolía / Sombrío / Calma Triste";
+                emotionLabel.className = "text-slate-600 font-bold";
+                colorVal.innerText = "Azules Profundos, Grises, Tonos Desaturados";
+                renderVal.innerText = "Movimiento fluido lento, desenfoque de movimiento suave";
+            } else {
+                emotionLabel.innerText = "Serenidad / Pacífico / Etéreo";
+                emotionLabel.className = "text-emerald-600 font-bold";
+                colorVal.innerText = "Verdes Menta, Tonos Pasteles, Blancos Cálidos";
+                renderVal.innerText = "Ondulaciones orgánicas, degradados suaves graduales";
+            }
+        }
+
+        // Section 3: AI Inference Benchmark Chart
+        function initAiBenchmarkChart() {
+            const ctx = document.getElementById('aiBenchmarkChart').getContext('2d');
+
+            aiBenchmarkChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        'StreamDiffusion (CUDA)',
+                        'StreamDiffusionV2 (Multi-GPU)',
+                        'CoreML (Apple Silicon M3)',
+                        'TouchDesigner + ComfyUI'
+                    ],
+                    datasets: [
+                        {
+                            label: 'Latencia de Inferencia (ms) - [Menor es mejor]',
+                            data: [10.65, 18.0, 24.4, 100.0],
+                            backgroundColor: '#10b981',
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Tasa de FPS Renderizado - [Mayor es mejor]',
+                            data: [91.0, 60.0, 22.7, 15.0],
+                            backgroundColor: '#6366f1',
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { size: 10 } }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#e2e8f0' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Section 4: Live-Coding Real-Time Engine (Canvas Loop)
+        let animationFrameId = null;
+        let time = 0;
+
+        function initLiveEngine() {
+            renderLiveCanvas();
+        }
+
+        function updateLiveEngine() {
+            const bass = parseFloat(document.getElementById('input-bass').value);
+            const treble = parseFloat(document.getElementById('input-treble').value);
+            const mode = document.getElementById('equation-mode').value;
+
+            document.getElementById('val-bass').innerText = bass.toFixed(1);
+            document.getElementById('val-treble').innerText = treble.toFixed(1);
+
+            const codeSnippet = document.getElementById('code-snippet');
+            if(mode === 'lissajous') {
+                codeSnippet.innerHTML = `x = sin(t * ${bass}) * cos(t * ${treble});<br>y = cos(t * ${bass}) * sin(t * ${treble});`;
+            } else if(mode === 'attractor') {
+                codeSnippet.innerHTML = `dx = ${bass} * (y - x);<br>dy = x * (${treble} - z) - y;`;
+            } else {
+                codeSnippet.innerHTML = `y = sin(x * ${treble}) * exp(-abs(x) / ${bass});`;
+            }
+        }
+
+        function renderLiveCanvas() {
+            const canvas = document.getElementById('liveCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            const bass = parseFloat(document.getElementById('input-bass').value);
+            const treble = parseFloat(document.getElementById('input-treble').value);
+            const mode = document.getElementById('equation-mode').value;
+
+            // Clear Background with Trail Effect
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.2)';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = `hsl(${((time * 20) + (treble * 30)) % 360}, 80%, 60%)`;
+
+            ctx.beginPath();
+
+            if(mode === 'lissajous') {
+                const cx = w / 2;
+                const cy = h / 2;
+                const radius = Math.min(w, h) * 0.35;
+
+                for(let i = 0; i < 200; i++) {
+                    const t = time + (i * 0.02);
+                    const x = cx + Math.sin(t * bass) * Math.cos(t * treble * 0.5) * radius;
+                    const y = cy + Math.cos(t * bass) * Math.sin(t * treble * 0.5) * radius;
+
+                    if(i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+            } else if(mode === 'attractor') {
+                const cx = w / 2;
+                const cy = h / 2;
+                
+                for(let i = 0; i < 150; i++) {
+                    const t = time + (i * 0.03);
+                    const x = cx + Math.sin(t * bass) * (i * 1.2);
+                    const y = cy + Math.cos(t * (treble * 0.3)) * (i * 0.8);
+
+                    if(i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+            } else { // Waveform DWT
+                const cy = h / 2;
+                for(let x = 0; x < w; x += 4) {
+                    const normX = (x - w/2) / 50;
+                    const y = cy + Math.sin(x * 0.05 * treble + time * 5) * Math.exp(-Math.abs(normX) / bass) * 80;
+
+                    if(x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+            }
+
+            ctx.stroke();
+
+            time += 0.02;
+            animationFrameId = requestAnimationFrame(renderLiveCanvas);
+        }
+    </script>
+</body>
+</html>

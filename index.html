@@ -1,0 +1,2976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MotorVisuales - Motor 3D Audiovisual, DSP Stems, IA & Grabación</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Three.js (Local & CDN Fallback) -->
+    <script src="three.min.js"></script>
+    <script>
+        if (typeof THREE === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+        }
+    </script>
+    <!-- Three.js r128 Post-Processing Passes & Shaders -->
+    <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://unpkg.com/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            height: 300px;
+            max-height: 350px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        @keyframes pulse-rec {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.15); }
+        }
+        .rec-dot {
+            animation: pulse-rec 1s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Header / Navigation & Global Recorder Controls -->
+    <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded bg-gradient-to-tr from-indigo-500 via-purple-500 to-amber-500 flex items-center justify-center font-bold text-white text-lg shadow">
+                        ♪
+                    </div>
+                    <div>
+                        <h1 class="text-base font-bold tracking-tight leading-none text-white flex items-center gap-2">
+                            MotorVisuales
+                            <span id="badge-source" class="text-[9px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">En espera</span>
+                        </h1>
+                        <p class="text-[11px] text-slate-400">DSP Stems • Three.js 3D • Director IA • Grabador 60 FPS</p>
+                    </div>
+                </div>
+
+                <!-- Video Recording Quick Action Bar -->
+                <div class="flex items-center space-x-2">
+                    <button onclick="toggleVideoRecording()" id="btn-record" class="px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition">
+                        <span id="rec-dot" class="w-2.5 h-2.5 rounded-full bg-white"></span>
+                        <span id="txt-record">Grabar Vídeo (60 FPS + Audio)</span>
+                    </button>
+                    <span id="rec-timer" class="hidden font-mono text-xs font-bold text-red-400 bg-slate-800 px-2 py-1 rounded border border-red-900/50">00:00</span>
+                </div>
+
+                <nav class="hidden lg:flex space-x-1">
+                    <button onclick="scrollToSection('sec-audio-bar')" class="px-2.5 py-1.5 rounded text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition">Audio</button>
+                    <button onclick="scrollToSection('sec-stems')" class="px-2.5 py-1.5 rounded text-xs font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">Stems DSP</button>
+                    <button onclick="scrollToSection('sec-viewport-3d')" class="px-2.5 py-1.5 rounded text-xs font-semibold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white transition shadow">Motor 3D</button>
+                    <button onclick="scrollToSection('sec-shader-editor'); openShaderEditorTab('frag');" class="px-2.5 py-1.5 rounded text-xs font-bold bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white transition shadow flex items-center gap-1"><span>⚡</span><span>Shaders GLSL</span></button>
+                    <button onclick="scrollToSection('sec-ia-director')" class="px-2.5 py-1.5 rounded text-xs font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">Director IA</button>
+                    <button onclick="scrollToSection('sec-frecuencial')" class="px-2.5 py-1.5 rounded text-xs font-medium hover:bg-slate-800 text-slate-300 hover:text-white transition">Espectro</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+        <!-- 1. AUDIO INPUT & SOURCE CONTROL -->
+        <section id="sec-audio-bar" class="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-xl shadow-lg border border-indigo-900/40 p-5 text-white">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+                <div class="space-y-1 text-center lg:text-left">
+                    <div class="inline-flex items-center space-x-2 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold px-2.5 py-0.5 rounded-full">
+                        <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+                        <span>Canal de Ingesta DSP Multi-Fuente</span>
+                    </div>
+                    <h2 class="text-base font-bold text-white">Entrada de Audio y Osciloscopio</h2>
+                    <p class="text-xs text-slate-300 max-w-xl">
+                        Alimenta la FFT de 2048 puntos, el banco de filtros de stems y el motor gráfico con tu micrófono, una canción local o el sintetizador procedural integrado.
+                    </p>
+                </div>
+
+                <!-- Input Action Buttons -->
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <button onclick="playUserUploadedTrack()" id="btn-user-track" class="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 active:scale-95 text-white font-extrabold text-xs flex items-center gap-2 shadow-lg shadow-purple-900/50 transition transform hover:-translate-y-0.5">
+                        <span>🔥</span>
+                        <span>Reproducir Mi Tema ("Mordaza")</span>
+                    </button>
+
+                    <button onclick="startMicrophone()" id="btn-mic" class="px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
+                        <span>🎙️</span>
+                        <span>Micrófono</span>
+                    </button>
+
+                    <button onclick="startTabCapture()" id="btn-tab" class="px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
+                        <span>🖥️</span>
+                        <span>Capturar Pestaña</span>
+                    </button>
+
+                    <label class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow cursor-pointer transition">
+                        <span>📁</span>
+                        <span>Cargar Otro Audio</span>
+                        <input type="file" id="file-input" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
+                    </label>
+
+                    <button onclick="toggleSynthDemo()" id="btn-synth" class="px-3 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs flex items-center gap-1.5 shadow transition">
+                        <span>⚡</span>
+                        <span id="txt-synth">Demo Synth Beat</span>
+                    </button>
+
+                    <button onclick="stopAudio()" id="btn-stop" class="px-2.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs border border-slate-700 transition">
+                        <span>⏹️</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- HTML5 Audio Element persistente en DOM -->
+            <audio id="html5-audio-player" preload="auto" crossorigin="anonymous" class="hidden"></audio>
+
+            <!-- Dedicated Track Scrubber & Controls -->
+            <div id="track-player-controls" class="hidden mt-3 p-2.5 bg-slate-950/90 rounded-lg border border-indigo-900/50 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button onclick="togglePlayPauseUserTrack()" id="btn-play-pause-track" class="w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-500 flex items-center justify-center font-bold text-white shadow transition">▶</button>
+                    <span id="track-title" class="font-semibold text-indigo-300 truncate max-w-[220px]">tema.mp3</span>
+                </div>
+                <div class="flex items-center gap-2 w-full sm:flex-1">
+                    <span id="track-current-time" class="font-mono text-[11px] text-slate-400">00:00</span>
+                    <input type="range" id="track-progress" min="0" max="100" value="0" step="0.1" oninput="seekUserTrack(this.value)" class="w-full accent-indigo-500 h-1.5 cursor-pointer">
+                    <span id="track-duration" class="font-mono text-[11px] text-slate-400">03:18</span>
+                </div>
+                <div class="flex items-center gap-2 text-slate-400 text-[11px]">
+                    <label for="track-loop" class="cursor-pointer">Bucle</label>
+                    <input type="checkbox" id="track-loop" checked onchange="toggleTrackLoop(this.checked)" class="accent-indigo-500 rounded cursor-pointer">
+                </div>
+            </div>
+
+            <!-- Mini Live Waveform & Telemetry -->
+            <div class="mt-4 pt-3 border-t border-slate-800/80 flex flex-col md:flex-row items-center gap-4">
+                <div class="w-full md:w-1/2 h-10 bg-slate-950/90 rounded border border-slate-800 overflow-hidden relative">
+                    <canvas id="miniWaveCanvas" class="w-full h-full"></canvas>
+                    <div class="absolute right-2 top-1 text-[9px] font-mono text-slate-500">Osciloscopio PCM</div>
+                </div>
+                <div class="w-full md:w-2/3 grid grid-cols-3 md:grid-cols-6 gap-2 text-center text-xs font-mono">
+                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40">
+                        <span class="text-[9px] text-slate-400 block font-sans">RMS</span>
+                        <span id="tele-rms" class="text-indigo-400 font-bold">0.00</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40">
+                        <span class="text-[9px] text-slate-400 block font-sans">Centroide</span>
+                        <span id="tele-centroid" class="text-amber-400 font-bold">0 Hz</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40">
+                        <span class="text-[9px] text-slate-400 block font-sans">Flujo</span>
+                        <span id="tele-flux" class="text-purple-400 font-bold">0.00</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40">
+                        <span class="text-[9px] text-slate-400 block font-sans">ZCR</span>
+                        <span id="tele-zcr" class="text-emerald-400 font-bold">0</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40">
+                        <span class="text-[9px] text-slate-400 block font-sans">Rolloff</span>
+                        <span id="tele-rolloff" class="text-cyan-400 font-bold">0 Hz</span>
+                    </div>
+                    <div class="bg-slate-800/50 p-1.5 rounded border border-slate-700/40 flex flex-col items-center justify-center">
+                        <span class="text-[9px] text-slate-400 block font-sans">Onset</span>
+                        <span id="tele-beat-indicator" class="w-3 h-3 rounded-full bg-slate-600 mt-0.5 transition-all"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. PASO 1: SEPARADOR DE STEMS MULTICANAL (BIQUAD DSP) -->
+        <section id="sec-stems" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                <div>
+                    <div class="inline-flex items-center space-x-2 bg-emerald-100 text-emerald-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
+                        <span>Paso 1</span>
+                        <span>•</span>
+                        <span>Banco de Filtros Multicanal (Biquad DSP)</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">Separación de Stems en Tiempo Real</h3>
+                    <p class="text-xs text-slate-500">
+                        Aísla la pista en 8 bandas espectrales independientes para modular transformaciones 3D y post-procesado FX.
+                    </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 text-xs">
+                    <!-- Presets Acústicos JSON -->
+                    <div class="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-lg border border-slate-200">
+                        <span class="text-slate-600 font-semibold text-[11px]">Preset:</span>
+                        <select id="preset-selector" onchange="loadSelectedPreset(this.value)" class="bg-white border border-slate-300 rounded px-1.5 py-0.5 text-[11px] font-medium text-slate-700">
+                            <option value="custom">-- Personalizado --</option>
+                            <option value="balanced" selected>Equilibrado (Hi-Fi)</option>
+                            <option value="club_sub">Club / Bass Boost</option>
+                            <option value="acoustic_vocal">Acústico / Voces & Aire</option>
+                            <option value="cyber_glitch">Cyberpunk / Glitch FX</option>
+                        </select>
+                        <button onclick="exportCurrentPreset()" class="px-2 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[10px] font-bold shadow-sm transition" title="Exportar configuración a JSON">
+                            💾 Exportar
+                        </button>
+                        <label class="px-2 py-0.5 bg-slate-700 hover:bg-slate-600 text-white rounded text-[10px] font-bold shadow-sm cursor-pointer transition" title="Importar configuración desde JSON">
+                            📂 Importar
+                            <input type="file" id="preset-file-input" accept=".json" class="hidden" onchange="importPresetFile(event)">
+                        </label>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500 font-medium">Sensibilidad General:</span>
+                        <input type="range" id="input-gain" min="0.5" max="4.0" step="0.1" value="1.5" oninput="updateGain()" class="w-20 accent-indigo-600">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stems Meters & Controls Grid -->
+            <div id="stems-ui-container" class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <!-- Se inyecta dinámicamente desde JS para los 8 stems -->
+            </div>
+        </section>
+
+        <!-- 3. PASO 2: MOTOR GRÁFICO 3D REACTIVO (THREE.JS VIEWPORT) -->
+        <section id="sec-viewport-3d" class="bg-slate-950 rounded-2xl p-5 border border-slate-800 shadow-2xl text-white space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <div>
+                    <div class="inline-flex items-center space-x-2 bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
+                        <span>Paso 2</span>
+                        <span>•</span>
+                        <span>Motor Gráfico 3D WebGL (Three.js)</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        Escena Volumétrica 3D en Tiempo Real
+                        <span id="viewport-fps" class="text-xs font-mono text-emerald-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">60 FPS</span>
+                    </h3>
+                </div>
+
+                <!-- 3D Controls & Scene Selector -->
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <span class="text-slate-400 font-medium">Escena 3D:</span>
+                    <select id="three-scene-mode" onchange="switchThreeScene(this.value)" class="bg-slate-900 border border-slate-700 text-white rounded px-2.5 py-1.5 font-medium focus:outline-none focus:border-indigo-500">
+                        <option value="nebula">1. Nebulosa de 30.000 Partículas Volumétricas</option>
+                        <option value="tunnel">2. Túnel Cilíndrico Infinito Deformado por FFT</option>
+                        <option value="monolith">3. Monolito Icosaédrico Wireframe con Dispersión</option>
+                        <option value="custom_shader">4. ⚡ Shader GLSL en Vivo (Custom ShaderMaterial)</option>
+                    </select>
+                    <div class="flex items-center gap-1.5 border-l border-slate-800 pl-2">
+                        <button id="btn-camera-orbit" onclick="toggleCameraOrbit()" class="px-2.5 py-1.5 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 rounded flex items-center gap-1.5 font-medium transition" title="Activar/Desactivar Cámara Cinemática Automática">
+                            <span id="orbit-indicator" class="w-2 h-2 rounded-full bg-indigo-400"></span>
+                            <span>Órbita Auto</span>
+                        </button>
+                        <select id="camera-orbit-mode" onchange="changeCameraOrbitMode(this.value)" class="bg-slate-900 border border-slate-700 text-slate-300 rounded px-2 py-1.5 font-medium focus:outline-none focus:border-indigo-500" title="Patrón de trayectoria de cámara">
+                            <option value="circle">Órbita Circular</option>
+                            <option value="spiral">Espiral Reactiva</option>
+                            <option value="lemniscate">Infinito / Ocho (∞)</option>
+                            <option value="dramatic">Fly-by Cinemático</option>
+                        </select>
+                        <select id="camera-orbit-speed" onchange="changeCameraOrbitSpeed(this.value)" class="bg-slate-900 border border-slate-700 text-slate-300 rounded px-2 py-1.5 font-medium focus:outline-none focus:border-indigo-500" title="Velocidad orbital">
+                            <option value="0.5">0.5x Lento</option>
+                            <option value="1.0" selected>1.0x Normal</option>
+                            <option value="1.8">1.8x Rápido</option>
+                        </select>
+                    </div>
+                    <button onclick="resetThreeCamera()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 text-slate-300">Reset Cámara</button>
+                    <button onclick="toggleFullscreen()" id="btn-fullscreen" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded border border-slate-700 text-slate-300 flex items-center gap-1" title="Pantalla Completa">
+                        <span id="fullscreen-icon">⛶</span>
+                        <span class="hidden sm:inline text-[11px]">Pantalla Completa</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- POST-PROCESSING SHADERS FX BAR -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-4 text-xs">
+                <div class="flex items-center gap-2 font-semibold text-slate-300">
+                    <span class="text-indigo-400">✨ Post-Procesado WebGL FX:</span>
+                </div>
+                <div class="flex flex-wrap items-center gap-5">
+                    <!-- Bloom Pass -->
+                    <div class="flex items-center gap-2">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200">
+                            <input type="checkbox" id="fx-bloom-enable" checked onchange="toggleBloomPass(this.checked)" class="accent-indigo-500 rounded">
+                            <span>Unreal Bloom (Glow)</span>
+                        </label>
+                        <input type="range" id="fx-bloom-strength" min="0.1" max="3.0" step="0.1" value="1.2" oninput="updateBloomParams()" class="w-16 accent-indigo-500 cursor-pointer" title="Intensidad de Bloom">
+                        <span id="fx-bloom-val" class="font-mono text-[10px] text-indigo-300 w-6">1.2</span>
+                    </div>
+
+                    <!-- Chromatic Aberration Pass -->
+                    <div class="flex items-center gap-2 border-l border-slate-800 pl-4">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200">
+                            <input type="checkbox" id="fx-chroma-enable" checked onchange="toggleChromaPass(this.checked)" class="accent-pink-500 rounded">
+                            <span>Aberración Cromática</span>
+                        </label>
+                        <input type="range" id="fx-chroma-amount" min="0.0" max="0.03" step="0.001" value="0.005" oninput="updateChromaParams()" class="w-16 accent-pink-500 cursor-pointer" title="Distorsión RGB reactiva">
+                        <span id="fx-chroma-val" class="font-mono text-[10px] text-pink-300 w-8">0.005</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- THREE.JS CANVAS CONTAINER -->
+            <div class="relative w-full h-[420px] md:h-[480px] bg-black rounded-xl overflow-hidden border border-slate-800 shadow-inner flex items-center justify-center">
+                <canvas id="threeCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+                
+                <!-- HUD Overlay in 3D Canvas -->
+                <div class="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-800/80 text-[11px] font-mono space-y-1 pointer-events-none">
+                    <div>Cámara: <span id="hud-camera-mode" class="text-indigo-400 font-semibold">Manual (Arrastrar / Zoom)</span></div>
+                    <div>Zoom / Rango: <span id="hud-camera-zoom" class="text-amber-400">400</span></div>
+                    <div id="hud-stem-status" class="text-slate-400">Stems activos: Bass, Mid, Treble</div>
+                </div>
+
+                <!-- Beat Impact Indicator -->
+                <div id="three-beat-flash" class="absolute inset-0 bg-indigo-500/10 pointer-events-none opacity-0 transition-opacity duration-75"></div>
+            </div>
+        </section>
+
+        <!-- 3.5. EDITOR DE SHADERS GLSL EN VIVO (LIVE SHADER STUDIO) -->
+        <section id="sec-shader-editor" class="bg-slate-900 rounded-2xl p-5 border border-pink-900/50 shadow-2xl text-white space-y-4">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <div>
+                    <div class="inline-flex items-center space-x-2 bg-pink-500/20 text-pink-300 border border-pink-500/30 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
+                        <span>Laboratorio GLSL</span>
+                        <span>•</span>
+                        <span>Editor de Shaders en Caliente (Hot-Reload WebGL)</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                        Editor de Shaders GLSL en Tiempo Real
+                        <span id="shader-compile-status" class="text-xs font-mono text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/40">✓ Compilado OK</span>
+                    </h3>
+                    <p class="text-xs text-slate-400">
+                        Programa tus propios Vertex y Fragment Shaders interactivos reactivos a los 8 stems DSP y telemetría de audio.
+                    </p>
+                </div>
+
+                <!-- Shader Presets, Actions & Buttons -->
+                <div class="flex flex-wrap items-center gap-2 text-xs">
+                    <div class="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-800">
+                        <span class="text-pink-400 font-semibold text-[11px]">Preset GLSL:</span>
+                        <select id="shader-preset-select" onchange="loadShaderPreset(this.value)" class="bg-slate-900 border border-slate-700 text-white rounded px-2 py-1 text-[11px] font-medium focus:outline-none focus:border-pink-500">
+                            <option value="plasma">1. Plasma Psicodélico Reactivo</option>
+                            <option value="raymarch">2. Raymarching Túnel Fractal (SDF)</option>
+                            <option value="spectral_waves">3. Ondas de Luz & Malla Espectral</option>
+                            <option value="voronoi">4. Bio-Voronoi Pulsante (Beat Spike)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="compileUserShaderFromUI()" class="px-3.5 py-1.5 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white rounded-lg font-bold shadow-md transition flex items-center gap-1.5" title="Compilar shader actual (Ctrl + Enter)">
+                        <span>▶</span>
+                        <span>Compilar & Aplicar</span>
+                        <span class="text-[9px] opacity-75 font-mono">(Ctrl+Enter)</span>
+                    </button>
+
+                    <button onclick="resetShaderToCurrentPreset()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 text-slate-300 transition" title="Restaurar código del preset">
+                        ↺ Reset
+                    </button>
+
+                    <button onclick="exportCurrentShaderFile()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 text-slate-300 transition" title="Descargar shader (.glsl)">
+                        💾 Exportar
+                    </button>
+
+                    <label class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg border border-slate-700 text-slate-300 cursor-pointer transition" title="Cargar fragment shader (.glsl / .frag / .txt)">
+                        📂 Importar
+                        <input type="file" id="shader-file-import" accept=".glsl,.frag,.txt" class="hidden" onchange="importShaderFile(event)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Tabs: Fragment Shader vs Vertex Shader -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <div class="flex space-x-2">
+                    <button id="tab-btn-frag" onclick="openShaderEditorTab('frag')" class="px-3 py-1 rounded-t-lg bg-pink-600 text-white font-bold text-xs flex items-center gap-1.5 transition">
+                        <span>Pixel / Fragment (gl_FragColor)</span>
+                    </button>
+                    <button id="tab-btn-vert" onclick="openShaderEditorTab('vert')" class="px-3 py-1 rounded-t-lg bg-slate-800 text-slate-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition">
+                        <span>Vertex (gl_Position)</span>
+                    </button>
+                </div>
+                <div class="text-[11px] text-slate-400 flex items-center gap-3">
+                    <button onclick="toggleUniformCheatSheet()" class="text-pink-400 hover:underline flex items-center gap-1 font-mono">
+                        <span>ℹ️</span><span>Ver Uniforms Disponibles</span>
+                    </button>
+                    <button onclick="activateCustomShaderScene()" class="bg-indigo-600/30 hover:bg-indigo-600/60 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/40 text-[10px] font-bold transition">
+                        Ver Escena en Pantalla ↗
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Uniforms Reference Cheat Sheet Drawer (Colapsable) -->
+            <div id="shader-uniforms-drawer" class="hidden bg-slate-950/95 border border-slate-800 rounded-xl p-3.5 text-[11px] font-mono grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="space-y-1 bg-slate-900/60 p-2.5 rounded border border-slate-800">
+                    <div class="text-pink-400 font-bold mb-1">Entornos y Coordenadas</div>
+                    <div><span class="text-indigo-300">uniform float</span> <span class="text-amber-300 font-bold">uTime</span>; <span class="text-slate-500">// Segundos</span></div>
+                    <div><span class="text-indigo-300">uniform vec2</span> <span class="text-amber-300 font-bold">uResolution</span>; <span class="text-slate-500">// W x H px</span></div>
+                    <div><span class="text-indigo-300">uniform vec2</span> <span class="text-amber-300 font-bold">uMouse</span>; <span class="text-slate-500">// [0..1] pos</span></div>
+                    <div><span class="text-indigo-300">varying vec2</span> <span class="text-amber-300 font-bold">vUv</span>; <span class="text-slate-500">// UV coord [0..1]</span></div>
+                </div>
+                <div class="space-y-1 bg-slate-900/60 p-2.5 rounded border border-slate-800">
+                    <div class="text-pink-400 font-bold mb-1">8 Stems DSP (0.0 a 1.0)</div>
+                    <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uSub</span>, <span class="text-emerald-300 font-bold">uBass</span>;</div>
+                    <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uLowmid</span>, <span class="text-emerald-300 font-bold">uMid</span>;</div>
+                    <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uHighmid</span>, <span class="text-emerald-300 font-bold">uPresence</span>;</div>
+                    <div><span class="text-indigo-300">uniform float</span> <span class="text-emerald-300 font-bold">uTreble</span>, <span class="text-emerald-300 font-bold">uAir</span>;</div>
+                </div>
+                <div class="space-y-1 bg-slate-900/60 p-2.5 rounded border border-slate-800">
+                    <div class="text-pink-400 font-bold mb-1">Métricas & Paleta IA</div>
+                    <div><span class="text-indigo-300">uniform float</span> <span class="text-cyan-300 font-bold">uRms</span>, <span class="text-cyan-300 font-bold">uFlux</span>;</div>
+                    <div><span class="text-indigo-300">uniform float</span> <span class="text-cyan-300 font-bold">uCentroid</span>, <span class="text-cyan-300 font-bold">uIsOnset</span>;</div>
+                    <div><span class="text-indigo-300">uniform vec3</span> <span class="text-purple-300 font-bold">uColor1</span>, <span class="text-purple-300 font-bold">uColor2</span>, <span class="text-purple-300 font-bold">uColor3</span>;</div>
+                </div>
+            </div>
+
+            <!-- Code Editor Workspace -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <!-- Textarea Editor Area -->
+                <div class="lg:col-span-12 space-y-2">
+                    <div class="relative bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-inner">
+                        <!-- Fragment Shader Textarea -->
+                        <textarea id="shader-code-frag" spellcheck="false" class="w-full h-80 bg-transparent text-pink-200 font-mono text-xs p-4 focus:outline-none resize-y leading-relaxed" placeholder="// Escribe tu Fragment Shader GLSL aquí..."></textarea>
+                        
+                        <!-- Vertex Shader Textarea (Oculto inicialmente) -->
+                        <textarea id="shader-code-vert" spellcheck="false" class="hidden w-full h-80 bg-transparent text-emerald-200 font-mono text-xs p-4 focus:outline-none resize-y leading-relaxed" placeholder="// Escribe tu Vertex Shader GLSL aquí..."></textarea>
+
+                        <!-- Line indicator badge -->
+                        <div class="absolute bottom-2 right-3 pointer-events-none text-[10px] font-mono text-slate-500 bg-slate-900/80 px-2 py-0.5 rounded border border-slate-800">
+                            GLSL ES 1.00 • WebGL
+                        </div>
+                    </div>
+
+                    <!-- Compiler Log Output Console -->
+                    <div id="shader-console-panel" class="bg-slate-950 rounded-xl border border-slate-800 p-3 font-mono text-xs space-y-1">
+                        <div class="flex items-center justify-between text-[11px] pb-1 border-b border-slate-900">
+                            <span class="text-slate-400 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400" id="shader-console-indicator"></span>
+                                <span>Salida del Compilador GLSL:</span>
+                            </span>
+                            <span id="shader-console-time" class="text-slate-500 text-[10px]">Listo</span>
+                        </div>
+                        <div id="shader-console-log" class="text-emerald-400 text-[11px] max-h-24 overflow-y-auto custom-scrollbar whitespace-pre-wrap">✓ Shader compilado y vinculado exitosamente con WebGL. No se detectaron advertencias ni errores.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. PASO 3: DIRECTOR DE ARTE IA GENERATIVA (GEMINI PROMPT ENGINE) -->
+        <section id="sec-ia-director" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                <div>
+                    <div class="inline-flex items-center space-x-2 bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
+                        <span>Paso 3</span>
+                        <span>•</span>
+                        <span>Dirección Artística por Inteligencia Artificial</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">Agente "Director de Arte" Multimodal en Vivo</h3>
+                    <p class="text-xs text-slate-500">
+                        Infiere el estado afectivo (Valencia / Arousal), el timbre y el tempo para sintetizar directivas artísticas y paletas que mutan la escena 3D.
+                    </p>
+                </div>
+                <button onclick="triggerAiArtDirectionNow()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-indigo-600 text-white font-bold text-xs flex items-center gap-1.5 shadow hover:opacity-90 transition">
+                    <span>✨</span>
+                    <span>Actualizar Directiva IA Ahora</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- AI Generated Prompt Output Card -->
+                <div class="lg:col-span-8 bg-slate-900 rounded-xl p-4 text-white space-y-3 border border-slate-800">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <span class="text-xs font-bold text-amber-400 flex items-center gap-2">
+                            <span>🎨 Prompt Generativo Activo (Diffusion / Veo3 / Shaders)</span>
+                        </span>
+                        <span id="ai-cycle-countdown" class="text-[10px] font-mono text-slate-400">Próximo ciclo: 15s</span>
+                    </div>
+
+                    <p id="ai-generated-prompt" class="text-xs font-mono text-indigo-200 leading-relaxed bg-slate-950 p-3 rounded-lg border border-slate-800">
+                        "Cosmic floating monolith with iridescent crystalline refraction, volumetric ultraviolet glow, particles drifting to ambient rhythm, 8k cinematic lighting, moody dark cyberpunk aesthetics."
+                    </p>
+
+                    <!-- Color Palette Generated by AI -->
+                    <div class="flex items-center gap-3 text-xs pt-1">
+                        <span class="text-slate-400 text-[11px]">Paleta Cromática Inyectada en Three.js:</span>
+                        <div class="flex items-center gap-1.5" id="ai-palette-swatches">
+                            <span class="w-5 h-5 rounded-full bg-indigo-500 border border-white/20 shadow" title="Primario"></span>
+                            <span class="w-5 h-5 rounded-full bg-amber-400 border border-white/20 shadow" title="Acento"></span>
+                            <span class="w-5 h-5 rounded-full bg-purple-600 border border-white/20 shadow" title="Niebla"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Parameters & Optional Gemini API Key -->
+                <div class="lg:col-span-4 bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-3 text-xs">
+                    <div class="flex items-center justify-between font-bold text-slate-800">
+                        <span>Configuración del Motor IA</span>
+                        <span class="text-emerald-600 text-[10px] font-mono">Modo Inteligente Activo</span>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block font-medium text-slate-700">Modo de Síntesis:</label>
+                        <select id="ai-engine-mode" class="w-full border border-slate-300 rounded p-1.5 bg-white font-medium">
+                            <option value="heuristic">Heurístico Avanzado (Local & Cero Latencia)</option>
+                            <option value="gemini">Google Gemini API (Cloud LLM)</option>
+                        </select>
+
+                        <div id="gemini-key-container" class="hidden space-y-1 pt-1">
+                            <label class="block font-medium text-slate-700">Gemini API Key (Opcional):</label>
+                            <input type="password" id="gemini-api-key" placeholder="AIzaSy..." class="w-full border border-slate-300 rounded p-1.5 font-mono text-[11px]">
+                            <p class="text-[10px] text-slate-500">Se guarda únicamente en el localStorage de tu navegador.</p>
+                        </div>
+
+                        <div class="space-y-1 pt-1 border-t border-slate-200">
+                            <label class="block font-medium text-slate-700">Intervalo del Ciclo IA:</label>
+                            <select id="ai-interval-select" onchange="updateAiInterval()" class="w-full border border-slate-300 rounded p-1.5 bg-white font-medium">
+                                <option value="15">15s (Agresivo — puede dar 429)</option>
+                                <option value="30">30s (Recomendado)</option>
+                                <option value="60" selected>60s (Conservador)</option>
+                                <option value="120">120s (Mínimo consumo)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. PASO 4: ESPECTROGRAMA & MODELO MER RUSSELL -->
+        <section id="sec-frecuencial" class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-6">
+            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                <div>
+                    <div class="inline-flex items-center space-x-2 bg-indigo-100 text-indigo-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1">
+                        <span>Módulo DSP</span>
+                        <span>•</span>
+                        <span>Análisis Espectral & Modelo Afectivo MER</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">Descomposición Espectral y Posicionamiento Emocional</h3>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                    <span class="text-slate-500">Transformada:</span>
+                    <select id="select-arch-dropdown" onchange="selectArch(this.value)" class="border border-slate-300 rounded p-1 font-medium bg-white">
+                        <option value="mel">Banco Mel / Escala Bark (24 Bandas)</option>
+                        <option value="triad">Tríada Tradicional (3 Bandas)</option>
+                        <option value="cqt">Transformada CQT (36 Semitonos)</option>
+                        <option value="fft">FFT Lineal Uniforme (48 Bins)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Spectrum Chart -->
+                <div class="lg:col-span-7 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <div class="chart-container">
+                        <canvas id="frequencyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- MER Russell Pad -->
+                <div class="lg:col-span-5 bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <h4 class="text-xs font-bold text-slate-800">Modelo MER 2D (Russell Circumplex)</h4>
+                            <label class="text-[10px] flex items-center gap-1 text-slate-600 font-medium cursor-pointer">
+                                <input type="checkbox" id="mer-auto-track" checked class="accent-indigo-600 rounded">
+                                <span>Seguir Audio</span>
+                            </label>
+                        </div>
+                        <div class="relative w-full aspect-square max-w-[220px] mx-auto bg-white border border-slate-300 rounded-lg shadow-inner cursor-crosshair" id="mer-pad" onclick="handleMerClick(event)">
+                            <canvas id="merCanvas" class="w-full h-full rounded-lg"></canvas>
+                        </div>
+                    </div>
+                    <div class="mt-2 bg-white p-2.5 rounded-lg border border-slate-200 text-xs">
+                        <div class="flex justify-between font-bold text-slate-800">
+                            <span>Estado Afectivo:</span>
+                            <span id="mer-emotion-label" class="text-amber-600">Energía Elevada / Alegre</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800 py-6 text-center text-xs">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>Motor de Visualización y Síntesis Gráfica <b>MotorVisuales</b>.</p>
+            <p class="mt-1 text-slate-500">Pipeline integrado: Web Audio DSP • Three.js WebGL • IA Generativa • MediaRecorder 60 FPS.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Master Architecture -->
+    <script>
+        // =========================================================================
+        // 1. WEB AUDIO API & STEMS DSP ENGINE (Biquad Multi-Channel Filter Bank)
+        // =========================================================================
+        let audioCtx = null;
+        let mainSourceNode = null;
+        let masterGainNode = null;
+        let audioDestNode = null; // For video recording
+        let micStream = null;
+        let audioElement = null;
+        let synthInterval = null;
+        let isAudioRunning = false;
+        let currentSourceType = 'none';
+
+        const FFT_SIZE = 2048;
+        let mainAnalyser = null;
+        let freqDataArray = new Uint8Array(FFT_SIZE / 2);
+        let timeDataArray = new Uint8Array(FFT_SIZE);
+        let prevSpectrum = new Float32Array(FFT_SIZE / 2);
+
+        // 8-STEM CONFIGURATION
+        const stemConfigs = [
+            { id: 'sub', name: 'Sub-Graves (<60Hz)', type: 'lowpass', freq: 60, Q: 1, color: 'indigo-500', hex: '#6366f1' },
+            { id: 'bass', name: 'Graves (60-250Hz)', type: 'bandpass', freq: 155, Q: 1.5, color: 'blue-500', hex: '#3b82f6' },
+            { id: 'lowmid', name: 'Medios-Bajos (250-500Hz)', type: 'bandpass', freq: 375, Q: 1.5, color: 'cyan-500', hex: '#06b6d4' },
+            { id: 'mid', name: 'Medios (500-2kHz)', type: 'bandpass', freq: 1250, Q: 1.5, color: 'emerald-500', hex: '#10b981' },
+            { id: 'highmid', name: 'Medios-Altos (2k-4kHz)', type: 'bandpass', freq: 3000, Q: 1.5, color: 'amber-500', hex: '#f59e0b' },
+            { id: 'presence', name: 'Presencia (4k-6kHz)', type: 'bandpass', freq: 5000, Q: 1.5, color: 'orange-500', hex: '#f97316' },
+            { id: 'treble', name: 'Agudos (6k-10kHz)', type: 'bandpass', freq: 8000, Q: 1.5, color: 'red-500', hex: '#ef4444' },
+            { id: 'air', name: 'Aire (>10kHz)', type: 'highpass', freq: 10000, Q: 1, color: 'pink-500', hex: '#ec4899' }
+        ];
+        
+        let stemsData = {}; // Object to hold filter nodes, data arrays, and current values
+
+        let liveAudioMetrics = {
+            rms: 0,
+            spectralCentroid: 0,
+            spectralFlux: 0,
+            zcr: 0,
+            rolloff: 0,
+            isOnset: false,
+            valence: 0.5,
+            arousal: 0.5
+        };
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContextClass();
+
+                mainAnalyser = audioCtx.createAnalyser();
+                mainAnalyser.fftSize = FFT_SIZE;
+                mainAnalyser.smoothingTimeConstant = 0.75;
+
+                masterGainNode = audioCtx.createGain();
+                masterGainNode.gain.value = parseFloat(document.getElementById('input-gain').value);
+
+                audioDestNode = audioCtx.createMediaStreamDestination();
+
+                freqDataArray = new Uint8Array(mainAnalyser.frequencyBinCount);
+                timeDataArray = new Uint8Array(mainAnalyser.fftSize);
+                prevSpectrum = new Float32Array(mainAnalyser.frequencyBinCount);
+
+                // Enrutar masterGainNode de forma permanente a mainAnalyser y audioDestNode
+                masterGainNode.connect(mainAnalyser);
+                masterGainNode.connect(audioDestNode);
+
+                // Build 8 Stems UI & Audio Nodes
+                const container = document.getElementById('stems-ui-container');
+                container.innerHTML = '';
+                
+                stemConfigs.forEach(conf => {
+                    // Audio Setup
+                    const filter = audioCtx.createBiquadFilter();
+                    filter.type = conf.type;
+                    filter.frequency.value = conf.freq;
+                    if (conf.Q) filter.Q.value = conf.Q;
+                    
+                    const gain = audioCtx.createGain();
+                    const analyser = audioCtx.createAnalyser();
+                    analyser.fftSize = 256;
+                    
+                    masterGainNode.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(analyser);
+                    
+                    stemsData[conf.id] = {
+                        config: conf,
+                        filter: filter,
+                        gain: gain,
+                        analyser: analyser,
+                        dataArray: new Uint8Array(128),
+                        value: 0,
+                        muted: false
+                    };
+                    
+                    // UI Setup
+                    const html = `
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-1.5 truncate">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-${conf.color} flex-shrink-0"></span>
+                                    <span class="font-bold text-[10px] text-slate-800 truncate" title="${conf.name}">${conf.name}</span>
+                                </div>
+                                <span id="meter-val-${conf.id}" class="font-mono text-[10px] font-bold text-${conf.color}">0%</span>
+                            </div>
+                            <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                                <div id="meter-bar-${conf.id}" class="bg-${conf.color} h-full w-0 transition-all duration-75"></div>
+                            </div>
+                            <div class="flex justify-end pt-1">
+                                <button onclick="toggleStemMute('${conf.id}')" id="btn-mute-${conf.id}" class="px-2 py-0.5 rounded text-[9px] bg-white border border-slate-300 font-semibold hover:bg-slate-100">Mute</button>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += html;
+                });
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function connectSourceToPipeline(source, connectSpeakers = true) {
+            if (mainSourceNode && mainSourceNode !== source) {
+                try { mainSourceNode.disconnect(); } catch(e){}
+            }
+            mainSourceNode = source;
+            if (mainSourceNode && masterGainNode) {
+                try {
+                    mainSourceNode.connect(masterGainNode);
+                } catch(e) {
+                    console.warn("Aviso al conectar source a masterGainNode:", e);
+                }
+            }
+
+            // Gestionar salida de altavoces
+            if (masterGainNode && audioCtx) {
+                try { masterGainNode.disconnect(audioCtx.destination); } catch(e){}
+                if (connectSpeakers) {
+                    try { masterGainNode.connect(audioCtx.destination); } catch(e){}
+                }
+            }
+        }
+
+        function updateGain() {
+            if (masterGainNode) {
+                masterGainNode.gain.value = parseFloat(document.getElementById('input-gain').value);
+            }
+        }
+
+        function toggleStemMute(stemId) {
+            const data = stemsData[stemId];
+            if (!data) return;
+            data.muted = !data.muted;
+            
+            const btn = document.getElementById(`btn-mute-${stemId}`);
+            if (data.muted) {
+                btn.className = "px-2 py-0.5 rounded text-[9px] bg-red-600 text-white font-semibold";
+                btn.innerText = "MUTED";
+                data.gain.gain.value = 0;
+            } else {
+                btn.className = "px-2 py-0.5 rounded text-[9px] bg-white border border-slate-300 font-semibold hover:bg-slate-100";
+                btn.innerText = "Mute";
+                data.gain.gain.value = 1;
+            }
+        }
+
+        // --- PRESETS DE MAPEO ACÚSTICO (JSON IMPORT/EXPORT) ---
+        const builtInPresets = {
+            balanced: {
+                name: "Equilibrado (Hi-Fi)",
+                gain: 1.5,
+                scene: "nebula",
+                bloom: { enabled: true, strength: 1.2 },
+                chroma: { enabled: true, amount: 0.005 },
+                stems: {
+                    sub:      { gain: 1.0, muted: false },
+                    bass:     { gain: 1.0, muted: false },
+                    lowmid:   { gain: 1.0, muted: false },
+                    mid:      { gain: 1.0, muted: false },
+                    highmid:  { gain: 1.0, muted: false },
+                    presence: { gain: 1.0, muted: false },
+                    treble:   { gain: 1.0, muted: false },
+                    air:      { gain: 1.0, muted: false }
+                }
+            },
+            club_sub: {
+                name: "Club / Bass Boost",
+                gain: 2.0,
+                scene: "tunnel",
+                bloom: { enabled: true, strength: 1.8 },
+                chroma: { enabled: true, amount: 0.008 },
+                stems: {
+                    sub:      { gain: 1.8, muted: false },
+                    bass:     { gain: 1.6, muted: false },
+                    lowmid:   { gain: 1.2, muted: false },
+                    mid:      { gain: 0.8, muted: false },
+                    highmid:  { gain: 0.7, muted: false },
+                    presence: { gain: 0.9, muted: false },
+                    treble:   { gain: 1.1, muted: false },
+                    air:      { gain: 1.0, muted: false }
+                }
+            },
+            acoustic_vocal: {
+                name: "Acústico / Voces & Aire",
+                gain: 1.3,
+                scene: "monolith",
+                bloom: { enabled: true, strength: 0.8 },
+                chroma: { enabled: false, amount: 0.002 },
+                stems: {
+                    sub:      { gain: 0.5, muted: false },
+                    bass:     { gain: 0.8, muted: false },
+                    lowmid:   { gain: 1.2, muted: false },
+                    mid:      { gain: 1.5, muted: false },
+                    highmid:  { gain: 1.6, muted: false },
+                    presence: { gain: 1.4, muted: false },
+                    treble:   { gain: 1.2, muted: false },
+                    air:      { gain: 1.5, muted: false }
+                }
+            },
+            cyber_glitch: {
+                name: "Cyberpunk / Glitch FX",
+                gain: 2.2,
+                scene: "nebula",
+                bloom: { enabled: true, strength: 2.5 },
+                chroma: { enabled: true, amount: 0.02 },
+                stems: {
+                    sub:      { gain: 1.5, muted: false },
+                    bass:     { gain: 1.4, muted: false },
+                    lowmid:   { gain: 0.6, muted: false },
+                    mid:      { gain: 1.0, muted: false },
+                    highmid:  { gain: 1.5, muted: false },
+                    presence: { gain: 1.8, muted: false },
+                    treble:   { gain: 1.9, muted: false },
+                    air:      { gain: 1.7, muted: false }
+                }
+            }
+        };
+
+        function applyPresetData(preset) {
+            if (!preset) return;
+            if (preset.gain !== undefined) {
+                document.getElementById('input-gain').value = preset.gain;
+                updateGain();
+            }
+            if (preset.scene) {
+                const sel = document.getElementById('three-scene-mode');
+                if (sel) {
+                    sel.value = preset.scene;
+                    switchThreeScene(preset.scene);
+                }
+            }
+            if (preset.bloom) {
+                const chk = document.getElementById('fx-bloom-enable');
+                const sld = document.getElementById('fx-bloom-strength');
+                if (chk) chk.checked = !!preset.bloom.enabled;
+                if (sld && preset.bloom.strength !== undefined) sld.value = preset.bloom.strength;
+                toggleBloomPass(chk ? chk.checked : true);
+                updateBloomParams();
+            }
+            if (preset.chroma) {
+                const chk = document.getElementById('fx-chroma-enable');
+                const sld = document.getElementById('fx-chroma-amount');
+                if (chk) chk.checked = !!preset.chroma.enabled;
+                if (sld && preset.chroma.amount !== undefined) sld.value = preset.chroma.amount;
+                toggleChromaPass(chk ? chk.checked : true);
+                updateChromaParams();
+            }
+            if (preset.stems) {
+                Object.keys(preset.stems).forEach(stemId => {
+                    const st = preset.stems[stemId];
+                    const data = stemsData[stemId];
+                    if (data) {
+                        data.muted = !st.muted;
+                        toggleStemMute(stemId);
+                        if (st.gain !== undefined && !data.muted) {
+                            data.gain.gain.value = st.gain;
+                        }
+                    }
+                });
+            }
+        }
+
+        function loadSelectedPreset(key) {
+            if (key === 'custom') return;
+            const preset = builtInPresets[key];
+            if (preset) {
+                applyPresetData(preset);
+            }
+        }
+
+        function exportCurrentPreset() {
+            const currentScene = activeSceneType || 'nebula';
+            const gain = parseFloat(document.getElementById('input-gain').value) || 1.5;
+            const bloomEnabled = document.getElementById('fx-bloom-enable') ? document.getElementById('fx-bloom-enable').checked : true;
+            const bloomStrength = parseFloat(document.getElementById('fx-bloom-strength')?.value) || 1.2;
+            const chromaEnabled = document.getElementById('fx-chroma-enable') ? document.getElementById('fx-chroma-enable').checked : true;
+            const chromaAmount = parseFloat(document.getElementById('fx-chroma-amount')?.value) || 0.005;
+
+            const stems = {};
+            stemConfigs.forEach(conf => {
+                const data = stemsData[conf.id];
+                stems[conf.id] = {
+                    gain: data ? (data.muted ? 0 : data.gain.gain.value) : 1.0,
+                    muted: data ? data.muted : false
+                };
+            });
+
+            const presetObj = {
+                format: "MotorVisualesPreset",
+                version: "1.0",
+                timestamp: new Date().toISOString(),
+                name: `Preset Custom ${new Date().toLocaleTimeString()}`,
+                gain: gain,
+                scene: currentScene,
+                bloom: { enabled: bloomEnabled, strength: bloomStrength },
+                chroma: { enabled: chromaEnabled, amount: chromaAmount },
+                stems: stems
+            };
+
+            const blob = new Blob([JSON.stringify(presetObj, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MotorVisuales_Preset_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        function importPresetFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const preset = JSON.parse(e.target.result);
+                    applyPresetData(preset);
+                    document.getElementById('preset-selector').value = 'custom';
+                    alert(`✅ Preset "${preset.name || file.name}" importado y aplicado correctamente.`);
+                } catch (err) {
+                    alert(`❌ Error al importar JSON: ${err.message}`);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // --- AUDIO ELEMENT & TRACK PLAYER HELPERS ---
+        let mediaElementSource = null;
+
+        function formatTime(secs) {
+            if (isNaN(secs) || !isFinite(secs)) return "00:00";
+            const m = Math.floor(secs / 60);
+            const s = Math.floor(secs % 60);
+            return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+        }
+
+        function setupAudioElement(srcUrl, title) {
+            if (!audioElement) {
+                audioElement = document.getElementById('html5-audio-player') || new Audio();
+                audioElement.crossOrigin = 'anonymous';
+                audioElement.loop = true;
+
+                audioElement.addEventListener('timeupdate', () => {
+                    if (!audioElement.duration || isNaN(audioElement.duration)) return;
+                    const cur = audioElement.currentTime;
+                    const dur = audioElement.duration;
+                    const prog = document.getElementById('track-progress');
+                    if (prog) prog.value = (cur / dur) * 100;
+                    const curEl = document.getElementById('track-current-time');
+                    if (curEl) curEl.innerText = formatTime(cur);
+                    const durEl = document.getElementById('track-duration');
+                    if (durEl) durEl.innerText = formatTime(dur);
+                });
+
+                audioElement.addEventListener('play', () => {
+                    const btn = document.getElementById('btn-play-pause-track');
+                    if (btn) btn.innerText = "⏸";
+                    if (audioCtx && audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                });
+
+                audioElement.addEventListener('pause', () => {
+                    const btn = document.getElementById('btn-play-pause-track');
+                    if (btn) btn.innerText = "▶";
+                });
+            }
+
+            if (!mediaElementSource && audioCtx) {
+                try {
+                    mediaElementSource = audioCtx.createMediaElementSource(audioElement);
+                } catch(err) {
+                    console.warn("createMediaElementSource ya inicializado o aviso:", err);
+                }
+            }
+
+            audioElement.src = srcUrl;
+            const titleEl = document.getElementById('track-title');
+            if (titleEl) titleEl.innerText = title;
+            const ctrlEl = document.getElementById('track-player-controls');
+            if (ctrlEl) ctrlEl.classList.remove('hidden');
+
+            if (mediaElementSource) {
+                connectSourceToPipeline(mediaElementSource, true);
+            }
+        }
+
+        function playUserUploadedTrack() {
+            stopAudio();
+            initAudioContext();
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
+            setupAudioElement('tema.mp3', 'Tu Tema ("Mordaza")');
+            audioElement.play().then(() => {
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                currentSourceType = 'file';
+                isAudioRunning = true;
+                updateBadge('Reproduciendo: Tu Tema (MP3)', 'bg-pink-600 text-white border-pink-400');
+            }).catch(e => {
+                console.error("Error al reproducir audio:", e);
+                alert("Aviso al reproducir tema: " + e.message);
+            });
+        }
+
+        function togglePlayPauseUserTrack() {
+            if (!audioElement || !audioElement.src) {
+                playUserUploadedTrack();
+                return;
+            }
+            if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+            if (audioElement.paused) {
+                audioElement.play().then(() => {
+                    isAudioRunning = true;
+                    currentSourceType = 'file';
+                    const title = document.getElementById('track-title')?.innerText || 'MP3';
+                    updateBadge(`Reproduciendo: ${title}`, 'bg-pink-600 text-white border-pink-400');
+                }).catch(e => {
+                    console.error("Error al reanudar audio:", e);
+                });
+            } else {
+                audioElement.pause();
+                isAudioRunning = false;
+                updateBadge('En pausa', 'bg-slate-800 text-slate-400 border-slate-700');
+            }
+        }
+
+        function seekUserTrack(val) {
+            if (!audioElement || !audioElement.duration || isNaN(audioElement.duration)) return;
+            audioElement.currentTime = (val / 100) * audioElement.duration;
+        }
+
+        function toggleTrackLoop(isLoop) {
+            if (audioElement) audioElement.loop = isLoop;
+        }
+
+        // --- AUDIO INPUT HANDLERS ---
+        async function startMicrophone() {
+            try {
+                stopAudio();
+                initAudioContext();
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                const source = audioCtx.createMediaStreamSource(micStream);
+                connectSourceToPipeline(source, false); // Micrófono sin salida a altavoces para prevenir acople
+
+                currentSourceType = 'mic';
+                isAudioRunning = true;
+                updateBadge('Micrófono Activo', 'bg-indigo-600 text-white border-indigo-400');
+            } catch (err) {
+                alert('Acceso a micrófono denegado: ' + err.message);
+            }
+        }
+
+        async function startTabCapture() {
+            try {
+                stopAudio();
+                initAudioContext();
+                micStream = await navigator.mediaDevices.getDisplayMedia({ 
+                    video: true, 
+                    audio: true 
+                });
+                
+                const audioTracks = micStream.getAudioTracks();
+                if (audioTracks.length === 0) {
+                    alert("No se detectó audio. Por favor, asegúrate de activar la casilla 'Compartir audio de la pestaña' al seleccionar la pestaña de YouTube.");
+                    micStream.getTracks().forEach(t => t.stop());
+                    return;
+                }
+
+                const audioStream = new MediaStream([audioTracks[0]]);
+                const source = audioCtx.createMediaStreamSource(audioStream);
+                connectSourceToPipeline(source, false); // Sin conectar a destination para evitar eco
+                
+                currentSourceType = 'tab';
+                isAudioRunning = true;
+                updateBadge('Captura de Pestaña Activa', 'bg-cyan-600 text-white border-cyan-400');
+            } catch (err) {
+                if (err.name !== 'NotAllowedError') {
+                    alert('Error al capturar la pestaña: ' + err.message);
+                }
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            stopAudio();
+            initAudioContext();
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const fileURL = URL.createObjectURL(file);
+
+            setupAudioElement(fileURL, file.name);
+            audioElement.play().then(() => {
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                currentSourceType = 'file';
+                isAudioRunning = true;
+                updateBadge(`Archivo: ${file.name.slice(0, 14)}...`, 'bg-emerald-600 text-white border-emerald-400');
+            }).catch(e => {
+                console.error("Error al reproducir archivo:", e);
+            });
+        }
+
+        let synthStep = 0;
+        function toggleSynthDemo() {
+            if (currentSourceType === 'synth') {
+                stopAudio();
+                return;
+            }
+            stopAudio();
+            initAudioContext();
+            masterGainNode.connect(audioCtx.destination);
+
+            currentSourceType = 'synth';
+            isAudioRunning = true;
+            document.getElementById('txt-synth').innerText = "Detener Synth";
+            updateBadge('Sintetizador Beat (124 BPM)', 'bg-amber-600 text-white border-amber-400');
+
+            synthInterval = setInterval(playSynthStep, (60 / 124 / 4) * 1000);
+        }
+
+        function playSynthStep() {
+            if (!audioCtx || currentSourceType !== 'synth') return;
+            const now = audioCtx.currentTime;
+
+            // Kick
+            if (synthStep % 4 === 0) {
+                const osc = audioCtx.createOscillator();
+                const env = audioCtx.createGain();
+                osc.frequency.setValueAtTime(140, now);
+                osc.frequency.exponentialRampToValueAtTime(32, now + 0.15);
+                env.gain.setValueAtTime(1.0, now);
+                env.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+                osc.connect(env);
+                env.connect(masterGainNode);
+                osc.start(now);
+                osc.stop(now + 0.28);
+            }
+            // Snare
+            if (synthStep % 8 === 4) {
+                const osc = audioCtx.createOscillator();
+                const env = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.exponentialRampToValueAtTime(90, now + 0.12);
+                env.gain.setValueAtTime(0.45, now);
+                env.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+                osc.connect(env);
+                env.connect(masterGainNode);
+                osc.start(now);
+                osc.stop(now + 0.18);
+            }
+            // Hi-Hat
+            if (synthStep % 2 === 1) {
+                const osc = audioCtx.createOscillator();
+                const env = audioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(8000 + Math.random() * 2000, now);
+                env.gain.setValueAtTime(0.15, now);
+                env.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.connect(env);
+                env.connect(masterGainNode);
+                osc.start(now);
+                osc.stop(now + 0.05);
+            }
+            // Bassline
+            const notes = [110, 130.81, 146.83, 164.81, 196, 220];
+            const oscB = audioCtx.createOscillator();
+            const envB = audioCtx.createGain();
+            oscB.type = 'sawtooth';
+            oscB.frequency.setValueAtTime(notes[(synthStep * 2) % notes.length], now);
+            envB.gain.setValueAtTime(0.2, now);
+            envB.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+            oscB.connect(envB);
+            envB.connect(masterGainNode);
+            oscB.start(now);
+            oscB.stop(now + 0.16);
+
+            synthStep = (synthStep + 1) % 16;
+        }
+
+        function stopAudio() {
+            if (synthInterval) { clearInterval(synthInterval); synthInterval = null; }
+            if (audioElement) { 
+                audioElement.pause(); 
+                audioElement.currentTime = 0;
+                const btnPlay = document.getElementById('btn-play-pause-track');
+                if (btnPlay) btnPlay.innerText = "▶";
+            }
+            if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+            if (mainSourceNode && mainSourceNode !== mediaElementSource) { 
+                try { mainSourceNode.disconnect(); } catch(e){} 
+                mainSourceNode = null; 
+            }
+            isAudioRunning = false;
+            currentSourceType = 'none';
+            const synthBtn = document.getElementById('txt-synth');
+            if (synthBtn) synthBtn.innerText = "Demo Synth Beat";
+            updateBadge('En espera', 'bg-slate-800 text-slate-400 border-slate-700');
+        }
+
+        function updateBadge(text, classes) {
+            const b = document.getElementById('badge-source');
+            b.innerText = text;
+            b.className = `text-[9px] uppercase font-mono px-2 py-0.5 rounded border ${classes}`;
+        }
+
+        // DSP Analysis Loop
+        function runAudioDSP() {
+            if (!isAudioRunning || !mainAnalyser) {
+                liveAudioMetrics.rms *= 0.9;
+                liveAudioMetrics.spectralFlux *= 0.8;
+                liveAudioMetrics.isOnset = false;
+                
+                // Decay all stems
+                stemConfigs.forEach(conf => {
+                    const data = stemsData[conf.id];
+                    if (data) {
+                        data.value *= 0.9;
+                        const meterBar = document.getElementById(`meter-bar-${conf.id}`);
+                        const meterVal = document.getElementById(`meter-val-${conf.id}`);
+                        if (meterBar) meterBar.style.width = `${Math.round(data.value * 100)}%`;
+                        if (meterVal) meterVal.innerText = `${Math.round(data.value * 100)}%`;
+                    }
+                });
+                return;
+            }
+
+            mainAnalyser.getByteFrequencyData(freqDataArray);
+            mainAnalyser.getByteTimeDomainData(timeDataArray);
+
+            // Read 8 Stems
+            stemConfigs.forEach(conf => {
+                const data = stemsData[conf.id];
+                if (!data) return;
+                data.analyser.getByteFrequencyData(data.dataArray);
+                let sum = 0;
+                for (let i = 0; i < data.dataArray.length; i++) sum += data.dataArray[i];
+                data.value = sum / (data.dataArray.length * 255);
+                
+                const meterBar = document.getElementById(`meter-bar-${conf.id}`);
+                const meterVal = document.getElementById(`meter-val-${conf.id}`);
+                if (meterBar) meterBar.style.width = `${Math.min(100, Math.round(data.value * 100))}%`;
+                if (meterVal) meterVal.innerText = `${Math.round(data.value * 100)}%`;
+            });
+
+            // RMS & Zero Crossing Rate (ZCR)
+            let sumSq = 0;
+            let zcrCount = 0;
+            for (let i = 0; i < timeDataArray.length; i++) {
+                const norm = (timeDataArray[i] - 128) / 128;
+                sumSq += norm * norm;
+                
+                if (i > 0) {
+                    const prevNorm = (timeDataArray[i-1] - 128) / 128;
+                    if ((norm >= 0 && prevNorm < 0) || (norm < 0 && prevNorm >= 0)) {
+                        zcrCount++;
+                    }
+                }
+            }
+            const rms = Math.sqrt(sumSq / timeDataArray.length);
+            liveAudioMetrics.rms = rms;
+            liveAudioMetrics.zcr = zcrCount;
+
+            // Centroid, Flux & Rolloff
+            let wSum = 0, tMag = 0, flux = 0;
+            const binHz = (audioCtx.sampleRate || 44100) / FFT_SIZE;
+            
+            // Calculate total energy first for Rolloff (85% of energy)
+            let totalEnergy = 0;
+            for (let i = 0; i < freqDataArray.length; i++) totalEnergy += (freqDataArray[i] / 255);
+            
+            let currentEnergy = 0;
+            let rolloffIndex = 0;
+
+            for (let i = 0; i < freqDataArray.length; i++) {
+                const mag = freqDataArray[i] / 255;
+                wSum += i * binHz * mag;
+                tMag += mag;
+                
+                // Rolloff accumulation
+                if (currentEnergy < totalEnergy * 0.85) {
+                    currentEnergy += mag;
+                    rolloffIndex = i;
+                }
+
+                const d = mag - prevSpectrum[i];
+                if (d > 0) flux += d;
+                prevSpectrum[i] = mag;
+            }
+            const centroid = tMag > 0 ? wSum / tMag : 0;
+            const rolloff = rolloffIndex * binHz;
+            
+            liveAudioMetrics.spectralCentroid = centroid;
+            liveAudioMetrics.spectralFlux = flux;
+            liveAudioMetrics.rolloff = rolloff;
+
+            // Onset (Beat) Detection using Sub/Bass stems + Flux
+            const sub = stemsData['sub'] ? stemsData['sub'].value : 0;
+            const bass = stemsData['bass'] ? stemsData['bass'].value : 0;
+            const air = stemsData['air'] ? stemsData['air'].value : 0;
+            
+            if (flux > 1.7 || ( (sub + bass) > 0.8 && !liveAudioMetrics.isOnset)) {
+                liveAudioMetrics.isOnset = true;
+                triggerBeatUI();
+            } else {
+                liveAudioMetrics.isOnset = false;
+            }
+
+            // Telemetry UI
+            document.getElementById('tele-rms').innerText = rms.toFixed(2);
+            document.getElementById('tele-centroid').innerText = `${Math.round(centroid)} Hz`;
+            document.getElementById('tele-flux').innerText = flux.toFixed(2);
+            document.getElementById('tele-zcr').innerText = zcrCount.toString();
+            document.getElementById('tele-rolloff').innerText = `${Math.round(rolloff)} Hz`;
+
+            // MER Tracking
+            if (document.getElementById('mer-auto-track').checked) {
+                const air = stemsData['air'] ? stemsData['air'].value : 0;
+                const tArousal = Math.min(1, Math.max(0.1, (rms * 1.6) + (air * 0.4)));
+                const tValence = Math.min(1, Math.max(0.1, 0.3 + (centroid / 4500) * 0.5));
+                merX = merX * 0.85 + tValence * 0.15;
+                merY = merY * 0.85 + tArousal * 0.15;
+                drawMerPad();
+                updateMerInfo();
+            }
+
+            drawMiniWave();
+        }
+
+        function triggerBeatUI() {
+            const ind = document.getElementById('tele-beat-indicator');
+            ind.className = "w-3 h-3 rounded-full bg-amber-400 mt-0.5 shadow-[0_0_10px_#f59e0b] scale-125 transition-all";
+            setTimeout(() => { ind.className = "w-3 h-3 rounded-full bg-slate-600 mt-0.5 transition-all"; }, 80);
+
+            const flash = document.getElementById('three-beat-flash');
+            if (flash) {
+                flash.style.opacity = '1';
+                setTimeout(() => { flash.style.opacity = '0'; }, 90);
+            }
+        }
+
+        function drawMiniWave() {
+            const canvas = document.getElementById('miniWaveCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = canvas.clientWidth;
+            const h = canvas.height = canvas.clientHeight;
+            ctx.clearRect(0, 0, w, h);
+            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = '#6366f1';
+            ctx.beginPath();
+            const slice = w / timeDataArray.length;
+            let x = 0;
+            for (let i = 0; i < timeDataArray.length; i++) {
+                const v = timeDataArray[i] / 128.0;
+                const y = (v * h) / 2;
+                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                x += slice;
+            }
+            ctx.stroke();
+        }
+
+        // =========================================================================
+        // 2. THREE.JS 3D REACTIVE GRAPHICS ENGINE (WebGL Viewport) & POST-PROCESSING FX
+        // =========================================================================
+        let threeScene, threeCamera, threeRenderer;
+        let threeComposer = null;
+        let bloomPass = null;
+        let chromaPass = null;
+        let fxBloomEnabled = true;
+        let fxChromaEnabled = true;
+        let fxBloomBaseStrength = 1.2;
+        let fxChromaBaseAmount = 0.005;
+
+        let particlesMesh, tunnelMesh, monolithMesh, customShaderMesh;
+        let customShaderUniforms = null;
+        let customShaderMaterial = null;
+        let activeSceneType = 'nebula';
+        let isMouseDown = false, mouseX = 0, mouseY = 0;
+        let targetRotX = 0, targetRotY = 0;
+
+        // Cámara Orbital Cinemática & Reactiva
+        let cameraOrbitEnabled = false;
+        let cameraOrbitMode = 'circle';       // 'circle', 'spiral', 'lemniscate', 'dramatic'
+        let cameraOrbitSpeedMult = 1.0;
+        let cameraOrbitRadius = 400;          // Distancia base al origen
+        let cameraTargetLookAt = new THREE.Vector3(0, 0, 0);
+        let cameraCurrentLookAt = new THREE.Vector3(0, 0, 0);
+        let cameraManualAzimuth = 0;          // Offset de rotación horizontal del usuario
+        let cameraManualElevation = 0;        // Offset de inclinación vertical del usuario
+
+        // Custom GLSL Chromatic Aberration Shader for ShaderPass
+        const ChromaticAberrationShader = {
+            uniforms: {
+                "tDiffuse": { value: null },
+                "uAmount":  { value: 0.005 },
+                "uAngle":   { value: 0.0 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float uAmount;
+                uniform float uAngle;
+                varying vec2 vUv;
+
+                void main() {
+                    vec2 offset = vec2(cos(uAngle), sin(uAngle)) * uAmount;
+                    float r = texture2D(tDiffuse, vUv + offset).r;
+                    float g = texture2D(tDiffuse, vUv).g;
+                    float b = texture2D(tDiffuse, vUv - offset).b;
+                    float a = texture2D(tDiffuse, vUv).a;
+                    gl_FragColor = vec4(r, g, b, a);
+                }
+            `
+        };
+
+        function initThreeEngine() {
+            const canvas = document.getElementById('threeCanvas');
+            const width = canvas.parentElement.clientWidth;
+            const height = canvas.parentElement.clientHeight;
+
+            threeScene = new THREE.Scene();
+            threeScene.fog = new THREE.FogExp2(0x050714, 0.002);
+
+            threeCamera = new THREE.PerspectiveCamera(60, width / height, 0.1, 2000);
+            threeCamera.position.set(0, 0, 400);
+
+            threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
+            threeRenderer.setSize(width, height);
+            threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0x222244);
+            threeScene.add(ambientLight);
+
+            const pointLight = new THREE.PointLight(0x6366f1, 2, 800);
+            pointLight.position.set(100, 100, 200);
+            pointLight.name = "pointLight";
+            threeScene.add(pointLight);
+
+            // Build Scenes
+            buildNebulaScene();
+            buildTunnelScene();
+            buildMonolithScene();
+            buildCustomShaderScene();
+
+            switchThreeScene('nebula');
+
+            // Setup EffectComposer if postprocessing libraries are loaded
+            setupPostProcessing(width, height);
+
+            // Mouse Interaction (Manual & Orbit Offset)
+            canvas.addEventListener('mousedown', (e) => { isMouseDown = true; mouseX = e.clientX; mouseY = e.clientY; });
+            window.addEventListener('mouseup', () => { isMouseDown = false; });
+            window.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const normX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+                const normY = Math.max(0, Math.min(1, 1.0 - ((e.clientY - rect.top) / rect.height)));
+                if (customShaderUniforms && customShaderUniforms.uMouse) {
+                    customShaderUniforms.uMouse.value.set(normX, normY);
+                }
+
+                if (!isMouseDown) return;
+                const deltaX = e.clientX - mouseX;
+                const deltaY = e.clientY - mouseY;
+                if (cameraOrbitEnabled) {
+                    cameraManualAzimuth -= deltaX * 0.005;
+                    cameraManualElevation = Math.max(-Math.PI * 0.42, Math.min(Math.PI * 0.42, cameraManualElevation + deltaY * 0.005));
+                } else {
+                    targetRotY += deltaX * 0.005;
+                    targetRotX += deltaY * 0.005;
+                }
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                if (cameraOrbitEnabled) {
+                    cameraOrbitRadius += e.deltaY * 0.35;
+                    cameraOrbitRadius = Math.max(80, Math.min(1400, cameraOrbitRadius));
+                    const zoomHud = document.getElementById('hud-camera-zoom');
+                    if (zoomHud) zoomHud.innerText = Math.round(cameraOrbitRadius);
+                } else {
+                    threeCamera.position.z += e.deltaY * 0.3;
+                    threeCamera.position.z = Math.max(10, Math.min(1500, threeCamera.position.z));
+                    const zoomHud = document.getElementById('hud-camera-zoom');
+                    if (zoomHud) zoomHud.innerText = Math.round(threeCamera.position.z);
+                }
+            }, { passive: false });
+
+            window.addEventListener('resize', () => {
+                if (!threeRenderer) return;
+                const w = canvas.parentElement.clientWidth;
+                const h = canvas.parentElement.clientHeight;
+                threeCamera.aspect = w / h;
+                threeCamera.updateProjectionMatrix();
+                threeRenderer.setSize(w, h);
+                if (threeComposer) threeComposer.setSize(w, h);
+                if (customShaderUniforms && customShaderUniforms.uResolution) {
+                    customShaderUniforms.uResolution.value.set(w, h);
+                }
+            });
+        }
+
+        function setupPostProcessing(width, height) {
+            if (typeof THREE.EffectComposer === 'undefined' || typeof THREE.RenderPass === 'undefined') {
+                console.warn("Three.js EffectComposer no disponible en este entorno; usando pipeline directo.");
+                threeComposer = null;
+                return;
+            }
+
+            try {
+                threeComposer = new THREE.EffectComposer(threeRenderer);
+                const renderPass = new THREE.RenderPass(threeScene, threeCamera);
+                threeComposer.addPass(renderPass);
+
+                // Unreal Bloom Pass
+                if (typeof THREE.UnrealBloomPass !== 'undefined') {
+                    bloomPass = new THREE.UnrealBloomPass(
+                        new THREE.Vector2(width, height),
+                        fxBloomBaseStrength, // Strength
+                        0.4,                 // Radius
+                        0.85                 // Threshold
+                    );
+                    bloomPass.enabled = fxBloomEnabled;
+                    threeComposer.addPass(bloomPass);
+                }
+
+                // Chromatic Aberration ShaderPass
+                if (typeof THREE.ShaderPass !== 'undefined') {
+                    chromaPass = new THREE.ShaderPass(ChromaticAberrationShader);
+                    chromaPass.uniforms.uAmount.value = fxChromaBaseAmount;
+                    chromaPass.enabled = fxChromaEnabled;
+                    threeComposer.addPass(chromaPass);
+                }
+            } catch (err) {
+                console.warn("Fallo al inicializar Post-Processing:", err);
+                threeComposer = null;
+            }
+        }
+
+        function toggleBloomPass(enabled) {
+            fxBloomEnabled = enabled;
+            if (bloomPass) bloomPass.enabled = enabled;
+            const valSpan = document.getElementById('fx-bloom-val');
+            if (valSpan) valSpan.classList.toggle('opacity-30', !enabled);
+        }
+
+        function updateBloomParams() {
+            const sld = document.getElementById('fx-bloom-strength');
+            if (!sld) return;
+            fxBloomBaseStrength = parseFloat(sld.value);
+            document.getElementById('fx-bloom-val').innerText = fxBloomBaseStrength.toFixed(1);
+            if (bloomPass) bloomPass.strength = fxBloomBaseStrength;
+        }
+
+        function toggleChromaPass(enabled) {
+            fxChromaEnabled = enabled;
+            if (chromaPass) chromaPass.enabled = enabled;
+            const valSpan = document.getElementById('fx-chroma-val');
+            if (valSpan) valSpan.classList.toggle('opacity-30', !enabled);
+        }
+
+        function updateChromaParams() {
+            const sld = document.getElementById('fx-chroma-amount');
+            if (!sld) return;
+            fxChromaBaseAmount = parseFloat(sld.value);
+            document.getElementById('fx-chroma-val').innerText = fxChromaBaseAmount.toFixed(3);
+            if (chromaPass) chromaPass.uniforms.uAmount.value = fxChromaBaseAmount;
+        }
+
+        // Controles de Cámara Cinemática Orbital
+        function toggleCameraOrbit() {
+            cameraOrbitEnabled = !cameraOrbitEnabled;
+            const btn = document.getElementById('btn-camera-orbit');
+            const ind = document.getElementById('orbit-indicator');
+            const hud = document.getElementById('hud-camera-mode');
+            if (btn && ind) {
+                if (cameraOrbitEnabled) {
+                    btn.classList.remove('bg-indigo-600/30', 'text-indigo-300');
+                    btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/30');
+                    ind.classList.remove('bg-indigo-400');
+                    ind.classList.add('bg-emerald-400', 'animate-pulse');
+                    if (hud) hud.innerHTML = `<span class="text-emerald-400 font-bold">Órbita Cinemática (${cameraOrbitMode})</span>`;
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-600/30');
+                    btn.classList.add('bg-indigo-600/30', 'text-indigo-300');
+                    ind.classList.remove('bg-emerald-400', 'animate-pulse');
+                    ind.classList.add('bg-indigo-400');
+                    if (hud) hud.innerHTML = `Manual (Arrastrar / Zoom)`;
+                }
+            }
+        }
+
+        function changeCameraOrbitMode(mode) {
+            cameraOrbitMode = mode;
+            const hud = document.getElementById('hud-camera-mode');
+            if (cameraOrbitEnabled && hud) {
+                hud.innerHTML = `<span class="text-emerald-400 font-bold">Órbita Cinemática (${cameraOrbitMode})</span>`;
+            }
+        }
+
+        function changeCameraOrbitSpeed(speed) {
+            cameraOrbitSpeedMult = parseFloat(speed) || 1.0;
+        }
+
+        function resetThreeCamera() {
+            targetRotX = 0; targetRotY = 0;
+            cameraManualAzimuth = 0;
+            cameraManualElevation = 0;
+            cameraOrbitRadius = 400;
+            cameraTargetLookAt.set(0, 0, 0);
+            cameraCurrentLookAt.set(0, 0, 0);
+            threeCamera.position.set(0, 0, 400);
+            threeCamera.lookAt(0, 0, 0);
+            const zoomHud = document.getElementById('hud-camera-zoom');
+            if (zoomHud) zoomHud.innerText = '400';
+        }
+
+        function toggleFullscreen() {
+            const container = document.getElementById('threeCanvas').parentElement;
+            if (!document.fullscreenElement) {
+                container.requestFullscreen().catch(err => console.warn('Fullscreen error:', err));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const icon = document.getElementById('fullscreen-icon');
+            const canvas = document.getElementById('threeCanvas');
+            if (!threeRenderer) return;
+            if (document.fullscreenElement) {
+                // Fullscreen activo: usar dimensiones de pantalla completa
+                if (icon) icon.textContent = '✕';
+                const w = window.screen.width;
+                const h = window.screen.height;
+                threeCamera.aspect = w / h;
+                threeCamera.updateProjectionMatrix();
+                threeRenderer.setSize(w, h);
+                if (threeComposer) threeComposer.setSize(w, h);
+                if (customShaderUniforms && customShaderUniforms.uResolution) {
+                    customShaderUniforms.uResolution.value.set(w, h);
+                }
+            } else {
+                // Volver a tamaño normal del contenedor
+                if (icon) icon.textContent = '⛶';
+                const w = canvas.parentElement.clientWidth;
+                const h = canvas.parentElement.clientHeight;
+                threeCamera.aspect = w / h;
+                threeCamera.updateProjectionMatrix();
+                threeRenderer.setSize(w, h);
+                if (threeComposer) threeComposer.setSize(w, h);
+                if (customShaderUniforms && customShaderUniforms.uResolution) {
+                    customShaderUniforms.uResolution.value.set(w, h);
+                }
+            }
+        });
+
+        // SCENE 1: 30,000 VOLUMETRIC NEBULA PARTICLES — GLSL ShaderMaterial
+        const PARTICLE_COUNT = 30000;
+        let particlePositions, particleBaseRadius;
+        let nebulaUniforms = null; // Uniforms para audio-reactivity en shader
+
+        const NEBULA_VERT_SHADER = `
+            uniform float uTime;
+            uniform float uBass;
+            uniform float uTreble;
+            uniform float uSub;
+            attribute float aRadius;
+
+            void main() {
+                // Pulso reactivo: sub expande el núcleo, bass añade escala global
+                float pulse = 1.0 + uSub * 0.9 + uBass * 0.45;
+                // Turbulencia per-partícula: treble mueve las partículas de forma ondulatoria
+                float turbulence = sin(uTime * 3.0 + aRadius * 0.045) * uTreble * 40.0;
+                vec3 pos = normalize(position) * (length(position) * pulse + turbulence);
+
+                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                // Tamaño de punto varía con treble y bass; se escala por distancia
+                float ptSize = (4.0 + uTreble * 5.0 + uBass * 2.5) * (280.0 / -mvPosition.z);
+                gl_PointSize = max(1.0, ptSize);
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        `;
+
+        const NEBULA_FRAG_SHADER = `
+            uniform vec3 uColor1;
+            uniform vec3 uColor2;
+            uniform float uTime;
+            uniform float uTreble;
+
+            void main() {
+                // Círculo suave con glow (gl_PointCoord: 0..1 en el quad de la partícula)
+                vec2 uv = gl_PointCoord - vec2(0.5);
+                float dist = length(uv);
+                if (dist > 0.5) discard;
+
+                // Suavizado del borde + halo interior
+                float alpha = 1.0 - smoothstep(0.15, 0.5, dist);
+                alpha *= (0.75 + uTreble * 0.25);
+
+                // Color interpolado entre los dos colores de paleta IA
+                vec3 col = mix(uColor1, uColor2, dist * 1.8);
+                gl_FragColor = vec4(col, alpha);
+            }
+        `;
+
+        function buildNebulaScene() {
+            const geometry = new THREE.BufferGeometry();
+            particlePositions = new Float32Array(PARTICLE_COUNT * 3);
+            particleBaseRadius = new Float32Array(PARTICLE_COUNT);
+
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                const u = Math.random();
+                const v = Math.random();
+                const theta = u * 2.0 * Math.PI;
+                const phi = Math.acos(2.0 * v - 1.0);
+                const r = Math.cbrt(Math.random()) * 220 + 20;
+
+                particleBaseRadius[i] = r;
+                const x = r * Math.sin(phi) * Math.cos(theta);
+                const y = r * Math.sin(phi) * Math.sin(theta);
+                const z = r * Math.cos(phi);
+
+                particlePositions[i * 3]     = x;
+                particlePositions[i * 3 + 1] = y;
+                particlePositions[i * 3 + 2] = z;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+            geometry.setAttribute('aRadius',  new THREE.BufferAttribute(particleBaseRadius, 1));
+
+            // Uniforms de audio-reactivity (se actualizan en renderThreeFrame)
+            nebulaUniforms = {
+                uTime:    { value: 0.0 },
+                uBass:    { value: 0.0 },
+                uTreble:  { value: 0.0 },
+                uSub:     { value: 0.0 },
+                uColor1:  { value: new THREE.Color(0x6366f1) }, // Indigo (primario)
+                uColor2:  { value: new THREE.Color(0xec4899) }  // Pink (acento)
+            };
+
+            const material = new THREE.ShaderMaterial({
+                uniforms:       nebulaUniforms,
+                vertexShader:   NEBULA_VERT_SHADER,
+                fragmentShader: NEBULA_FRAG_SHADER,
+                transparent:    true,
+                blending:       THREE.AdditiveBlending,
+                depthWrite:     false
+            });
+
+            particlesMesh = new THREE.Points(geometry, material);
+            threeScene.add(particlesMesh);
+        }
+
+        // SCENE 2: INFINITE CYLINDER FFT TUNNEL
+        function buildTunnelScene() {
+            const geom = new THREE.CylinderGeometry(140, 140, 1000, 48, 80, true);
+            const mat = new THREE.MeshBasicMaterial({
+                color: 0x6366f1,
+                wireframe: true,
+                transparent: true,
+                opacity: 0.75,
+                side: THREE.DoubleSide
+            });
+            tunnelMesh = new THREE.Mesh(geom, mat);
+            tunnelMesh.rotation.x = Math.PI / 2;
+            threeScene.add(tunnelMesh);
+        }
+
+        function buildMonolithScene() {
+            const group = new THREE.Group();
+            const geom = new THREE.IcosahedronGeometry(110, 3);
+            const wireMat = new THREE.MeshBasicMaterial({ color: 0xf59e0b, wireframe: true, transparent: true, opacity: 0.8, side: THREE.DoubleSide });
+            const solidMat = new THREE.MeshPhongMaterial({ color: 0x1e1b4b, shininess: 80, transparent: true, opacity: 0.65, side: THREE.DoubleSide });
+
+            const solidMesh = new THREE.Mesh(geom, solidMat);
+            const wireMesh = new THREE.Mesh(geom, wireMat);
+
+            group.add(solidMesh);
+            group.add(wireMesh);
+            monolithMesh = group;
+            threeScene.add(monolithMesh);
+        }
+
+        // SCENE 4: LIVE PROCEDURAL GLSL SHADER (FULLSCREEN QUAD / SHADERTOY STYLE)
+        const DEFAULT_CUSTOM_VERT_SHADER = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position.xy, 0.0, 1.0);
+            }
+        `;
+
+        function buildCustomShaderScene() {
+            const geom = new THREE.PlaneGeometry(2, 2);
+            
+            const canvas = document.getElementById('threeCanvas');
+            const w = canvas ? (canvas.clientWidth || 800) : 800;
+            const h = canvas ? (canvas.clientHeight || 480) : 480;
+
+            customShaderUniforms = {
+                uTime:        { value: 0.0 },
+                uResolution:  { value: new THREE.Vector2(w, h) },
+                uMouse:       { value: new THREE.Vector2(0.5, 0.5) },
+                // 8 Stems DSP
+                uSub:         { value: 0.0 },
+                uBass:        { value: 0.0 },
+                uLowmid:      { value: 0.0 },
+                uMid:         { value: 0.0 },
+                uHighmid:     { value: 0.0 },
+                uPresence:    { value: 0.0 },
+                uTreble:      { value: 0.0 },
+                uAir:         { value: 0.0 },
+                // Telemetría
+                uRms:         { value: 0.0 },
+                uFlux:        { value: 0.0 },
+                uCentroid:    { value: 0.0 },
+                uIsOnset:     { value: 0.0 },
+                // Paleta IA
+                uColor1:      { value: new THREE.Color(0x6366f1) },
+                uColor2:      { value: new THREE.Color(0xec4899) },
+                uColor3:      { value: new THREE.Color(0x06b6d4) }
+            };
+
+            const defaultFrag = (typeof SHADER_PRESETS !== 'undefined' && SHADER_PRESETS.plasma) 
+                ? SHADER_PRESETS.plasma.frag 
+                : `
+                uniform float uTime;
+                uniform vec2 uResolution;
+                uniform float uBass;
+                uniform float uTreble;
+                varying vec2 vUv;
+                void main() {
+                    vec2 uv = vUv;
+                    vec3 col = 0.5 + 0.5 * cos(uTime + uv.xyx + vec3(0.0, 2.0, 4.0));
+                    gl_FragColor = vec4(col, 1.0);
+                }
+                `;
+
+            customShaderMaterial = new THREE.ShaderMaterial({
+                uniforms: customShaderUniforms,
+                vertexShader: DEFAULT_CUSTOM_VERT_SHADER,
+                fragmentShader: defaultFrag,
+                depthWrite: false,
+                depthTest: false
+            });
+
+            customShaderMesh = new THREE.Mesh(geom, customShaderMaterial);
+            customShaderMesh.visible = false;
+            customShaderMesh.frustumCulled = false;
+            threeScene.add(customShaderMesh);
+        }
+
+        function switchThreeScene(type) {
+            activeSceneType = type;
+            if (particlesMesh) particlesMesh.visible = (type === 'nebula');
+            if (tunnelMesh) tunnelMesh.visible = (type === 'tunnel');
+            if (monolithMesh) monolithMesh.visible = (type === 'monolith');
+            if (customShaderMesh) customShaderMesh.visible = (type === 'custom_shader');
+        }
+
+        function renderThreeFrame(time) {
+            if (!threeRenderer) return;
+
+            // === MAPPING GRANULAR: 8 stems → parámetros individuales ===
+            const sSub      = stemsData['sub']?.value      || 0; // <60Hz → expansión núcleo nebulosa
+            const sBass     = stemsData['bass']?.value     || 0; // 60-250Hz → escala Monolito + rotación Y
+            const sLowmid   = stemsData['lowmid']?.value   || 0; // 250-500Hz → densidad de niebla (fog)
+            const sMid      = stemsData['mid']?.value      || 0; // 500-2kHz → rotación X del Monolito
+            const sHighmid  = stemsData['highmid']?.value  || 0; // 2k-4kHz → velocidad de rotación del Túnel
+            const sPresence = stemsData['presence']?.value || 0; // 4k-6kHz → tinte de luz puntual
+            const sTreble   = stemsData['treble']?.value   || 0; // 6k-10kHz → turbulencia nebulosa (ya en shader)
+            const sAir      = stemsData['air']?.value      || 0; // >10kHz → opacidad nebulosa
+
+            // === CÁMARA: CINEMÁTICA ORBITAL REACTIVA VS CONTROL MANUAL ===
+            if (cameraOrbitEnabled) {
+                // Modulación por audio y tiempo
+                const orbitSpeed = 0.4 * cameraOrbitSpeedMult;
+                const baseAngle = time * orbitSpeed + cameraManualAzimuth;
+                
+                // Efecto de empuje por graves (dolly zoom o radio reactivo)
+                const bassKick = (sSub * 60) + (sBass * 40) + (liveAudioMetrics.isOnset ? 35 : 0);
+                const currentRadius = cameraOrbitRadius + bassKick;
+                
+                // Oscilación de elevación vertical con frecuencias medias y agudas
+                const vertWobble = Math.sin(time * 0.7 * cameraOrbitSpeedMult) * 60 + (sMid * 50) - (sAir * 30);
+                const currentElev = cameraManualElevation;
+
+                let targetCamX = 0, targetCamY = 0, targetCamZ = currentRadius;
+
+                if (cameraOrbitMode === 'circle') {
+                    // Órbita circular 360° con inclinación
+                    const yOffset = Math.sin(currentElev) * currentRadius + vertWobble;
+                    const planeRadius = Math.cos(currentElev) * currentRadius;
+                    targetCamX = Math.sin(baseAngle) * planeRadius;
+                    targetCamY = yOffset;
+                    targetCamZ = Math.cos(baseAngle) * planeRadius;
+                } else if (cameraOrbitMode === 'spiral') {
+                    // Espiral vertical oscilante (ascenso / descenso elíptico)
+                    const spiralHeight = Math.sin(time * 0.3 * cameraOrbitSpeedMult) * 160 + vertWobble;
+                    const radVar = currentRadius * (0.85 + Math.cos(time * 0.5) * 0.25);
+                    targetCamX = Math.cos(baseAngle) * radVar;
+                    targetCamY = spiralHeight;
+                    targetCamZ = Math.sin(baseAngle) * radVar;
+                } else if (cameraOrbitMode === 'lemniscate') {
+                    // Trayectoria en figura de 8 (Lemniscata de Bernoulli)
+                    const scaleFactor = currentRadius * 1.1;
+                    const denom = 1 + Math.sin(baseAngle) * Math.sin(baseAngle);
+                    targetCamX = (scaleFactor * Math.cos(baseAngle)) / denom;
+                    targetCamZ = (scaleFactor * Math.sin(baseAngle) * Math.cos(baseAngle)) / denom;
+                    targetCamY = Math.sin(baseAngle * 2.0) * 80 + vertWobble;
+                } else if (cameraOrbitMode === 'dramatic') {
+                    // Fly-by cinemático amplio con sweep rasante y subida dramática
+                    const tNorm = (time * 0.25 * cameraOrbitSpeedMult) % (Math.PI * 2);
+                    const sweepDist = currentRadius * (1.2 + Math.sin(tNorm) * 0.4);
+                    targetCamX = Math.sin(tNorm * 1.5) * sweepDist;
+                    targetCamY = Math.cos(tNorm * 2.0) * 120 + (sSub * 60);
+                    targetCamZ = Math.cos(tNorm) * sweepDist;
+                }
+
+                // Micro-vibración cinematográfica en transitorios (Camera Shake ante beat/onset)
+                if (liveAudioMetrics.isOnset) {
+                    const shakeAmt = 3.5 + sSub * 4.0;
+                    targetCamX += (Math.random() - 0.5) * shakeAmt;
+                    targetCamY += (Math.random() - 0.5) * shakeAmt;
+                    targetCamZ += (Math.random() - 0.5) * shakeAmt;
+                }
+
+                // Interpolación amortiguada (damping / lerp suave de posición)
+                threeCamera.position.x += (targetCamX - threeCamera.position.x) * 0.055;
+                threeCamera.position.y += (targetCamY - threeCamera.position.y) * 0.055;
+                threeCamera.position.z += (targetCamZ - threeCamera.position.z) * 0.055;
+
+                // LookAt cinemático dinámico con sutil desviación reactiva hacia el centro
+                cameraTargetLookAt.set(
+                    Math.sin(time * 0.6) * sMid * 20,
+                    Math.cos(time * 0.8) * sLowmid * 20,
+                    0
+                );
+                cameraCurrentLookAt.lerp(cameraTargetLookAt, 0.05);
+                threeCamera.lookAt(cameraCurrentLookAt);
+
+                // Actualizar HUD indicador de radio dinámico
+                const zoomHud = document.getElementById('hud-camera-zoom');
+                if (zoomHud && Math.random() < 0.1) {
+                    zoomHud.innerText = Math.round(threeCamera.position.length());
+                }
+            } else {
+                // Control Manual: interpolación suave de rotación de ejes
+                threeCamera.rotation.x += (targetRotX - threeCamera.rotation.x) * 0.08;
+                threeCamera.rotation.y += (targetRotY - threeCamera.rotation.y) * 0.08;
+            }
+
+            // Fog density reactiva a lowmid (atmósfera más densa con mucho bajo-medio)
+            if (threeScene.fog) {
+                threeScene.fog.density = 0.0015 + sLowmid * 0.006;
+            }
+
+            // Luz puntual hue-shift con presence
+            const pLight = threeScene.getObjectByName("pointLight");
+            if (pLight) {
+                const hue = (0.66 + sPresence * 0.4) % 1.0; // azul→verde→rojo según presence
+                pLight.color.setHSL(hue, 1.0, 0.6);
+                pLight.intensity = 2.0 + sPresence * 3.0;
+            }
+
+            // SCENE 1 — NEBULOSA: toda la animación va en el shader vía uniforms
+            if (activeSceneType === 'nebula' && particlesMesh && nebulaUniforms) {
+                nebulaUniforms.uTime.value   = time;
+                nebulaUniforms.uSub.value    = sSub;
+                nebulaUniforms.uBass.value   = sBass;
+                nebulaUniforms.uTreble.value = sTreble;
+
+                // Opacidad global del material por sAir (>10kHz = brillo etéreo)
+                particlesMesh.material.opacity = 0.6 + sAir * 0.4;
+
+                // Rotación reactiva a mids
+                particlesMesh.rotation.y = time * 0.2 + sMid * 0.8;
+                particlesMesh.rotation.x = sSub * 0.3;
+            }
+
+            // SCENE 2 — TÚNEL: highmid controla velocidad, bass controla escala
+            if (activeSceneType === 'tunnel' && tunnelMesh) {
+                tunnelMesh.rotation.z += 0.005 + sHighmid * 0.035;
+                tunnelMesh.position.z = (time * 150) % 200 - 100;
+                const scaleTunnel = 1 + sBass * 0.5 + sSub * 0.3;
+                tunnelMesh.scale.set(scaleTunnel, scaleTunnel, 1);
+                // Opacidad por treble
+                tunnelMesh.material.opacity = 0.5 + sTreble * 0.5;
+            }
+
+            // SCENE 3 — MONOLITO: bass → escala global, mid → rotX, bass+sub → rotY, onset → spike
+            if (activeSceneType === 'monolith' && monolithMesh) {
+                monolithMesh.rotation.x = time * 0.6 + sMid * 1.2;
+                monolithMesh.rotation.y = time * 0.8 + sBass * 0.8 + sSub * 0.4;
+                const scaleMono = 1 + sBass * 0.7 + sSub * 0.4 + (liveAudioMetrics.isOnset ? 0.3 : 0);
+                monolithMesh.scale.set(scaleMono, scaleMono, scaleMono);
+                // Wireframe brilla con highmid
+                if (monolithMesh.children[1]) {
+                    monolithMesh.children[1].material.opacity = 0.5 + sHighmid * 0.5;
+                }
+            }
+
+            // SCENE 4 — LIVE PROCEDURAL GLSL SHADER: alimentar todos los uniforms DSP
+            if (activeSceneType === 'custom_shader' && customShaderUniforms) {
+                customShaderUniforms.uTime.value       = time;
+                customShaderUniforms.uSub.value        = sSub;
+                customShaderUniforms.uBass.value       = sBass;
+                customShaderUniforms.uLowmid.value     = sLowmid;
+                customShaderUniforms.uMid.value        = sMid;
+                customShaderUniforms.uHighmid.value    = sHighmid;
+                customShaderUniforms.uPresence.value   = sPresence;
+                customShaderUniforms.uTreble.value     = sTreble;
+                customShaderUniforms.uAir.value        = sAir;
+
+                customShaderUniforms.uRms.value        = liveAudioMetrics.rms || 0;
+                customShaderUniforms.uFlux.value       = liveAudioMetrics.spectralFlux || 0;
+                customShaderUniforms.uCentroid.value   = liveAudioMetrics.spectralCentroid || 0;
+                customShaderUniforms.uIsOnset.value    = liveAudioMetrics.isOnset ? 1.0 : 0.0;
+            }
+
+            // === POST-PROCESSING FX MODULATION (REACTIVA AL AUDIO) ===
+            if (bloomPass && fxBloomEnabled) {
+                // Bloom reactivo: destello ante onsets y expansión con energía en sub/bass y agudos
+                const onsetBoost = liveAudioMetrics.isOnset ? 0.8 : 0.0;
+                bloomPass.strength = fxBloomBaseStrength * (1.0 + (sSub * 0.5) + (sTreble * 0.3) + onsetBoost);
+            }
+
+            if (chromaPass && fxChromaEnabled) {
+                // Aberración cromática: dispersión con el flujo espectral y los transitorios (onsets)
+                const fluxNorm = Math.min(1.0, (liveAudioMetrics.spectralFlux || 0) / 4.0);
+                const onsetGlitch = liveAudioMetrics.isOnset ? (fxChromaBaseAmount * 1.5) : 0.0;
+                chromaPass.uniforms.uAmount.value = fxChromaBaseAmount + (fluxNorm * 0.008) + onsetGlitch;
+                chromaPass.uniforms.uAngle.value = time * 2.0; // Rotación lenta del eje RGB
+            }
+
+            // Renderizado final: Composer con passes FX (o fallback directo a WebGLRenderer)
+            if (threeComposer) {
+                threeComposer.render();
+            } else {
+                threeRenderer.render(threeScene, threeCamera);
+            }
+        }
+
+        // =========================================================================
+        // 3. AI ART DIRECTOR (Multimodal Semantic & Palette Synthesis)
+        // =========================================================================
+        let aiCycleDuration = 60; // Configurable: 15, 30, 60, 120s
+        let aiCycleTimer = 60;
+        let aiInterval = null;
+
+        function updateAiInterval() {
+            const select = document.getElementById('ai-interval-select');
+            if (select) {
+                aiCycleDuration = parseInt(select.value, 10) || 60;
+                aiCycleTimer = Math.min(aiCycleTimer, aiCycleDuration);
+                const cdElem = document.getElementById('ai-cycle-countdown');
+                if (cdElem) cdElem.innerText = `Próximo ciclo: ${aiCycleTimer}s`;
+            }
+        }
+
+        const aiThemes = {
+            energetic: [
+                "Hyper-detailed cyberpunk megalopolis with neon plasma arcs, volumetric ultraviolet fog, pulsating geometric core, 8k cinematic lighting",
+                "Futuristic particle collider exploding with golden lightning and liquid chrome waves, high kinetic motion, ultra-vibrant contrast"
+            ],
+            serene: [
+                "Bioluminescent deep ocean trench with floating crystalline jellyfish, gentle cyan auroras, soft refractive mist, tranquil ambient aesthetic",
+                "Ethereal floating islands with glowing mint vegetation, iridescent clouds, pastel sunbeams, meditative dreamscape"
+            ],
+            tense: [
+                "Chaotic obsidian cavern with scarlet laser fissures, jagged metallic fractures, dark techno brutalist architecture, strobing volumetric shadows",
+                "Glitch surrealism labyrinth with shifting crimson portals and sharp angular monoliths, high tension industrial vibe"
+            ]
+        };
+
+        function startAiDirectorLoop() {
+            const select = document.getElementById('ai-interval-select');
+            if (select) {
+                aiCycleDuration = parseInt(select.value, 10) || 60;
+                aiCycleTimer = aiCycleDuration;
+            }
+            if (aiInterval) clearInterval(aiInterval);
+            aiInterval = setInterval(() => {
+                aiCycleTimer--;
+                const cdElem = document.getElementById('ai-cycle-countdown');
+                if (cdElem) cdElem.innerText = `Próximo ciclo: ${aiCycleTimer}s`;
+                if (aiCycleTimer <= 0) {
+                    aiCycleTimer = aiCycleDuration;
+                    triggerAiArtDirectionNow();
+                }
+            }, 1000);
+        }
+
+        function triggerAiArtDirectionNow() {
+            const mode = document.getElementById('ai-engine-mode').value;
+            const apiKey = document.getElementById('gemini-api-key').value.trim();
+
+            if (mode === 'gemini' && apiKey) {
+                localStorage.setItem('motor_gemini_key', apiKey);
+                generateGeminiPrompt(apiKey);
+            } else {
+                generateHeuristicPrompt();
+            }
+        }
+
+        function generateHeuristicPrompt() {
+            let mood = 'serene';
+            let palette = ['#10b981', '#6ee7b7', '#064e3b']; // Mint/Green
+
+            if (merY >= 0.5 && merX >= 0.5) {
+                mood = 'energetic';
+                palette = ['#f59e0b', '#ef4444', '#6366f1']; // Gold/Crimson/Indigo
+            } else if (merY >= 0.5 && merX < 0.5) {
+                mood = 'tense';
+                palette = ['#dc2626', '#7c3aed', '#111827']; // Red/Violet/Black
+            }
+
+            const candidates = aiThemes[mood];
+            const prompt = candidates[Math.floor(Math.random() * candidates.length)];
+
+            applyAiDirectionToThree(prompt, palette);
+        }
+
+        async function generateGeminiPrompt(apiKey) {
+            try {
+                // Indicador de carga
+                document.getElementById('ai-generated-prompt').innerText = "Generando con Gemini...";
+
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+                const bEnergy = (((stemsData['sub']?.value || 0) + (stemsData['bass']?.value || 0)) * 50).toFixed(0);
+                const promptReq = `Act as an expert AI Art Director for live concerts and audio-reactive visuals.
+Audio Metrics:
+- BPM: 124, Bass Energy: ${bEnergy}%, Spectral Centroid: ${Math.round(liveAudioMetrics.spectralCentroid)}Hz.
+- Valence: ${(merX).toFixed(2)}, Arousal: ${(merY).toFixed(2)}.
+Write a single concise image prompt (1-2 sentences) for an abstract visualizer. Respond ONLY with valid JSON containing "prompt" (string) and "palette" (array of 3 hex color strings).`;
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        contents: [{ parts: [{ text: promptReq }] }],
+                        generationConfig: {
+                            responseMimeType: "application/json"
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                const rawText = data.candidates[0].content.parts[0].text;
+                const parsed = JSON.parse(rawText);
+                applyAiDirectionToThree(parsed.prompt, parsed.palette);
+            } catch (err) {
+                console.warn("Gemini falló:", err);
+                document.getElementById('ai-generated-prompt').innerText = `⚠️ Error de Gemini API: ${err.message}. Revise la consola o su API Key.`;
+            }
+        }
+
+        function applyAiDirectionToThree(promptText, palette) {
+            document.getElementById('ai-generated-prompt').innerText = `"${promptText}"`;
+            
+            // Update Swatches UI
+            const swatches = document.getElementById('ai-palette-swatches');
+            swatches.innerHTML = palette.map(c => `<span class="w-5 h-5 rounded-full border border-white/20 shadow" style="background-color:${c}"></span>`).join('');
+
+            // Inject into Three.js Scene
+            if (threeScene) {
+                const primColor = new THREE.Color(palette[0] || '#ffffff');
+                const accentColor = new THREE.Color(palette[1] || '#ffffff');
+                const fogColor = new THREE.Color(palette[2] || palette[0] || '#ffffff');
+
+                threeScene.fog.color = fogColor;
+                const pLight = threeScene.getObjectByName("pointLight");
+                if (pLight) pLight.color = primColor;
+
+                if (tunnelMesh) tunnelMesh.material.color = primColor;
+                if (monolithMesh) monolithMesh.children[1].material.color = accentColor;
+                
+                // Actualizar los colores de la Nebulosa (Partículas / Shaders)
+                if (particlesMesh && nebulaUniforms) {
+                    nebulaUniforms.uColor1.value.copy(primColor);
+                    nebulaUniforms.uColor2.value.copy(accentColor);
+                } else if (particlesMesh && particlesMesh.material.color) {
+                    particlesMesh.material.color = primColor;
+                }
+
+                // Inyectar en Custom GLSL Shader
+                if (customShaderUniforms) {
+                    customShaderUniforms.uColor1.value.copy(primColor);
+                    customShaderUniforms.uColor2.value.copy(accentColor);
+                    customShaderUniforms.uColor3.value.copy(fogColor);
+                }
+            }
+        }
+
+        document.getElementById('ai-engine-mode').addEventListener('change', (e) => {
+            document.getElementById('gemini-key-container').className = e.target.value === 'gemini' ? 'space-y-1 pt-1' : 'hidden';
+            if (e.target.value === 'gemini') {
+                const savedKey = localStorage.getItem('motor_gemini_key');
+                if (savedKey) document.getElementById('gemini-api-key').value = savedKey;
+            }
+        });
+
+        // Cargar key guardada al inicio
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('motor_gemini_key');
+            if (savedKey) {
+                document.getElementById('gemini-api-key').value = savedKey;
+                document.getElementById('ai-engine-mode').value = 'gemini';
+                document.getElementById('gemini-key-container').className = 'space-y-1 pt-1';
+            }
+        });
+
+        // =========================================================================
+        // 4. VIDEO RECORDER ENGINE (MediaRecorder WebM 60 FPS + Audio Sync)
+        // =========================================================================
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        let isRecording = false;
+        let recStartTime = 0;
+        let recTimerInterval = null;
+
+        function toggleVideoRecording() {
+            if (isRecording) {
+                stopVideoRecording();
+            } else {
+                startVideoRecording();
+            }
+        }
+
+        function startVideoRecording() {
+            initAudioContext();
+            const canvas = document.getElementById('threeCanvas');
+            const videoStream = canvas.captureStream(60); // 60 FPS
+
+            // Mix Audio Stream Destination
+            const audioTracks = audioDestNode ? audioDestNode.stream.getAudioTracks() : [];
+            const combinedStream = new MediaStream([
+                ...videoStream.getVideoTracks(),
+                ...audioTracks
+            ]);
+
+            recordedChunks = [];
+            let options = { mimeType: 'video/webm;codecs=vp9,opus' };
+            if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                options = { mimeType: 'video/webm' };
+            }
+
+            try {
+                mediaRecorder = new MediaRecorder(combinedStream, options);
+            } catch (e) {
+                mediaRecorder = new MediaRecorder(combinedStream);
+            }
+
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data && event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = saveRecordedVideo;
+            mediaRecorder.start(100);
+
+            isRecording = true;
+            document.getElementById('btn-record').className = "px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center gap-2 border border-red-500 shadow-lg transition";
+            document.getElementById('rec-dot').className = "w-2.5 h-2.5 rounded-full bg-red-500 rec-dot";
+            document.getElementById('txt-record').innerText = "Detener y Descargar Vídeo";
+
+            const timerBadge = document.getElementById('rec-timer');
+            timerBadge.classList.remove('hidden');
+            recStartTime = Date.now();
+            recTimerInterval = setInterval(() => {
+                const diff = Math.floor((Date.now() - recStartTime) / 1000);
+                const m = String(Math.floor(diff / 60)).padStart(2, '0');
+                const s = String(diff % 60).padStart(2, '0');
+                timerBadge.innerText = `${m}:${s}`;
+            }, 500);
+        }
+
+        function stopVideoRecording() {
+            if (!mediaRecorder || !isRecording) return;
+            mediaRecorder.stop();
+            isRecording = false;
+
+            clearInterval(recTimerInterval);
+            document.getElementById('rec-timer').classList.add('hidden');
+            document.getElementById('btn-record').className = "px-3.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 active:bg-red-700 text-white font-bold text-xs flex items-center gap-2 shadow-lg transition";
+            document.getElementById('rec-dot').className = "w-2.5 h-2.5 rounded-full bg-white";
+            document.getElementById('txt-record').innerText = "Grabar Vídeo (60 FPS + Audio)";
+        }
+
+        function saveRecordedVideo() {
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `MotorVisuales_Rec_${Date.now()}.webm`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        // =========================================================================
+        // 5. CHARTS & MER RUSSELL PAD
+        // =========================================================================
+        let currentArchKey = 'mel';
+        const freqArchitectures = {
+            mel: {
+                title: "Banco Mel / Escala Bark (24 Bandas)",
+                labels: Array.from({length: 24}, (_, i) => `Mel ${i+1}`),
+                color: '#f59e0b'
+            },
+            triad: {
+                title: "Tríada Tradicional (3 Bandas)",
+                labels: ['Graves (<180Hz)', 'Medios (180-3.5kHz)', 'Agudos (>3.5kHz)'],
+                color: '#6366f1'
+            },
+            cqt: {
+                title: "Transformada CQT (36 Semitonos)",
+                labels: ['C2','D2','E2','F2','G2','A2','B2','C3','D3','E3','F3','G3','A3','B3','C4','D4','E4','F4','G4','A4','B4','C5','D5','E5','F5','G5','A5','B5','C6','D6','E6','F6','G6','A6','B6','C7'],
+                color: '#10b981'
+            },
+            fft: {
+                title: "FFT Lineal Uniforme (48 Bins)",
+                labels: Array.from({length: 48}, (_, i) => `${Math.round(i * 450)}Hz`),
+                color: '#3b82f6'
+            }
+        };
+
+        let freqChart = null;
+        function initFrequencyChart() {
+            const ctx = document.getElementById('frequencyChart').getContext('2d');
+            const arch = freqArchitectures[currentArchKey];
+
+            freqChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: arch.labels,
+                    datasets: [{
+                        label: 'Magnitud de Banda',
+                        data: new Array(arch.labels.length).fill(0),
+                        backgroundColor: arch.color,
+                        borderRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    scales: {
+                        x: { grid: { display: false }, ticks: { font: { size: 9 }, maxRotation: 90 } },
+                        y: { beginAtZero: true, max: 255, grid: { color: '#e2e8f0' } }
+                    }
+                }
+            });
+        }
+
+        function selectArch(key) {
+            currentArchKey = key;
+            const arch = freqArchitectures[key];
+            if (!arch) return;
+            document.getElementById('select-arch-dropdown').value = key;
+            freqChart.data.labels = arch.labels;
+            freqChart.data.datasets[0].backgroundColor = arch.color;
+            freqChart.data.datasets[0].data = new Array(arch.labels.length).fill(0);
+            freqChart.update();
+        }
+
+        function updateRealFrequencyChart() {
+            if (!freqChart) return;
+            const bufferLen = freqDataArray.length;
+            let values = [];
+
+            if (currentArchKey === 'triad') {
+                const b = (stemsData['bass']?.value || 0) * 255;
+                const m = (stemsData['mid']?.value || 0) * 255;
+                const t = (stemsData['treble']?.value || 0) * 255;
+                values = [b, m, t];
+            } else if (currentArchKey === 'mel') {
+                values = new Array(24).fill(0);
+                for (let m = 0; m < 24; m++) {
+                    const startBin = Math.floor(Math.pow(m / 24, 2.5) * (bufferLen / 2));
+                    const endBin = Math.max(startBin + 1, Math.floor(Math.pow((m + 1) / 24, 2.5) * (bufferLen / 2)));
+                    let sum = 0;
+                    for (let b = startBin; b < endBin && b < bufferLen; b++) sum += freqDataArray[b];
+                    values[m] = sum / (endBin - startBin);
+                }
+            } else if (currentArchKey === 'cqt') {
+                values = new Array(36).fill(0);
+                for (let s = 0; s < 36; s++) {
+                    const bin = Math.min(bufferLen - 1, Math.floor(Math.pow(2, s / 12) * 4));
+                    values[s] = freqDataArray[bin] || 0;
+                }
+            } else {
+                values = new Array(48).fill(0);
+                const step = Math.floor(bufferLen / 48);
+                for (let i = 0; i < 48; i++) values[i] = freqDataArray[i * step] || 0;
+            }
+
+            freqChart.data.datasets[0].data = values;
+            freqChart.update();
+        }
+
+        // MER Russell Pad
+        let merX = 0.7, merY = 0.8;
+        function drawMerPad() {
+            const canvas = document.getElementById('merCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width = canvas.clientWidth;
+            const h = canvas.height = canvas.clientHeight;
+
+            ctx.clearRect(0, 0, w, h);
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.beginPath();
+            ctx.moveTo(w/2, 0); ctx.lineTo(w/2, h);
+            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
+            ctx.stroke();
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '9px sans-serif';
+            ctx.fillText('+ Energía', w/2 + 4, 10);
+            ctx.fillText('+ Valencia', w - 50, h/2 - 4);
+
+            const px = merX * w;
+            const py = (1 - merY) * h;
+            ctx.fillStyle = '#f59e0b';
+            ctx.beginPath();
+            ctx.arc(px, py, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function handleMerClick(e) {
+            document.getElementById('mer-auto-track').checked = false;
+            const rect = e.currentTarget.getBoundingClientRect();
+            merX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            merY = Math.max(0, Math.min(1, 1 - ((e.clientY - rect.top) / rect.height)));
+            drawMerPad();
+            updateMerInfo();
+        }
+
+        function updateMerInfo() {
+            const lbl = document.getElementById('mer-emotion-label');
+            if (merX >= 0.5 && merY >= 0.5) lbl.innerText = "Energía Elevada / Alegre";
+            else if (merX < 0.5 && merY >= 0.5) lbl.innerText = "Tensión / Caótico";
+            else if (merX < 0.5 && merY < 0.5) lbl.innerText = "Melancolía / Calma Triste";
+            else lbl.innerText = "Serenidad / Etéreo";
+        }
+
+        // =========================================================================
+        // 3.8. SHADER GLSL STUDIO (Presets, Editor & Hot-Reload Compiler)
+        // =========================================================================
+        const SHADER_PRESETS = {
+            plasma: {
+                name: "Plasma Psicodélico Reactivo",
+                vert: DEFAULT_CUSTOM_VERT_SHADER,
+                frag: `// 1. Plasma Psicodélico Reactivo
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec2 uMouse;
+uniform float uSub;
+uniform float uBass;
+uniform float uMid;
+uniform float uTreble;
+uniform float uIsOnset;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+varying vec2 vUv;
+
+void main() {
+    vec2 p = (vUv - 0.5) * 2.0;
+    p.x *= uResolution.x / uResolution.y;
+
+    float t = uTime * (0.8 + uBass * 1.5);
+    
+    // Deformación ondulatoria reactiva a sub y mids
+    float v1 = sin(p.x * 6.0 + t + uSub * 4.0);
+    float v2 = sin(p.y * 6.0 - t * 0.8 + uMid * 3.0);
+    float v3 = sin(p.x * 4.0 + p.y * 4.0 + t * 1.2);
+    
+    // Distancia al cursor / centro con pulsación
+    float dist = length(p - (uMouse - 0.5) * 2.0);
+    float v4 = sin(dist * (10.0 + uTreble * 15.0) - t * 2.0);
+
+    float val = (v1 + v2 + v3 + v4) * 0.25;
+
+    // Paleta cromática interpolada
+    vec3 col = mix(uColor1, uColor2, sin(val * 3.1415 + t) * 0.5 + 0.5);
+    col += vec3(0.1, 0.2, 0.3) * cos(val * 6.28);
+    
+    // Flash en transitorios de beat
+    col += vec3(uIsOnset * 0.4);
+
+    gl_FragColor = vec4(col, 1.0);
+}`
+            },
+            raymarch: {
+                name: "Raymarching Túnel Fractal (SDF)",
+                vert: DEFAULT_CUSTOM_VERT_SHADER,
+                frag: `// 2. Raymarching Túnel Fractal (SDF)
+uniform float uTime;
+uniform vec2 uResolution;
+uniform vec2 uMouse;
+uniform float uSub;
+uniform float uBass;
+uniform float uMid;
+uniform float uHighmid;
+uniform float uTreble;
+uniform float uIsOnset;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+varying vec2 vUv;
+
+float map(vec3 p) {
+    // Torsión con los agudos y medios
+    float twist = sin(p.z * 0.25 + uTime * 0.5) * (0.4 + uMid * 0.5);
+    mat2 rot = mat2(cos(twist), -sin(twist), sin(twist), cos(twist));
+    p.xy = rot * p.xy;
+
+    // Repetición espacial cilíndrica
+    vec2 c = vec2(2.5, 2.5);
+    vec3 q = vec3(mod(p.xy + 0.5 * c, c) - 0.5 * c, p.z);
+
+    // Radio reactivo al subgrave
+    float radius = 0.55 + uSub * 0.35 + sin(p.z * 2.0 + uTime * 2.0) * (0.08 + uTreble * 0.15);
+    return length(q.xy) - radius;
+}
+
+void main() {
+    vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution.xy) / uResolution.y;
+    
+    // Cámara en movimiento hacia adelante
+    float speed = uTime * (3.0 + uBass * 4.0);
+    vec3 ro = vec3(sin(uTime * 0.4) * 0.5, cos(uTime * 0.3) * 0.5, speed);
+    vec3 rd = normalize(vec3(uv, 1.0));
+
+    float dO = 0.0;
+    float glow = 0.0;
+    for(int i = 0; i < 48; i++) {
+        vec3 p = ro + rd * dO;
+        float dS = map(p);
+        glow += exp(-dS * (4.0 + uHighmid * 3.0));
+        dO += max(dS * 0.7, 0.02);
+        if(dS < 0.001 || dO > 35.0) break;
+    }
+
+    // Coloración volumétrica por niebla y glow
+    vec3 col = mix(uColor1, uColor2, sin(dO * 0.2 + uTime) * 0.5 + 0.5);
+    col *= glow * (0.03 + uBass * 0.03);
+    
+    // Destello de onset
+    col += vec3(uIsOnset * 0.25);
+
+    gl_FragColor = vec4(col, 1.0);
+}`
+            },
+            spectral_waves: {
+                name: "Ondas de Luz & Malla Espectral",
+                vert: DEFAULT_CUSTOM_VERT_SHADER,
+                frag: `// 3. Ondas de Luz & Malla Espectral
+uniform float uTime;
+uniform vec2 uResolution;
+uniform float uSub;
+uniform float uBass;
+uniform float uLowmid;
+uniform float uMid;
+uniform float uHighmid;
+uniform float uPresence;
+uniform float uTreble;
+uniform float uAir;
+uniform float uRms;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+varying vec2 vUv;
+
+void main() {
+    vec2 uv = vUv * 2.0 - 1.0;
+    uv.x *= uResolution.x / uResolution.y;
+
+    vec3 finalColor = vec3(0.01, 0.01, 0.03);
+    float stems[8];
+    stems[0] = uSub;
+    stems[1] = uBass;
+    stems[2] = uLowmid;
+    stems[3] = uMid;
+    stems[4] = uHighmid;
+    stems[5] = uPresence;
+    stems[6] = uTreble;
+    stems[7] = uAir;
+
+    // 8 líneas o vigas de luz correspondientes a los 8 stems
+    for(int i = 0; i < 8; i++) {
+        float fi = float(i);
+        float offset = (fi - 3.5) * 0.22;
+        float freq = 3.0 + fi * 1.5;
+        float speed = uTime * (1.0 + fi * 0.2);
+        
+        float wave = sin(uv.x * freq + speed) * (0.15 + stems[i] * 0.55);
+        wave += cos(uv.x * 2.0 - speed * 0.5) * 0.08;
+
+        float dist = abs(uv.y - offset - wave);
+        float intensity = 0.012 / max(dist, 0.003);
+        
+        vec3 lineColor = mix(uColor1, uColor2, fi / 7.0);
+        finalColor += lineColor * intensity * (0.5 + stems[i] * 1.5);
+    }
+
+    gl_FragColor = vec4(finalColor, 1.0);
+}`
+            },
+            voronoi: {
+                name: "Bio-Voronoi Pulsante (Beat Spike)",
+                vert: DEFAULT_CUSTOM_VERT_SHADER,
+                frag: `// 4. Bio-Voronoi Pulsante
+uniform float uTime;
+uniform vec2 uResolution;
+uniform float uSub;
+uniform float uBass;
+uniform float uMid;
+uniform float uTreble;
+uniform float uIsOnset;
+uniform vec3 uColor1;
+uniform vec3 uColor2;
+uniform vec3 uColor3;
+varying vec2 vUv;
+
+vec2 hash2(vec2 p) {
+    p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
+    return fract(sin(p) * 43758.5453);
+}
+
+void main() {
+    vec2 st = vUv * 6.0;
+    st.x *= uResolution.x / uResolution.y;
+
+    vec2 i_st = floor(st);
+    vec2 f_st = fract(st);
+
+    float m_dist = 1.0;
+    vec2 m_point;
+
+    for (int y= -1; y <= 1; y++) {
+        for (int x= -1; x <= 1; x++) {
+            vec2 neighbor = vec2(float(x), float(y));
+            vec2 point = hash2(i_st + neighbor);
+            
+            // Animación oscilatoria de los núcleos celulares con graves
+            point = 0.5 + 0.45 * sin(uTime * 1.5 + 6.2831 * point + uBass * 3.0);
+            vec2 diff = neighbor + point - f_st;
+            float dist = length(diff);
+
+            if(dist < m_dist) {
+                m_dist = dist;
+                m_point = point;
+            }
+        }
+    }
+
+    // Grosor del núcleo celular reactivo al sub y agudos
+    float cellGlow = 1.0 - smoothstep(0.0, 0.75 + uTreble * 0.4, m_dist);
+    float border = smoothstep(0.03, 0.08, m_dist);
+
+    vec3 col = mix(uColor1, uColor2, m_point.x + sin(uTime) * 0.2);
+    col = mix(col, uColor3, cellGlow * (0.8 + uSub * 0.8));
+    col *= border;
+
+    // Destello de Onset
+    col += vec3(uIsOnset * 0.35);
+
+    gl_FragColor = vec4(col, 1.0);
+}`
+            }
+        };
+
+        let activeEditorTab = 'frag'; // 'frag' o 'vert'
+
+        function initShaderEditor() {
+            const fragArea = document.getElementById('shader-code-frag');
+            const vertArea = document.getElementById('shader-code-vert');
+
+            // Cargar código guardado en localStorage o preset inicial
+            const savedFrag = localStorage.getItem('motor_custom_glsl_frag');
+            const savedVert = localStorage.getItem('motor_custom_glsl_vert');
+
+            if (fragArea) {
+                fragArea.value = savedFrag || SHADER_PRESETS.plasma.frag;
+                fragArea.addEventListener('keydown', handleEditorKeydown);
+            }
+            if (vertArea) {
+                vertArea.value = savedVert || DEFAULT_CUSTOM_VERT_SHADER;
+                vertArea.addEventListener('keydown', handleEditorKeydown);
+            }
+
+            // Compilar inicialmente en caliente
+            compileUserShader(
+                (vertArea && vertArea.value) ? vertArea.value : DEFAULT_CUSTOM_VERT_SHADER,
+                (fragArea && fragArea.value) ? fragArea.value : SHADER_PRESETS.plasma.frag,
+                false
+            );
+        }
+
+        function handleEditorKeydown(e) {
+            // Atajo Ctrl+Enter / Cmd+Enter para compilar
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                compileUserShaderFromUI();
+            }
+            // Soporte para Tabulación en el editor
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
+            }
+        }
+
+        function openShaderEditorTab(tab) {
+            activeEditorTab = tab;
+            const fragArea = document.getElementById('shader-code-frag');
+            const vertArea = document.getElementById('shader-code-vert');
+            const btnFrag = document.getElementById('tab-btn-frag');
+            const btnVert = document.getElementById('tab-btn-vert');
+
+            if (tab === 'frag') {
+                if (fragArea) fragArea.classList.remove('hidden');
+                if (vertArea) vertArea.classList.add('hidden');
+                if (btnFrag) btnFrag.className = "px-3 py-1 rounded-t-lg bg-pink-600 text-white font-bold text-xs flex items-center gap-1.5 transition";
+                if (btnVert) btnVert.className = "px-3 py-1 rounded-t-lg bg-slate-800 text-slate-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition";
+            } else {
+                if (fragArea) fragArea.classList.add('hidden');
+                if (vertArea) vertArea.classList.remove('hidden');
+                if (btnFrag) btnFrag.className = "px-3 py-1 rounded-t-lg bg-slate-800 text-slate-400 hover:text-white font-bold text-xs flex items-center gap-1.5 transition";
+                if (btnVert) btnVert.className = "px-3 py-1 rounded-t-lg bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5 transition";
+            }
+        }
+
+        function toggleUniformCheatSheet() {
+            const drawer = document.getElementById('shader-uniforms-drawer');
+            if (drawer) drawer.classList.toggle('hidden');
+        }
+
+        function activateCustomShaderScene() {
+            const sel = document.getElementById('three-scene-mode');
+            if (sel) {
+                sel.value = 'custom_shader';
+                switchThreeScene('custom_shader');
+            }
+            scrollToSection('sec-viewport-3d');
+        }
+
+        function loadShaderPreset(presetKey) {
+            const preset = SHADER_PRESETS[presetKey];
+            if (!preset) return;
+
+            const fragArea = document.getElementById('shader-code-frag');
+            const vertArea = document.getElementById('shader-code-vert');
+
+            if (fragArea) fragArea.value = preset.frag;
+            if (vertArea) vertArea.value = preset.vert;
+
+            compileUserShader(preset.vert, preset.frag, true);
+        }
+
+        function resetShaderToCurrentPreset() {
+            const sel = document.getElementById('shader-preset-select');
+            const key = sel ? sel.value : 'plasma';
+            loadShaderPreset(key);
+        }
+
+        function compileUserShaderFromUI() {
+            const fragArea = document.getElementById('shader-code-frag');
+            const vertArea = document.getElementById('shader-code-vert');
+            const vertSrc = vertArea ? vertArea.value : DEFAULT_CUSTOM_VERT_SHADER;
+            const fragSrc = fragArea ? fragArea.value : SHADER_PRESETS.plasma.frag;
+
+            // Cambiar automáticamente a la escena de shader si no está activa
+            const sel = document.getElementById('three-scene-mode');
+            if (sel && sel.value !== 'custom_shader') {
+                sel.value = 'custom_shader';
+                switchThreeScene('custom_shader');
+            }
+
+            compileUserShader(vertSrc, fragSrc, true);
+        }
+
+        function compileUserShader(vertSrc, fragSrc, shouldPersist = true) {
+            const statusBadge = document.getElementById('shader-compile-status');
+            const consoleLog = document.getElementById('shader-console-log');
+            const consoleTime = document.getElementById('shader-console-time');
+            const consoleInd = document.getElementById('shader-console-indicator');
+
+            const now = new Date().toLocaleTimeString();
+            if (consoleTime) consoleTime.innerText = now;
+
+            if (!threeRenderer || !threeScene) return;
+
+            try {
+                // Crear un material temporal para probar compilación WebGL sin romper la escena
+                const testMat = new THREE.ShaderMaterial({
+                    uniforms: customShaderUniforms,
+                    vertexShader: vertSrc,
+                    fragmentShader: fragSrc,
+                    depthWrite: false,
+                    depthTest: false
+                });
+
+                // Prueba de compilación directa en GPU
+                const testMesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), testMat);
+                const testScene = new THREE.Scene();
+                testScene.add(testMesh);
+                
+                threeRenderer.compile(testScene, threeCamera);
+
+                // Si no arrojó excepción, aplicar al mesh principal
+                if (customShaderMesh) {
+                    if (customShaderMaterial) customShaderMaterial.dispose();
+                    customShaderMaterial = testMat;
+                    customShaderMesh.material = customShaderMaterial;
+                }
+
+                // Guardar en localStorage si se solicita
+                if (shouldPersist) {
+                    localStorage.setItem('motor_custom_glsl_frag', fragSrc);
+                    localStorage.setItem('motor_custom_glsl_vert', vertSrc);
+                }
+
+                // Feedback UI: Verde / Éxito
+                if (statusBadge) {
+                    statusBadge.className = "text-xs font-mono text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/40";
+                    statusBadge.innerText = "✓ Compilado OK";
+                }
+                if (consoleInd) consoleInd.className = "w-2 h-2 rounded-full bg-emerald-400";
+                if (consoleLog) {
+                    consoleLog.className = "text-emerald-400 text-[11px] max-h-24 overflow-y-auto custom-scrollbar whitespace-pre-wrap";
+                    consoleLog.innerText = `[${now}] ✓ Shader compilado y vinculado exitosamente con WebGL.\nTodos los uniforms (8 stems DSP, uTime, uMouse, uResolution) vinculados.`;
+                }
+
+            } catch (err) {
+                // Feedback UI: Rojo / Error con mensaje de GPU
+                console.warn("Error de compilación GLSL:", err);
+
+                if (statusBadge) {
+                    statusBadge.className = "text-xs font-mono text-rose-400 bg-rose-950/80 px-2 py-0.5 rounded border border-rose-500/40";
+                    statusBadge.innerText = "✕ Error de Compilación";
+                }
+                if (consoleInd) consoleInd.className = "w-2 h-2 rounded-full bg-rose-500 animate-ping";
+                if (consoleLog) {
+                    consoleLog.className = "text-rose-400 font-bold text-[11px] max-h-24 overflow-y-auto custom-scrollbar whitespace-pre-wrap";
+                    consoleLog.innerText = `[${now}] ✕ ERROR DE COMPILACIÓN GLSL:\n${err.message || err}`;
+                }
+            }
+        }
+
+        function exportCurrentShaderFile() {
+            const fragArea = document.getElementById('shader-code-frag');
+            const code = fragArea ? fragArea.value : '';
+            const blob = new Blob([code], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `MotorVisuales_Shader_${Date.now()}.glsl`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        function importShaderFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const code = e.target.result;
+                const fragArea = document.getElementById('shader-code-frag');
+                if (fragArea) {
+                    fragArea.value = code;
+                    openShaderEditorTab('frag');
+                    compileUserShaderFromUI();
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function masterRenderLoop(timestamp) {
+            requestAnimationFrame(masterRenderLoop);
+            const time = (timestamp || performance.now()) * 0.001;
+
+            // 1. Procesamiento DSP de Audio en tiempo real (stems, RMS, FFT, ZCR, Onset)
+            runAudioDSP();
+
+            // 2. Actualización de espectrograma interactivo
+            updateRealFrequencyChart();
+
+            // 3. Renderizado y modulación de Three.js (Nebulosa / Túnel / Monolito / Shader GLSL)
+            renderThreeFrame(time);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            initThreeEngine();
+            initShaderEditor();
+            initFrequencyChart();
+            drawMerPad();
+            startAiDirectorLoop();
+            masterRenderLoop();
+        });
+
+        function scrollToSection(id) {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
