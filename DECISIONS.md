@@ -126,4 +126,26 @@
   - Creación de un grafo Web Audio permanente: `masterGainNode` enlazado de forma fija a `mainAnalyser`, `audioDestNode` y a los 8 filtros Biquad, evitando reconexiones destructivas o duplicadas en cada reproducción.
   - Ciclo de animación maestro `masterRenderLoop(timestamp)` ejecutando a 60 FPS con `requestAnimationFrame`: `runAudioDSP()` → `updateRealFrequencyChart()` → `renderThreeFrame(time)`.
 
+---
+
+### D-011 — Suite Completa de Post-Procesado WebGL (9 Passes Reactivos)
+- **Fecha:** 2026-09-26
+- **Estado:** ✅ Aceptada
+- **Contexto:** La experiencia visual requería un rack completo de efectos ópticos, analógicos y digitales profesionales para modular el pipeline de Three.js y el editor GLSL en tiempo real ante la música.
+- **Decisión:**
+  - Cadena ordenada en `THREE.EffectComposer`:
+    `RenderPass` → `UnrealBloomPass` → `RadialBlurPass` → `KaleidoscopePass` → `ChromaticAberrationPass` → `GlitchPass` → `PixelatePass` → `NegativeInvertPass` → `FilmGrainPass` → `CRTScanlinePass`.
+  - Reactividad DSP granular en cada frame a 60 FPS:
+    1. **Bloom Glow:** Transitorios en sub/treble + destello extra en beats/onsets.
+    2. **Radial Zoom Shockwave:** Onda de choque acústica expansiva reactiva a sub y bombos.
+    3. **Caleidoscopio Master:** Simetría radial N-caras con rotación continua modulada por agudos.
+    4. **Aberración Cromática:** Dispersión espectral RGB modulada por el flujo espectral.
+    5. **Audio Glitch & Block Displacement:** Desplazamiento pseudoaleatorio y ruido digital en picos y onsets.
+    6. **Pixelación Retro 8-Bit:** Cuantización de bloques modulada por bandas de presencia y agudos.
+    7. **Inversor Negativo / Solarización:** Flashes de luminancia invertida en picos climáticos.
+    8. **Film Grain 35mm & Viñeta:** Ruido analógico cinematográfico reactivo a la banda de aire (>10kHz).
+    9. **Monitor CRT / VHS:** Curvatura de tubo catódico y scanlines moduladas por frecuencias medias-bajas.
+  - Controles UI dedicados por efecto (toggle checkbox + slider de intensidad en tiempo real) y botones globales ("Todo ON", "Todo OFF", "Reset").
+  - Integración total en la exportación e importación de Presets JSON (v1.1).
+
 

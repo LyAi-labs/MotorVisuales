@@ -294,30 +294,132 @@
                 </div>
             </div>
 
-            <!-- POST-PROCESSING SHADERS FX BAR -->
-            <div class="bg-slate-900/90 border border-slate-800 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-4 text-xs">
-                <div class="flex items-center gap-2 font-semibold text-slate-300">
-                    <span class="text-indigo-400">✨ Post-Procesado WebGL FX:</span>
+            <!-- POST-PROCESSING SHADERS FX MASTER SUITE (9 EFECTOS REACTIVOS) -->
+            <div class="bg-slate-900/95 border border-slate-800 rounded-xl p-3.5 space-y-3 text-xs shadow-lg">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                    <div class="flex items-center gap-2 font-bold text-slate-200">
+                        <span class="text-indigo-400">✨ Suite de Post-Procesado WebGL FX</span>
+                        <span class="text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">9 Passes Reactivos</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-[11px]">
+                        <button onclick="enableAllFX()" class="px-2 py-0.5 bg-indigo-600/30 hover:bg-indigo-600/60 text-indigo-300 rounded border border-indigo-500/40 transition">Todo ON</button>
+                        <button onclick="disableAllFX()" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded border border-slate-700 transition">Todo OFF</button>
+                        <button onclick="resetAllFX()" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded border border-slate-700 transition">Reset</button>
+                    </div>
                 </div>
-                <div class="flex flex-wrap items-center gap-5">
-                    <!-- Bloom Pass -->
-                    <div class="flex items-center gap-2">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200">
+
+                <!-- Grid de los 9 Efectos de Post-Procesado -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- 1. Unreal Bloom -->
+                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
                             <input type="checkbox" id="fx-bloom-enable" checked onchange="toggleBloomPass(this.checked)" class="accent-indigo-500 rounded">
-                            <span>Unreal Bloom (Glow)</span>
+                            <span>🌸 Bloom Glow</span>
                         </label>
-                        <input type="range" id="fx-bloom-strength" min="0.1" max="3.0" step="0.1" value="1.2" oninput="updateBloomParams()" class="w-16 accent-indigo-500 cursor-pointer" title="Intensidad de Bloom">
-                        <span id="fx-bloom-val" class="font-mono text-[10px] text-indigo-300 w-6">1.2</span>
+                        <div class="flex items-center gap-1.5">
+                            <input type="range" id="fx-bloom-strength" min="0.1" max="3.0" step="0.1" value="1.2" oninput="updateBloomParams()" class="w-14 accent-indigo-500 cursor-pointer" title="Intensidad Bloom">
+                            <span id="fx-bloom-val" class="font-mono text-[10px] text-indigo-300 w-5 text-right">1.2</span>
+                        </div>
                     </div>
 
-                    <!-- Chromatic Aberration Pass -->
-                    <div class="flex items-center gap-2 border-l border-slate-800 pl-4">
-                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200">
+                    <!-- 2. Aberración Cromática -->
+                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
                             <input type="checkbox" id="fx-chroma-enable" checked onchange="toggleChromaPass(this.checked)" class="accent-pink-500 rounded">
-                            <span>Aberración Cromática</span>
+                            <span>🎨 Aberración RGB</span>
                         </label>
-                        <input type="range" id="fx-chroma-amount" min="0.0" max="0.03" step="0.001" value="0.005" oninput="updateChromaParams()" class="w-16 accent-pink-500 cursor-pointer" title="Distorsión RGB reactiva">
-                        <span id="fx-chroma-val" class="font-mono text-[10px] text-pink-300 w-8">0.005</span>
+                        <div class="flex items-center gap-1.5">
+                            <input type="range" id="fx-chroma-amount" min="0.0" max="0.03" step="0.001" value="0.005" oninput="updateChromaParams()" class="w-14 accent-pink-500 cursor-pointer" title="Distorsión RGB">
+                            <span id="fx-chroma-val" class="font-mono text-[10px] text-pink-300 w-7 text-right">0.005</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Audio Glitch & Block Displacement -->
+                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
+                            <input type="checkbox" id="fx-glitch-enable" onchange="toggleGlitchPass(this.checked)" class="accent-red-500 rounded">
+                            <span>💥 Audio Glitch</span>
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="range" id="fx-glitch-amount" min="0.0" max="1.0" step="0.05" value="0.25" oninput="updateGlitchParams()" class="w-14 accent-red-500 cursor-pointer" title="Fuerza del Glitch">
+                            <span id="fx-glitch-val" class="font-mono text-[10px] text-red-300 w-5 text-right">0.25</span>
+                        </div>
+                    </div>
+
+                    <!-- 4. Radial Zoom Shockwave -->
+                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
+                            <input type="checkbox" id="fx-blur-enable" onchange="toggleRadialBlurPass(this.checked)" class="accent-amber-500 rounded">
+                            <span>🌀 Zoom Shockwave</span>
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="range" id="fx-blur-strength" min="0.0" max="0.5" step="0.02" value="0.15" oninput="updateRadialBlurParams()" class="w-14 accent-amber-500 cursor-pointer" title="Onda de choque radial">
+                            <span id="fx-blur-val" class="font-mono text-[10px] text-amber-300 w-6 text-right">0.15</span>
+                        </div>
+                    </div>
+
+                    <!-- 5. Monitor CRT & Scanlines -->
+                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
+                            <input type="checkbox" id="fx-crt-enable" onchange="toggleCRTPass(this.checked)" class="accent-emerald-500 rounded">
+                            <span>📺 Monitor CRT/VHS</span>
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="range" id="fx-crt-intensity" min="0.0" max="1.0" step="0.05" value="0.6" oninput="updateCRTParams()" class="w-14 accent-emerald-500 cursor-pointer" title="Intensidad Scanline/Tubo">
+                            <span id="fx-crt-val" class="font-mono text-[10px] text-emerald-300 w-5 text-right">0.6</span>
+                        </div>
+                    </div>
+
+                    <!-- 6. Caleidoscopio Master -->
+                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
+                            <input type="checkbox" id="fx-kaleido-enable" onchange="toggleKaleidoPass(this.checked)" class="accent-purple-500 rounded">
+                            <span>🔮 Caleidoscopio</span>
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <select id="fx-kaleido-sides" onchange="updateKaleidoParams()" class="bg-slate-900 border border-slate-700 text-purple-300 rounded px-1.5 py-0.5 text-[10px] font-mono">
+                                <option value="6">6 caras</option>
+                                <option value="8" selected>8 caras</option>
+                                <option value="12">12 caras</option>
+                                <option value="16">16 caras</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 7. Film Grain & Viñeta -->
+                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
+                            <input type="checkbox" id="fx-film-enable" onchange="toggleFilmPass(this.checked)" class="accent-yellow-500 rounded">
+                            <span>🎞️ Cine 35mm / Viñeta</span>
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="range" id="fx-film-grain" min="0.0" max="1.0" step="0.05" value="0.35" oninput="updateFilmParams()" class="w-14 accent-yellow-500 cursor-pointer" title="Grano de película">
+                            <span id="fx-film-val" class="font-mono text-[10px] text-yellow-300 w-5 text-right">0.35</span>
+                        </div>
+                    </div>
+
+                    <!-- 8. Inversor Negativo / Flash -->
+                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
+                            <input type="checkbox" id="fx-invert-enable" onchange="toggleInvertPass(this.checked)" class="accent-cyan-500 rounded">
+                            <span>⚡ Inversor Negativo</span>
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="range" id="fx-invert-amount" min="0.0" max="1.0" step="0.1" value="0.0" oninput="updateInvertParams()" class="w-14 accent-cyan-500 cursor-pointer" title="Inversión RGB">
+                            <span id="fx-invert-val" class="font-mono text-[10px] text-cyan-300 w-5 text-right">0.0</span>
+                        </div>
+                    </div>
+
+                    <!-- 9. Pixelación Retro 8-Bit -->
+                    <div class="flex items-center justify-between bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-200 text-[11px]">
+                            <input type="checkbox" id="fx-pixel-enable" onchange="togglePixelPass(this.checked)" class="accent-fuchsia-500 rounded">
+                            <span>👾 Pixelación 8-Bit</span>
+                        </label>
+                        <div class="flex items-center gap-1.5">
+                            <input type="range" id="fx-pixel-size" min="2" max="32" step="2" value="8" oninput="updatePixelParams()" class="w-14 accent-fuchsia-500 cursor-pointer" title="Tamaño de bloque de píxel">
+                            <span id="fx-pixel-val" class="font-mono text-[10px] text-fuchsia-300 w-5 text-right">8px</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -787,8 +889,17 @@
                 name: "Equilibrado (Hi-Fi)",
                 gain: 1.5,
                 scene: "nebula",
-                bloom: { enabled: true, strength: 1.2 },
-                chroma: { enabled: true, amount: 0.005 },
+                fx: {
+                    bloom:   { enabled: true,  strength: 1.2 },
+                    chroma:  { enabled: true,  amount: 0.005 },
+                    glitch:  { enabled: false, amount: 0.25 },
+                    blur:    { enabled: false, strength: 0.15 },
+                    crt:     { enabled: false, intensity: 0.6 },
+                    kaleido: { enabled: false, sides: 8 },
+                    film:    { enabled: true,  grain: 0.2 },
+                    invert:  { enabled: false, amount: 0.0 },
+                    pixel:   { enabled: false, size: 8 }
+                },
                 stems: {
                     sub:      { gain: 1.0, muted: false },
                     bass:     { gain: 1.0, muted: false },
@@ -804,8 +915,17 @@
                 name: "Club / Bass Boost",
                 gain: 2.0,
                 scene: "tunnel",
-                bloom: { enabled: true, strength: 1.8 },
-                chroma: { enabled: true, amount: 0.008 },
+                fx: {
+                    bloom:   { enabled: true,  strength: 2.0 },
+                    chroma:  { enabled: true,  amount: 0.008 },
+                    glitch:  { enabled: false, amount: 0.3 },
+                    blur:    { enabled: true,  strength: 0.22 },
+                    crt:     { enabled: false, intensity: 0.5 },
+                    kaleido: { enabled: false, sides: 8 },
+                    film:    { enabled: false, grain: 0.3 },
+                    invert:  { enabled: false, amount: 0.0 },
+                    pixel:   { enabled: false, size: 8 }
+                },
                 stems: {
                     sub:      { gain: 1.8, muted: false },
                     bass:     { gain: 1.6, muted: false },
@@ -821,8 +941,17 @@
                 name: "Acústico / Voces & Aire",
                 gain: 1.3,
                 scene: "monolith",
-                bloom: { enabled: true, strength: 0.8 },
-                chroma: { enabled: false, amount: 0.002 },
+                fx: {
+                    bloom:   { enabled: true,  strength: 0.8 },
+                    chroma:  { enabled: false, amount: 0.002 },
+                    glitch:  { enabled: false, amount: 0.2 },
+                    blur:    { enabled: false, strength: 0.1 },
+                    crt:     { enabled: false, intensity: 0.4 },
+                    kaleido: { enabled: false, sides: 6 },
+                    film:    { enabled: true,  grain: 0.45 },
+                    invert:  { enabled: false, amount: 0.0 },
+                    pixel:   { enabled: false, size: 8 }
+                },
                 stems: {
                     sub:      { gain: 0.5, muted: false },
                     bass:     { gain: 0.8, muted: false },
@@ -838,8 +967,17 @@
                 name: "Cyberpunk / Glitch FX",
                 gain: 2.2,
                 scene: "nebula",
-                bloom: { enabled: true, strength: 2.5 },
-                chroma: { enabled: true, amount: 0.02 },
+                fx: {
+                    bloom:   { enabled: true,  strength: 2.5 },
+                    chroma:  { enabled: true,  amount: 0.015 },
+                    glitch:  { enabled: true,  amount: 0.45 },
+                    blur:    { enabled: false, strength: 0.15 },
+                    crt:     { enabled: true,  intensity: 0.75 },
+                    kaleido: { enabled: false, sides: 8 },
+                    film:    { enabled: true,  grain: 0.35 },
+                    invert:  { enabled: false, amount: 0.0 },
+                    pixel:   { enabled: true,  size: 10 }
+                },
                 stems: {
                     sub:      { gain: 1.5, muted: false },
                     bass:     { gain: 1.4, muted: false },
@@ -866,21 +1004,78 @@
                     switchThreeScene(preset.scene);
                 }
             }
-            if (preset.bloom) {
+            const fxData = preset.fx || preset;
+            if (fxData.bloom) {
                 const chk = document.getElementById('fx-bloom-enable');
                 const sld = document.getElementById('fx-bloom-strength');
-                if (chk) chk.checked = !!preset.bloom.enabled;
-                if (sld && preset.bloom.strength !== undefined) sld.value = preset.bloom.strength;
+                if (chk) chk.checked = !!fxData.bloom.enabled;
+                if (sld && fxData.bloom.strength !== undefined) sld.value = fxData.bloom.strength;
                 toggleBloomPass(chk ? chk.checked : true);
                 updateBloomParams();
             }
-            if (preset.chroma) {
+            if (fxData.chroma) {
                 const chk = document.getElementById('fx-chroma-enable');
                 const sld = document.getElementById('fx-chroma-amount');
-                if (chk) chk.checked = !!preset.chroma.enabled;
-                if (sld && preset.chroma.amount !== undefined) sld.value = preset.chroma.amount;
+                if (chk) chk.checked = !!fxData.chroma.enabled;
+                if (sld && fxData.chroma.amount !== undefined) sld.value = fxData.chroma.amount;
                 toggleChromaPass(chk ? chk.checked : true);
                 updateChromaParams();
+            }
+            if (fxData.glitch) {
+                const chk = document.getElementById('fx-glitch-enable');
+                const sld = document.getElementById('fx-glitch-amount');
+                if (chk) chk.checked = !!fxData.glitch.enabled;
+                if (sld && fxData.glitch.amount !== undefined) sld.value = fxData.glitch.amount;
+                toggleGlitchPass(chk ? chk.checked : false);
+                updateGlitchParams();
+            }
+            if (fxData.blur) {
+                const chk = document.getElementById('fx-blur-enable');
+                const sld = document.getElementById('fx-blur-strength');
+                if (chk) chk.checked = !!fxData.blur.enabled;
+                if (sld && fxData.blur.strength !== undefined) sld.value = fxData.blur.strength;
+                toggleRadialBlurPass(chk ? chk.checked : false);
+                updateRadialBlurParams();
+            }
+            if (fxData.crt) {
+                const chk = document.getElementById('fx-crt-enable');
+                const sld = document.getElementById('fx-crt-intensity');
+                if (chk) chk.checked = !!fxData.crt.enabled;
+                if (sld && fxData.crt.intensity !== undefined) sld.value = fxData.crt.intensity;
+                toggleCRTPass(chk ? chk.checked : false);
+                updateCRTParams();
+            }
+            if (fxData.kaleido) {
+                const chk = document.getElementById('fx-kaleido-enable');
+                const sel = document.getElementById('fx-kaleido-sides');
+                if (chk) chk.checked = !!fxData.kaleido.enabled;
+                if (sel && fxData.kaleido.sides !== undefined) sel.value = fxData.kaleido.sides;
+                toggleKaleidoPass(chk ? chk.checked : false);
+                updateKaleidoParams();
+            }
+            if (fxData.film) {
+                const chk = document.getElementById('fx-film-enable');
+                const sld = document.getElementById('fx-film-grain');
+                if (chk) chk.checked = !!fxData.film.enabled;
+                if (sld && fxData.film.grain !== undefined) sld.value = fxData.film.grain;
+                toggleFilmPass(chk ? chk.checked : false);
+                updateFilmParams();
+            }
+            if (fxData.invert) {
+                const chk = document.getElementById('fx-invert-enable');
+                const sld = document.getElementById('fx-invert-amount');
+                if (chk) chk.checked = !!fxData.invert.enabled;
+                if (sld && fxData.invert.amount !== undefined) sld.value = fxData.invert.amount;
+                toggleInvertPass(chk ? chk.checked : false);
+                updateInvertParams();
+            }
+            if (fxData.pixel) {
+                const chk = document.getElementById('fx-pixel-enable');
+                const sld = document.getElementById('fx-pixel-size');
+                if (chk) chk.checked = !!fxData.pixel.enabled;
+                if (sld && fxData.pixel.size !== undefined) sld.value = fxData.pixel.size;
+                togglePixelPass(chk ? chk.checked : false);
+                updatePixelParams();
             }
             if (preset.stems) {
                 Object.keys(preset.stems).forEach(stemId => {
@@ -924,11 +1119,22 @@
 
             const presetObj = {
                 format: "MotorVisualesPreset",
-                version: "1.0",
+                version: "1.1",
                 timestamp: new Date().toISOString(),
                 name: `Preset Custom ${new Date().toLocaleTimeString()}`,
                 gain: gain,
                 scene: currentScene,
+                fx: {
+                    bloom: { enabled: !!document.getElementById('fx-bloom-enable')?.checked, strength: parseFloat(document.getElementById('fx-bloom-strength')?.value) || 1.2 },
+                    chroma: { enabled: !!document.getElementById('fx-chroma-enable')?.checked, amount: parseFloat(document.getElementById('fx-chroma-amount')?.value) || 0.005 },
+                    glitch: { enabled: !!document.getElementById('fx-glitch-enable')?.checked, amount: parseFloat(document.getElementById('fx-glitch-amount')?.value) || 0.25 },
+                    blur: { enabled: !!document.getElementById('fx-blur-enable')?.checked, strength: parseFloat(document.getElementById('fx-blur-strength')?.value) || 0.15 },
+                    crt: { enabled: !!document.getElementById('fx-crt-enable')?.checked, intensity: parseFloat(document.getElementById('fx-crt-intensity')?.value) || 0.6 },
+                    kaleido: { enabled: !!document.getElementById('fx-kaleido-enable')?.checked, sides: parseFloat(document.getElementById('fx-kaleido-sides')?.value) || 8 },
+                    film: { enabled: !!document.getElementById('fx-film-enable')?.checked, grain: parseFloat(document.getElementById('fx-film-grain')?.value) || 0.35 },
+                    invert: { enabled: !!document.getElementById('fx-invert-enable')?.checked, amount: parseFloat(document.getElementById('fx-invert-amount')?.value) || 0.0 },
+                    pixel: { enabled: !!document.getElementById('fx-pixel-enable')?.checked, size: parseFloat(document.getElementById('fx-pixel-size')?.value) || 8 }
+                },
                 bloom: { enabled: bloomEnabled, strength: bloomStrength },
                 chroma: { enabled: chromaEnabled, amount: chromaAmount },
                 stems: stems
@@ -1414,12 +1620,27 @@
         // =========================================================================
         let threeScene, threeCamera, threeRenderer;
         let threeComposer = null;
+
+        // --- MASTER POST-PROCESSING SUITE (9 FX PASSES) ---
         let bloomPass = null;
         let chromaPass = null;
-        let fxBloomEnabled = true;
-        let fxChromaEnabled = true;
-        let fxBloomBaseStrength = 1.2;
-        let fxChromaBaseAmount = 0.005;
+        let glitchPass = null;
+        let radialBlurPass = null;
+        let crtPass = null;
+        let kaleidoPass = null;
+        let filmPass = null;
+        let invertPass = null;
+        let pixelPass = null;
+
+        let fxBloomEnabled = true,   fxBloomBaseStrength = 1.2;
+        let fxChromaEnabled = true,  fxChromaBaseAmount = 0.005;
+        let fxGlitchEnabled = false, fxGlitchBaseAmount = 0.25;
+        let fxBlurEnabled = false,   fxBlurBaseStrength = 0.15;
+        let fxCRTEnabled = false,    fxCRTBaseIntensity = 0.6;
+        let fxKaleidoEnabled = false,fxKaleidoSides = 8.0;
+        let fxFilmEnabled = false,   fxFilmBaseGrain = 0.35;
+        let fxInvertEnabled = false, fxInvertBaseAmount = 0.0;
+        let fxPixelEnabled = false,  fxPixelBaseSize = 8.0;
 
         let particlesMesh, tunnelMesh, monolithMesh, customShaderMesh;
         let customShaderUniforms = null;
@@ -1438,7 +1659,7 @@
         let cameraManualAzimuth = 0;          // Offset de rotación horizontal del usuario
         let cameraManualElevation = 0;        // Offset de inclinación vertical del usuario
 
-        // Custom GLSL Chromatic Aberration Shader for ShaderPass
+        // === 1. Chromatic Aberration Shader ===
         const ChromaticAberrationShader = {
             uniforms: {
                 "tDiffuse": { value: null },
@@ -1465,6 +1686,290 @@
                     float b = texture2D(tDiffuse, vUv - offset).b;
                     float a = texture2D(tDiffuse, vUv).a;
                     gl_FragColor = vec4(r, g, b, a);
+                }
+            `
+        };
+
+        // === 2. Audio Glitch & Block Displacement Shader ===
+        const GlitchShader = {
+            uniforms: {
+                "tDiffuse": { value: null },
+                "uAmount":  { value: 0.0 },
+                "uTime":    { value: 0.0 },
+                "uIsOnset": { value: 0.0 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float uAmount;
+                uniform float uTime;
+                uniform float uIsOnset;
+                varying vec2 vUv;
+
+                float hashGlitch(vec2 p) {
+                    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+                }
+
+                void main() {
+                    vec2 uv = vUv;
+                    float glitchStrength = uAmount + (uIsOnset * 0.45);
+                    if (glitchStrength > 0.01) {
+                        float block = floor(uv.y * 30.0);
+                        float n = hashGlitch(vec2(block, floor(uTime * 20.0)));
+                        if (n < glitchStrength * 0.6) {
+                            float shift = (hashGlitch(vec2(block, uTime)) - 0.5) * glitchStrength * 0.12;
+                            uv.x += shift;
+                        }
+                    }
+                    float r = texture2D(tDiffuse, uv + vec2(glitchStrength * 0.007, 0.0)).r;
+                    float g = texture2D(tDiffuse, uv).g;
+                    float b = texture2D(tDiffuse, uv - vec2(glitchStrength * 0.007, 0.0)).b;
+                    gl_FragColor = vec4(r, g, b, 1.0);
+                }
+            `
+        };
+
+        // === 3. Radial Zoom Blur / Shockwave Shader ===
+        const RadialBlurShader = {
+            uniforms: {
+                "tDiffuse":  { value: null },
+                "uStrength": { value: 0.0 },
+                "uCenter":   { value: new THREE.Vector2(0.5, 0.5) }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float uStrength;
+                uniform vec2 uCenter;
+                varying vec2 vUv;
+
+                void main() {
+                    if (uStrength <= 0.001) {
+                        gl_FragColor = texture2D(tDiffuse, vUv);
+                        return;
+                    }
+                    vec2 toCenter = uCenter - vUv;
+                    vec4 col = vec4(0.0);
+                    const int SAMPLES = 10;
+                    float delta = uStrength / float(SAMPLES);
+                    for (int i = 0; i < SAMPLES; i++) {
+                        vec2 sampleUv = vUv + toCenter * (float(i) * delta);
+                        col += texture2D(tDiffuse, sampleUv);
+                    }
+                    gl_FragColor = col / float(SAMPLES);
+                }
+            `
+        };
+
+        // === 4. Monitor CRT & Scanlines Shader ===
+        const CRTScanlineShader = {
+            uniforms: {
+                "tDiffuse":   { value: null },
+                "uIntensity": { value: 0.6 },
+                "uCurvature": { value: 0.08 },
+                "uTime":      { value: 0.0 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float uIntensity;
+                uniform float uCurvature;
+                uniform float uTime;
+                varying vec2 vUv;
+
+                vec2 curveCRT(vec2 uv, float bend) {
+                    uv = (uv - 0.5) * 2.0;
+                    uv *= 1.0 + pow(length(uv) * bend * 0.6, 2.0);
+                    uv = (uv * 0.5) + 0.5;
+                    return uv;
+                }
+
+                void main() {
+                    vec2 uv = vUv;
+                    if (uCurvature > 0.001) {
+                        uv = curveCRT(uv, uCurvature);
+                        if (uv.x < 0.0 || uv.x > 1.0 || uv.y < 0.0 || uv.y > 1.0) {
+                            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+                            return;
+                        }
+                    }
+                    vec4 col = texture2D(tDiffuse, uv);
+                    if (uIntensity > 0.001) {
+                        float scanline = sin((uv.y * 650.0) + (uTime * 4.0)) * 0.5 + 0.5;
+                        col.rgb -= scanline * uIntensity * 0.3;
+                        float vig = uv.x * uv.y * (1.0 - uv.x) * (1.0 - uv.y);
+                        col.rgb *= clamp(pow(16.0 * vig, 0.25), 0.0, 1.0);
+                    }
+                    gl_FragColor = col;
+                }
+            `
+        };
+
+        // === 5. Master Kaleidoscope Pass Shader ===
+        const KaleidoscopePassShader = {
+            uniforms: {
+                "tDiffuse": { value: null },
+                "uSides":   { value: 8.0 },
+                "uAngle":   { value: 0.0 },
+                "uEnabled": { value: 0.0 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float uSides;
+                uniform float uAngle;
+                uniform float uEnabled;
+                varying vec2 vUv;
+
+                void main() {
+                    if (uEnabled < 0.5) {
+                        gl_FragColor = texture2D(tDiffuse, vUv);
+                        return;
+                    }
+                    vec2 p = vUv - 0.5;
+                    float r = length(p);
+                    float a = atan(p.y, p.x) + uAngle;
+                    float segment = 6.2831853 / max(uSides, 2.0);
+                    a = mod(a, segment) - segment * 0.5;
+                    a = abs(a);
+                    vec2 newUv = vec2(cos(a), sin(a)) * r + 0.5;
+                    newUv = clamp(newUv, 0.0, 1.0);
+                    gl_FragColor = texture2D(tDiffuse, newUv);
+                }
+            `
+        };
+
+        // === 6. Film Grain & Vignette Shader ===
+        const FilmGrainShader = {
+            uniforms: {
+                "tDiffuse":  { value: null },
+                "uGrain":    { value: 0.35 },
+                "uVignette": { value: 0.8 },
+                "uTime":     { value: 0.0 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float uGrain;
+                uniform float uVignette;
+                uniform float uTime;
+                varying vec2 vUv;
+
+                float grainNoise(vec2 p) {
+                    return fract(sin(dot(p + uTime * 10.0, vec2(12.9898, 78.233))) * 43758.5453);
+                }
+
+                void main() {
+                    vec4 col = texture2D(tDiffuse, vUv);
+                    if (uGrain > 0.001) {
+                        float n = (grainNoise(vUv * 800.0) - 0.5) * uGrain * 0.35;
+                        col.rgb += n;
+                    }
+                    if (uVignette > 0.001) {
+                        vec2 center = vUv - 0.5;
+                        float d = length(center);
+                        float v = 1.0 - smoothstep(0.25, 0.75, d) * uVignette;
+                        col.rgb *= v;
+                    }
+                    gl_FragColor = col;
+                }
+            `
+        };
+
+        // === 7. Negative Invert & Solarize Shader ===
+        const NegativeInvertShader = {
+            uniforms: {
+                "tDiffuse":      { value: null },
+                "uInvertAmount": { value: 0.0 },
+                "uSolarize":     { value: 0.0 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float uInvertAmount;
+                uniform float uSolarize;
+                varying vec2 vUv;
+
+                void main() {
+                    vec4 col = texture2D(tDiffuse, vUv);
+                    if (uInvertAmount > 0.001) {
+                        vec3 inv = vec3(1.0) - col.rgb;
+                        col.rgb = mix(col.rgb, inv, uInvertAmount);
+                    }
+                    if (uSolarize > 0.001) {
+                        col.r = col.r < 0.5 ? col.r * 2.0 : (1.0 - col.r) * 2.0;
+                        col.g = col.g < 0.5 ? col.g * 2.0 : (1.0 - col.g) * 2.0;
+                        col.b = col.b < 0.5 ? col.b * 2.0 : (1.0 - col.b) * 2.0;
+                    }
+                    gl_FragColor = col;
+                }
+            `
+        };
+
+        // === 8. Pixelate Retro 8-Bit Shader ===
+        const PixelateShader = {
+            uniforms: {
+                "tDiffuse":    { value: null },
+                "uPixelSize":  { value: 8.0 },
+                "uResolution": { value: new THREE.Vector2(800, 600) }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float uPixelSize;
+                uniform vec2 uResolution;
+                varying vec2 vUv;
+
+                void main() {
+                    if (uPixelSize <= 1.01) {
+                        gl_FragColor = texture2D(tDiffuse, vUv);
+                        return;
+                    }
+                    vec2 pSize = uPixelSize / uResolution;
+                    vec2 coord = floor(vUv / pSize) * pSize + pSize * 0.5;
+                    gl_FragColor = texture2D(tDiffuse, coord);
                 }
             `
         };
@@ -1554,6 +2059,9 @@
                 if (customShaderUniforms && customShaderUniforms.uResolution) {
                     customShaderUniforms.uResolution.value.set(w, h);
                 }
+                if (pixelPass && pixelPass.uniforms.uResolution) {
+                    pixelPass.uniforms.uResolution.value.set(w, h);
+                }
             });
         }
 
@@ -1569,24 +2077,68 @@
                 const renderPass = new THREE.RenderPass(threeScene, threeCamera);
                 threeComposer.addPass(renderPass);
 
-                // Unreal Bloom Pass
+                // 1. Unreal Bloom Pass
                 if (typeof THREE.UnrealBloomPass !== 'undefined') {
                     bloomPass = new THREE.UnrealBloomPass(
                         new THREE.Vector2(width, height),
-                        fxBloomBaseStrength, // Strength
-                        0.4,                 // Radius
-                        0.85                 // Threshold
+                        fxBloomBaseStrength,
+                        0.4,
+                        0.85
                     );
                     bloomPass.enabled = fxBloomEnabled;
                     threeComposer.addPass(bloomPass);
                 }
 
-                // Chromatic Aberration ShaderPass
+                // 2. Radial Zoom Shockwave Pass
                 if (typeof THREE.ShaderPass !== 'undefined') {
+                    radialBlurPass = new THREE.ShaderPass(RadialBlurShader);
+                    radialBlurPass.uniforms.uStrength.value = fxBlurBaseStrength;
+                    radialBlurPass.enabled = fxBlurEnabled;
+                    threeComposer.addPass(radialBlurPass);
+
+                    // 3. Master Kaleidoscope Pass
+                    kaleidoPass = new THREE.ShaderPass(KaleidoscopePassShader);
+                    kaleidoPass.uniforms.uSides.value = fxKaleidoSides;
+                    kaleidoPass.uniforms.uEnabled.value = fxKaleidoEnabled ? 1.0 : 0.0;
+                    kaleidoPass.enabled = fxKaleidoEnabled;
+                    threeComposer.addPass(kaleidoPass);
+
+                    // 4. Chromatic Aberration Pass
                     chromaPass = new THREE.ShaderPass(ChromaticAberrationShader);
                     chromaPass.uniforms.uAmount.value = fxChromaBaseAmount;
                     chromaPass.enabled = fxChromaEnabled;
                     threeComposer.addPass(chromaPass);
+
+                    // 5. Audio Glitch & Block Displacement Pass
+                    glitchPass = new THREE.ShaderPass(GlitchShader);
+                    glitchPass.uniforms.uAmount.value = fxGlitchBaseAmount;
+                    glitchPass.enabled = fxGlitchEnabled;
+                    threeComposer.addPass(glitchPass);
+
+                    // 6. Retro 8-Bit Pixelate Pass
+                    pixelPass = new THREE.ShaderPass(PixelateShader);
+                    pixelPass.uniforms.uPixelSize.value = fxPixelBaseSize;
+                    pixelPass.uniforms.uResolution.value.set(width, height);
+                    pixelPass.enabled = fxPixelEnabled;
+                    threeComposer.addPass(pixelPass);
+
+                    // 7. Negative / Solarize Invert Pass
+                    invertPass = new THREE.ShaderPass(NegativeInvertShader);
+                    invertPass.uniforms.uInvertAmount.value = fxInvertBaseAmount;
+                    invertPass.enabled = fxInvertEnabled;
+                    threeComposer.addPass(invertPass);
+
+                    // 8. Film Grain & Vignette Pass
+                    filmPass = new THREE.ShaderPass(FilmGrainShader);
+                    filmPass.uniforms.uGrain.value = fxFilmBaseGrain;
+                    filmPass.enabled = fxFilmEnabled;
+                    threeComposer.addPass(filmPass);
+
+                    // 9. CRT Monitor & Scanlines Pass
+                    crtPass = new THREE.ShaderPass(CRTScanlineShader);
+                    crtPass.uniforms.uIntensity.value = fxCRTBaseIntensity;
+                    crtPass.enabled = fxCRTEnabled;
+                    threeComposer.addPass(crtPass);
                 }
             } catch (err) {
                 console.warn("Fallo al inicializar Post-Processing:", err);
@@ -1594,6 +2146,7 @@
             }
         }
 
+        // --- FX CONTROLLERS & TOGGLES ---
         function toggleBloomPass(enabled) {
             fxBloomEnabled = enabled;
             if (bloomPass) bloomPass.enabled = enabled;
@@ -1622,6 +2175,135 @@
             fxChromaBaseAmount = parseFloat(sld.value);
             document.getElementById('fx-chroma-val').innerText = fxChromaBaseAmount.toFixed(3);
             if (chromaPass) chromaPass.uniforms.uAmount.value = fxChromaBaseAmount;
+        }
+
+        function toggleGlitchPass(enabled) {
+            fxGlitchEnabled = enabled;
+            if (glitchPass) glitchPass.enabled = enabled;
+            const valSpan = document.getElementById('fx-glitch-val');
+            if (valSpan) valSpan.classList.toggle('opacity-30', !enabled);
+        }
+
+        function updateGlitchParams() {
+            const sld = document.getElementById('fx-glitch-amount');
+            if (!sld) return;
+            fxGlitchBaseAmount = parseFloat(sld.value);
+            document.getElementById('fx-glitch-val').innerText = fxGlitchBaseAmount.toFixed(2);
+            if (glitchPass) glitchPass.uniforms.uAmount.value = fxGlitchBaseAmount;
+        }
+
+        function toggleRadialBlurPass(enabled) {
+            fxBlurEnabled = enabled;
+            if (radialBlurPass) radialBlurPass.enabled = enabled;
+            const valSpan = document.getElementById('fx-blur-val');
+            if (valSpan) valSpan.classList.toggle('opacity-30', !enabled);
+        }
+
+        function updateRadialBlurParams() {
+            const sld = document.getElementById('fx-blur-strength');
+            if (!sld) return;
+            fxBlurBaseStrength = parseFloat(sld.value);
+            document.getElementById('fx-blur-val').innerText = fxBlurBaseStrength.toFixed(2);
+            if (radialBlurPass) radialBlurPass.uniforms.uStrength.value = fxBlurBaseStrength;
+        }
+
+        function toggleCRTPass(enabled) {
+            fxCRTEnabled = enabled;
+            if (crtPass) crtPass.enabled = enabled;
+            const valSpan = document.getElementById('fx-crt-val');
+            if (valSpan) valSpan.classList.toggle('opacity-30', !enabled);
+        }
+
+        function updateCRTParams() {
+            const sld = document.getElementById('fx-crt-intensity');
+            if (!sld) return;
+            fxCRTBaseIntensity = parseFloat(sld.value);
+            document.getElementById('fx-crt-val').innerText = fxCRTBaseIntensity.toFixed(1);
+            if (crtPass) crtPass.uniforms.uIntensity.value = fxCRTBaseIntensity;
+        }
+
+        function toggleKaleidoPass(enabled) {
+            fxKaleidoEnabled = enabled;
+            if (kaleidoPass) {
+                kaleidoPass.enabled = enabled;
+                kaleidoPass.uniforms.uEnabled.value = enabled ? 1.0 : 0.0;
+            }
+        }
+
+        function updateKaleidoParams() {
+            const sel = document.getElementById('fx-kaleido-sides');
+            if (!sel) return;
+            fxKaleidoSides = parseFloat(sel.value) || 8.0;
+            if (kaleidoPass) kaleidoPass.uniforms.uSides.value = fxKaleidoSides;
+        }
+
+        function toggleFilmPass(enabled) {
+            fxFilmEnabled = enabled;
+            if (filmPass) filmPass.enabled = enabled;
+            const valSpan = document.getElementById('fx-film-val');
+            if (valSpan) valSpan.classList.toggle('opacity-30', !enabled);
+        }
+
+        function updateFilmParams() {
+            const sld = document.getElementById('fx-film-grain');
+            if (!sld) return;
+            fxFilmBaseGrain = parseFloat(sld.value);
+            document.getElementById('fx-film-val').innerText = fxFilmBaseGrain.toFixed(2);
+            if (filmPass) filmPass.uniforms.uGrain.value = fxFilmBaseGrain;
+        }
+
+        function toggleInvertPass(enabled) {
+            fxInvertEnabled = enabled;
+            if (invertPass) invertPass.enabled = enabled;
+            const valSpan = document.getElementById('fx-invert-val');
+            if (valSpan) valSpan.classList.toggle('opacity-30', !enabled);
+        }
+
+        function updateInvertParams() {
+            const sld = document.getElementById('fx-invert-amount');
+            if (!sld) return;
+            fxInvertBaseAmount = parseFloat(sld.value);
+            document.getElementById('fx-invert-val').innerText = fxInvertBaseAmount.toFixed(1);
+            if (invertPass) invertPass.uniforms.uInvertAmount.value = fxInvertBaseAmount;
+        }
+
+        function togglePixelPass(enabled) {
+            fxPixelEnabled = enabled;
+            if (pixelPass) pixelPass.enabled = enabled;
+            const valSpan = document.getElementById('fx-pixel-val');
+            if (valSpan) valSpan.classList.toggle('opacity-30', !enabled);
+        }
+
+        function updatePixelParams() {
+            const sld = document.getElementById('fx-pixel-size');
+            if (!sld) return;
+            fxPixelBaseSize = parseFloat(sld.value);
+            document.getElementById('fx-pixel-val').innerText = `${Math.round(fxPixelBaseSize)}px`;
+            if (pixelPass) pixelPass.uniforms.uPixelSize.value = fxPixelBaseSize;
+        }
+
+        function enableAllFX() {
+            const chks = ['bloom', 'chroma', 'glitch', 'blur', 'crt', 'kaleido', 'film', 'invert', 'pixel'];
+            chks.forEach(k => {
+                const el = document.getElementById(`fx-${k}-enable`);
+                if (el) { el.checked = true; el.dispatchEvent(new Event('change')); }
+            });
+        }
+
+        function disableAllFX() {
+            const chks = ['bloom', 'chroma', 'glitch', 'blur', 'crt', 'kaleido', 'film', 'invert', 'pixel'];
+            chks.forEach(k => {
+                const el = document.getElementById(`fx-${k}-enable`);
+                if (el) { el.checked = false; el.dispatchEvent(new Event('change')); }
+            });
+        }
+
+        function resetAllFX() {
+            disableAllFX();
+            const b = document.getElementById('fx-bloom-enable');
+            const c = document.getElementById('fx-chroma-enable');
+            if (b) { b.checked = true; b.dispatchEvent(new Event('change')); }
+            if (c) { c.checked = true; c.dispatchEvent(new Event('change')); }
         }
 
         // Controles de Cámara Cinemática Orbital
@@ -2076,19 +2758,64 @@
                 customShaderUniforms.uIsOnset.value    = liveAudioMetrics.isOnset ? 1.0 : 0.0;
             }
 
-            // === POST-PROCESSING FX MODULATION (REACTIVA AL AUDIO) ===
+            // === POST-PROCESSING FX MODULATION (REACTIVA AL AUDIO - SUITE COMPLETA 9 FX) ===
             if (bloomPass && fxBloomEnabled) {
-                // Bloom reactivo: destello ante onsets y expansión con energía en sub/bass y agudos
+                // 1. Bloom reactivo: destello ante onsets y expansión con energía en sub/bass y agudos
                 const onsetBoost = liveAudioMetrics.isOnset ? 0.8 : 0.0;
                 bloomPass.strength = fxBloomBaseStrength * (1.0 + (sSub * 0.5) + (sTreble * 0.3) + onsetBoost);
             }
 
+            if (radialBlurPass && fxBlurEnabled) {
+                // 2. Radial Zoom Shockwave: onda de choque reactiva a transitorios graves y onsets
+                const blurBoost = (sSub * 0.8 + sBass * 0.5) + (liveAudioMetrics.isOnset ? 0.25 : 0.0);
+                radialBlurPass.uniforms.uStrength.value = fxBlurBaseStrength * (1.0 + blurBoost);
+            }
+
+            if (kaleidoPass && fxKaleidoEnabled) {
+                // 3. Caleidoscopio Master: rotación angular modulada por el tiempo y agudos
+                kaleidoPass.uniforms.uAngle.value = time * 0.2 + (sHighmid * 0.6);
+                kaleidoPass.uniforms.uSides.value = fxKaleidoSides;
+                kaleidoPass.uniforms.uEnabled.value = 1.0;
+            }
+
             if (chromaPass && fxChromaEnabled) {
-                // Aberración cromática: dispersión con el flujo espectral y los transitorios (onsets)
+                // 4. Aberración cromática: dispersión con el flujo espectral y los transitorios (onsets)
                 const fluxNorm = Math.min(1.0, (liveAudioMetrics.spectralFlux || 0) / 4.0);
                 const onsetGlitch = liveAudioMetrics.isOnset ? (fxChromaBaseAmount * 1.5) : 0.0;
                 chromaPass.uniforms.uAmount.value = fxChromaBaseAmount + (fluxNorm * 0.008) + onsetGlitch;
                 chromaPass.uniforms.uAngle.value = time * 2.0; // Rotación lenta del eje RGB
+            }
+
+            if (glitchPass && fxGlitchEnabled) {
+                // 5. Audio Glitch & Block Displacement: artefactos digitales en picos y onsets
+                const glitchAudio = (sSub * 0.6) + (sBass * 0.4) + (liveAudioMetrics.isOnset ? 0.5 : 0.0);
+                glitchPass.uniforms.uAmount.value = fxGlitchBaseAmount * (1.0 + glitchAudio);
+                glitchPass.uniforms.uTime.value = time;
+                glitchPass.uniforms.uIsOnset.value = liveAudioMetrics.isOnset ? 1.0 : 0.0;
+            }
+
+            if (pixelPass && fxPixelEnabled) {
+                // 6. Retro 8-Bit Pixelate: escalado de pixelado reactivo a presencia y transitorios
+                const pixelAudio = (sTreble * 1.2 + sPresence * 0.8);
+                pixelPass.uniforms.uPixelSize.value = Math.max(1.0, fxPixelBaseSize * (1.0 + (liveAudioMetrics.isOnset ? 0.5 : 0.0) + pixelAudio * 0.4));
+            }
+
+            if (invertPass && fxInvertEnabled) {
+                // 7. Negative Invert / Solarize: inversión de luminancia ante onsets
+                const onsetInvert = (liveAudioMetrics.isOnset && fxInvertBaseAmount > 0.0) ? 0.3 : 0.0;
+                invertPass.uniforms.uInvertAmount.value = Math.min(1.0, fxInvertBaseAmount + onsetInvert);
+            }
+
+            if (filmPass && fxFilmEnabled) {
+                // 8. Film Grain 35mm & Viñeta: modulación de ruido orgánico con la banda aire
+                filmPass.uniforms.uTime.value = time;
+                filmPass.uniforms.uGrain.value = fxFilmBaseGrain * (1.0 + (sAir * 0.5));
+            }
+
+            if (crtPass && fxCRTEnabled) {
+                // 9. Monitor CRT / VHS: scanlines dinámicas y curvatura analógica
+                crtPass.uniforms.uTime.value = time;
+                crtPass.uniforms.uIntensity.value = fxCRTBaseIntensity * (1.0 + (sLowmid * 0.25));
             }
 
             // Renderizado final: Composer con passes FX (o fallback directo a WebGLRenderer)

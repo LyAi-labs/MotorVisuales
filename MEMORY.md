@@ -62,8 +62,8 @@ Source → masterGainNode → mainAnalyser
 - ✅ Shaders GLSL en la Nebulosa (Vertex/Fragment shaders con partículas circulares, halo glow y uniforms reactivos)
 - ✅ Modo pantalla completa (Fullscreen) para el canvas 3D con auto-ajuste de aspect ratio y resolución
 
-- ✅ Soporte para shaders de post-procesado (UnrealBloomPass reactivo y ChromaticAberration ShaderPass con EffectComposer)
-- ✅ Presets de mapeo acústico (Importación/Exportación JSON con perfiles de fábrica y descarga/carga de presets personalizados)
+- ✅ Soporte para shaders de post-procesado: Suite Completa de 9 FX reactivos al audio (Unreal Bloom, Aberración Cromática, Audio Glitch & Block Displacement, Radial Zoom Shockwave, Monitor CRT/VHS con scanlines, Caleidoscopio Master N-caras, Film Grain 35mm con viñeta, Inversor Negativo/Solarización y Pixelación Retro 8-Bit) modulados individualmente a 60 FPS por los 8 stems DSP y onsets.
+- ✅ Presets de mapeo acústico (Importación/Exportación JSON v1.1 con perfiles de fábrica, estado de los 9 FX y descarga/carga de presets personalizados)
 - ✅ Cámara orbital cinemática multieje reactiva al audio (modos Círculo, Espiral, Lemniscata ∞ y Fly-by dramático con retroalimentación en HUD y controles interactivos)
 - ✅ Editor de shaders GLSL en vivo con Hot-Reload WebGL, consola de errores en pantalla, 10 presets de alta fidelidad (Plasma, Raymarching SDF, Espectro, Voronoi, Synthwave 80s, Agujero Negro, Caleidoscopio, Esfera Tesla, Topografía Cuántica y Túnel Hexagonal Sci-Fi), exportación/importación y vinculación a los 8 stems DSP
 - ✅ Bucle maestro de renderizado (`masterRenderLoop`) unificado a 60 FPS vinculando en tiempo real el análisis DSP (`runAudioDSP`), espectrograma y renderizado Three.js
@@ -72,3 +72,4 @@ Source → masterGainNode → mainAnalyser
 ## Próximas Ideas / Pendientes
 - [ ] Renderizado de audio-reactividad a múltiples texturas / mapas de altura WebGL
 - [ ] Exportación directa de animaciones WebM con shader personalizado activo
+
