@@ -1,0 +1,1781 @@
+<!DOCTYPE html><html class="dark" lang="es"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>MotorVisuales - Live Runner Console (Chaos Attractors Suite)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{
+  "surface-lowest":"#08080c","surface-base":"#0e0e14","surface-card":"#14141c","surface-high":"#22222c",
+  "cyan-neon":"#00f5ff","fuchsia-neon":"#ff007f","amber-neon":"#ffaa00","outline-dim":"#363645","outline-txt":"#7d7d96"
+},fontFamily:{mono:["JetBrains Mono","monospace"],sans:["Inter","sans-serif"]}}}};
+</script>
+<style>
+* { box-sizing: border-box; }
+::-webkit-scrollbar { display: none; }
+.glass-panel { background: rgba(14, 14, 20, 0.75); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+.active-glow-cyan { border-color: #00f5ff; box-shadow: 0 0 16px rgba(0, 245, 255, 0.35); }
+.active-glow-fuchsia { border-color: #ff007f; box-shadow: 0 0 16px rgba(255, 0, 127, 0.35); }
+.active-glow-amber { border-color: #ffaa00; box-shadow: 0 0 16px rgba(255, 170, 0, 0.35); }
+.crosshair-line { position: absolute; pointer-events: none; }
+</style>
+</head>
+<body class="bg-[#050508] font-sans text-gray-200 select-none overflow-x-hidden">
+<!-- TOP GLOBAL NAVIGATION -->
+<header class="fixed top-0 left-0 right-0 h-14 bg-[#09090e]/90 backdrop-blur-xl z-50 px-4 flex items-center justify-between border-b border-white/10 shadow-lg">
+  <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2">
+      <div class="w-7 h-7 rounded border border-cyan-neon/80 bg-black flex items-center justify-center shadow-[0_0_8px_rgba(0,245,255,0.4)]">
+        <span class="w-2.5 h-2.5 rounded-full bg-cyan-neon"></span>
+      </div>
+      <span class="font-bold tracking-wider text-white text-sm uppercase">MOTOR<span class="text-cyan-neon">VISUALES</span></span>
+      <span class="text-[9px] font-mono px-1 py-0.5 rounded bg-surface-high text-cyan-neon tracking-widest">v4.2-PRO</span>
+    </div>
+    <div class="h-5 w-[1px] bg-white/10"></div>
+    <div class="flex items-center gap-2 px-2.5 py-1 bg-surface-lowest rounded border border-white/5 font-mono text-[11px]">
+      <span class="text-outline-txt text-[9px]">CLOCK:</span>
+      <span class="text-cyan-neon font-bold" id="hdrBpm">128.00 BPM</span>
+      <span class="text-outline-txt">|</span>
+      <span class="text-fuchsia-neon text-[9px]">EXT LINK</span>
+      <span class="text-outline-txt">|</span>
+      <span class="text-outline-txt text-[9px]">BAR:</span>
+      <span class="text-white" id="hdrBar">32.4</span>
+    </div>
+  </div>
+  <nav class="flex items-center gap-1 bg-surface-lowest p-1 rounded-lg border border-white/5 font-mono text-[11px] uppercase">
+    <a class="px-3 py-1 rounded bg-cyan-neon text-black font-bold shadow-[0_0_12px_rgba(0,245,255,0.4)]" href="#">Live Runner</a>
+    <a class="px-3 py-1 rounded text-gray-400 hover:text-white hover:bg-surface-high transition-colors" href="#">Graph Composer</a>
+    <a class="px-3 py-1 rounded text-gray-400 hover:text-white hover:bg-surface-high transition-colors" href="#">Audio DSP</a>
+    <a class="px-3 py-1 rounded text-gray-400 hover:text-white hover:bg-surface-high transition-colors" href="#">Node Patcher</a>
+    <a class="px-3 py-1 rounded text-gray-400 hover:text-white hover:bg-surface-high transition-colors" href="#">System Config</a>
+  </nav>
+  <div class="flex items-center gap-3 font-mono text-[10px]">
+    <div class="flex items-center gap-1.5 px-2 py-1 bg-surface-lowest rounded border border-white/5">
+      <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon animate-pulse shadow-[0_0_6px_#00f5ff]"></span>
+      <span class="text-gray-300">DP 4K @120Hz</span>
+    </div>
+    <div class="w-7 h-7 rounded-full bg-surface-high flex items-center justify-center border border-white/10 text-cyan-neon">
+      <span class="material-symbols-outlined text-[16px]">person</span>
+    </div>
+  </div>
+</header>
+
+<!-- PERSISTENT LEFT HARDWARE SIDEBAR -->
+<aside class="fixed left-0 top-14 bottom-0 w-56 bg-[#08080d]/85 backdrop-blur-xl z-40 p-3 flex flex-col justify-between border-r border-white/10 shadow-2xl">
+  <div class="space-y-4">
+    <div>
+      <span class="font-mono text-[9px] uppercase tracking-widest text-outline-txt block mb-2 px-1">Hardware Transport</span>
+      <div class="grid grid-cols-2 gap-1.5 font-mono text-[10px]">
+        <button class="py-1 px-2 rounded bg-surface-lowest border border-white/5 text-red-400 flex items-center justify-center gap-1 hover:bg-red-950/50">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>REC
+        </button>
+        <button class="py-1 px-2 rounded bg-surface-lowest border border-white/5 text-gray-400 flex items-center justify-center gap-1 hover:bg-surface-high">
+          <span class="material-symbols-outlined text-[12px]">stop</span>STOP
+        </button>
+        <button class="py-1 px-2 rounded bg-cyan-neon text-black font-bold flex items-center justify-center gap-1 shadow-[0_0_8px_rgba(0,245,255,0.4)]">
+          <span class="material-symbols-outlined text-[12px]">play_arrow</span>PLAY
+        </button>
+        <button class="py-1 px-2 rounded bg-surface-lowest border border-white/5 text-amber-neon flex items-center justify-center gap-1 hover:bg-surface-high">
+          <span class="material-symbols-outlined text-[12px]">pause</span>FREEZE
+        </button>
+        <button class="py-1 px-2 rounded bg-surface-lowest border border-white/5 text-gray-400 flex items-center justify-center gap-1 hover:bg-surface-high">
+          <span class="material-symbols-outlined text-[12px]">flashlight_off</span>BLACKOUT
+        </button>
+        <button class="py-1 px-2 rounded bg-surface-lowest border border-white/5 text-cyan-neon flex items-center justify-center gap-1 hover:bg-surface-high">
+          <span class="material-symbols-outlined text-[12px]">sensors</span>NDI OUT
+        </button>
+      </div>
+    </div>
+    <div>
+      <span class="font-mono text-[9px] uppercase tracking-widest text-outline-txt block mb-2 px-1">Signal Matrices</span>
+      <div class="space-y-1 font-mono text-[10px]">
+        <div class="flex items-center justify-between p-1.5 rounded bg-surface-high/60 text-cyan-neon border-l-2 border-cyan-neon">
+          <span class="">Master Pipe 01</span>
+          <span class="text-[9px]">60Hz</span>
+        </div>
+        <div class="flex items-center justify-between p-1.5 rounded bg-surface-lowest/70 text-gray-400 hover:text-white hover:bg-surface-card">
+          <span class="">Shader Engine</span>
+          <span class="text-fuchsia-neon text-[9px]">Hot-Reload</span>
+        </div>
+        <div class="flex items-center justify-between p-1.5 rounded bg-surface-lowest/70 text-gray-400 hover:text-white hover:bg-surface-card">
+          <span class="">FFT Analysis 8ch</span>
+          <span class="text-amber-neon text-[9px]">-12dB</span>
+        </div>
+        <div class="flex items-center justify-between p-1.5 rounded bg-surface-lowest/70 text-gray-400 hover:text-white hover:bg-surface-card">
+          <span class="">OSC / MIDI Nodes</span>
+          <span class="text-gray-500 text-[9px]">Ch 1-16</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="font-mono text-[9px] text-outline-txt p-2 rounded bg-surface-lowest/80 border border-white/5 space-y-1">
+    <div class="flex justify-between"><span class="">CHASSIS TEMP:</span><span class="text-white">41°C</span></div>
+    <div class="flex justify-between"><span class="">GPU RUNTIME:</span><span class="text-cyan-neon font-bold">3.82ms</span></div>
+    <div class="flex justify-between"><span class="">CORE ARCH:</span><span class="text-gray-300">V4.2 RT</span></div>
+  </div>
+</aside>
+
+<!-- MAIN WORKSPACE -->
+<main class="ml-56 pt-16 px-4 pb-12">
+  <!-- TOP TELEMETRY STRIP & PRESET SELECTOR -->
+  <div class="glass-panel rounded-xl p-2 mb-3 flex flex-wrap items-center justify-between gap-3 shadow-2xl">
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5 px-2.5 py-1 bg-black/60 rounded border border-white/5">
+        <span class="material-symbols-outlined text-[14px] text-cyan-neon animate-spin" style="animation-duration: 8s;">album</span>
+        <span class="font-mono text-[9px] uppercase tracking-wider text-outline-txt">ACOUSTIC PRESET:</span>
+      </div>
+      <div class="flex items-center gap-1.5" id="presetButtonGroup">
+        <button class="preset-btn relative flex items-center gap-2 px-3 py-1.5 rounded-lg border font-mono text-[10px] uppercase tracking-wider transition-all duration-200 bg-cyan-neon/15 text-cyan-neon border-cyan-neon active-glow-cyan" id="btn-stage-rave" onclick="setPreset('stage-rave')">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_6px_#00f5ff] animate-pulse"></span>
+          <span class="font-bold">STAGE RAVE</span>
+          <span class="px-1.5 py-0.2 rounded text-[8px] bg-cyan-neon/20 font-semibold">128 BPM</span>
+        </button>
+        <button class="preset-btn relative flex items-center gap-2 px-3 py-1.5 rounded-lg border font-mono text-[10px] uppercase tracking-wider transition-all duration-200 bg-surface-lowest text-gray-400 border-white/10 hover:border-fuchsia-neon hover:text-fuchsia-neon" id="btn-ambient-sphere" onclick="setPreset('ambient-sphere')">
+          <span class="w-1.5 h-1.5 rounded-full bg-fuchsia-neon/50"></span>
+          <span class="font-bold">AMBIENT SPHERE</span>
+          <span class="px-1.5 py-0.2 rounded text-[8px] bg-white/5 font-semibold">74 BPM</span>
+        </button>
+        <button class="preset-btn relative flex items-center gap-2 px-3 py-1.5 rounded-lg border font-mono text-[10px] uppercase tracking-wider transition-all duration-200 bg-surface-lowest text-gray-400 border-white/10 hover:border-amber-neon hover:text-amber-neon" id="btn-drum-bass" onclick="setPreset('drum-bass')">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-neon/50"></span>
+          <span class="font-bold">DRUM &amp; BASS</span>
+          <span class="px-1.5 py-0.2 rounded text-[8px] bg-white/5 font-semibold">174 BPM</span>
+        </button>
+        <button class="preset-btn relative flex items-center gap-2 px-3 py-1.5 rounded-lg border font-mono text-[10px] uppercase tracking-wider transition-all duration-200 bg-surface-lowest text-gray-400 border-white/10 hover:border-red-400 hover:text-red-400" id="btn-peak-techno" onclick="setPreset('peak-techno')">
+          <span class="w-1.5 h-1.5 rounded-full bg-red-500/50"></span>
+          <span class="font-bold">PEAK TECHNO</span>
+          <span class="px-1.5 py-0.2 rounded text-[8px] bg-white/5 font-semibold">135 BPM</span>
+        </button>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 font-mono text-[9px] text-outline-txt pr-2">
+      <div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/50 border border-white/10">
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon" id="mouseModIndicatorDot"></span>
+        <span class="text-gray-400">XY MOD:</span>
+        <span class="text-cyan-neon font-bold" id="mouseModStatusText">STANDBY</span>
+        <span class="text-white bg-surface-high px-1 py-0.2 rounded text-[8px]" id="mouseCoordsBadge">[0.50, 0.50]</span>
+      </div>
+      <span class="">|</span>
+      <div class="flex items-center gap-1">
+        <span class="">MOD ROUTING:</span>
+        <span class="text-cyan-neon font-bold" id="presetRoutingLabel">FFT_RMS + XY_MOD → GLSL</span>
+      </div>
+      <span class="">|</span>
+      <div class="flex items-center gap-1">
+        <span class="">DSP LATENCY:</span>
+        <span class="text-amber-neon font-bold">0.67ms</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORKSPACE GRID: CENTRAL VIEWPORT + RIGHT GLSL SHADER CONSOLE -->
+  <div class="grid grid-cols-12 gap-3 mb-3">
+    <!-- 1. CENTRAL CINEMATIC 16:9 VIEWPORT WITH REALTIME WEBGL CANVAS -->
+    <div class="col-span-12 xl:col-span-8 flex flex-col gap-3">
+      <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black border border-white/15 shadow-[0_12px_40px_rgba(0,0,0,0.85)] group cursor-crosshair" id="viewportContainer">
+        <div class="absolute top-2 left-2 z-30 font-mono text-[8px] text-outline-txt flex items-center gap-1 pointer-events-none">
+          <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
+          <span class="">[SURFACE: XY-MODULATOR]</span>
+        </div>
+        <div class="absolute top-2 right-2 z-30 font-mono text-[8px] text-outline-txt flex items-center gap-1 pointer-events-none">
+          <span class="">[RES: 3840×2160]</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
+        </div>
+        <div class="absolute bottom-2 left-2 z-30 font-mono text-[8px] text-outline-txt flex items-center gap-1 pointer-events-none">
+          <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
+          <span class="">OUT 01 // HDR10</span>
+        </div>
+        <div class="absolute bottom-2 right-2 z-30 font-mono text-[8px] text-outline-txt flex items-center gap-1 pointer-events-none">
+          <span class="">COLOR: ACEScg</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span>
+        </div>
+
+        <canvas class="absolute inset-0 w-full h-full block touch-none" id="liveViewportCanvas" width="677" height="380"></canvas>
+
+        <!-- HARDWARE CROSSHAIR HUD OVERLAY TRACKING THE CURSOR -->
+        <div class="crosshair-line top-0 bottom-0 w-[1px] bg-cyan-neon/30 pointer-events-none transition-opacity duration-150 opacity-0" id="vpHudCrosshairX" style="left: 50%;"></div>
+        <div class="crosshair-line left-0 right-0 h-[1px] bg-cyan-neon/30 pointer-events-none transition-opacity duration-150 opacity-0" id="vpHudCrosshairY" style="top: 50%;"></div>
+
+        <!-- LUMINOUS TARGET RING UNDER CURSOR / ATTRACTOR -->
+        <div class="absolute pointer-events-none z-25 -translate-x-1/2 -translate-y-1/2 transition-opacity duration-150 opacity-0" id="vpCursorReticle" style="left: 50%; top: 50%;">
+          <div class="w-12 h-12 rounded-full border border-cyan-neon/60 flex items-center justify-center transition-all duration-200" id="reticleOuterRing">
+            <div class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_8px_#00f5ff]" id="reticleInnerDot"></div>
+            <div class="absolute -top-1 w-2 h-0.5 bg-cyan-neon"></div>
+            <div class="absolute -bottom-1 w-2 h-0.5 bg-cyan-neon"></div>
+            <div class="absolute -left-1 h-2 w-0.5 bg-cyan-neon"></div>
+            <div class="absolute -right-1 h-2 w-0.5 bg-cyan-neon"></div>
+          </div>
+          <div class="absolute left-7 top-1/2 -translate-y-1/2 px-2 py-0.5 rounded bg-black/85 border border-cyan-neon/50 text-[8px] font-mono text-cyan-neon whitespace-nowrap shadow-xl flex items-center gap-1.5 backdrop-blur-md" id="reticleCoordPill">
+            <span class="">X:<span class="text-white font-bold ml-0.5" id="hudCurX">0.50</span></span>
+            <span class="">Y:<span class="text-white font-bold ml-0.5" id="hudCurY">0.50</span></span>
+            <span class="text-outline-txt">|</span>
+            <span class="text-fuchsia-neon font-bold" id="hudParamDyn">WARP 1.00</span>
+          </div>
+        </div>
+
+        <div class="absolute inset-0 pointer-events-none z-10">
+          <div class="absolute left-1/3 top-0 bottom-0 w-[1px] bg-white/[0.03]"></div>
+          <div class="absolute right-1/3 top-0 bottom-0 w-[1px] bg-white/[0.03]"></div>
+          <div class="absolute top-1/3 left-0 right-0 h-[1px] bg-white/[0.03]"></div>
+          <div class="absolute bottom-1/3 left-0 right-0 h-[1px] bg-white/[0.03]"></div>
+        </div>
+
+        <!-- FLOATING TOP HUD PILL -->
+        <div class="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3 py-1 rounded-full bg-[#08080e]/85 backdrop-blur-xl border border-white/15 shadow-2xl font-mono text-[10px] pointer-events-none">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-cyan-neon animate-ping" id="hudDot"></span>
+            <span class="text-cyan-neon font-bold" id="hudBpm">4K UHD // 128.00 BPM</span>
+            <span class="px-1 rounded text-[8px] bg-cyan-neon/20 text-cyan-neon">LOCKED</span>
+          </div>
+          <span class="text-white/20">/</span>
+          <div class="flex items-center gap-1 text-gray-300">
+            <span class="text-outline-txt">PRESET:</span>
+            <span class="text-white font-bold" id="hudPresetTag">[STAGE RAVE 128]</span>
+          </div>
+          <span class="text-white/20">/</span>
+          <div class="flex items-center gap-1 text-cyan-neon">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon animate-pulse"></span>
+            <span class="">XY-TOUCH [LIVE]</span>
+          </div>
+        </div>
+
+        <!-- FLOATING BOTTOM CONTROLS PILL -->
+        <div class="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 p-1 rounded-full bg-[#08080e]/90 backdrop-blur-xl border border-white/15 font-mono text-[10px]">
+          <button class="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-high hover:bg-white/20 text-gray-300">
+            <span class="material-symbols-outlined text-[12px] text-cyan-neon">photo_camera</span>SNAPSHOT
+          </button>
+          <button class="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-high hover:bg-white/20 text-gray-300">
+            <span class="material-symbols-outlined text-[12px] text-amber-neon">compare</span>A/B PREVIEW
+          </button>
+          <button class="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-high hover:bg-cyan-neon/20 text-cyan-neon" onclick="recenterPuck()">
+            <span class="material-symbols-outlined text-[12px]">filter_center_focus</span>RESET XY
+          </button>
+          <button class="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-950/80 border border-red-500/30 text-red-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>REC STREAM
+          </button>
+        </div>
+      </div>
+
+      <!-- 8-CHANNEL DSP STEM BUS WITH VERTICAL LED VU-METERS -->
+      <div class="glass-panel rounded-xl p-3 shadow-xl flex flex-col gap-2">
+        <div class="flex items-center justify-between pb-1.5 border-b border-white/5">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[15px] text-cyan-neon">equalizer</span>
+            <span class="font-bold text-xs uppercase tracking-wider text-white">Realtime DSP Stem Bus</span>
+            <span class="font-mono text-[9px] px-1.5 py-0.5 rounded bg-cyan-neon/15 text-cyan-neon">8 CH DYNAMIC PROFILE</span>
+          </div>
+          <div class="font-mono text-[9px] text-outline-txt flex items-center gap-3">
+            <span class="">BANDWIDTH: <span class="text-white">20Hz - 22.4kHz</span></span>
+            <span class="">SIDECHAIN: <span class="text-cyan-neon font-bold">ACTIVE (CH 8)</span></span>
+          </div>
+        </div>
+        <div class="grid grid-cols-8 gap-1.5 pt-1" id="dspStemGrid"><div class="flex flex-col items-center bg-black/60 rounded p-1 border border-white/5 transition-all">
+      <div class="w-full flex justify-between text-[7px] font-mono text-outline-txt">
+        <span class="text-cyan-neon">01</span>
+        <span class="">52.4 Hz</span>
+      </div>
+      <span class="font-mono text-[8px] font-bold text-gray-200 truncate w-full text-center mt-0.5">SUB KICK</span>
+      <div class="flex items-center justify-center gap-1.5 w-full my-1.5 h-32">
+        <div class="flex flex-col gap-[2px] w-2 h-full justify-between items-center bg-black p-0.5 rounded">
+          <div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-amber-neon shadow-[0_0_4px_#ffaa00]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div>
+        </div>
+        <div class="relative w-3.5 h-full bg-[#06060a] rounded flex justify-center items-center py-1">
+          <div class="w-[2px] h-full bg-white/10 rounded"></div>
+          <div style="top: 24%;" class="absolute w-4 h-6 rounded-xs bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/30 shadow-md flex items-center justify-center cursor-ns-resize transition-all duration-300">
+            <div class="w-full h-[1px] bg-cyan-neon"></div>
+          </div>
+        </div>
+      </div>
+      <div class="font-mono text-[8px] text-cyan-neon">-1.8 dB</div>
+    </div><div class="flex flex-col items-center bg-black/60 rounded p-1 border border-white/5 transition-all">
+      <div class="w-full flex justify-between text-[7px] font-mono text-outline-txt">
+        <span class="text-cyan-neon">02</span>
+        <span class="">310 Hz</span>
+      </div>
+      <span class="font-mono text-[8px] font-bold text-gray-200 truncate w-full text-center mt-0.5">SNARE</span>
+      <div class="flex items-center justify-center gap-1.5 w-full my-1.5 h-32">
+        <div class="flex flex-col gap-[2px] w-2 h-full justify-between items-center bg-black p-0.5 rounded">
+          <div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div>
+        </div>
+        <div class="relative w-3.5 h-full bg-[#06060a] rounded flex justify-center items-center py-1">
+          <div class="w-[2px] h-full bg-white/10 rounded"></div>
+          <div style="top: 38%;" class="absolute w-4 h-6 rounded-xs bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/30 shadow-md flex items-center justify-center cursor-ns-resize transition-all duration-300">
+            <div class="w-full h-[1px] bg-cyan-neon"></div>
+          </div>
+        </div>
+      </div>
+      <div class="font-mono text-[8px] text-cyan-neon">-5.2 dB</div>
+    </div><div class="flex flex-col items-center bg-black/60 rounded p-1 border border-white/5 transition-all">
+      <div class="w-full flex justify-between text-[7px] font-mono text-outline-txt">
+        <span class="text-cyan-neon">03</span>
+        <span class="">8.4 kHz</span>
+      </div>
+      <span class="font-mono text-[8px] font-bold text-gray-200 truncate w-full text-center mt-0.5">HI-HAT</span>
+      <div class="flex items-center justify-center gap-1.5 w-full my-1.5 h-32">
+        <div class="flex flex-col gap-[2px] w-2 h-full justify-between items-center bg-black p-0.5 rounded">
+          <div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div>
+        </div>
+        <div class="relative w-3.5 h-full bg-[#06060a] rounded flex justify-center items-center py-1">
+          <div class="w-[2px] h-full bg-white/10 rounded"></div>
+          <div style="top: 46%;" class="absolute w-4 h-6 rounded-xs bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/30 shadow-md flex items-center justify-center cursor-ns-resize transition-all duration-300">
+            <div class="w-full h-[1px] bg-cyan-neon"></div>
+          </div>
+        </div>
+      </div>
+      <div class="font-mono text-[8px] text-cyan-neon">-8.1 dB</div>
+    </div><div class="flex flex-col items-center bg-black/60 rounded p-1 border border-white/5 transition-all">
+      <div class="w-full flex justify-between text-[7px] font-mono text-outline-txt">
+        <span class="text-cyan-neon">04</span>
+        <span class="">142 Hz</span>
+      </div>
+      <span class="font-mono text-[8px] font-bold text-gray-200 truncate w-full text-center mt-0.5">BASS SYN</span>
+      <div class="flex items-center justify-center gap-1.5 w-full my-1.5 h-32">
+        <div class="flex flex-col gap-[2px] w-2 h-full justify-between items-center bg-black p-0.5 rounded">
+          <div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div>
+        </div>
+        <div class="relative w-3.5 h-full bg-[#06060a] rounded flex justify-center items-center py-1">
+          <div class="w-[2px] h-full bg-white/10 rounded"></div>
+          <div style="top: 28%;" class="absolute w-4 h-6 rounded-xs bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/30 shadow-md flex items-center justify-center cursor-ns-resize transition-all duration-300">
+            <div class="w-full h-[1px] bg-cyan-neon"></div>
+          </div>
+        </div>
+      </div>
+      <div class="font-mono text-[8px] text-cyan-neon">-2.9 dB</div>
+    </div><div class="flex flex-col items-center bg-black/60 rounded p-1 border border-white/5 transition-all">
+      <div class="w-full flex justify-between text-[7px] font-mono text-outline-txt">
+        <span class="text-cyan-neon">05</span>
+        <span class="">2.2 kHz</span>
+      </div>
+      <span class="font-mono text-[8px] font-bold text-gray-200 truncate w-full text-center mt-0.5">LEADS</span>
+      <div class="flex items-center justify-center gap-1.5 w-full my-1.5 h-32">
+        <div class="flex flex-col gap-[2px] w-2 h-full justify-between items-center bg-black p-0.5 rounded">
+          <div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div>
+        </div>
+        <div class="relative w-3.5 h-full bg-[#06060a] rounded flex justify-center items-center py-1">
+          <div class="w-[2px] h-full bg-white/10 rounded"></div>
+          <div style="top: 34%;" class="absolute w-4 h-6 rounded-xs bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/30 shadow-md flex items-center justify-center cursor-ns-resize transition-all duration-300">
+            <div class="w-full h-[1px] bg-cyan-neon"></div>
+          </div>
+        </div>
+      </div>
+      <div class="font-mono text-[8px] text-cyan-neon">-4.8 dB</div>
+    </div><div class="flex flex-col items-center bg-black/60 rounded p-1 border border-white/5 transition-all">
+      <div class="w-full flex justify-between text-[7px] font-mono text-outline-txt">
+        <span class="text-cyan-neon">06</span>
+        <span class="">1.1 kHz</span>
+      </div>
+      <span class="font-mono text-[8px] font-bold text-gray-200 truncate w-full text-center mt-0.5">VOCALS</span>
+      <div class="flex items-center justify-center gap-1.5 w-full my-1.5 h-32">
+        <div class="flex flex-col gap-[2px] w-2 h-full justify-between items-center bg-black p-0.5 rounded">
+          <div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div>
+        </div>
+        <div class="relative w-3.5 h-full bg-[#06060a] rounded flex justify-center items-center py-1">
+          <div class="w-[2px] h-full bg-white/10 rounded"></div>
+          <div style="top: 52%;" class="absolute w-4 h-6 rounded-xs bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/30 shadow-md flex items-center justify-center cursor-ns-resize transition-all duration-300">
+            <div class="w-full h-[1px] bg-cyan-neon"></div>
+          </div>
+        </div>
+      </div>
+      <div class="font-mono text-[8px] text-cyan-neon">-8.5 dB</div>
+    </div><div class="flex flex-col items-center bg-black/60 rounded p-1 border border-white/5 transition-all">
+      <div class="w-full flex justify-between text-[7px] font-mono text-outline-txt">
+        <span class="text-cyan-neon">07</span>
+        <span class="">640 Hz</span>
+      </div>
+      <span class="font-mono text-[8px] font-bold text-gray-200 truncate w-full text-center mt-0.5">ATMOS</span>
+      <div class="flex items-center justify-center gap-1.5 w-full my-1.5 h-32">
+        <div class="flex flex-col gap-[2px] w-2 h-full justify-between items-center bg-black p-0.5 rounded">
+          <div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div><div class="w-full h-1.5 rounded-xs bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></div>
+        </div>
+        <div class="relative w-3.5 h-full bg-[#06060a] rounded flex justify-center items-center py-1">
+          <div class="w-[2px] h-full bg-white/10 rounded"></div>
+          <div style="top: 64%;" class="absolute w-4 h-6 rounded-xs bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/30 shadow-md flex items-center justify-center cursor-ns-resize transition-all duration-300">
+            <div class="w-full h-[1px] bg-cyan-neon"></div>
+          </div>
+        </div>
+      </div>
+      <div class="font-mono text-[8px] text-cyan-neon">-10.5 dB</div>
+    </div><div class="flex flex-col items-center bg-black/60 rounded p-1 border border-cyan-neon/40 shadow-[0_0_8px_rgba(0,245,255,0.2)] transition-all">
+      <div class="w-full flex justify-between text-[7px] font-mono text-outline-txt">
+        <span class="text-amber-neon font-bold">08</span>
+        <span class="">FULL</span>
+      </div>
+      <span class="font-mono text-[8px] font-bold text-gray-200 truncate w-full text-center mt-0.5">MST BUS</span>
+      <div class="flex items-center justify-center gap-1.5 w-full my-1.5 h-32">
+        <div class="flex flex-col gap-[2px] w-2 h-full justify-between items-center bg-black p-0.5 rounded">
+          <div class="w-full h-1.5 rounded-xs bg-cyan-neon/20"></div><div class="w-full h-1.5 rounded-xs bg-red-500 shadow-[0_0_4px_#ef4444]"></div><div class="w-full h-1.5 rounded-xs bg-amber-neon shadow-[0_0_4px_#ffaa00]"></div><div class="w-full h-1.5 rounded-xs bg-amber-neon shadow-[0_0_4px_#ffaa00]"></div><div class="w-full h-1.5 rounded-xs bg-fuchsia-neon shadow-[0_0_4px_#ff007f]"></div><div class="w-full h-1.5 rounded-xs bg-fuchsia-neon shadow-[0_0_4px_#ff007f]"></div><div class="w-full h-1.5 rounded-xs bg-fuchsia-neon shadow-[0_0_4px_#ff007f]"></div><div class="w-full h-1.5 rounded-xs bg-fuchsia-neon shadow-[0_0_4px_#ff007f]"></div><div class="w-full h-1.5 rounded-xs bg-fuchsia-neon shadow-[0_0_4px_#ff007f]"></div><div class="w-full h-1.5 rounded-xs bg-fuchsia-neon shadow-[0_0_4px_#ff007f]"></div><div class="w-full h-1.5 rounded-xs bg-fuchsia-neon shadow-[0_0_4px_#ff007f]"></div><div class="w-full h-1.5 rounded-xs bg-fuchsia-neon shadow-[0_0_4px_#ff007f]"></div><div class="w-full h-1.5 rounded-xs bg-fuchsia-neon shadow-[0_0_4px_#ff007f]"></div><div class="w-full h-1.5 rounded-xs bg-fuchsia-neon shadow-[0_0_4px_#ff007f]"></div>
+        </div>
+        <div class="relative w-3.5 h-full bg-[#06060a] rounded flex justify-center items-center py-1">
+          <div class="w-[2px] h-full bg-white/10 rounded"></div>
+          <div style="top: 14%;" class="absolute w-4 h-6 rounded-xs bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/30 shadow-md flex items-center justify-center cursor-ns-resize transition-all duration-300">
+            <div class="w-full h-[1px] bg-fuchsia-neon"></div>
+          </div>
+        </div>
+      </div>
+      <div class="font-mono text-[8px] text-fuchsia-neon font-bold">-0.4 dB</div>
+    </div></div>
+      </div>
+    </div>
+
+    <!-- 2. GLSL HOT-RELOAD SHADER CONSOLE & MANUAL MODULATION XY RACK (RIGHT COLUMN) -->
+    <div class="col-span-12 xl:col-span-4 flex flex-col gap-3">
+      <div class="glass-panel rounded-xl p-3 shadow-xl flex flex-col h-full">
+        <!-- Console Header -->
+        <div class="flex flex-col gap-1.5 pb-2 border-b border-white/5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px] text-fuchsia-neon">terminal</span>
+              <span class="font-bold text-xs uppercase tracking-wider text-white">GLSL RUNNER</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="font-mono text-[8px] px-1.5 py-0.5 rounded bg-cyan-neon/20 text-cyan-neon border border-cyan-neon/30">u_mouse: LIVE</span>
+              <span class="font-mono text-[8px] px-1.5 py-0.5 rounded bg-fuchsia-neon/20 text-fuchsia-neon border border-fuchsia-neon/30">PASS: 03/04</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between px-2 py-1 bg-black/60 rounded border border-white/5 font-mono text-[10px]">
+            <span class="text-cyan-neon truncate" id="glslFileName">[stage_rave_4k.glsl] (V4.2)</span>
+            <span class="material-symbols-outlined text-[12px] text-outline-txt">expand_more</span>
+          </div>
+          <div class="flex items-center justify-between font-mono text-[8px] py-0.5 px-1.5 rounded bg-surface-lowest">
+            <div class="flex items-center gap-1 text-cyan-neon">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon animate-pulse"></span>
+              <span id="compilerStatus" class="">HOT RELOAD ACTIVE // 12ms</span>
+            </div>
+            <span class="text-amber-neon font-semibold">0 ERR // 0 WARN</span>
+          </div>
+        </div>
+
+        <!-- Code Editor Display -->
+        <div class="relative flex-1 min-h-[145px] max-h-[175px] my-2 p-2 rounded bg-black/80 border border-white/5 font-mono text-[10px] leading-relaxed overflow-x-auto text-gray-300">
+          <div class="flex gap-2">
+            <div class="flex flex-col text-outline-txt select-none opacity-40 text-right pr-1 border-r border-white/5 text-[9px]">
+              01<br>02<br>03<br>04<br>05<br>06<br>07<br>08<br>09<br>10<br>11<br>12<br>13<br>14
+            </div>
+            <div class="flex flex-col text-[10px]" id="glslCodeContainer"><div><span class="text-fuchsia-400">#version</span> <span class="text-amber-400">450 core</span></div>
+<div class=""><span class="text-fuchsia-400">layout</span>(location = 0) <span class="text-fuchsia-400">out vec4</span> fragColor;</div>
+<div class="text-gray-500 italic">// STAGE RAVE (128 BPM PUMP + XY WARP)</div>
+<div class=""><span class="text-fuchsia-400">uniform float</span> <span class="text-cyan-neon">u_time</span>;</div>
+<div class=""><span class="text-fuchsia-400">uniform vec2</span>  <span class="text-cyan-neon">u_resolution</span>;</div>
+<div class=""><span class="text-fuchsia-400">uniform vec2</span>  <span class="text-cyan-neon">u_mouse</span>; <span class="text-amber-300">// [0.0 - 1.0] XY Mod</span></div>
+<div class=""><span class="text-fuchsia-400">uniform float</span> <span class="text-cyan-neon">u_bass_kick</span>;</div>
+<div class="py-0.5"></div>
+<div class=""><span class="text-fuchsia-400">void</span> main() {</div>
+<div class="pl-3">vec2 uv = (gl_FragCoord.xy * 2.0 - u_resolution) / u_resolution.y;</div>
+<div class="pl-3">vec2 m = (u_mouse - 0.5) * 2.0;</div>
+<div class="pl-3">uv += m * 0.35; <span class="text-gray-500">// Attractor focal offset</span></div>
+<div class="pl-3">float pulse = sin(u_time * 13.4 + u_bass_kick * 6.0 + length(m)*2.5);</div>
+<div class="pl-3">float rot = pulse * 0.3 + m.x * 2.0;</div>
+<div class="pl-3">uv *= mat2(cos(rot), -sin(rot), sin(rot), cos(rot));</div>
+<div class="pl-3">float r = length(uv);</div>
+<div class="pl-3">vec3 col = vec3(0.0, 0.96, 1.0) * (0.15 / r);</div>
+<div class="pl-3">fragColor = vec4(col + vec3(1.0, 0.0, 0.5) * abs(pulse) * (1.0 + m.y), 1.0);</div>
+<div class="">}</div></div>
+          </div>
+        </div>
+
+        <!-- Compile Action Micro Bar -->
+        <div class="flex items-center justify-between pt-1 pb-2 border-b border-white/5 font-mono text-[9px]">
+          <button class="px-2.5 py-1 rounded bg-fuchsia-neon text-white font-bold flex items-center gap-1 shadow-[0_0_8px_rgba(255,0,127,0.4)]">
+            <span class="material-symbols-outlined text-[12px]">play_arrow</span>COMPIL (⌘S)
+          </button>
+          <div class="flex items-center gap-1">
+            <span class="text-outline-txt">BACKEND:</span>
+            <span class="text-cyan-neon">VULKAN 1.3 SPIR-V</span>
+          </div>
+        </div>
+
+        <!-- AUTO LFO GENERATOR & EXPANDED CHAOTIC ATTRACTORS MATRIX -->
+        <div class="mt-2 pt-2 border-b border-white/5 pb-2.5">
+          <div class="flex items-center justify-between mb-1.5">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[13px] text-cyan-neon">motion_mode</span>
+              <span class="font-mono text-[9px] uppercase tracking-wider text-white font-bold">Auto LFO Generator</span>
+              <span class="font-mono text-[7px] px-1 py-0.2 rounded bg-white/5 text-gray-400 border border-white/10" id="lfoActiveBadge">OFF</span>
+            </div>
+            <div class="flex items-center gap-1 font-mono text-[7px] bg-black/70 p-0.5 rounded border border-white/10">
+              <span class="text-outline-txt px-0.5">SYNC:</span>
+              <button class="px-1 py-0.2 rounded bg-cyan-neon text-black font-bold" id="btnLfoSyncBpm" onclick="setLfoSyncMode('bpm')">BPM</button>
+              <button class="px-1 py-0.2 rounded text-gray-400 hover:text-white" id="btnLfoSyncHz" onclick="setLfoSyncMode('hz')">FREE HZ</button>
+            </div>
+          </div>
+
+          <!-- LFO BUTTON SELECTOR MATRIX: PERIODIC / S&H (ROW 1) + NON-LINEAR CHAOTIC ATTRACTORS (ROW 2) -->
+          <div class="space-y-1" id="lfoButtonGroup">
+            <!-- ROW 1: STANDARD LFO WAVEFORMS -->
+            <div class="grid grid-cols-4 gap-1 font-mono text-[8px]">
+              <button class="lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-cyan-neon/15 text-cyan-neon border-cyan-neon active-glow-cyan" id="btn-lfo-off" onclick="setLfoPattern('off')">
+                <span class="material-symbols-outlined text-[11px]">pan_tool</span>
+                <span class="font-bold">OFF</span>
+                <span class="text-[7px] text-gray-400 opacity-70 ml-0.5">MAN</span>
+              </button>
+              <button class="lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-surface-lowest text-gray-400 border-white/10 hover:border-cyan-neon hover:text-cyan-neon" id="btn-lfo-sine" onclick="setLfoPattern('sine')">
+                <svg class="w-3 h-2.5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 14"><path d="M0,7 C4,0 8,0 12,7 C16,14 20,14 24,7"></path></svg>
+                <span class="font-bold">SINE</span>
+                <span class="text-[7px] text-outline-txt ml-0.5">LIS</span>
+              </button>
+              <button class="lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-surface-lowest text-gray-400 border-white/10 hover:border-fuchsia-neon hover:text-fuchsia-neon" id="btn-lfo-triangle" onclick="setLfoPattern('triangle')">
+                <svg class="w-3 h-2.5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 14"><path d="M0,7 L6,1 L18,13 L24,7"></path></svg>
+                <span class="font-bold">TRIANGLE</span>
+                <span class="text-[7px] text-outline-txt ml-0.5">BNC</span>
+              </button>
+              <button class="lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-surface-lowest text-gray-400 border-white/10 hover:border-amber-neon hover:text-amber-neon" id="btn-lfo-random" onclick="setLfoPattern('random')">
+                <svg class="w-3 h-2.5 stroke-current fill-none stroke-[1.8]" viewBox="0 0 24 14"><path d="M0,9 L5,9 L5,3 L12,3 L12,11 L18,11 L18,5 L24,5"></path></svg>
+                <span class="font-bold">RAND S&amp;H</span>
+              </button>
+            </div>
+
+            <!-- ROW 2: 4 PRECISION CHAOTIC ATTRACTORS SUB-SELECTOR -->
+            <div class="grid grid-cols-4 gap-1 font-mono text-[8px] pt-0.5">
+              <button class="lfo-btn relative flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-surface-lowest text-gray-400 border-white/10 hover:border-cyan-neon hover:text-cyan-neon" id="btn-lfo-lorenz" onclick="setLfoPattern('lorenz')" title="Classic 2-wing strange attractor">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon/40"></span>
+                <span class="font-bold">LORENZ</span>
+                <span class="text-[6px] px-1 py-0.2 rounded bg-white/5 text-cyan-neon uppercase">3D</span>
+              </button>
+              <button class="lfo-btn relative flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-surface-lowest text-gray-400 border-white/10 hover:border-fuchsia-neon hover:text-fuchsia-neon" id="btn-lfo-rossler" onclick="setLfoPattern('rossler')" title="Spiral band with periodic topological folds">
+                <span class="w-1.5 h-1.5 rounded-full bg-fuchsia-neon/40"></span>
+                <span class="font-bold">RÖSSLER</span>
+                <span class="text-[6px] px-1 py-0.2 rounded bg-white/5 text-fuchsia-neon uppercase">FOLD</span>
+              </button>
+              <button class="lfo-btn relative flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-surface-lowest text-gray-400 border-white/10 hover:border-amber-neon hover:text-amber-neon" id="btn-lfo-chen" onclick="setLfoPattern('chen')" title="Dual swirling hyperchaotic vortex">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-neon/40"></span>
+                <span class="font-bold">CHEN</span>
+                <span class="text-[6px] px-1 py-0.2 rounded bg-white/5 text-amber-neon uppercase">VTX</span>
+              </button>
+              <button class="lfo-btn relative flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-surface-lowest text-gray-400 border-white/10 hover:border-cyan-neon hover:text-cyan-neon" id="btn-lfo-clifford" onclick="setLfoPattern('clifford')" title="Discrete 2D fractal attractor map">
+                <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon/40"></span>
+                <span class="font-bold">CLIFFORD</span>
+                <span class="text-[6px] px-1 py-0.2 rounded bg-white/5 text-cyan-neon uppercase">MAP</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- LFO Parameter Controls -->
+          <div class="grid grid-cols-3 gap-1.5 mt-2 bg-black/60 p-1.5 rounded border border-white/5 font-mono text-[8px]">
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-outline-txt">
+                <span class="">LFO RATE</span>
+                <span class="text-cyan-neon font-bold" id="lfoRateVal">1/4 BAR</span>
+              </div>
+              <input class="w-full h-1 bg-white/10 rounded accent-cyan-neon cursor-pointer appearance-none" id="sliderLfoRate" max="6" min="0" oninput="updateLfoParam('rate', this.value)" step="1" type="range" value="2">
+            </div>
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-outline-txt">
+                <span class="">DEPTH/RAD</span>
+                <span class="text-fuchsia-neon font-bold" id="lfoDepthVal">75%</span>
+              </div>
+              <input class="w-full h-1 bg-white/10 rounded accent-fuchsia-neon cursor-pointer appearance-none" id="sliderLfoDepth" max="100" min="5" oninput="updateLfoParam('depth', this.value)" step="1" type="range" value="75">
+            </div>
+            <div class="space-y-0.5">
+              <div class="flex justify-between text-outline-txt">
+                <span id="lfoPhaseOrPerturbLabel" class="">PHASE Δ</span>
+                <span class="text-amber-neon font-bold" id="lfoPhaseVal">90°</span>
+              </div>
+              <input class="w-full h-1 bg-white/10 rounded accent-amber-neon cursor-pointer appearance-none" id="sliderLfoPhase" max="360" min="0" oninput="updateLfoParam('phase', this.value)" step="5" type="range" value="90">
+            </div>
+          </div>
+
+          <!-- Active Attractor Telemetry Strip -->
+          <div class="mt-1.5 p-1.5 rounded bg-black/70 border border-cyan-neon/30 font-mono text-[8px] space-y-1.5" id="bifurcationLabPanel"><div class="flex items-center justify-between pb-1 border-b border-white/10"><div class="flex items-center gap-1"><span class="material-symbols-outlined text-[12px] text-cyan-neon">device_hub</span><span class="font-bold uppercase tracking-wider text-white text-[8px]">Bifurcation &amp; Parametric Lab</span></div><div class="flex items-center gap-1"><span class="text-[7px] text-outline-txt">FEIGENBAUM δ:</span><span class="text-[7px] px-1 py-0.2 rounded bg-cyan-neon/15 text-cyan-neon font-bold border border-cyan-neon/30">4.6692</span><span class="text-[7px] px-1 py-0.2 rounded bg-fuchsia-neon/20 text-fuchsia-neon font-bold border border-fuchsia-neon/30" id="lyapunovSpectrumTag">λ: +0.419</span></div></div><div class="grid grid-cols-3 gap-1.5 bg-black/50 p-1 rounded border border-white/5" id="bifurcationSlidersGrid"><div class="space-y-0.5"><div class="flex justify-between text-outline-txt"><span id="bifParam1Label" class="">PARAM ρ</span><span class="text-cyan-neon font-bold" id="bifParam1Val">28.0</span></div><input class="w-full h-1 bg-white/10 rounded accent-cyan-neon cursor-pointer appearance-none" id="sliderBifParam1" max="50" min="5" oninput="updateBifurcationParam(1, this.value)" step="0.5" type="range" value="28"></div><div class="space-y-0.5"><div class="flex justify-between text-outline-txt"><span id="bifParam2Label" class="">PARAM σ</span><span class="text-fuchsia-neon font-bold" id="bifParam2Val">10.0</span></div><input class="w-full h-1 bg-white/10 rounded accent-fuchsia-neon cursor-pointer appearance-none" id="sliderBifParam2" max="25" min="1" oninput="updateBifurcationParam(2, this.value)" step="0.5" type="range" value="10"></div><div class="space-y-0.5"><div class="flex justify-between text-outline-txt"><span id="bifParam3Label" class="">PARAM β</span><span class="text-amber-neon font-bold" id="bifParam3Val">2.67</span></div><input class="w-full h-1 bg-white/10 rounded accent-amber-neon cursor-pointer appearance-none" id="sliderBifParam3" max="8" min="0.5" oninput="updateBifurcationParam(3, this.value)" step="0.1" type="range" value="2.67"></div></div><div class="relative w-full h-14 bg-black rounded border border-white/10 overflow-hidden flex flex-col justify-end p-0.5"><canvas class="absolute inset-0 w-full h-full block" id="bifurcationCanvas"></canvas><div class="absolute top-0 bottom-0 w-[1px] bg-cyan-neon shadow-[0_0_6px_#00f5ff] pointer-events-none transition-all" id="bifurcationScanline" style="left: 68%;"></div><div class="absolute top-1 left-1.5 text-[7px] text-outline-txt pointer-events-none z-10 flex items-center gap-1.5"><span class="">MAP: xₙ₊₁ = r·xₙ(1 - xₙ)</span><span class="px-1 py-0.2 rounded bg-black/80 border border-cyan-neon/40 text-cyan-neon font-bold" id="bifurcationScanlineBadge">r: 3.74 (CHAOS)</span></div><div class="absolute bottom-1 right-1.5 text-[7px] text-fuchsia-neon font-bold pointer-events-none z-10">CASCADE SPECTRUM</div></div><div class="flex items-center justify-between gap-1 pt-0.5"><div class="flex items-center gap-1"><button class="px-1.5 py-0.5 rounded bg-surface-lowest border border-white/10 hover:border-cyan-neon text-gray-300 hover:text-white text-[7px] transition-all" onclick="setBifurcationPreset('limit-cycle')">LIMIT CYCLE</button><button class="px-1.5 py-0.5 rounded bg-surface-lowest border border-white/10 hover:border-fuchsia-neon text-gray-300 hover:text-white text-[7px] transition-all" onclick="setBifurcationPreset('period-doubling')">PERIOD 2-4</button><button class="px-1.5 py-0.5 rounded bg-surface-lowest border border-white/10 hover:border-amber-neon text-gray-300 hover:text-white text-[7px] transition-all" onclick="setBifurcationPreset('full-chaos')">FULL CHAOS</button><button class="px-1.5 py-0.5 rounded bg-surface-lowest border border-white/10 hover:border-red-400 text-gray-300 hover:text-white text-[7px] transition-all" onclick="setBifurcationPreset('crisis')">CRISIS</button></div><button class="px-1.5 py-0.5 rounded bg-cyan-neon/15 border border-cyan-neon/40 text-cyan-neon font-bold text-[7px] hover:bg-cyan-neon/30 transition-all flex items-center gap-1" id="btnChaosSweep" onclick="toggleChaosSweep()"><span class="w-1.5 h-1.5 rounded-full bg-cyan-neon animate-pulse"></span>AUTO-SWEEP</button></div></div><div class="mt-1 flex items-center justify-between px-1.5 py-0.5 rounded bg-black/40 border border-white/5 font-mono text-[7px]" id="chaosAttractorTelemetry">
+            <span class="text-outline-txt truncate mr-2" id="chaosTelemetryFormula">[SYS: DYNAMICS STD // LFO GENERATOR]</span>
+            <span class="text-cyan-neon font-semibold whitespace-nowrap" id="chaosStateCoords">STANDBY</span>
+          </div>
+        </div>
+
+        <!-- DEDICATED MANUAL MODULATION CONTROLS SUB-RACK (KAOSS PAD) -->
+        <div class="mt-2">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_6px_#00f5ff]"></span>
+              <span class="font-mono text-[9px] uppercase tracking-wider text-white font-bold">Manual XY Modulation</span>
+            </div>
+            <div class="flex items-center gap-1 font-mono text-[8px] bg-black/70 p-0.5 rounded border border-white/10">
+              <span class="text-outline-txt px-1">MODE:</span>
+              <button class="px-1.5 py-0.5 rounded transition-all bg-white/10 text-gray-300 hover:text-white" id="btnModeMomentary" onclick="setPadMode('momentary')">MOMENTARY</button>
+              <button class="px-1.5 py-0.5 rounded transition-all bg-cyan-neon text-black font-bold shadow-[0_0_6px_#00f5ff]" id="btnModeLatch" onclick="setPadMode('latch')">LATCH</button>
+            </div>
+          </div>
+
+          <!-- 2D Vector XY Pad Grid and Draggable Puck -->
+          <div class="grid grid-cols-12 gap-2">
+            <div class="col-span-7 flex flex-col gap-1">
+              <div class="relative w-full h-36 bg-black/90 rounded-lg border border-cyan-neon/30 overflow-hidden cursor-crosshair group touch-none select-none shadow-[inset_0_0_20px_rgba(0,0,0,0.9)]" id="xyPadSurface">
+                <div class="absolute inset-0 grid grid-cols-4 grid-rows-4 pointer-events-none opacity-20">
+                  <div class="border-r border-b border-cyan-neon"></div><div class="border-r border-b border-cyan-neon"></div><div class="border-r border-b border-cyan-neon"></div><div class="border-b border-cyan-neon"></div>
+                  <div class="border-r border-b border-cyan-neon"></div><div class="border-r border-b border-cyan-neon"></div><div class="border-r border-b border-cyan-neon"></div><div class="border-b border-cyan-neon"></div>
+                  <div class="border-r border-b border-cyan-neon"></div><div class="border-r border-b border-cyan-neon"></div><div class="border-r border-b border-cyan-neon"></div><div class="border-b border-cyan-neon"></div>
+                  <div class="border-r border-cyan-neon"></div><div class="border-r border-cyan-neon"></div><div class="border-r border-cyan-neon"></div><div></div>
+                </div>
+                <div class="absolute left-1/2 top-0 bottom-0 w-[1px] bg-cyan-neon/20 pointer-events-none"></div>
+                <div class="absolute top-1/2 left-0 right-0 h-[1px] bg-cyan-neon/20 pointer-events-none"></div>
+                <div class="absolute top-0 bottom-0 w-[1px] bg-cyan-neon/40 pointer-events-none" id="xyLaserX" style="left: 50%;"></div>
+                <div class="absolute left-0 right-0 h-[1px] bg-fuchsia-neon/40 pointer-events-none" id="xyLaserY" style="top: 50%;"></div>
+                <div class="absolute w-5 h-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-cyan-neon bg-[#0e1726]/90 shadow-[0_0_12px_#00f5ff] flex items-center justify-center pointer-events-none transition-transform duration-75" id="xyPuck" style="left: 50%; top: 50%;">
+                  <div class="w-1.5 h-1.5 rounded-full bg-cyan-neon"></div>
+                </div>
+                <div class="absolute bottom-1 left-1.5 font-mono text-[7px] text-cyan-neon/70 uppercase pointer-events-none">X: FLOW / DISP</div>
+                <div class="absolute top-1 right-1.5 font-mono text-[7px] text-fuchsia-neon/70 uppercase pointer-events-none">Y: RES / WARP</div>
+              </div>
+              <div class="flex items-center justify-between font-mono text-[8px] px-1 text-outline-txt">
+                <div class="">X: <span class="text-cyan-neon font-bold" id="xyReadoutX">0.500</span></div>
+                <div class="">Y: <span class="text-fuchsia-neon font-bold" id="xyReadoutY">0.500</span></div>
+                <div class="">MAG: <span class="text-white font-semibold" id="xyReadoutMag">0.00</span></div>
+              </div>
+            </div>
+
+            <!-- MODULATION HARDWARE SLIDERS & DAMPING CONTROLS -->
+            <div class="col-span-5 flex flex-col justify-between p-1 bg-black/60 rounded-lg border border-white/5 font-mono text-[8px]">
+              <div class="space-y-0.5">
+                <div class="flex justify-between text-outline-txt">
+                  <span class="">WARP GAIN</span>
+                  <span class="text-cyan-neon" id="sliderWarpVal">1.25x</span>
+                </div>
+                <input class="w-full h-1 bg-white/10 rounded accent-cyan-neon cursor-pointer appearance-none" id="sliderWarp" max="3.0" min="0.2" oninput="updateModParam('warp', this.value)" step="0.05" type="range" value="1.25">
+              </div>
+              <div class="space-y-0.5">
+                <div class="flex justify-between text-outline-txt">
+                  <span class="">AUDIO/XY BAL</span>
+                  <span class="text-fuchsia-neon" id="sliderBalVal">50%</span>
+                </div>
+                <input class="w-full h-1 bg-white/10 rounded accent-fuchsia-neon cursor-pointer appearance-none" id="sliderBal" max="100" min="0" oninput="updateModParam('balance', this.value)" step="1" type="range" value="50">
+              </div>
+              <div class="space-y-0.5">
+                <div class="flex justify-between text-outline-txt">
+                  <span class="">INERTIA GLIDE</span>
+                  <span class="text-amber-neon" id="sliderGlideVal">180ms</span>
+                </div>
+                <input class="w-full h-1 bg-white/10 rounded accent-amber-neon cursor-pointer appearance-none" id="sliderGlide" max="500" min="0" oninput="updateModParam('glide', this.value)" step="10" type="range" value="180">
+              </div>
+              <div class="pt-1 border-t border-white/5 flex gap-1">
+                <button class="w-full py-1 rounded bg-surface-high hover:bg-white/20 text-gray-300 text-center font-bold tracking-wider" onclick="recenterPuck()">
+                  SPRING CENTER
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ANALOG ROTARY KNOBS & UNIFORMS -->
+        <div class="mt-3 pt-2 border-t border-white/5">
+          <span class="font-mono text-[8px] tracking-widest text-outline-txt uppercase block mb-1.5">Active Uniform Controls</span>
+          <div class="grid grid-cols-3 gap-1.5 text-center p-1.5 bg-black/50 rounded border border-white/5">
+            <div class="flex flex-col items-center gap-1">
+              <div class="relative w-10 h-10 rounded-full bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/10 flex items-center justify-center shadow-inner">
+                <div class="absolute top-1 w-0.5 h-2.5 rounded bg-cyan-neon shadow-[0_0_6px_#00f5ff] -rotate-45 origin-bottom transition-transform duration-300" id="knobTick1" style="transform: rotate(-45deg);"></div>
+                <span class="font-mono text-[8px] font-bold text-white" id="knobVal1">1.85</span>
+              </div>
+              <span class="font-mono text-[8px] text-cyan-neon leading-none">Audio React</span>
+              <span class="font-mono text-[7px] text-outline-txt">Sub → Scale</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <div class="relative w-10 h-10 rounded-full bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/10 flex items-center justify-center shadow-inner">
+                <div class="absolute top-1 w-0.5 h-2.5 rounded bg-fuchsia-neon shadow-[0_0_6px_#ff007f] rotate-12 origin-bottom transition-transform duration-300" id="knobTick2" style="transform: rotate(12deg);"></div>
+                <span class="font-mono text-[8px] font-bold text-white" id="knobVal2">0.42</span>
+              </div>
+              <span class="font-mono text-[8px] text-fuchsia-neon leading-none">Flow Distort</span>
+              <span class="font-mono text-[7px] text-outline-txt">Mid → Twist</span>
+            </div>
+            <div class="flex flex-col items-center gap-1">
+              <div class="relative w-10 h-10 rounded-full bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/10 flex items-center justify-center shadow-inner">
+                <div class="absolute top-1 w-0.5 h-2.5 rounded bg-amber-neon shadow-[0_0_6px_#ffaa00] rotate-90 origin-bottom transition-transform duration-300" id="knobTick3" style="transform: rotate(90deg);"></div>
+                <span class="font-mono text-[8px] font-bold text-white" id="knobVal3">850ms</span>
+              </div>
+              <span class="font-mono text-[8px] text-amber-neon leading-none">Decay Time</span>
+              <span class="font-mono text-[7px] text-outline-txt">Env → Fall</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. OPTICAL POST-PROCESSING EURORACK MATRIX -->
+  <div class="glass-panel rounded-xl p-3 shadow-xl">
+    <div class="flex items-center justify-between pb-2 mb-2 border-b border-white/5">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-[15px] text-fuchsia-neon">tune</span>
+        <span class="font-bold text-xs uppercase tracking-wider text-white">Optical Post-Processing Eurorack</span>
+        <span class="font-mono text-[8px] px-1.5 py-0.5 rounded bg-fuchsia-neon/20 text-fuchsia-neon font-bold">9 PRECISION SLOTS</span>
+      </div>
+      <div class="font-mono text-[9px] text-outline-txt">
+        PIPELINE: <span class="text-cyan-neon font-bold">GBUFFER → COMPUTE SHADERS → HDR TONEMAP</span>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 md:grid-cols-5 xl:grid-cols-9 gap-1.5" id="rackModulesGrid"><div class="rounded bg-black/60 border border-white/5 p-1.5 flex flex-col justify-between hover:border-white/20 transition-all font-mono text-[8px]">
+      <div class="flex items-center justify-between">
+        <span class="font-bold px-1 rounded bg-white/10 text-cyan-neon">CHRM</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></span>
+      </div>
+      <span class="text-gray-300 font-sans text-[9px] font-semibold mt-1 truncate">Chromatic Aberr</span>
+      <div class="my-1.5">
+        <div class="flex justify-between text-outline-txt text-[7px]">
+          <span class="">Amount</span><span class="text-cyan-neon">3.4px</span>
+        </div>
+        <div class="h-1 w-full bg-white/10 rounded overflow-hidden mt-0.5">
+          <div class="h-full bg-cyan-neon" style="width: 65%;"></div>
+        </div>
+      </div>
+      <div class="text-[7px] text-outline-txt border-t border-white/5 pt-0.5 flex justify-between">
+        <span class="">RTX</span><span class="text-cyan-neon">ACTIVE</span>
+      </div>
+    </div><div class="rounded bg-black/60 border border-white/5 p-1.5 flex flex-col justify-between hover:border-white/20 transition-all font-mono text-[8px]">
+      <div class="flex items-center justify-between">
+        <span class="font-bold px-1 rounded bg-white/10 text-cyan-neon">FLAR</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></span>
+      </div>
+      <span class="text-gray-300 font-sans text-[9px] font-semibold mt-1 truncate">Anamorphic Flare</span>
+      <div class="my-1.5">
+        <div class="flex justify-between text-outline-txt text-[7px]">
+          <span class="">Amount</span><span class="text-cyan-neon">0.82</span>
+        </div>
+        <div class="h-1 w-full bg-white/10 rounded overflow-hidden mt-0.5">
+          <div class="h-full bg-cyan-neon" style="width: 82%;"></div>
+        </div>
+      </div>
+      <div class="text-[7px] text-outline-txt border-t border-white/5 pt-0.5 flex justify-between">
+        <span class="">RTX</span><span class="text-cyan-neon">ACTIVE</span>
+      </div>
+    </div><div class="rounded bg-black/60 border border-white/5 p-1.5 flex flex-col justify-between hover:border-white/20 transition-all font-mono text-[8px]">
+      <div class="flex items-center justify-between">
+        <span class="font-bold px-1 rounded bg-white/10 text-cyan-neon">SCAN</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></span>
+      </div>
+      <span class="text-gray-300 font-sans text-[9px] font-semibold mt-1 truncate">CRT Phosphor</span>
+      <div class="my-1.5">
+        <div class="flex justify-between text-outline-txt text-[7px]">
+          <span class="">Amount</span><span class="text-cyan-neon">2.0px</span>
+        </div>
+        <div class="h-1 w-full bg-white/10 rounded overflow-hidden mt-0.5">
+          <div class="h-full bg-cyan-neon" style="width: 40%;"></div>
+        </div>
+      </div>
+      <div class="text-[7px] text-outline-txt border-t border-white/5 pt-0.5 flex justify-between">
+        <span class="">RTX</span><span class="text-cyan-neon">ACTIVE</span>
+      </div>
+    </div><div class="rounded bg-black/60 border border-white/5 p-1.5 flex flex-col justify-between hover:border-white/20 transition-all font-mono text-[8px]">
+      <div class="flex items-center justify-between">
+        <span class="font-bold px-1 rounded bg-white/10 text-cyan-neon">BLOM</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></span>
+      </div>
+      <span class="text-gray-300 font-sans text-[9px] font-semibold mt-1 truncate">Bloom &amp; Glare</span>
+      <div class="my-1.5">
+        <div class="flex justify-between text-outline-txt text-[7px]">
+          <span class="">Amount</span><span class="text-cyan-neon">1.45</span>
+        </div>
+        <div class="h-1 w-full bg-white/10 rounded overflow-hidden mt-0.5">
+          <div class="h-full bg-cyan-neon" style="width: 72%;"></div>
+        </div>
+      </div>
+      <div class="text-[7px] text-outline-txt border-t border-white/5 pt-0.5 flex justify-between">
+        <span class="">RTX</span><span class="text-cyan-neon">ACTIVE</span>
+      </div>
+    </div><div class="rounded bg-black/60 border border-white/5 p-1.5 flex flex-col justify-between hover:border-white/20 transition-all font-mono text-[8px]">
+      <div class="flex items-center justify-between">
+        <span class="font-bold px-1 rounded bg-white/10 text-cyan-neon">VOLU</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></span>
+      </div>
+      <span class="text-gray-300 font-sans text-[9px] font-semibold mt-1 truncate">Volumetric Dust</span>
+      <div class="my-1.5">
+        <div class="flex justify-between text-outline-txt text-[7px]">
+          <span class="">Amount</span><span class="text-cyan-neon">0.35</span>
+        </div>
+        <div class="h-1 w-full bg-white/10 rounded overflow-hidden mt-0.5">
+          <div class="h-full bg-cyan-neon" style="width: 35%;"></div>
+        </div>
+      </div>
+      <div class="text-[7px] text-outline-txt border-t border-white/5 pt-0.5 flex justify-between">
+        <span class="">RTX</span><span class="text-cyan-neon">ACTIVE</span>
+      </div>
+    </div><div class="rounded bg-black/60 border border-white/5 p-1.5 flex flex-col justify-between hover:border-white/20 transition-all font-mono text-[8px]">
+      <div class="flex items-center justify-between">
+        <span class="font-bold px-1 rounded bg-white/10 text-cyan-neon">GRAIN</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></span>
+      </div>
+      <span class="text-gray-300 font-sans text-[9px] font-semibold mt-1 truncate">Organic Grain</span>
+      <div class="my-1.5">
+        <div class="flex justify-between text-outline-txt text-[7px]">
+          <span class="">Amount</span><span class="text-cyan-neon">ISO 800</span>
+        </div>
+        <div class="h-1 w-full bg-white/10 rounded overflow-hidden mt-0.5">
+          <div class="h-full bg-cyan-neon" style="width: 60%;"></div>
+        </div>
+      </div>
+      <div class="text-[7px] text-outline-txt border-t border-white/5 pt-0.5 flex justify-between">
+        <span class="">RTX</span><span class="text-cyan-neon">ACTIVE</span>
+      </div>
+    </div><div class="rounded bg-black/60 border border-white/5 p-1.5 flex flex-col justify-between hover:border-white/20 transition-all font-mono text-[8px]">
+      <div class="flex items-center justify-between">
+        <span class="font-bold px-1 rounded bg-white/10 text-cyan-neon">MBLR</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></span>
+      </div>
+      <span class="text-gray-300 font-sans text-[9px] font-semibold mt-1 truncate">Vector Blur</span>
+      <div class="my-1.5">
+        <div class="flex justify-between text-outline-txt text-[7px]">
+          <span class="">Amount</span><span class="text-cyan-neon">180°</span>
+        </div>
+        <div class="h-1 w-full bg-white/10 rounded overflow-hidden mt-0.5">
+          <div class="h-full bg-cyan-neon" style="width: 50%;"></div>
+        </div>
+      </div>
+      <div class="text-[7px] text-outline-txt border-t border-white/5 pt-0.5 flex justify-between">
+        <span class="">RTX</span><span class="text-cyan-neon">ACTIVE</span>
+      </div>
+    </div><div class="rounded bg-black/60 border border-white/5 p-1.5 flex flex-col justify-between hover:border-white/20 transition-all font-mono text-[8px]">
+      <div class="flex items-center justify-between">
+        <span class="font-bold px-1 rounded bg-white/10 text-cyan-neon">BOKH</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span>
+      </div>
+      <span class="text-gray-300 font-sans text-[9px] font-semibold mt-1 truncate">DoF Bokeh</span>
+      <div class="my-1.5">
+        <div class="flex justify-between text-outline-txt text-[7px]">
+          <span class="">Amount</span><span class="text-cyan-neon">f/1.4</span>
+        </div>
+        <div class="h-1 w-full bg-white/10 rounded overflow-hidden mt-0.5">
+          <div class="h-full bg-cyan-neon" style="width: 20%;"></div>
+        </div>
+      </div>
+      <div class="text-[7px] text-outline-txt border-t border-white/5 pt-0.5 flex justify-between">
+        <span class="">RTX</span><span class="text-gray-500">BYP</span>
+      </div>
+    </div><div class="rounded bg-black/60 border border-white/5 p-1.5 flex flex-col justify-between hover:border-white/20 transition-all font-mono text-[8px]">
+      <div class="flex items-center justify-between">
+        <span class="font-bold px-1 rounded bg-white/10 text-cyan-neon">LUTs</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-cyan-neon shadow-[0_0_4px_#00f5ff]"></span>
+      </div>
+      <span class="text-gray-300 font-sans text-[9px] font-semibold mt-1 truncate">Film Emulation</span>
+      <div class="my-1.5">
+        <div class="flex justify-between text-outline-txt text-[7px]">
+          <span class="">Amount</span><span class="text-cyan-neon">ACEScg</span>
+        </div>
+        <div class="h-1 w-full bg-white/10 rounded overflow-hidden mt-0.5">
+          <div class="h-full bg-cyan-neon" style="width: 100%;"></div>
+        </div>
+      </div>
+      <div class="text-[7px] text-outline-txt border-t border-white/5 pt-0.5 flex justify-between">
+        <span class="">RTX</span><span class="text-cyan-neon">ACTIVE</span>
+      </div>
+    </div></div>
+  </div>
+</main>
+
+<script>
+// MOUSE MODULATION SYSTEM STATE
+const mouseMod = {
+  targetX: 0.5,
+  targetY: 0.5,
+  currentX: 0.5,
+  currentY: 0.5,
+  velX: 0,
+  velY: 0,
+  isInteracting: false,
+  mode: 'latch',
+  warpGain: 1.25,
+  audioBalance: 0.5,
+  smoothingMs: 180,
+  viewportHover: false
+};
+
+// AUTO LFO GENERATOR STATE (4 PERIODIC/S&H + 4 CHAOTIC DYNAMICAL ATTRACTORS)
+const lfoState = {
+  pattern: 'off', // 'off', 'sine', 'triangle', 'random', 'lorenz', 'rossler', 'chen', 'clifford'
+  syncMode: 'bpm',
+  rateIndex: 2,
+  depth: 0.75,
+  phaseDeg: 90,
+  phaseRad: Math.PI * 0.5,
+  timeAcc: 0,
+  shNextTime: 0,
+  shTargetX: 0.5,
+  shTargetY: 0.5,
+  lorenz: {
+    x: 0.1, y: 0.0, z: 0.0,
+    sigma: 10.0, rho: 28.0, beta: 8.0 / 3.0
+  },
+  rossler: {
+    x: 0.1, y: 0.1, z: 0.1,
+    a: 0.2, b: 0.2, c: 5.7
+  },
+  chen: {
+    x: -0.1, y: 0.5, z: -0.6,
+    a: 35.0, b: 3.0, c: 28.0
+  },
+  clifford: {
+    x: 0.1, y: 0.1,
+    a: -1.4, b: 1.6, c: 1.0, d: 0.7,
+    subTimer: 0,
+    currX: 0.5, currY: 0.5,
+    nextX: 0.5, nextY: 0.5
+  }
+};
+
+const LFO_BPM_RATES = [
+  { label: '1/16', mult: 4 },
+  { label: '1/8',  mult: 2 },
+  { label: '1/4',  mult: 1 },
+  { label: '1/2',  mult: 0.5 },
+  { label: '1 BAR',mult: 0.25 },
+  { label: '2 BAR',mult: 0.125 },
+  { label: '4 BAR',mult: 0.0625 }
+];
+
+const LFO_HZ_RATES = [
+  { label: '8.0 Hz', hz: 8.0 },
+  { label: '4.0 Hz', hz: 4.0 },
+  { label: '2.0 Hz', hz: 2.0 },
+  { label: '1.0 Hz', hz: 1.0 },
+  { label: '0.5 Hz', hz: 0.5 },
+  { label: '0.25 Hz', hz: 0.25 },
+  { label: '0.1 Hz', hz: 0.1 }
+];
+
+const PRESETS = {
+  'stage-rave': {
+    name: 'STAGE RAVE', bpm: '128.00 BPM', bpmNum: 128, file: '[stage_rave_4k.glsl] (V4.2)',
+    routing: 'FFT_RMS + XY_MOD → GLSL', tag: '[STAGE RAVE 128]', shaderIdx: 0, accent: '#00f5ff',
+    knobs: { k1: '1.85', r1: -45, k2: '0.42', r2: 12, k3: '850ms', r3: 90 },
+    stems: [
+      { name: 'SUB KICK', fader: 24, db: '-1.8 dB', hz: '52.4 Hz', activeLeds: 11 },
+      { name: 'SNARE',    fader: 38, db: '-5.2 dB', hz: '310 Hz',  activeLeds: 8 },
+      { name: 'HI-HAT',   fader: 46, db: '-8.1 dB', hz: '8.4 kHz', activeLeds: 7 },
+      { name: 'BASS SYN', fader: 28, db: '-2.9 dB', hz: '142 Hz',  activeLeds: 10 },
+      { name: 'LEADS',    fader: 34, db: '-4.8 dB', hz: '2.2 kHz', activeLeds: 9 },
+      { name: 'VOCALS',   fader: 52, db: '-8.5 dB', hz: '1.1 kHz', activeLeds: 6 },
+      { name: 'ATMOS',    fader: 64, db: '-10.5 dB', hz: '640 Hz', activeLeds: 5 },
+      { name: 'MST BUS',  fader: 14, db: '-0.4 dB', hz: 'FULL',    activeLeds: 13, master: true }
+    ],
+    code: `<div><span class="text-fuchsia-400">#version</span> <span class="text-amber-400">450 core</span></div>
+<div><span class="text-fuchsia-400">layout</span>(location = 0) <span class="text-fuchsia-400">out vec4</span> fragColor;</div>
+<div class="text-gray-500 italic">// STAGE RAVE (128 BPM PUMP + XY WARP)</div>
+<div><span class="text-fuchsia-400">uniform float</span> <span class="text-cyan-neon">u_time</span>;</div>
+<div><span class="text-fuchsia-400">uniform vec2</span>  <span class="text-cyan-neon">u_resolution</span>;</div>
+<div><span class="text-fuchsia-400">uniform vec2</span>  <span class="text-cyan-neon">u_mouse</span>; <span class="text-amber-300">// [0.0 - 1.0] XY Mod</span></div>
+<div><span class="text-fuchsia-400">uniform float</span> <span class="text-cyan-neon">u_bass_kick</span>;</div>
+<div class="py-0.5"></div>
+<div><span class="text-fuchsia-400">void</span> main() {</div>
+<div class="pl-3">vec2 uv = (gl_FragCoord.xy * 2.0 - u_resolution) / u_resolution.y;</div>
+<div class="pl-3">vec2 m = (u_mouse - 0.5) * 2.0;</div>
+<div class="pl-3">uv += m * 0.35; <span class="text-gray-500">// Attractor focal offset</span></div>
+<div class="pl-3">float pulse = sin(u_time * 13.4 + u_bass_kick * 6.0 + length(m)*2.5);</div>
+<div class="pl-3">float rot = pulse * 0.3 + m.x * 2.0;</div>
+<div class="pl-3">uv *= mat2(cos(rot), -sin(rot), sin(rot), cos(rot));</div>
+<div class="pl-3">float r = length(uv);</div>
+<div class="pl-3">vec3 col = vec3(0.0, 0.96, 1.0) * (0.15 / r);</div>
+<div class="pl-3">fragColor = vec4(col + vec3(1.0, 0.0, 0.5) * abs(pulse) * (1.0 + m.y), 1.0);</div>
+<div>}`
+  },
+  'ambient-sphere': {
+    name: 'AMBIENT SPHERE', bpm: '74.00 BPM', bpmNum: 74, file: '[ambient_sphere.glsl] (V4.2)',
+    routing: 'DENSE_PADS + XY_DRIFT → RAYMARCH', tag: '[AMBIENT SPHERE 74]', shaderIdx: 1, accent: '#ff007f',
+    knobs: { k1: '0.65', r1: -90, k2: '1.20', r2: 65, k3: '2400ms', r3: 140 },
+    stems: [
+      { name: 'SUB KICK', fader: 66, db: '-12.8 dB', hz: '44.0 Hz', activeLeds: 4 },
+      { name: 'SNARE',    fader: 74, db: '-16.2 dB', hz: '280 Hz',  activeLeds: 3 },
+      { name: 'HI-HAT',   fader: 62, db: '-11.4 dB', hz: '9.2 kHz', activeLeds: 5 },
+      { name: 'BASS SYN', fader: 42, db: '-5.2 dB',  hz: '98 Hz',   activeLeds: 8 },
+      { name: 'LEADS',    fader: 45, db: '-6.5 dB',  hz: '1.8 kHz', activeLeds: 7 },
+      { name: 'VOCALS',   fader: 36, db: '-4.0 dB',  hz: '1.4 kHz', activeLeds: 9 },
+      { name: 'ATMOS',    fader: 18, db: '-1.2 dB',  hz: 'SHIMMER', activeLeds: 12 },
+      { name: 'MST BUS',  fader: 28, db: '-3.2 dB',  hz: 'FULL',    activeLeds: 10, master: true }
+    ],
+    code: `<div><span class="text-fuchsia-400">#version</span> <span class="text-amber-400">450 core</span></div>
+<div><span class="text-fuchsia-400">layout</span>(location = 0) <span class="text-fuchsia-400">out vec4</span> fragColor;</div>
+<div class="text-gray-500 italic">// AMBIENT SPHERE (74 BPM + XY ORBIT)</div>
+<div><span class="text-fuchsia-400">uniform float</span> <span class="text-cyan-neon">u_time</span>;</div>
+<div><span class="text-fuchsia-400">uniform vec2</span>  <span class="text-cyan-neon">u_resolution</span>;</div>
+<div><span class="text-fuchsia-400">uniform vec2</span>  <span class="text-cyan-neon">u_mouse</span>;</div>
+<div><span class="text-fuchsia-400">void</span> main() {</div>
+<div class="pl-3">vec2 p = (gl_FragCoord.xy * 2.0 - u_resolution) / u_resolution.y;</div>
+<div class="pl-3">vec2 m = (u_mouse - 0.5) * 1.8;</div>
+<div class="pl-3">p -= m;</div>
+<div class="pl-3">float d = length(p);</div>
+<div class="pl-3">float glow = 0.38 / (d * (1.6 + m.y*0.8) + 0.12);</div>
+<div class="pl-3">vec3 c1 = vec3(0.3, 0.05, 0.6); vec3 c2 = vec3(1.0, 0.4, 0.7);</div>
+<div class="pl-3">fragColor = vec4(mix(c1, c2, sin(d*4.0 - u_time*0.5 + m.x*3.0)*0.5+0.5) * glow, 1.0);</div>
+<div>}`
+  },
+  'drum-bass': {
+    name: 'DRUM & BASS', bpm: '174.00 BPM', bpmNum: 174, file: '[amen_warp_174.glsl] (V4.2)',
+    routing: 'AMEN_SLICER + XY_PINCH → REESE_WARP', tag: '[DRUM & BASS 174]', shaderIdx: 2, accent: '#ffaa00',
+    knobs: { k1: '2.40', r1: 60, k2: '0.95', r2: 110, k3: '420ms', r3: -15 },
+    stems: [
+      { name: 'SUB KICK', fader: 18, db: '-1.2 dB', hz: '48.0 Hz', activeLeds: 12 },
+      { name: 'SNARE',    fader: 20, db: '-1.6 dB', hz: '240 Hz',  activeLeds: 12 },
+      { name: 'HI-HAT',   fader: 22, db: '-1.9 dB', hz: '11.5kHz', activeLeds: 11 },
+      { name: 'BASS SYN', fader: 15, db: '-0.8 dB', hz: '42 Hz',   activeLeds: 13 },
+      { name: 'LEADS',    fader: 48, db: '-7.2 dB', hz: '3.1 kHz', activeLeds: 7 },
+      { name: 'VOCALS',   fader: 56, db: '-8.9 dB', hz: '1.2 kHz', activeLeds: 6 },
+      { name: 'ATMOS',    fader: 60, db: '-9.8 dB', hz: '800 Hz',  activeLeds: 5 },
+      { name: 'MST BUS',  fader: 12, db: '-0.2 dB', hz: 'FULL',    activeLeds: 14, master: true }
+    ],
+    code: `<div><span class="text-fuchsia-400">#version</span> <span class="text-amber-400">450 core</span></div>
+<div><span class="text-fuchsia-400">layout</span>(location = 0) <span class="text-fuchsia-400">out vec4</span> fragColor;</div>
+<div class="text-gray-500 italic">// DRUM & BASS (174 BPM + LOG SPIRAL WARP)</div>
+<div><span class="text-fuchsia-400">uniform float</span> <span class="text-cyan-neon">u_time</span>;</div>
+<div><span class="text-fuchsia-400">uniform vec2</span>  <span class="text-cyan-neon">u_resolution</span>;</div>
+<div><span class="text-fuchsia-400">uniform vec2</span>  <span class="text-cyan-neon">u_mouse</span>;</div>
+<div><span class="text-fuchsia-400">void</span> main() {</div>
+<div class="pl-3">vec2 uv = (gl_FragCoord.xy * 2.0 - u_resolution) / u_resolution.y;</div>
+<div class="pl-3">vec2 m = (u_mouse - 0.5) * 2.5;</div>
+<div class="pl-3">float angle = atan(uv.y, uv.x) + u_time * 3.5 + m.x * 2.0;</div>
+<div class="pl-3">float r = length(uv - m * 0.2);</div>
+<div class="pl-3">float rings = sin(16.0 * log(r) - u_time * 9.0 + m.y * 6.0) + cos(angle * 6.0);</div>
+<div class="pl-3">fragColor = vec4(vec3(1.0, 0.7, 0.1) * smoothstep(0.2, 1.0, rings) / (r+0.12), 1.0);</div>
+<div>}`
+  },
+  'peak-techno': {
+    name: 'PEAK TECHNO', bpm: '135.00 BPM', bpmNum: 135, file: '[peak_techno_core.glsl] (V4.2)',
+    routing: 'RUMBLE_KICK + XY_CHOP → BRUTALIST_GRID', tag: '[PEAK TECHNO 135]', shaderIdx: 3, accent: '#ef4444',
+    knobs: { k1: '2.85', r1: 110, k2: '1.80', r2: 135, k3: '210ms', r3: -65 },
+    stems: [
+      { name: 'SUB KICK', fader: 10, db: '-0.1 dB', hz: '50.0 Hz', activeLeds: 14 },
+      { name: 'SNARE',    fader: 30, db: '-3.8 dB', hz: '350 Hz',  activeLeds: 9 },
+      { name: 'HI-HAT',   fader: 24, db: '-2.4 dB', hz: '10.0kHz', activeLeds: 11 },
+      { name: 'BASS SYN', fader: 16, db: '-1.0 dB', hz: '65 Hz',   activeLeds: 13 },
+      { name: 'LEADS',    fader: 58, db: '-9.0 dB', hz: '1.9 kHz', activeLeds: 6 },
+      { name: 'VOCALS',   fader: 72, db: '-16.0 dB',hz: '850 Hz',  activeLeds: 3 },
+      { name: 'ATMOS',    fader: 50, db: '-7.5 dB', hz: 'HALL',    activeLeds: 7 },
+      { name: 'MST BUS',  fader: 10, db: '+0.1 dB', hz: 'FULL',    activeLeds: 14, master: true }
+    ],
+    code: `<div><span class="text-fuchsia-400">#version</span> <span class="text-amber-400">450 core</span></div>
+<div><span class="text-fuchsia-400">layout</span>(location = 0) <span class="text-fuchsia-400">out vec4</span> fragColor;</div>
+<div class="text-gray-500 italic">// PEAK TECHNO (135 BPM + XY SLICE)</div>
+<div><span class="text-fuchsia-400">uniform float</span> <span class="text-cyan-neon">u_time</span>;</div>
+<div><span class="text-fuchsia-400">uniform vec2</span>  <span class="text-cyan-neon">u_resolution</span>;</div>
+<div><span class="text-fuchsia-400">uniform vec2</span>  <span class="text-cyan-neon">u_mouse</span>;</div>
+<div><span class="text-fuchsia-400">void</span> main() {</div>
+<div class="pl-3">vec2 uv = (gl_FragCoord.xy * 2.0 - u_resolution) / u_resolution.y;</div>
+<div class="pl-3">vec2 m = (u_mouse - 0.5) * 2.0;</div>
+<div class="pl-3">vec2 g = abs(fract(uv * (2.5 + m.y * 2.0) + m.x) - 0.5);</div>
+<div class="pl-3">float line = min(g.x, g.y);</div>
+<div class="pl-3">float strobe = step(0.85, sin(u_time * 14.13));</div>
+<div class="pl-3">fragColor = vec4(vec3(0.02 / max(line, 0.004) * 0.7) + vec3(1.0, 0.05, 0.25)*strobe*0.6, 1.0);</div>
+<div>}`
+  }
+};
+
+let currentPresetKey = 'stage-rave';
+
+function renderStems(stems) {
+  const container = document.getElementById('dspStemGrid');
+  container.innerHTML = '';
+  stems.forEach((ch, idx) => {
+    const isMst = ch.master;
+    let leds = '';
+    for (let l = 13; l >= 0; l--) {
+      const active = l < ch.activeLeds;
+      let ledColor = 'bg-cyan-neon/20';
+      if (active) {
+        if (l >= 12) ledColor = 'bg-red-500 shadow-[0_0_4px_#ef4444]';
+        else if (l >= 10) ledColor = 'bg-amber-neon shadow-[0_0_4px_#ffaa00]';
+        else ledColor = isMst ? 'bg-fuchsia-neon shadow-[0_0_4px_#ff007f]' : 'bg-cyan-neon shadow-[0_0_4px_#00f5ff]';
+      }
+      leds += `<div class="w-full h-1.5 rounded-xs ${ledColor}"></div>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = `flex flex-col items-center bg-black/60 rounded p-1 border ${isMst ? 'border-cyan-neon/40 shadow-[0_0_8px_rgba(0,245,255,0.2)]' : 'border-white/5'} transition-all`;
+    card.innerHTML = `
+      <div class="w-full flex justify-between text-[7px] font-mono text-outline-txt">
+        <span class="${isMst ? 'text-amber-neon font-bold' : 'text-cyan-neon'}">0${idx+1}</span>
+        <span>${ch.hz}</span>
+      </div>
+      <span class="font-mono text-[8px] font-bold text-gray-200 truncate w-full text-center mt-0.5">${ch.name}</span>
+      <div class="flex items-center justify-center gap-1.5 w-full my-1.5 h-32">
+        <div class="flex flex-col gap-[2px] w-2 h-full justify-between items-center bg-black p-0.5 rounded">
+          ${leds}
+        </div>
+        <div class="relative w-3.5 h-full bg-[#06060a] rounded flex justify-center items-center py-1">
+          <div class="w-[2px] h-full bg-white/10 rounded"></div>
+          <div style="top: ${ch.fader}%;" class="absolute w-4 h-6 rounded-xs bg-gradient-to-b from-[#2a2934] to-[#121218] border border-white/30 shadow-md flex items-center justify-center cursor-ns-resize transition-all duration-300">
+            <div class="w-full h-[1px] ${isMst ? 'bg-fuchsia-neon' : 'bg-cyan-neon'}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="font-mono text-[8px] ${isMst ? 'text-fuchsia-neon font-bold' : 'text-cyan-neon'}">${ch.db}</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderRack() {
+  const rack = [
+    { tag: 'CHRM', name: 'Chromatic Aberr', v1: '3.4px', w1: '65%', on: true },
+    { tag: 'FLAR', name: 'Anamorphic Flare', v1: '0.82', w1: '82%', on: true },
+    { tag: 'SCAN', name: 'CRT Phosphor', v1: '2.0px', w1: '40%', on: true },
+    { tag: 'BLOM', name: 'Bloom & Glare', v1: '1.45', w1: '72%', on: true },
+    { tag: 'VOLU', name: 'Volumetric Dust', v1: '0.35', w1: '35%', on: true },
+    { tag: 'GRAIN', name: 'Organic Grain', v1: 'ISO 800', w1: '60%', on: true },
+    { tag: 'MBLR', name: 'Vector Blur', v1: '180°', w1: '50%', on: true },
+    { tag: 'BOKH', name: 'DoF Bokeh', v1: 'f/1.4', w1: '20%', on: false },
+    { tag: 'LUTs', name: 'Film Emulation', v1: 'ACEScg', w1: '100%', on: true }
+  ];
+
+  const grid = document.getElementById('rackModulesGrid');
+  grid.innerHTML = '';
+  rack.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'rounded bg-black/60 border border-white/5 p-1.5 flex flex-col justify-between hover:border-white/20 transition-all font-mono text-[8px]';
+    card.innerHTML = `
+      <div class="flex items-center justify-between">
+        <span class="font-bold px-1 rounded bg-white/10 text-cyan-neon">${m.tag}</span>
+        <span class="w-1.5 h-1.5 rounded-full ${m.on ? 'bg-cyan-neon shadow-[0_0_4px_#00f5ff]' : 'bg-gray-600'}"></span>
+      </div>
+      <span class="text-gray-300 font-sans text-[9px] font-semibold mt-1 truncate">${m.name}</span>
+      <div class="my-1.5">
+        <div class="flex justify-between text-outline-txt text-[7px]">
+          <span>Amount</span><span class="text-cyan-neon">${m.v1}</span>
+        </div>
+        <div class="h-1 w-full bg-white/10 rounded overflow-hidden mt-0.5">
+          <div class="h-full bg-cyan-neon" style="width: ${m.w1};"></div>
+        </div>
+      </div>
+      <div class="text-[7px] text-outline-txt border-t border-white/5 pt-0.5 flex justify-between">
+        <span>RTX</span><span class="${m.on ? 'text-cyan-neon' : 'text-gray-500'}">${m.on ? 'ACTIVE' : 'BYP'}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function setPreset(key) {
+  const p = PRESETS[key];
+  if (!p) return;
+  currentPresetKey = key;
+
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.classList.remove('active-glow-cyan', 'active-glow-fuchsia', 'active-glow-amber', 'border-cyan-neon', 'border-fuchsia-neon', 'border-amber-neon', 'border-red-400');
+    btn.classList.add('border-white/10', 'text-gray-400');
+  });
+  const activeBtn = document.getElementById('btn-' + key);
+  if (activeBtn) {
+    activeBtn.classList.remove('border-white/10', 'text-gray-400');
+    if (key === 'stage-rave') activeBtn.classList.add('border-cyan-neon', 'text-cyan-neon', 'active-glow-cyan');
+    if (key === 'ambient-sphere') activeBtn.classList.add('border-fuchsia-neon', 'text-fuchsia-neon', 'active-glow-fuchsia');
+    if (key === 'drum-bass') activeBtn.classList.add('border-amber-neon', 'text-amber-neon', 'active-glow-amber');
+    if (key === 'peak-techno') activeBtn.classList.add('border-red-400', 'text-red-400');
+  }
+
+  document.getElementById('hdrBpm').innerText = p.bpm;
+  document.getElementById('hudBpm').innerText = '4K UHD // ' + p.bpm;
+  document.getElementById('hudPresetTag').innerText = p.tag;
+  document.getElementById('presetRoutingLabel').innerText = p.routing;
+  document.getElementById('glslFileName').innerText = p.file;
+  document.getElementById('glslCodeContainer').innerHTML = p.code;
+
+  document.getElementById('knobVal1').innerText = p.knobs.k1;
+  document.getElementById('knobTick1').style.transform = `rotate(${p.knobs.r1}deg)`;
+  document.getElementById('knobVal2').innerText = p.knobs.k2;
+  document.getElementById('knobTick2').style.transform = `rotate(${p.knobs.r2}deg)`;
+  document.getElementById('knobVal3').innerText = p.knobs.k3;
+  document.getElementById('knobTick3').style.transform = `rotate(${p.knobs.r3}deg)`;
+
+  renderStems(p.stems);
+}
+
+// -------------------------------------------------------------
+// DOM ELEMENTS FOR RETICLE & PAD
+// -------------------------------------------------------------
+const vpContainer = document.getElementById('viewportContainer');
+const vpHudCrossX = document.getElementById('vpHudCrosshairX');
+const vpHudCrossY = document.getElementById('vpHudCrosshairY');
+const vpReticle = document.getElementById('vpCursorReticle');
+const reticleOuterRing = document.getElementById('reticleOuterRing');
+const hudCurX = document.getElementById('hudCurX');
+const hudCurY = document.getElementById('hudCurY');
+const hudParamDyn = document.getElementById('hudParamDyn');
+
+const xyPad = document.getElementById('xyPadSurface');
+const xyPuck = document.getElementById('xyPuck');
+const xyLaserX = document.getElementById('xyLaserX');
+const xyLaserY = document.getElementById('xyLaserY');
+const xyReadoutX = document.getElementById('xyReadoutX');
+const xyReadoutY = document.getElementById('xyReadoutY');
+const xyReadoutMag = document.getElementById('xyReadoutMag');
+const mouseModStatusText = document.getElementById('mouseModStatusText');
+const mouseCoordsBadge = document.getElementById('mouseCoordsBadge');
+const mouseModIndicatorDot = document.getElementById('mouseModIndicatorDot');
+
+// -------------------------------------------------------------
+// AUTO LFO GENERATOR & DYNAMICAL ATTRACTOR SELECTION
+// -------------------------------------------------------------
+function setLfoPattern(pattern) {
+  lfoState.pattern = pattern;
+  const badge = document.getElementById('lfoActiveBadge');
+  const formulaLabel = document.getElementById('chaosTelemetryFormula');
+  const stateCoords = document.getElementById('chaosStateCoords');
+  const phaseLabel = document.getElementById('lfoPhaseOrPerturbLabel');
+
+  const allBtns = ['off', 'sine', 'triangle', 'random', 'lorenz', 'rossler', 'chen', 'clifford'];
+  allBtns.forEach(p => {
+    const b = document.getElementById('btn-lfo-' + p);
+    if (!b) return;
+    b.className = 'lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-surface-lowest text-gray-400 border-white/10 hover:border-white/30';
+  });
+
+  const activeBtn = document.getElementById('btn-lfo-' + pattern);
+  if (pattern === 'off') {
+    if (activeBtn) activeBtn.className = 'lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-cyan-neon/15 text-cyan-neon border-cyan-neon active-glow-cyan';
+    badge.innerText = 'OFF';
+    badge.className = 'font-mono text-[7px] px-1 py-0.2 rounded bg-white/5 text-gray-400 border border-white/10';
+    formulaLabel.innerText = '[SYS: DYNAMICS STD // LFO GENERATOR]';
+    stateCoords.innerText = 'STANDBY';
+    phaseLabel.innerText = 'PHASE Δ';
+    if (!mouseMod.isInteracting && !mouseMod.viewportHover) {
+      mouseModStatusText.innerText = 'STANDBY';
+      mouseModStatusText.className = 'text-gray-400 font-bold';
+      mouseModIndicatorDot.className = 'w-1.5 h-1.5 rounded-full bg-cyan-neon';
+    }
+  } else if (pattern === 'sine') {
+    if (activeBtn) activeBtn.className = 'lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-cyan-neon/20 text-cyan-neon border-cyan-neon active-glow-cyan';
+    badge.innerText = 'SINE LFO';
+    badge.className = 'font-mono text-[7px] px-1 py-0.2 rounded bg-cyan-neon/20 text-cyan-neon border border-cyan-neon/50 shadow-[0_0_8px_rgba(0,245,255,0.3)] animate-pulse';
+    formulaLabel.innerText = '[SYS: HARMONIC LISSAJOUS]';
+    stateCoords.innerText = 'HARMONIC 2D';
+    phaseLabel.innerText = 'PHASE Δ';
+  } else if (pattern === 'triangle') {
+    if (activeBtn) activeBtn.className = 'lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-fuchsia-neon/20 text-fuchsia-neon border-fuchsia-neon active-glow-fuchsia';
+    badge.innerText = 'TRI LFO';
+    badge.className = 'font-mono text-[7px] px-1 py-0.2 rounded bg-fuchsia-neon/20 text-fuchsia-neon border border-fuchsia-neon/50 shadow-[0_0_8px_rgba(255,0,127,0.3)] animate-pulse';
+    formulaLabel.innerText = '[SYS: LINEAR DIAGONAL BOUNCE]';
+    stateCoords.innerText = 'TRI-WAVE 2D';
+    phaseLabel.innerText = 'PHASE Δ';
+  } else if (pattern === 'random') {
+    if (activeBtn) activeBtn.className = 'lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-amber-neon/20 text-amber-neon border-amber-neon active-glow-amber';
+    badge.innerText = 'S&H LFO';
+    badge.className = 'font-mono text-[7px] px-1 py-0.2 rounded bg-amber-neon/20 text-amber-neon border border-amber-neon/50 shadow-[0_0_8px_rgba(255,170,0,0.3)] animate-pulse';
+    formulaLabel.innerText = '[SYS: QUANTIZED SAMPLE & HOLD]';
+    stateCoords.innerText = 'S&H DYNAMICS';
+    phaseLabel.innerText = 'PHASE Δ';
+    lfoState.shNextTime = 0;
+  } else if (pattern === 'lorenz') {
+    if (activeBtn) activeBtn.className = 'lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-cyan-neon/20 text-cyan-neon border-cyan-neon active-glow-cyan shadow-[0_0_10px_rgba(0,245,255,0.4)]';
+    badge.innerText = 'CHAOS: LORENZ';
+    badge.className = 'font-mono text-[7px] px-1.5 py-0.2 rounded bg-cyan-neon/20 text-cyan-neon border border-cyan-neon/50 shadow-[0_0_10px_rgba(0,245,255,0.4)] animate-pulse font-bold';
+    formulaLabel.innerText = '[CHAOS DYNAMICS: LORENZ ATTRACTOR // σ=10, ρ=28, β=8/3]';
+    stateCoords.innerText = '2-WING BUTTERFLY';
+    phaseLabel.innerText = 'PERTURB Δ';
+    if (Math.abs(lfoState.lorenz.x) < 0.01) { lfoState.lorenz.x = 0.5; lfoState.lorenz.y = 0.5; lfoState.lorenz.z = 25.0; }
+  } else if (pattern === 'rossler') {
+    if (activeBtn) activeBtn.className = 'lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-fuchsia-neon/20 text-fuchsia-neon border-fuchsia-neon active-glow-fuchsia shadow-[0_0_10px_rgba(255,0,127,0.4)]';
+    badge.innerText = 'CHAOS: RÖSSLER';
+    badge.className = 'font-mono text-[7px] px-1.5 py-0.2 rounded bg-fuchsia-neon/20 text-fuchsia-neon border border-fuchsia-neon/50 shadow-[0_0_10px_rgba(255,0,127,0.4)] animate-pulse font-bold';
+    formulaLabel.innerText = '[CHAOS DYNAMICS: RÖSSLER ATTRACTOR // a=0.2, b=0.2, c=5.7 (Spiral Fold)]';
+    stateCoords.innerText = 'SPIRAL FOLD';
+    phaseLabel.innerText = 'PERTURB Δ';
+    if (Math.abs(lfoState.rossler.x) < 0.01) { lfoState.rossler.x = 0.2; lfoState.rossler.y = 0.2; lfoState.rossler.z = 0.1; }
+  } else if (pattern === 'chen') {
+    if (activeBtn) activeBtn.className = 'lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-amber-neon/20 text-amber-neon border-amber-neon active-glow-amber shadow-[0_0_10px_rgba(255,170,0,0.4)]';
+    badge.innerText = 'CHAOS: CHEN';
+    badge.className = 'font-mono text-[7px] px-1.5 py-0.2 rounded bg-amber-neon/20 text-amber-neon border border-amber-neon/50 shadow-[0_0_10px_rgba(255,170,0,0.4)] animate-pulse font-bold';
+    formulaLabel.innerText = '[CHAOS DYNAMICS: CHEN ATTRACTOR // a=35, b=3, c=28 (Dual Hyper-Vortex)]';
+    stateCoords.innerText = 'DUAL VORTEX';
+    phaseLabel.innerText = 'PERTURB Δ';
+    if (Math.abs(lfoState.chen.x) < 0.01) { lfoState.chen.x = -0.1; lfoState.chen.y = 0.5; lfoState.chen.z = -0.6; }
+  } else if (pattern === 'clifford') {
+    if (activeBtn) activeBtn.className = 'lfo-btn flex items-center justify-center gap-1 p-1 rounded border transition-all duration-150 bg-gradient-to-r from-cyan-neon/20 to-fuchsia-neon/20 text-cyan-neon border-cyan-neon active-glow-cyan shadow-[0_0_10px_rgba(0,245,255,0.4)]';
+    badge.innerText = 'CHAOS: CLIFFORD';
+    badge.className = 'font-mono text-[7px] px-1.5 py-0.2 rounded bg-gradient-to-r from-cyan-neon/20 to-fuchsia-neon/20 text-cyan-neon border border-cyan-neon/50 shadow-[0_0_10px_rgba(0,245,255,0.4)] animate-pulse font-bold';
+    formulaLabel.innerText = '[CHAOS DYNAMICS: CLIFFORD MAP // a=-1.4, b=1.6, c=1.0, d=0.7 (Fractal Torus)]';
+    stateCoords.innerText = 'FRACTAL MAP';
+    phaseLabel.innerText = 'PERTURB Δ';
+    lfoState.clifford.currX = mouseMod.currentX;
+    lfoState.clifford.currY = mouseMod.currentY;
+    lfoState.clifford.subTimer = 0;
+  }
+
+  if (pattern !== 'off') {
+    vpHudCrossX.classList.remove('opacity-0');
+    vpHudCrossY.classList.remove('opacity-0');
+    vpReticle.classList.remove('opacity-0');
+  } else if (!mouseMod.viewportHover && !mouseMod.isInteracting) {
+    vpHudCrossX.classList.add('opacity-0');
+    vpHudCrossY.classList.add('opacity-0');
+    vpReticle.classList.add('opacity-0');
+  }
+}
+
+function setLfoSyncMode(mode) {
+  lfoState.syncMode = mode;
+  const btnBpm = document.getElementById('btnLfoSyncBpm');
+  const btnHz = document.getElementById('btnLfoSyncHz');
+  if (mode === 'bpm') {
+    btnBpm.className = 'px-1 py-0.2 rounded bg-cyan-neon text-black font-bold';
+    btnHz.className = 'px-1 py-0.2 rounded text-gray-400 hover:text-white';
+  } else {
+    btnHz.className = 'px-1 py-0.2 rounded bg-fuchsia-neon text-white font-bold';
+    btnBpm.className = 'px-1 py-0.2 rounded text-gray-400 hover:text-white';
+  }
+  updateLfoParam('rate', lfoState.rateIndex);
+}
+
+function updateLfoParam(param, val) {
+  if (param === 'rate') {
+    lfoState.rateIndex = parseInt(val, 10);
+    const label = lfoState.syncMode === 'bpm' ? LFO_BPM_RATES[lfoState.rateIndex].label : LFO_HZ_RATES[lfoState.rateIndex].label;
+    document.getElementById('lfoRateVal').innerText = label;
+  } else if (param === 'depth') {
+    lfoState.depth = parseInt(val, 10) / 100;
+    document.getElementById('lfoDepthVal').innerText = val + '%';
+  } else if (param === 'phase') {
+    lfoState.phaseDeg = parseInt(val, 10);
+    lfoState.phaseRad = (lfoState.phaseDeg * Math.PI) / 180;
+    document.getElementById('lfoPhaseVal').innerText = val + '°';
+    const perturb = (lfoState.phaseDeg / 180 - 1.0) * 1.5;
+    if (lfoState.pattern === 'lorenz') lfoState.lorenz.y += perturb;
+    else if (lfoState.pattern === 'rossler') lfoState.rossler.x += perturb * 0.8;
+    else if (lfoState.pattern === 'chen') lfoState.chen.y += perturb * 1.2;
+    else if (lfoState.pattern === 'clifford') { lfoState.clifford.x += perturb * 0.1; lfoState.clifford.y += perturb * 0.1; }
+  }
+}
+
+function setPadMode(mode) {
+  mouseMod.mode = mode;
+  const btnM = document.getElementById('btnModeMomentary');
+  const btnL = document.getElementById('btnModeLatch');
+  if (mode === 'momentary') {
+    btnM.className = 'px-1.5 py-0.5 rounded transition-all bg-fuchsia-neon text-white font-bold shadow-[0_0_6px_#ff007f]';
+    btnL.className = 'px-1.5 py-0.5 rounded transition-all bg-white/10 text-gray-300 hover:text-white';
+    if (!mouseMod.isInteracting && lfoState.pattern === 'off') recenterPuck();
+  } else {
+    btnL.className = 'px-1.5 py-0.5 rounded transition-all bg-cyan-neon text-black font-bold shadow-[0_0_6px_#00f5ff]';
+    btnM.className = 'px-1.5 py-0.5 rounded transition-all bg-white/10 text-gray-300 hover:text-white';
+  }
+}
+
+function updateModParam(type, val) {
+  if (type === 'warp') {
+    mouseMod.warpGain = parseFloat(val);
+    document.getElementById('sliderWarpVal').innerText = mouseMod.warpGain.toFixed(2) + 'x';
+  } else if (type === 'balance') {
+    mouseMod.audioBalance = parseFloat(val) / 100;
+    document.getElementById('sliderBalVal').innerText = val + '%';
+  } else if (type === 'glide') {
+    mouseMod.smoothingMs = parseInt(val, 10);
+    document.getElementById('sliderGlideVal').innerText = val + 'ms';
+  }
+}
+
+function recenterPuck() {
+  mouseMod.targetX = 0.5;
+  mouseMod.targetY = 0.5;
+  if (lfoState.pattern !== 'off') setLfoPattern('off');
+}
+
+function handleViewportPointer(e, isClick) {
+  const rect = vpContainer.getBoundingClientRect();
+  const rawX = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+  const rawY = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+
+  const nx = rawX / rect.width;
+  const ny = 1.0 - (rawY / rect.height);
+
+  mouseMod.targetX = nx;
+  mouseMod.targetY = ny;
+
+  if (isClick && lfoState.pattern !== 'off') setLfoPattern('off');
+
+  vpHudCrossX.style.left = rawX + 'px';
+  vpHudCrossY.style.top = rawY + 'px';
+  vpReticle.style.left = rawX + 'px';
+  vpReticle.style.top = rawY + 'px';
+
+  hudCurX.innerText = nx.toFixed(2);
+  hudCurY.innerText = ny.toFixed(2);
+  const warpMag = ((Math.hypot(nx - 0.5, ny - 0.5) * 2.0) * mouseMod.warpGain).toFixed(2);
+  hudParamDyn.innerText = `WARP ${warpMag}`;
+}
+
+vpContainer.addEventListener('pointerenter', () => {
+  mouseMod.viewportHover = true;
+  vpHudCrossX.classList.remove('opacity-0');
+  vpHudCrossY.classList.remove('opacity-0');
+  vpReticle.classList.remove('opacity-0');
+  if (lfoState.pattern === 'off') {
+    mouseModStatusText.innerText = 'TRACKING';
+    mouseModStatusText.className = 'text-cyan-neon font-bold';
+  }
+});
+
+vpContainer.addEventListener('pointerleave', () => {
+  mouseMod.viewportHover = false;
+  if (!mouseMod.isInteracting && lfoState.pattern === 'off') {
+    vpHudCrossX.classList.add('opacity-0');
+    vpHudCrossY.classList.add('opacity-0');
+    vpReticle.classList.add('opacity-0');
+    mouseModStatusText.innerText = 'STANDBY';
+    mouseModStatusText.className = 'text-gray-400 font-bold';
+    if (mouseMod.mode === 'momentary') recenterPuck();
+  }
+});
+
+vpContainer.addEventListener('pointerdown', (e) => {
+  mouseMod.isInteracting = true;
+  reticleOuterRing.classList.add('scale-125', 'border-fuchsia-neon', 'shadow-[0_0_16px_#ff007f]');
+  mouseModStatusText.innerText = 'MOD ACTIVE';
+  mouseModStatusText.className = 'text-fuchsia-neon font-bold animate-pulse';
+  mouseModIndicatorDot.className = 'w-1.5 h-1.5 rounded-full bg-fuchsia-neon animate-ping';
+  handleViewportPointer(e, true);
+  vpContainer.setPointerCapture(e.pointerId);
+});
+
+vpContainer.addEventListener('pointermove', (e) => handleViewportPointer(e, false));
+
+vpContainer.addEventListener('pointerup', (e) => {
+  mouseMod.isInteracting = false;
+  reticleOuterRing.classList.remove('scale-125', 'border-fuchsia-neon', 'shadow-[0_0_16px_#ff007f]');
+  mouseModIndicatorDot.className = 'w-1.5 h-1.5 rounded-full bg-cyan-neon';
+  if (lfoState.pattern !== 'off') {
+    mouseModStatusText.innerText = `LFO: ${lfoState.pattern.toUpperCase()}`;
+    mouseModStatusText.className = 'text-fuchsia-neon font-bold animate-pulse';
+  } else {
+    mouseModStatusText.innerText = mouseMod.viewportHover ? 'TRACKING' : 'STANDBY';
+    mouseModStatusText.className = mouseMod.viewportHover ? 'text-cyan-neon font-bold' : 'text-gray-400 font-bold';
+    if (mouseMod.mode === 'momentary') recenterPuck();
+  }
+  try { vpContainer.releasePointerCapture(e.pointerId); } catch(err){}
+});
+
+let isPadDragging = false;
+function handlePadPointer(e) {
+  const rect = xyPad.getBoundingClientRect();
+  const rawX = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+  const rawY = Math.max(0, Math.min(rect.height, e.clientY - rect.top));
+  mouseMod.targetX = rawX / rect.width;
+  mouseMod.targetY = 1.0 - (rawY / rect.height);
+}
+
+xyPad.addEventListener('pointerdown', (e) => {
+  isPadDragging = true;
+  mouseMod.isInteracting = true;
+  if (lfoState.pattern !== 'off') setLfoPattern('off');
+  mouseModStatusText.innerText = 'PAD ACTIVE';
+  mouseModStatusText.className = 'text-cyan-neon font-bold animate-pulse';
+  mouseModIndicatorDot.className = 'w-1.5 h-1.5 rounded-full bg-cyan-neon animate-ping';
+  xyPad.setPointerCapture(e.pointerId);
+  handlePadPointer(e);
+});
+
+xyPad.addEventListener('pointermove', (e) => { if (isPadDragging) handlePadPointer(e); });
+xyPad.addEventListener('pointerup', (e) => {
+  isPadDragging = false;
+  mouseMod.isInteracting = false;
+  mouseModIndicatorDot.className = 'w-1.5 h-1.5 rounded-full bg-cyan-neon';
+  mouseModStatusText.innerText = 'STANDBY';
+  mouseModStatusText.className = 'text-gray-400 font-bold';
+  try { xyPad.releasePointerCapture(e.pointerId); } catch(err){}
+  if (mouseMod.mode === 'momentary') recenterPuck();
+});
+
+function getLfoFrequency() {
+  if (lfoState.syncMode === 'hz') return LFO_HZ_RATES[lfoState.rateIndex].hz;
+  const currentBpm = PRESETS[currentPresetKey] ? PRESETS[currentPresetKey].bpmNum : 128;
+  const beatsPerSec = currentBpm / 60;
+  const barRate = LFO_BPM_RATES[lfoState.rateIndex].mult;
+  return (beatsPerSec / 4) * barRate;
+}
+
+function triangleWave(t) {
+  return 2 * Math.abs(2 * (t - Math.floor(t + 0.5))) - 1;
+}
+
+// -------------------------------------------------------------
+// EXACT DYNAMICAL ATTRACTOR SIMULATION EQUATIONS (4 ATTRACTORS)
+// -------------------------------------------------------------
+function stepLorenz(dt, speedScale) {
+  const lz = lfoState.lorenz;
+  const subSteps = 6;
+  const h = (dt * speedScale * 4.2) / subSteps;
+  for (let i = 0; i < subSteps; i++) {
+    const dx = lz.sigma * (lz.y - lz.x);
+    const dy = lz.x * (lz.rho - lz.z) - lz.y;
+    const dz = lz.x * lz.y - lz.beta * lz.z;
+    lz.x += dx * h; lz.y += dy * h; lz.z += dz * h;
+    if (!isFinite(lz.x) || Math.abs(lz.x) > 60) { lz.x = 0.5; lz.y = 0.5; lz.z = 25.0; }
+  }
+  const normX = (lz.x / 22.0) * 0.5;
+  const normY = ((lz.z - 25.0) / 25.0) * 0.5;
+  const rad = lfoState.depth;
+  return {
+    px: Math.max(0.02, Math.min(0.98, 0.5 + normX * rad)),
+    py: Math.max(0.02, Math.min(0.98, 0.5 + normY * rad)),
+    readout: `X:${lz.x.toFixed(1)} Y:${lz.y.toFixed(1)} Z:${lz.z.toFixed(1)}`
+  };
+}
+
+function stepRossler(dt, speedScale) {
+  const ro = lfoState.rossler;
+  const subSteps = 8;
+  const h = (dt * speedScale * 4.8) / subSteps;
+  for (let i = 0; i < subSteps; i++) {
+    const dx = -ro.y - ro.z;
+    const dy = ro.x + ro.a * ro.y;
+    const dz = ro.b + ro.z * (ro.x - ro.c);
+    ro.x += dx * h; ro.y += dy * h; ro.z += dz * h;
+    if (!isFinite(ro.x) || Math.abs(ro.x) > 50 || Math.abs(ro.z) > 70) { ro.x = 0.2; ro.y = 0.2; ro.z = 0.1; }
+  }
+  const normX = (ro.x / 14.0) * 0.5;
+  const normY = (ro.y / 14.0) * 0.5 + (Math.min(1.0, ro.z / 15.0) * 0.15);
+  const rad = lfoState.depth;
+  return {
+    px: Math.max(0.02, Math.min(0.98, 0.5 + normX * rad)),
+    py: Math.max(0.02, Math.min(0.98, 0.5 + normY * rad)),
+    readout: `X:${ro.x.toFixed(1)} Y:${ro.y.toFixed(1)} Z:${ro.z.toFixed(1)}`
+  };
+}
+
+function stepChen(dt, speedScale) {
+  const ch = lfoState.chen;
+  const subSteps = 8;
+  const h = (dt * speedScale * 3.6) / subSteps;
+  for (let i = 0; i < subSteps; i++) {
+    const dx = ch.a * (ch.y - ch.x);
+    const dy = (ch.c - ch.a) * ch.x - ch.x * ch.z + ch.c * ch.y;
+    const dz = ch.x * ch.y - ch.b * ch.z;
+    ch.x += dx * h; ch.y += dy * h; ch.z += dz * h;
+    if (!isFinite(ch.x) || Math.abs(ch.x) > 60 || Math.abs(ch.z) > 70) { ch.x = -0.1; ch.y = 0.5; ch.z = -0.6; }
+  }
+  const normX = (ch.x / 28.0) * 0.5;
+  const normY = ((ch.z - 28.0) / 26.0) * 0.5;
+  const rad = lfoState.depth;
+  return {
+    px: Math.max(0.02, Math.min(0.98, 0.5 + normX * rad)),
+    py: Math.max(0.02, Math.min(0.98, 0.5 + normY * rad)),
+    readout: `X:${ch.x.toFixed(1)} Y:${ch.y.toFixed(1)} Z:${ch.z.toFixed(1)}`
+  };
+}
+
+function stepClifford(dt, speedScale) {
+  const cl = lfoState.clifford;
+  cl.subTimer += dt * speedScale * 2.8;
+  if (cl.subTimer >= 1.0) {
+    cl.subTimer = 0.0;
+    cl.currX = cl.nextX;
+    cl.currY = cl.nextY;
+    const nextRawX = Math.sin(cl.a * cl.y) + cl.c * Math.cos(cl.a * cl.x);
+    const nextRawY = Math.sin(cl.b * cl.x) + cl.d * Math.cos(cl.b * cl.y);
+    cl.x = nextRawX; cl.y = nextRawY;
+    const rad = lfoState.depth;
+    cl.nextX = Math.max(0.02, Math.min(0.98, 0.5 + (cl.x / 2.2) * 0.5 * rad));
+    cl.nextY = Math.max(0.02, Math.min(0.98, 0.5 + (cl.y / 2.2) * 0.5 * rad));
+  }
+  const t = (1 - Math.cos(cl.subTimer * Math.PI)) * 0.5;
+  return {
+    px: cl.currX + (cl.nextX - cl.currX) * t,
+    py: cl.currY + (cl.nextY - cl.currY) * t,
+    readout: `X:${cl.x.toFixed(2)} Y:${cl.y.toFixed(2)} [TORUS]`
+  };
+}
+
+function updatePhysics(dt, nowSec) {
+  if (lfoState.pattern !== 'off' && !mouseMod.isInteracting) {
+    const freq = getLfoFrequency();
+    lfoState.timeAcc += dt * freq;
+    const radX = lfoState.depth * 0.42;
+    const radY = lfoState.depth * 0.42;
+
+    if (lfoState.pattern === 'sine') {
+      const angleX = lfoState.timeAcc * Math.PI * 2;
+      mouseMod.targetX = 0.5 + Math.cos(angleX) * radX;
+      mouseMod.targetY = 0.5 + Math.sin(angleX + lfoState.phaseRad) * radY;
+    } else if (lfoState.pattern === 'triangle') {
+      mouseMod.targetX = 0.5 + triangleWave(lfoState.timeAcc) * radX;
+      mouseMod.targetY = 0.5 + triangleWave(lfoState.timeAcc + (lfoState.phaseDeg / 360)) * radY;
+    } else if (lfoState.pattern === 'random') {
+      const shInterval = Math.max(0.08, 1.0 / freq);
+      if (nowSec >= lfoState.shNextTime) {
+        lfoState.shNextTime = nowSec + shInterval;
+        const randAngle = Math.random() * Math.PI * 2;
+        const randR = (Math.random() * 0.7 + 0.3) * radX;
+        lfoState.shTargetX = Math.max(0.05, Math.min(0.95, 0.5 + Math.cos(randAngle) * randR));
+        lfoState.shTargetY = Math.max(0.05, Math.min(0.95, 0.5 + Math.sin(randAngle + lfoState.phaseRad) * randR));
+      }
+      mouseMod.targetX = lfoState.shTargetX;
+      mouseMod.targetY = lfoState.shTargetY;
+    } else if (lfoState.pattern === 'lorenz') {
+      const pos = stepLorenz(dt, freq);
+      mouseMod.targetX = pos.px; mouseMod.targetY = pos.py;
+      const sc = document.getElementById('chaosStateCoords'); if (sc) sc.innerText = pos.readout;
+    } else if (lfoState.pattern === 'rossler') {
+      const pos = stepRossler(dt, freq);
+      mouseMod.targetX = pos.px; mouseMod.targetY = pos.py;
+      const sc = document.getElementById('chaosStateCoords'); if (sc) sc.innerText = pos.readout;
+    } else if (lfoState.pattern === 'chen') {
+      const pos = stepChen(dt, freq);
+      mouseMod.targetX = pos.px; mouseMod.targetY = pos.py;
+      const sc = document.getElementById('chaosStateCoords'); if (sc) sc.innerText = pos.readout;
+    } else if (lfoState.pattern === 'clifford') {
+      const pos = stepClifford(dt, freq);
+      mouseMod.targetX = pos.px; mouseMod.targetY = pos.py;
+      const sc = document.getElementById('chaosStateCoords'); if (sc) sc.innerText = pos.readout;
+    }
+
+    const isChaos = ['lorenz', 'rossler', 'chen', 'clifford'].includes(lfoState.pattern);
+    mouseModStatusText.innerText = isChaos ? `CHAOS: ${lfoState.pattern.toUpperCase()}` : `LFO: ${lfoState.pattern.toUpperCase()}`;
+    mouseModStatusText.className = 'text-cyan-neon font-bold animate-pulse';
+    mouseModIndicatorDot.className = 'w-1.5 h-1.5 rounded-full bg-cyan-neon animate-ping';
+  }
+
+  const isAttractor = ['lorenz', 'rossler', 'chen', 'clifford'].includes(lfoState.pattern);
+  const activeGlideMs = isAttractor ? Math.min(38, mouseMod.smoothingMs) : mouseMod.smoothingMs;
+  const smoothFactor = Math.min(1.0, dt / Math.max(0.014, activeGlideMs * 0.001));
+  mouseMod.currentX += (mouseMod.targetX - mouseMod.currentX) * smoothFactor;
+  mouseMod.currentY += (mouseMod.targetY - mouseMod.currentY) * smoothFactor;
+
+  const padPercentX = (mouseMod.currentX * 100).toFixed(1);
+  const padPercentY = ((1.0 - mouseMod.currentY) * 100).toFixed(1);
+
+  xyPuck.style.left = padPercentX + '%';
+  xyPuck.style.top = padPercentY + '%';
+  xyLaserX.style.left = padPercentX + '%';
+  xyLaserY.style.top = padPercentY + '%';
+
+  xyReadoutX.innerText = mouseMod.currentX.toFixed(3);
+  xyReadoutY.innerText = mouseMod.currentY.toFixed(3);
+  const mag = Math.hypot(mouseMod.currentX - 0.5, mouseMod.currentY - 0.5) * 2.0;
+  xyReadoutMag.innerText = mag.toFixed(2);
+  mouseCoordsBadge.innerText = `[${mouseMod.currentX.toFixed(2)}, ${mouseMod.currentY.toFixed(2)}]`;
+
+  if (lfoState.pattern !== 'off' && !mouseMod.viewportHover) {
+    const vpRect = vpContainer.getBoundingClientRect();
+    const vpPxX = mouseMod.currentX * vpRect.width;
+    const vpPxY = (1.0 - mouseMod.currentY) * vpRect.height;
+    vpHudCrossX.style.left = vpPxX + 'px';
+    vpHudCrossY.style.top = vpPxY + 'px';
+    vpReticle.style.left = vpPxX + 'px';
+    vpReticle.style.top = vpPxY + 'px';
+    hudCurX.innerText = mouseMod.currentX.toFixed(2);
+    hudCurY.innerText = mouseMod.currentY.toFixed(2);
+    const warpMag = (mag * mouseMod.warpGain).toFixed(2);
+    hudParamDyn.innerText = `WARP ${warpMag}`;
+  }
+}
+
+// -------------------------------------------------------------
+// REALTIME MULTI-ALGORITHM WEBGL SHADER ENGINE
+// -------------------------------------------------------------
+(function() {
+  const canvas = document.getElementById('liveViewportCanvas');
+  function resize() {
+    const w = canvas.clientWidth || 960;
+    const h = canvas.clientHeight || 540;
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w; canvas.height = h;
+    }
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+
+  const vs = `attribute vec2 a_position;
+void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
+
+  const fs = `precision highp float;
+uniform float u_time;
+uniform vec2 u_resolution;
+uniform vec2 u_mouse;
+uniform float u_warp_gain;
+uniform float u_audio_mix;
+uniform int u_preset;
+
+void main() {
+  vec2 uv = (gl_FragCoord.xy * 2.0 - u_resolution.xy) / min(u_resolution.x, u_resolution.y);
+  vec3 col = vec3(0.0);
+  vec2 m = (u_mouse - 0.5) * 2.0 * u_warp_gain;
+  float mDist = length(m);
+
+  if (u_preset == 0) {
+    vec2 p = uv + m * 0.45;
+    float pulse = sin(u_time * 13.4) * (0.5 + 0.5 * u_audio_mix);
+    float a = atan(p.y, p.x) + m.x * 1.5;
+    float r = length(p);
+    float wave = sin(r * (16.0 + m.y * 8.0) - u_time * 8.0 + sin(a * 4.0 + m.x * 3.0));
+    float glow = 0.035 / max(abs(wave), 0.004);
+    vec3 cCyan = vec3(0.0, 0.96, 1.0) * glow;
+    float pinch = 0.02 / max(abs(pulse * 0.4 - r + mDist * 0.1), 0.008);
+    vec3 cFuch = vec3(1.0, 0.0, 0.5) * pinch * (1.0 + mDist);
+    col = cCyan + cFuch;
+  } else if (u_preset == 1) {
+    vec2 p = uv - m * 0.6;
+    float d = length(p);
+    float glow = 0.38 / (d * (1.5 + m.y * 0.8) + 0.12);
+    vec3 c1 = vec3(0.2, 0.05, 0.5);
+    vec3 c2 = vec3(1.0, 0.3, 0.7);
+    col = mix(c1, c2, sin(d * 4.0 - u_time * 0.8 + m.x * 3.0) * 0.5 + 0.5) * glow;
+  } else if (u_preset == 2) {
+    vec2 p = uv - m * 0.35;
+    float a = atan(p.y, p.x) + u_time * 3.5 + m.x * 2.5;
+    float r = length(p);
+    float rings = sin(14.0 * log(max(r, 0.001)) - u_time * 9.0 + m.y * 6.0) + cos(a * 6.0);
+    col = vec3(1.0, 0.7, 0.1) * smoothstep(0.2, 1.0, rings) / (r + 0.12);
+  } else {
+    vec2 p = uv + m * 0.3;
+    vec2 g = abs(fract(p * (2.8 + m.y * 2.0) + m.x) - 0.5);
+    float line = min(g.x, g.y);
+    float strobe = step(0.85, sin(u_time * 14.13));
+    col = vec3(0.025 / max(line, 0.003) * 0.65) + vec3(1.0, 0.05, 0.25) * strobe * 0.7;
+  }
+  gl_FragColor = vec4(col, 1.0);
+}`;
+
+  function compileShader(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, compileShader(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, compileShader(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+
+  const quad = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+
+  const aPos = gl.getAttribLocation(prog, 'a_position');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  const uTimeLoc = gl.getUniformLocation(prog, 'u_time');
+  const uResLoc = gl.getUniformLocation(prog, 'u_resolution');
+  const uMouseLoc = gl.getUniformLocation(prog, 'u_mouse');
+  const uWarpGainLoc = gl.getUniformLocation(prog, 'u_warp_gain');
+  const uAudioMixLoc = gl.getUniformLocation(prog, 'u_audio_mix');
+  const uPresetLoc = gl.getUniformLocation(prog, 'u_preset');
+
+  let lastTime = performance.now();
+  function renderLoop(now) {
+    const dt = Math.min(0.05, (now - lastTime) * 0.001);
+    lastTime = now;
+    const nowSec = now * 0.001;
+
+    updatePhysics(dt, nowSec);
+
+    resize();
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+    gl.uniform1f(uTimeLoc, nowSec);
+    gl.uniform2f(uResLoc, gl.canvas.width, gl.canvas.height);
+    gl.uniform2f(uMouseLoc, mouseMod.currentX, mouseMod.currentY);
+    gl.uniform1f(uWarpGainLoc, mouseMod.warpGain);
+    gl.uniform1f(uAudioMixLoc, mouseMod.audioBalance);
+    const pIdx = PRESETS[currentPresetKey] ? PRESETS[currentPresetKey].shaderIdx : 0;
+    gl.uniform1i(uPresetLoc, pIdx);
+
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    requestAnimationFrame(renderLoop);
+  }
+  requestAnimationFrame(renderLoop);
+})();
+
+// INIT
+setPreset('stage-rave');
+renderRack();
+</script>
+
+
+
+</body></html>

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary": "#fface9", "outline": "#849495", "surface-bright": "#38393f", "tertiary-container": "#67f4b7", "surface-container-highest": "#34343a", "surface-container-low": "#1a1b21", "surface": "#121318", "error-container": "#93000a", "on-tertiary-fixed-variant": "#005236", "on-primary-container": "#006a70", "on-surface": "#e3e1e9", "inverse-surface": "#e3e1e9", "tertiary-fixed": "#6ffbbe", "on-tertiary": "#003824", "on-secondary-container": "#ffc8ed", "surface-tint": "#00dce6", "surface-container-high": "#292a2f", "on-secondary-fixed": "#3a0033", "inverse-on-surface": "#2f3036", "on-error": "#690005", "background": "#121318", "inverse-primary": "#00696f", "on-secondary": "#5d0054", "secondary-fixed-dim": "#fface9", "on-secondary-fixed-variant": "#840077", "tertiary": "#e1ffec", "primary-fixed": "#6ff6ff", "primary-container": "#00f2fe", "on-tertiary-fixed": "#002113", "error": "#ffb4ab", "primary": "#e0fdff", "on-surface-variant": "#b9cacb", "surface-container-lowest": "#0d0e13", "surface-dim": "#121318", "secondary-container": "#ad009c", "on-error-container": "#ffdad6", "outline-variant": "#3a494b", "on-tertiary-container": "#006e4b", "on-primary": "#00373a", "on-primary-fixed-variant": "#004f53", "primary-fixed-dim": "#00dce6", "on-background": "#e3e1e9", "surface-container": "#1e1f25", "tertiary-fixed-dim": "#4edea3", "secondary-fixed": "#ffd7f1", "on-primary-fixed": "#002022", "surface-variant": "#34343a" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "gutter": "1rem", "margin": "1rem", "margin-desktop": "1.5rem", "space-xl": "2rem", "space-lg": "1.5rem", "space-md": "1rem", "space-xs": "0.25rem", "gutter-lg": "1.5rem", "space-sm": "0.5rem", "margin-mobile": "0.75rem", "gutter-sm": "0.5rem" }, "fontFamily": { "body-sm": ["Space Grotesk"], "headline-lg": ["Space Grotesk"], "body-md": ["Space Grotesk"], "code-sm": ["JetBrains Mono"], "display-xl-mobile": ["Space Grotesk"], "display-xl": ["Space Grotesk"], "headline-lg-mobile": ["Space Grotesk"], "headline-sm": ["Space Grotesk"], "headline-md": ["Space Grotesk"], "body-lg": ["Space Grotesk"], "label-md": ["JetBrains Mono"], "telemetry-xs": ["JetBrains Mono"], "code-md": ["JetBrains Mono"], "label-sm": ["JetBrains Mono"] }, "fontSize": { "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "400" }], "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "400" }], "code-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "400" }], "display-xl-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "display-xl": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.03em", "fontWeight": "700" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "500" }], "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.08em", "fontWeight": "500" }], "telemetry-xs": ["9px", { "lineHeight": "12px", "letterSpacing": "0.15em", "fontWeight": "700" }], "code-md": ["13px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "label-sm": ["10px", { "lineHeight": "14px", "letterSpacing": "0.12em", "fontWeight": "600" }] } } } };</script></head><body class="bg-surface text-on-surface font-body-md text-body-md antialiased select-none"><header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-50 flex items-center justify-between px-margin-desktop shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="flex items-center gap-space-md"><img alt="MotorVisuales Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VVO3L45HaaXK91UEP_bBxQABwszm30w7DQ6CqNMTz6jMg-dMRrTpt1pIPlN2DOylvwKFlJRgNQQiGgKPjKC0kvlTiM_fyjKPSQfjYoXHmdyMwSIHDMl8Glsrn4EfWCTG7Wg7PUyLlDod3U4BY50nY9D5Qi8v2iMl909ccQjQXu3YhhRJ7Y287uzL2XUN2vVoSyZoVUnsF3NkzYaOpDNHLrRCu53iohdupZWWUqE0MqS5tkJlRx4t6jeukM"/><div class="flex flex-col"><div class="flex items-center gap-space-sm"><span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">MotorVisuales</span><div class="flex items-center gap-space-xs px-space-xs py-0.5 rounded bg-tertiary-container/15 text-tertiary-fixed font-telemetry-xs text-telemetry-xs uppercase"><span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim animate-pulse"></span><span>60 FPS • DSP ENGINE ONLINE</span></div></div></div></div><nav class="hidden lg:flex items-center h-full gap-space-xs" data-active-classes="bg-surface-container-high text-primary-fixed border-b border-primary-container font-semibold"><a aria-current="page" class="h-full flex items-center px-space-md uppercase transition-colors bg-surface-container-high text-primary-fixed border-b border-primary-container font-semibold" data-path="canal-ingesta-dsp" href="#">Canal Ingesta DSP</a><a class="h-full flex items-center px-space-md font-label-md text-label-md uppercase text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="motor-3d-shaders" href="#">Motor 3D &amp; Shaders</a><a class="h-full flex items-center px-space-md font-label-md text-label-md uppercase text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="director-ia" href="#">Director IA</a><a class="h-full flex items-center px-space-md font-label-md text-label-md uppercase text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors" data-path="analisis-mer" href="#">Análisis MER</a></nav><div class="flex items-center gap-space-md"><button class="flex items-center gap-space-xs px-space-md py-space-xs bg-error-container text-on-error font-code-sm text-code-sm uppercase rounded shadow-[0_0_12px_rgba(239,68,68,0.3)] hover:bg-error hover:text-on-error-container transition-all" type="button"><span class="material-symbols-outlined text-[16px]">fiber_manual_record</span><span class="hidden xl:inline">Grabar Vídeo 60 FPS + Audio</span></button><div class="hidden sm:flex items-center gap-space-sm bg-surface-container-low px-space-sm py-1 rounded"><span class="material-symbols-outlined text-primary-fixed-dim text-[18px]">volume_up</span><div class="w-16 h-1.5 bg-surface-container-highest rounded-full overflow-hidden"><div class="h-full w-3/4 bg-primary-container shadow-[0_0_6px_#00f2fe]"></div></div><span class="font-code-sm text-code-sm text-on-surface-variant">-6.2dB</span></div><div class="flex items-center gap-space-xs px-space-xs py-1 rounded bg-secondary-container/20 text-secondary-fixed font-telemetry-xs text-telemetry-xs uppercase"><span class="material-symbols-outlined text-[14px]">graphic_eq</span><span>SYNC ACTIVE</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-lowest/80 backdrop-blur-xl z-40 flex flex-col justify-between p-space-sm shadow-[1px_0_12px_rgba(0,0,0,0.5)]"><div class="flex flex-col gap-space-xs"><div class="px-space-sm py-space-xs font-telemetry-xs text-telemetry-xs uppercase text-outline">Rack Modular Principal</div><nav class="flex flex-col gap-1" data-active-classes="bg-surface-container-high text-primary-fixed border-l-2 border-primary-container font-semibold"><a aria-current="page" class="flex items-center gap-space-sm px-space-sm py-space-sm rounded transition-all bg-surface-container-high text-primary-fixed border-l-2 border-primary-container font-semibold" data-path="canal-ingesta-dsp" href="#"><span class="material-symbols-outlined text-[18px]">equalizer</span><span class="font-label-sm text-label-sm uppercase tracking-wider">Canal Ingesta DSP</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="motor-3d-shaders" href="#"><span class="material-symbols-outlined text-[18px]">view_in_ar</span><span class="font-label-sm text-label-sm uppercase tracking-wider">Motor 3D &amp; Shaders</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="director-ia" href="#"><span class="material-symbols-outlined text-[18px]">psychology</span><span class="font-label-sm text-label-sm uppercase tracking-wider">Director IA</span></a><a class="flex items-center gap-space-sm px-space-sm py-space-sm rounded text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="analisis-mer" href="#"><span class="material-symbols-outlined text-[18px]">query_stats</span><span class="font-label-sm text-label-sm uppercase tracking-wider">Análisis MER</span></a></nav></div><div class="flex flex-col gap-space-sm p-space-sm bg-surface-container-low rounded"><div class="flex items-center justify-between font-telemetry-xs text-telemetry-xs uppercase text-on-surface-variant"><span>WebGL Pipeline</span><span class="text-tertiary-fixed">GLSL 3.0</span></div><div class="flex items-center justify-between font-telemetry-xs text-telemetry-xs uppercase text-on-surface-variant"><span>Buffer Latency</span><span class="text-primary-fixed">1.2 ms</span></div><div class="flex items-center justify-between font-telemetry-xs text-telemetry-xs uppercase text-on-surface-variant"><span>Audio Stems</span><span class="text-secondary">8 Ingest</span></div></div></aside><div class="pl-64"><main class="relative pt-16 min-h-screen bg-surface w-full"><div class="flex flex-col w-full">
+<!-- Top Control Deck / Master Transport Dock -->
+<section class="w-full bg-surface-container-lowest px-gutter py-space-sm shadow-xl relative z-30">
+<div class="max-w-[1920px] mx-auto flex flex-col gap-space-sm">
+<!-- Status & Master Recording Row -->
+<div class="flex flex-wrap items-center justify-between gap-space-md bg-surface-container-low px-space-md py-space-xs rounded">
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="inline-block w-2.5 h-2.5 rounded-full bg-primary-container shadow-[0_0_8px_#00f2fe] animate-pulse"></span>
+<span class="font-headline-sm text-headline-sm text-primary font-bold tracking-tight">♪ MotorVisuales En espera</span>
+</div>
+<span class="hidden md:inline-block text-outline-variant font-telemetry-xs">|</span>
+<p class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant hidden md:block">
+            DSP Stems • Three.js 3D • Director IA • Grabador 60 FPS
+          </p>
+</div>
+<!-- Master Rec Counter & Stems Shortcut -->
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-space-xs bg-surface-container-highest/60 px-space-sm py-1 rounded">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed">graphic_eq</span>
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant hidden sm:inline">Audio Stems DSP</span>
+<span class="font-label-sm text-label-sm uppercase text-primary-fixed hidden lg:inline">Motor 3D</span>
+<span class="font-label-sm text-label-sm uppercase text-secondary hidden xl:inline">⚡Shaders GLSL</span>
+<span class="font-label-sm text-label-sm uppercase text-tertiary-fixed-dim hidden xl:inline">Director IA</span>
+<span class="font-label-sm text-label-sm uppercase text-outline hidden xl:inline">Espectro</span>
+</div>
+<div class="flex items-center gap-space-xs bg-error-container/30 px-space-md py-1 rounded">
+<span class="w-2.5 h-2.5 rounded-full bg-error animate-ping"></span>
+<button class="font-code-sm text-code-sm text-on-error font-semibold flex items-center gap-1 hover:text-error transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">videocam</span>
+<span>Grabar Vídeo (60 FPS + Audio)</span>
+</button>
+<span class="font-code-md text-code-md text-error font-bold ml-1">00:00</span>
+</div>
+</div>
+</div>
+<!-- Quick Audio Ingestion Bar -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pt-0.5">
+<div class="flex flex-wrap items-center gap-space-xs">
+<span class="font-telemetry-xs text-telemetry-xs uppercase text-outline mr-1">Canal de Ingesta DSP Multi-Fuente:</span>
+<button class="px-space-sm py-1 rounded bg-secondary-container text-on-secondary-container font-label-sm text-label-sm uppercase flex items-center gap-1 hover:brightness-110 shadow-[0_0_10px_rgba(173,0,156,0.3)]" type="button">
+            🔥 Reproducir Mi Tema ("Mordaza")
+          </button>
+<button class="px-space-sm py-1 rounded bg-surface-container-high text-on-surface hover:text-primary font-label-sm text-label-sm uppercase flex items-center gap-1 transition-all" type="button">
+            🎙️ Micrófono
+          </button>
+<button class="px-space-sm py-1 rounded bg-surface-container-high text-on-surface hover:text-primary font-label-sm text-label-sm uppercase flex items-center gap-1 transition-all" type="button">
+            🖥️ Capturar Pestaña
+          </button>
+<button class="px-space-sm py-1 rounded bg-surface-container-high text-on-surface hover:text-primary font-label-sm text-label-sm uppercase flex items-center gap-1 transition-all" type="button">
+            📁 Cargar Otro Audio
+          </button>
+<button class="px-space-sm py-1 rounded bg-surface-container-high text-tertiary-fixed hover:bg-surface-bright font-label-sm text-label-sm uppercase flex items-center gap-1 transition-all" type="button">
+            ⚡ Demo Synth Beat
+          </button>
+<button class="w-7 h-7 flex items-center justify-center rounded bg-surface-container-highest text-on-surface-variant hover:text-error transition-all" title="Detener" type="button">
+            ⏹️
+          </button>
+</div>
+<!-- Track Scrubber Track Display -->
+<div class="flex items-center gap-space-sm bg-surface-container-low px-space-md py-1 rounded flex-1 min-w-[280px] max-w-md justify-end">
+<span class="font-code-sm text-code-sm text-primary font-bold whitespace-nowrap">▶ tema.mp3</span>
+<span class="font-telemetry-xs text-telemetry-xs text-on-surface-variant">00:00 / 03:18</span>
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden relative cursor-pointer group">
+<div class="h-full w-1/4 bg-primary-container group-hover:bg-primary transition-all"></div>
+</div>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-high text-tertiary font-telemetry-xs text-telemetry-xs uppercase hover:bg-surface-bright" type="button">
+            Bucle
+          </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Cockpit Grid (Tri-Panel Modular Console) -->
+<div class="w-full max-w-[1920px] mx-auto p-gutter grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- ========================================== -->
+<!-- LEFT PANEL: DSP INGEST & STEM RACK (Paso 1) -->
+<!-- ========================================== -->
+<div class="lg:col-span-3 flex flex-col gap-space-md">
+<!-- Ingestion & Oscilloscope Module -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm relative overflow-hidden">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary-fixed-dim text-[18px]">graphic_eq</span>
+<h2 class="font-headline-sm text-headline-sm text-primary">Entrada de Audio y Osciloscopio</h2>
+</div>
+<span class="font-telemetry-xs text-telemetry-xs uppercase text-tertiary-fixed bg-tertiary-container/20 px-1.5 py-0.5 rounded">FFT 2048</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Alimenta la FFT de 2048 puntos, el banco de filtros de stems y el motor gráfico con tu micrófono, una canción local o el sintetizador procedural integrado.
+        </p>
+<!-- Oscilloscope Waveform Surface -->
+<div class="w-full h-28 bg-surface-container-lowest rounded relative overflow-hidden flex items-center justify-center shadow-inner">
+<div class="absolute inset-0 opacity-15 bg-[radial-gradient(#00f2fe_1px,transparent_1px)] [background-size:8px_8px]"></div>
+<!-- Animated Oscilloscope Waveform Vector -->
+<svg class="w-full h-full text-primary-container" preserveaspectratio="none" viewbox="0 0 400 100">
+<path class="animate-pulse" d="M 0,50 Q 20,48 40,52 T 80,45 T 120,62 T 160,35 T 200,68 T 240,25 T 280,75 T 320,40 T 360,54 T 400,50" fill="none" stroke="currentColor" stroke-width="1.8"></path>
+<path d="M 0,50 Q 25,38 50,62 T 100,40 T 150,70 T 200,30 T 250,65 T 300,38 T 350,58 T 400,50" fill="none" opacity="0.6" stroke="#67f4b7" stroke-width="1"></path>
+</svg>
+<div class="absolute bottom-1 right-2 font-telemetry-xs text-telemetry-xs text-primary-container/80 tracking-widest">
+            Osciloscopio PCM
+          </div>
+</div>
+<!-- Telemetry Metrology Strip -->
+<div class="grid grid-cols-3 gap-1.5 pt-1">
+<div class="bg-surface-container p-1.5 rounded flex flex-col">
+<span class="font-telemetry-xs text-telemetry-xs text-outline uppercase">RMS</span>
+<span class="font-code-md text-code-md text-primary font-bold">0.00</span>
+</div>
+<div class="bg-surface-container p-1.5 rounded flex flex-col">
+<span class="font-telemetry-xs text-telemetry-xs text-outline uppercase">Centroide</span>
+<span class="font-code-md text-code-md text-primary font-bold">0 Hz</span>
+</div>
+<div class="bg-surface-container p-1.5 rounded flex flex-col">
+<span class="font-telemetry-xs text-telemetry-xs text-outline uppercase">Flujo</span>
+<span class="font-code-md text-code-md text-primary font-bold">0.00</span>
+</div>
+<div class="bg-surface-container p-1.5 rounded flex flex-col">
+<span class="font-telemetry-xs text-telemetry-xs text-outline uppercase">ZCR</span>
+<span class="font-code-md text-code-md text-secondary font-bold">0</span>
+</div>
+<div class="bg-surface-container p-1.5 rounded flex flex-col">
+<span class="font-telemetry-xs text-telemetry-xs text-outline uppercase">Rolloff</span>
+<span class="font-code-md text-code-md text-secondary font-bold">0 Hz</span>
+</div>
+<div class="bg-surface-container p-1.5 rounded flex flex-col items-center justify-center">
+<span class="font-telemetry-xs text-telemetry-xs text-outline uppercase">Disparo</span>
+<span class="px-2 py-0.5 rounded bg-surface-container-highest text-outline font-label-sm text-label-sm uppercase">Onset</span>
+</div>
+</div>
+</div>
+<!-- Paso 1: Real-time 8-Stems DSP Equalizer Rack -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm flex-1">
+<div class="flex items-center justify-between">
+<div>
+<div class="font-telemetry-xs text-telemetry-xs uppercase text-tertiary-fixed tracking-wider">Paso 1 • Banco de Filtros Multicanal (Biquad DSP)</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Separación de Stems en Tiempo Real</h3>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Aísla la pista en 8 bandas espectrales independientes para modular transformaciones 3D y post-procesado FX.
+        </p>
+<!-- Presets Row -->
+<div class="flex items-center gap-space-xs flex-wrap bg-surface-container p-1.5 rounded">
+<span class="font-telemetry-xs text-telemetry-xs uppercase text-outline">Preset:</span>
+<select class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-2 py-1 rounded outline-none focus:text-primary">
+<option>-- Personalizado --</option>
+<option selected="">Equilibrado (Hi-Fi)</option>
+<option>Club / Bass Boost</option>
+<option>Acústico / Voces &amp; Aire</option>
+<option>Cyberpunk / Glitch FX</option>
+</select>
+<div class="flex items-center gap-1 ml-auto">
+<button class="p-1 rounded bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" title="Exportar" type="button">
+              💾 Exportar
+            </button>
+<button class="p-1 rounded bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" title="Importar" type="button">
+              📂 Importar
+            </button>
+</div>
+</div>
+<!-- Master Sensitivity -->
+<div class="flex items-center justify-between bg-surface-container px-space-sm py-1.5 rounded">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant">Sensibilidad General:</span>
+<div class="flex items-center gap-space-sm w-1/2">
+<input class="w-full h-1 bg-surface-container-highest accent-primary-container rounded-lg cursor-pointer" max="100" min="0" type="range" value="75"/>
+<span class="font-code-sm text-code-sm text-primary font-bold">1.5x</span>
+</div>
+</div>
+<!-- 8 Stems Hardware Strip Mixer -->
+<div class="grid grid-cols-8 gap-1.5 pt-space-xs h-64 bg-surface-container-lowest p-2 rounded items-end">
+<!-- Stem 1: Sub -->
+<div class="flex flex-col items-center h-full justify-between py-1 group">
+<span class="font-telemetry-xs text-telemetry-xs text-outline">SUB</span>
+<div class="w-3.5 h-44 bg-surface-container-highest rounded-full flex flex-col justify-end p-0.5 relative">
+<div class="w-full bg-secondary rounded-full shadow-[0_0_8px_#fface9]" style="height: 65%;"></div>
+</div>
+<span class="font-telemetry-xs text-telemetry-xs text-secondary font-bold">60Hz</span>
+</div>
+<!-- Stem 2: Bass -->
+<div class="flex flex-col items-center h-full justify-between py-1 group">
+<span class="font-telemetry-xs text-telemetry-xs text-primary-fixed">BASS</span>
+<div class="w-3.5 h-44 bg-surface-container-highest rounded-full flex flex-col justify-end p-0.5 relative">
+<div class="w-full bg-primary-container rounded-full shadow-[0_0_8px_#00f2fe]" style="height: 82%;"></div>
+</div>
+<span class="font-telemetry-xs text-telemetry-xs text-primary-fixed font-bold">150Hz</span>
+</div>
+<!-- Stem 3: Lowmid -->
+<div class="flex flex-col items-center h-full justify-between py-1 group">
+<span class="font-telemetry-xs text-telemetry-xs text-outline">LMID</span>
+<div class="w-3.5 h-44 bg-surface-container-highest rounded-full flex flex-col justify-end p-0.5 relative">
+<div class="w-full bg-primary-container/80 rounded-full" style="height: 48%;"></div>
+</div>
+<span class="font-telemetry-xs text-telemetry-xs text-on-surface-variant font-bold">400Hz</span>
+</div>
+<!-- Stem 4: Mid -->
+<div class="flex flex-col items-center h-full justify-between py-1 group">
+<span class="font-telemetry-xs text-telemetry-xs text-tertiary-fixed">MID</span>
+<div class="w-3.5 h-44 bg-surface-container-highest rounded-full flex flex-col justify-end p-0.5 relative">
+<div class="w-full bg-tertiary-fixed rounded-full shadow-[0_0_8px_#6ffbbe]" style="height: 55%;"></div>
+</div>
+<span class="font-telemetry-xs text-telemetry-xs text-tertiary-fixed font-bold">1kHz</span>
+</div>
+<!-- Stem 5: Highmid -->
+<div class="flex flex-col items-center h-full justify-between py-1 group">
+<span class="font-telemetry-xs text-telemetry-xs text-outline">HMID</span>
+<div class="w-3.5 h-44 bg-surface-container-highest rounded-full flex flex-col justify-end p-0.5 relative">
+<div class="w-full bg-primary-fixed-dim/70 rounded-full" style="height: 38%;"></div>
+</div>
+<span class="font-telemetry-xs text-telemetry-xs text-on-surface-variant font-bold">2.5k</span>
+</div>
+<!-- Stem 6: Presence -->
+<div class="flex flex-col items-center h-full justify-between py-1 group">
+<span class="font-telemetry-xs text-telemetry-xs text-secondary-fixed">PRES</span>
+<div class="w-3.5 h-44 bg-surface-container-highest rounded-full flex flex-col justify-end p-0.5 relative">
+<div class="w-full bg-secondary-fixed rounded-full shadow-[0_0_8px_#ffd7f1]" style="height: 70%;"></div>
+</div>
+<span class="font-telemetry-xs text-telemetry-xs text-secondary-fixed font-bold">5kHz</span>
+</div>
+<!-- Stem 7: Treble -->
+<div class="flex flex-col items-center h-full justify-between py-1 group">
+<span class="font-telemetry-xs text-telemetry-xs text-primary">TREB</span>
+<div class="w-3.5 h-44 bg-surface-container-highest rounded-full flex flex-col justify-end p-0.5 relative">
+<div class="w-full bg-primary-container rounded-full shadow-[0_0_8px_#00f2fe]" style="height: 60%;"></div>
+</div>
+<span class="font-telemetry-xs text-telemetry-xs text-primary font-bold">10k</span>
+</div>
+<!-- Stem 8: Air -->
+<div class="flex flex-col items-center h-full justify-between py-1 group">
+<span class="font-telemetry-xs text-telemetry-xs text-tertiary-container">AIR</span>
+<div class="w-3.5 h-44 bg-surface-container-highest rounded-full flex flex-col justify-end p-0.5 relative">
+<div class="w-full bg-tertiary-container rounded-full shadow-[0_0_8px_#67f4b7]" style="height: 42%;"></div>
+</div>
+<span class="font-telemetry-xs text-telemetry-xs text-tertiary-container font-bold">16k</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-telemetry-xs pt-1 px-1">
+<span>RANGO DINÁMICO: 96dB</span>
+<span class="text-tertiary-fixed">LATENCIA: 1.2ms (DSP OK)</span>
+</div>
+</div>
+</div>
+<!-- ============================================== -->
+<!-- CENTER PANEL: 3D WEBGL VIEWPORT & FX (Paso 2)  -->
+<!-- ============================================== -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<!-- Paso 2 3D Realtime Canvas Stage -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm flex-1">
+<div class="flex flex-wrap items-center justify-between gap-space-xs">
+<div>
+<div class="font-telemetry-xs text-telemetry-xs uppercase text-primary-fixed tracking-wider">Paso 2 • Motor Gráfico 3D WebGL (Three.js)</div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Escena Volumétrica 3D en Tiempo Real 60 FPS</h3>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-space-sm py-1 rounded bg-surface-container text-on-surface font-label-sm text-label-sm uppercase hover:text-primary" type="button">
+              Reset Cámara
+            </button>
+<button class="px-space-sm py-1 rounded bg-surface-container text-primary-fixed font-label-sm text-label-sm uppercase hover:bg-surface-bright" type="button">
+              ⛶ Pantalla Completa
+            </button>
+</div>
+</div>
+<!-- Scene Selectors Tabs -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-1 bg-surface-container-lowest p-1 rounded font-label-sm text-label-sm">
+<button class="p-1.5 rounded bg-primary text-on-primary font-semibold text-center leading-tight truncate" type="button">
+            1. Nebulosa Partículas
+          </button>
+<button class="p-1.5 rounded bg-surface-container text-on-surface-variant hover:text-on-surface text-center leading-tight truncate" type="button">
+            2. Túnel Cilíndrico FFT
+          </button>
+<button class="p-1.5 rounded bg-surface-container text-on-surface-variant hover:text-on-surface text-center leading-tight truncate" type="button">
+            3. Monolito Wireframe
+          </button>
+<button class="p-1.5 rounded bg-surface-container text-secondary hover:text-secondary-fixed text-center leading-tight truncate" type="button">
+            4. ⚡ Shader GLSL en Vivo
+          </button>
+</div>
+<!-- High Precision WebGL Viewport Surface -->
+<div class="w-full h-80 sm:h-96 bg-surface-container-lowest rounded-lg relative overflow-hidden flex flex-col justify-between p-space-sm shadow-2xl">
+<!-- Simulated Volumetric 3D Particle Scene -->
+<div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#1f2438] via-[#0d0e13] to-[#07080c] flex items-center justify-center">
+<!-- Simulated Core Monolith / Particle Nebula SVG Matrix -->
+<svg class="w-72 h-72 animate-[spin_24s_linear_infinite] opacity-80" viewbox="0 0 200 200">
+<defs>
+<lineargradient id="gradCyanMagenta" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#00f2fe"></stop>
+<stop offset="50%" stop-color="#fface9"></stop>
+<stop offset="100%" stop-color="#6ffbbe"></stop>
+</lineargradient>
+</defs>
+<polygon fill="none" points="100,20 170,60 170,140 100,180 30,140 30,60" stroke="url(#gradCyanMagenta)" stroke-dasharray="3,3" stroke-width="1.2"></polygon>
+<polygon fill="none" points="100,35 155,70 155,130 100,165 45,130 45,70" stroke="#00f2fe" stroke-width="1.8"></polygon>
+<circle cx="100" cy="100" fill="none" r="45" stroke="#fface9" stroke-dasharray="4,2" stroke-width="1"></circle>
+<circle class="animate-ping" cx="100" cy="100" fill="#00f2fe" r="8"></circle>
+<!-- Orbital Particle Nodes -->
+<circle cx="150" cy="50" fill="#6ffbbe" r="3"></circle>
+<circle cx="50" cy="150" fill="#fface9" r="3"></circle>
+<circle cx="130" cy="140" fill="#00f2fe" r="2"></circle>
+<circle cx="70" cy="60" fill="#6ffbbe" r="2.5"></circle>
+</svg>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest via-transparent to-transparent"></div>
+</div>
+<!-- HUD Telemetry Top Strip inside Viewport -->
+<div class="relative z-10 flex items-center justify-between font-telemetry-xs text-telemetry-xs">
+<div class="flex items-center gap-space-xs bg-surface-container-lowest/80 backdrop-blur-md px-space-sm py-1 rounded">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim animate-pulse"></span>
+<span class="text-tertiary-fixed">THREE.JS V162 • 60.0 FPS</span>
+</div>
+<div class="flex items-center gap-space-xs bg-surface-container-lowest/80 backdrop-blur-md px-space-sm py-1 rounded text-primary">
+<span>Cámara: Manual (Arrastrar / Zoom)</span>
+<span class="text-outline">|</span>
+<span>Zoom / Rango: 400</span>
+</div>
+</div>
+<!-- HUD Telemetry Bottom Strip inside Viewport -->
+<div class="relative z-10 flex items-center justify-between font-telemetry-xs text-telemetry-xs">
+<div class="flex items-center gap-1.5 bg-surface-container-lowest/80 backdrop-blur-md px-space-sm py-1 rounded">
+<span class="text-outline uppercase">Stems activos:</span>
+<span class="text-secondary font-bold">Bass</span>
+<span class="text-tertiary-fixed font-bold">Mid</span>
+<span class="text-primary-fixed font-bold">Treble</span>
+</div>
+<div class="bg-surface-container-lowest/80 backdrop-blur-md px-space-sm py-1 rounded text-on-surface-variant font-code-sm">
+              NEBULOSA::30K_PARTS [OK]
+            </div>
+</div>
+</div>
+<!-- Camera Orbit Mode & Speed Controls -->
+<div class="flex flex-wrap items-center justify-between gap-space-xs bg-surface-container p-space-xs rounded">
+<div class="flex items-center gap-1 flex-wrap">
+<span class="font-telemetry-xs text-telemetry-xs text-outline uppercase mr-1">Órbita:</span>
+<button class="px-2 py-0.5 rounded bg-surface-container-high text-primary font-telemetry-xs uppercase" type="button">Órbita Auto</button>
+<button class="px-2 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-telemetry-xs uppercase hover:text-on-surface" type="button">Circular</button>
+<button class="px-2 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-telemetry-xs uppercase hover:text-on-surface" type="button">Espiral Reactiva</button>
+<button class="px-2 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-telemetry-xs uppercase hover:text-on-surface" type="button">Infinito / Ocho (∞)</button>
+<button class="px-2 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-telemetry-xs uppercase hover:text-on-surface" type="button">Fly-by Cinemático</button>
+</div>
+<div class="flex items-center gap-1">
+<span class="font-telemetry-xs text-telemetry-xs text-outline">VEL:</span>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-telemetry-xs" type="button">0.5x Lento</button>
+<button class="px-1.5 py-0.5 rounded bg-primary text-on-primary font-telemetry-xs font-bold" type="button">1.0x Normal</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-telemetry-xs" type="button">1.8x Rápido</button>
+</div>
+</div>
+<!-- Post-Processing WebGL FX Suite (9 Reactive Passes) -->
+<div class="flex flex-col gap-space-xs bg-surface-container-lowest p-space-sm rounded">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1">
+<span class="font-label-sm text-label-sm uppercase text-secondary font-bold">✨ Suite de Post-Procesado WebGL FX</span>
+<span class="font-telemetry-xs text-telemetry-xs text-outline">9 Passes Reactivos</span>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-1.5 py-0.5 rounded bg-surface-container text-tertiary-fixed font-telemetry-xs uppercase hover:bg-surface-bright" type="button">Todo ON</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container text-outline font-telemetry-xs uppercase hover:text-on-surface" type="button">Todo OFF</button>
+<button class="px-1.5 py-0.5 rounded bg-surface-container text-error font-telemetry-xs uppercase hover:bg-surface-bright" type="button">Reset</button>
+</div>
+</div>
+<!-- 9 FX Sliders & Toggles Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 font-body-sm">
+<!-- FX 1: Bloom Glow -->
+<div class="bg-surface-container p-2 rounded flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-primary">🌸 Bloom Glow</span>
+<span class="font-code-sm text-code-sm text-primary-fixed">1.2</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest accent-primary rounded-lg cursor-pointer" max="300" min="0" type="range" value="120"/>
+</div>
+<!-- FX 2: Aberración RGB -->
+<div class="bg-surface-container p-2 rounded flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-secondary">🎨 Aberración RGB</span>
+<span class="font-code-sm text-code-sm text-secondary">0.005</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest accent-secondary rounded-lg cursor-pointer" max="100" min="0" type="range" value="25"/>
+</div>
+<!-- FX 3: Audio Glitch -->
+<div class="bg-surface-container p-2 rounded flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-error">💥 Audio Glitch</span>
+<span class="font-code-sm text-code-sm text-error">0.25</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest accent-error rounded-lg cursor-pointer" max="100" min="0" type="range" value="25"/>
+</div>
+<!-- FX 4: Zoom Shockwave -->
+<div class="bg-surface-container p-2 rounded flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface">🌀 Zoom Shockwave</span>
+<span class="font-code-sm text-code-sm text-primary-fixed-dim">0.15</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest accent-primary-fixed-dim rounded-lg cursor-pointer" max="100" min="0" type="range" value="15"/>
+</div>
+<!-- FX 5: Monitor CRT/VHS -->
+<div class="bg-surface-container p-2 rounded flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface">📺 Monitor CRT/VHS</span>
+<span class="font-code-sm text-code-sm text-tertiary-fixed">0.6</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest accent-tertiary-fixed rounded-lg cursor-pointer" max="100" min="0" type="range" value="60"/>
+</div>
+<!-- FX 6: Caleidoscopio -->
+<div class="bg-surface-container p-2 rounded flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface">🔮 Caleidoscopio</span>
+<span class="font-code-sm text-code-sm text-secondary-fixed">8 caras</span>
+</div>
+<div class="flex gap-1">
+<span class="px-1 py-0.2 rounded bg-surface-container-highest text-telemetry-xs text-outline cursor-pointer">6</span>
+<span class="px-1 py-0.2 rounded bg-secondary text-on-secondary font-bold text-telemetry-xs cursor-pointer">8</span>
+<span class="px-1 py-0.2 rounded bg-surface-container-highest text-telemetry-xs text-outline cursor-pointer">12</span>
+<span class="px-1 py-0.2 rounded bg-surface-container-highest text-telemetry-xs text-outline cursor-pointer">16</span>
+</div>
+</div>
+<!-- FX 7: Cine 35mm / Viñeta -->
+<div class="bg-surface-container p-2 rounded flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface">🎞️ Cine 35mm / Viñeta</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">0.35</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest accent-outline rounded-lg cursor-pointer" max="100" min="0" type="range" value="35"/>
+</div>
+<!-- FX 8: Inversor Negativo -->
+<div class="bg-surface-container p-2 rounded flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface">⚡ Inversor Negativo</span>
+<span class="font-code-sm text-code-sm text-outline">0.0</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest accent-primary rounded-lg cursor-pointer" max="100" min="0" type="range" value="0"/>
+</div>
+<!-- FX 9: Pixelación 8-Bit -->
+<div class="bg-surface-container p-2 rounded flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-tertiary-fixed">👾 Pixelación 8-Bit</span>
+<span class="font-code-sm text-code-sm text-tertiary-fixed">8px</span>
+</div>
+<input class="w-full h-1 bg-surface-container-highest accent-tertiary rounded-lg cursor-pointer" max="64" min="0" type="range" value="8"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- ============================================== -->
+<!-- RIGHT PANEL: GLSL STUDIO, AI & MER MODEL       -->
+<!-- ============================================== -->
+<div class="lg:col-span-4 flex flex-col gap-space-md">
+<!-- GLSL Shader Live Coding Studio -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div>
+<div class="font-telemetry-xs text-telemetry-xs uppercase text-secondary tracking-wider">Laboratorio GLSL • Editor de Shaders en Caliente (Hot-Reload WebGL)</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold flex items-center gap-1.5">
+<span>Editor de Shaders GLSL en Tiempo Real</span>
+<span class="font-telemetry-xs text-telemetry-xs bg-tertiary-container/20 text-tertiary-fixed px-1.5 py-0.5 rounded font-bold">✓ Compilado OK</span>
+</h3>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Programa tus propios Vertex y Fragment Shaders interactivos reactivos a los 8 stems DSP y telemetría de audio.
+        </p>
+<!-- Presets Selector -->
+<div class="flex items-center gap-space-xs flex-wrap bg-surface-container p-1.5 rounded">
+<span class="font-telemetry-xs text-telemetry-xs uppercase text-outline">Preset GLSL:</span>
+<select class="bg-surface-container-highest text-on-surface font-label-sm text-label-sm px-2 py-1 rounded outline-none focus:text-primary flex-1 max-w-[220px]">
+<option selected="">1. Plasma Psicodélico Reactivo</option>
+<option>2. Raymarching Túnel Fractal (SDF)</option>
+<option>3. Ondas de Luz &amp; Malla Espectral</option>
+<option>4. Bio-Voronoi Pulsante (Beat Spike)</option>
+<option>5. Synthwave Neon Grid 80s (Retro Horizon)</option>
+<option>6. Agujero Negro &amp; Lente Gravitacional</option>
+<option>7. Caleidoscopio Hiperdimensional Fractal</option>
+<option>8. Esfera de Plasma Eléctrico (Arcos Tesla)</option>
+<option>9. Campo Topográfico Cuántico (Isolíneas)</option>
+<option>10. Túnel Hexagonal Sci-Fi (Warp Drive)</option>
+</select>
+<div class="flex items-center gap-1">
+<button class="p-1 rounded bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" title="Exportar" type="button">💾 Exportar</button>
+<button class="p-1 rounded bg-surface-container-high text-on-surface-variant hover:text-primary transition-colors" title="Importar" type="button">📂 Importar</button>
+</div>
+</div>
+<!-- Action Bar: Tabs & Compile -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1">
+<button class="px-space-sm py-1 rounded bg-surface-container-highest text-primary font-label-sm text-label-sm uppercase font-bold" type="button">
+              Pixel / Fragment (gl_FragColor)
+            </button>
+<button class="px-space-sm py-1 rounded bg-surface-container text-outline font-label-sm text-label-sm uppercase hover:text-on-surface" type="button">
+              Vertex (gl_Position)
+            </button>
+</div>
+<div class="flex items-center gap-1">
+<button class="px-space-sm py-1 rounded bg-primary-container text-on-primary font-code-sm text-code-sm font-bold shadow-[0_0_12px_rgba(0,242,254,0.4)] hover:brightness-110 flex items-center gap-1" type="button">
+              ▶ Compilar &amp; Aplicar (Ctrl+Enter)
+            </button>
+<button class="p-1 rounded bg-surface-container text-on-surface-variant hover:text-error" title="Reset" type="button">
+              ↺ Reset
+            </button>
+</div>
+</div>
+<!-- Live Code Editor Simulation -->
+<div class="bg-surface-container-lowest rounded p-space-sm font-code-sm text-code-sm flex flex-col gap-1 overflow-x-auto shadow-inner">
+<div class="flex items-center justify-between pb-1 border-b border-surface-container-highest text-telemetry-xs text-outline uppercase">
+<span>ℹ️ Ver Uniforms Disponibles</span>
+<span class="text-primary-fixed cursor-pointer hover:underline">Ver Escena en Pantalla ↗</span>
+</div>
+<div class="text-outline-variant font-code-sm leading-relaxed">
+<span class="text-tertiary-fixed-dim">// Entornos y Coordenadas</span><br/>
+<span class="text-primary-fixed">uniform float</span> uTime; <span class="text-outline">// Segundos</span><br/>
+<span class="text-primary-fixed">uniform vec2</span> uResolution; <span class="text-outline">// W x H px</span><br/>
+<span class="text-primary-fixed">uniform vec2</span> uMouse; <span class="text-outline">// [0..1] pos</span><br/>
+<span class="text-secondary">varying vec2</span> vUv; <span class="text-outline">// UV coord [0..1]</span><br/>
+<span class="text-tertiary-fixed-dim">// 8 Stems DSP (0.0 a 1.0)</span><br/>
+<span class="text-primary-fixed">uniform float</span> uSub, uBass;<br/>
+<span class="text-primary-fixed">uniform float</span> uLowmid, uMid;<br/>
+<span class="text-primary-fixed">uniform float</span> uHighmid, uPresence;<br/>
+<span class="text-primary-fixed">uniform float</span> uTreble, uAir;<br/>
+<span class="text-tertiary-fixed-dim">// Métricas &amp; Paleta IA</span><br/>
+<span class="text-primary-fixed">uniform float</span> uRms, uFlux;<br/>
+<span class="text-primary-fixed">uniform float</span> uCentroid, uIsOnset;<br/>
+<span class="text-primary-fixed">uniform vec3</span> uColor1, uColor2, uColor3;
+          </div>
+</div>
+<!-- Compiler Output Strip -->
+<div class="bg-surface-container-lowest px-space-sm py-1.5 rounded flex items-center justify-between font-telemetry-xs text-telemetry-xs">
+<span class="text-tertiary-fixed flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span>
+<span>Salida del Compilador GLSL: Listo ✓ Shader compilado y vinculado exitosamente con WebGL. No se detectaron advertencias ni errores.</span>
+</span>
+<span class="text-outline uppercase">GLSL ES 1.00 • WebGL</span>
+</div>
+</div>
+<!-- Paso 3: Multimodal AI Art Director Agent -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div>
+<div class="font-telemetry-xs text-telemetry-xs uppercase text-secondary-fixed-dim tracking-wider">Paso 3 • Dirección Artística por Inteligencia Artificial</div>
+<h3 class="font-headline-sm text-headline-sm text-secondary font-bold">Agente "Director de Arte" Multimodal en Vivo</h3>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Infiere el estado afectivo (Valencia / Arousal), el timbre y el tempo para sintetizar directivas artísticas y paletas que mutan la escena 3D.
+        </p>
+<!-- Prompt Generativo Activo Card -->
+<div class="bg-surface-container-lowest p-space-sm rounded flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase text-secondary flex items-center gap-1 font-semibold">
+              🎨 Prompt Generativo Activo (Diffusion / Veo3 / Shaders)
+            </span>
+<span class="font-telemetry-xs text-telemetry-xs text-primary-fixed bg-surface-container px-1.5 py-0.5 rounded">
+              Próximo ciclo: 15s
+            </span>
+</div>
+<p class="font-code-sm text-code-sm text-on-surface italic bg-surface-container/60 p-space-xs rounded">
+            "Cosmic floating monolith with iridescent crystalline refraction, volumetric ultraviolet glow, particles drifting to ambient rhythm, 8k cinematic lighting, moody dark cyberpunk aesthetics."
+          </p>
+<div class="flex items-center justify-between pt-1">
+<span class="font-telemetry-xs text-telemetry-xs uppercase text-outline">Paleta Cromática Inyectada en Three.js:</span>
+<div class="flex items-center gap-1">
+<span class="w-5 h-5 rounded-full bg-[#00f2fe] shadow-[0_0_8px_#00f2fe]"></span>
+<span class="w-5 h-5 rounded-full bg-[#ad009c] shadow-[0_0_8px_#ad009c]"></span>
+<span class="w-5 h-5 rounded-full bg-[#fface9] shadow-[0_0_8px_#fface9]"></span>
+<span class="w-5 h-5 rounded-full bg-[#67f4b7] shadow-[0_0_8px_#67f4b7]"></span>
+</div>
+</div>
+</div>
+<button class="w-full py-1.5 rounded bg-secondary-container text-on-secondary-container font-label-md text-label-md uppercase font-bold hover:brightness-110 shadow-[0_0_12px_rgba(173,0,156,0.4)] flex items-center justify-center gap-2" type="button">
+<span>✨ Actualizar Directiva IA Ahora</span>
+</button>
+<!-- AI Engine Configuration Drawer -->
+<div class="bg-surface-container p-space-sm rounded flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-telemetry-xs text-telemetry-xs uppercase text-on-surface-variant">Configuración del Motor IA</span>
+<span class="font-telemetry-xs text-telemetry-xs text-tertiary-fixed">Modo Inteligente Activo</span>
+</div>
+<div class="grid grid-cols-2 gap-1 font-label-sm text-label-sm">
+<button class="p-1 rounded bg-surface-container-highest text-primary font-bold text-center" type="button">
+              Heurístico Avanzado (Local &amp; Cero Latencia)
+            </button>
+<button class="p-1 rounded bg-surface-container-low text-outline text-center hover:text-on-surface" type="button">
+              Google Gemini API (Cloud LLM)
+            </button>
+</div>
+<div class="flex flex-col gap-1 pt-1">
+<label class="font-telemetry-xs text-telemetry-xs uppercase text-outline">Gemini API Key (Opcional):</label>
+<input class="bg-surface-container-lowest text-on-surface font-code-sm text-code-sm px-2 py-1 rounded outline-none focus:text-primary" placeholder="••••••••••••••••••••••••••••••••" type="password"/>
+<span class="font-telemetry-xs text-telemetry-xs text-outline">Se guarda únicamente en el localStorage de tu navegador.</span>
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="font-telemetry-xs text-telemetry-xs uppercase text-outline">Intervalo del Ciclo IA:</span>
+<div class="flex items-center gap-1 font-telemetry-xs text-telemetry-xs">
+<span class="px-1.5 py-0.5 rounded bg-secondary text-on-secondary font-bold cursor-pointer">15s (Agresivo — puede dar 429)</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-lowest text-outline cursor-pointer hover:text-on-surface">30s (Recomendado)</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-lowest text-outline cursor-pointer hover:text-on-surface">60s (Conservador)</span>
+<span class="px-1.5 py-0.5 rounded bg-surface-container-lowest text-outline cursor-pointer hover:text-on-surface">120s (Mínimo consumo)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- DSP Module: Spectral Analysis & MER Affective Model (Russell Circumplex) -->
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-md flex flex-col gap-space-sm">
+<div>
+<div class="font-telemetry-xs text-telemetry-xs uppercase text-tertiary-fixed tracking-wider">Módulo DSP • Análisis Espectral &amp; Modelo Afectivo MER</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold">Descomposición Espectral y Posicionamiento Emocional</h3>
+</div>
+<!-- Transform Mode Buttons -->
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-1 font-telemetry-xs text-telemetry-xs uppercase">
+<button class="p-1 rounded bg-tertiary-container/30 text-tertiary-fixed font-bold text-center" type="button">
+            Banco Mel / Escala Bark (24 Bandas)
+          </button>
+<button class="p-1 rounded bg-surface-container text-on-surface-variant text-center hover:text-on-surface" type="button">
+            Tríada Tradicional (3 Bandas)
+          </button>
+<button class="p-1 rounded bg-surface-container text-on-surface-variant text-center hover:text-on-surface" type="button">
+            Transformada CQT (36 Semitonos)
+          </button>
+<button class="p-1 rounded bg-surface-container text-on-surface-variant text-center hover:text-on-surface" type="button">
+            FFT Lineal Uniforme (48 Bins)
+          </button>
+</div>
+<!-- Russell Circumplex 2D Affective Map -->
+<div class="bg-surface-container-lowest p-space-sm rounded flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<h4 class="font-label-sm text-label-sm uppercase text-primary font-bold">Modelo MER 2D (Russell Circumplex)</h4>
+<div class="flex items-center gap-1 font-telemetry-xs text-telemetry-xs">
+<span class="text-tertiary-fixed">Seguir Audio</span>
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed"></span>
+</div>
+</div>
+<!-- Circumplex Coordinate Plane -->
+<div class="w-full h-36 bg-surface-container rounded relative flex items-center justify-center overflow-hidden">
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-full h-[1px] bg-surface-container-highest"></div>
+<div class="h-full w-[1px] bg-surface-container-highest absolute"></div>
+</div>
+<!-- Circumplex Quadrant Labels -->
+<span class="absolute top-1 text-telemetry-xs text-outline uppercase tracking-wider">+ Arousal (Excitación)</span>
+<span class="absolute bottom-1 text-telemetry-xs text-outline uppercase tracking-wider">- Arousal (Calma)</span>
+<span class="absolute right-2 text-telemetry-xs text-outline uppercase tracking-wider">+ Valencia</span>
+<span class="absolute left-2 text-telemetry-xs text-outline uppercase tracking-wider">- Valencia</span>
+<!-- Active Emotional Vector Coordinates Pin -->
+<div class="absolute top-6 right-16 flex flex-col items-center group">
+<div class="w-4 h-4 rounded-full bg-primary-container shadow-[0_0_12px_#00f2fe] animate-ping opacity-75"></div>
+<div class="w-3 h-3 rounded-full bg-primary-container shadow-[0_0_8px_#00f2fe] absolute top-0.5"></div>
+<span class="font-telemetry-xs text-telemetry-xs bg-surface-container-lowest/90 px-1 py-0.5 rounded text-primary-fixed mt-4 whitespace-nowrap">
+                Estado Afectivo: Energía Elevada / Alegre
+              </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Workspace Status Footer Bar -->
+<footer class="w-full bg-surface-container-lowest px-gutter py-space-xs flex flex-wrap items-center justify-between gap-space-sm text-on-surface-variant font-telemetry-xs text-telemetry-xs mt-space-md shadow-2xl">
+<div class="flex items-center gap-space-sm">
+<span class="text-primary font-bold">Motor de Visualización y Síntesis Gráfica MotorVisuales.</span>
+<span class="text-outline">Pipeline integrado: Web Audio DSP • Three.js WebGL • IA Generativa • MediaRecorder 60 FPS.</span>
+</div>
+<div class="flex items-center gap-space-md">
+<span class="text-tertiary-fixed">AUDIO BUFFER: 2048 SAMPLES</span>
+<span class="text-secondary">AI REASONING: LOCAL HEURISTIC</span>
+<span class="text-primary">GPU VENDOR: WEBGL 2.0 (ANGLE)</span>
+</div>
+</footer>
+</div></main></div></body></html>

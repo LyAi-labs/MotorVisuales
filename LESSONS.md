@@ -84,3 +84,103 @@
 - **Solución:** Declarar `masterRenderLoop(timestamp)` con `requestAnimationFrame(masterRenderLoop)` invocando secuencialmente el análisis DSP (`runAudioDSP`), actualización de espectrograma y renderizado Three.js.
 - **Trigger:** Al depurar congelamiento de métricas y visualizadores en tiempo real.
 
+---
+
+### L-008
+- **Tags:** #webgl #gpgpu #computeshaders #fbo #pingpong #datatexture
+- **Síntoma:** Al implementar simulaciones GPGPU (Ping-Pong FBO), la pantalla parpadea en negro o los valores de posición colapsan a NaN / 0.
+- **Causa raíz:** Inicialización directa de render targets sin datos válidos, o intentar escribir y leer del mismo render target en el mismo fotograma (feedback loop no permitido en WebGL), o falta de soporte para FloatType en navegadores que requieren OES_texture_float.
+- **Solución:**
+  1. Utilizar siempre doble búfer (Ping-Pong: `targetA` y `targetB`) alternando índices `currentIdx = 1 - currentIdx`.
+  2. Detectar soporte de precisión: `renderer.capabilities.isWebGL2 || renderer.extensions.get('OES_texture_float') ? THREE.FloatType : THREE.HalfFloatType`.
+  3. Sembrar datos iniciales mediante un pase de renderizado con textura `DataTexture` + quad ortográfico, asegurando estado flotante normalizado previo a la primera iteración.
+  4. Enviar `audioDataTexture` como `THREE.UnsignedByteType` con `THREE.LinearFilter` para interpolación continua del espectro acústico en fragment shaders.
+- **Trigger:** Al desarrollar shaders compute o simulaciones masivas de partículas/fluidos sobre WebGL.
+
+---
+
+### L-009
+- **Tags:** #gemini-api #models #endpoints #v1beta
+- **Síntoma:** Error HTTP 404 al invocar `gemini-2.5-flash` ("This model is no longer available to new users").
+- **Causa raíz:** En la API v1beta de Google Generative AI, los modelos Flash recomendados y activos para cuentas recientes son `gemini-3.5-flash` y `gemini-3.8-flash`.
+- **Solución:** Utilizar `models/gemini-3.5-flash` o `models/gemini-flash-latest` en las URLs de endpoints REST para garantizar compatibilidad continua.
+- **Trigger:** Al actualizar o configurar endpoints de Gemini API para el Director de Arte.
+
+---
+
+### L-010
+- **Tags:** #threejs #screenshots #super-sampling #offscreen #rendertarget
+- **Síntoma:** Al redimensionar el renderer para capturas fijas en 4K/8K, el layout de la página se deforma, el canvas desborda el viewport o la imagen final aparece estirada o recortada.
+- **Causa raíz:** Llamar a `renderer.setSize(w, h)` sin el tercer parámetro (`updateStyle = false`) inyecta estilos CSS inline (`width: 3840px; height: 2160px`) en el elemento `<canvas>`.
+- **Solución:** Pasar `threeRenderer.setSize(renderW, renderH, false)`, actualizar la matriz de proyección con el nuevo aspect ratio (`threeCamera.aspect = renderW / renderH; threeCamera.updateProjectionMatrix();`), sincronizar `threeComposer.setSize(renderW, renderH)`, extraer el blob PNG con `canvas.toBlob()`, y restaurar inmediatamente el DPR y dimensiones previas con `triggerThreeResize()`.
+- **Trigger:** Al implementar capturas de alta resolución o exportación de fotogramas en Three.js.
+
+---
+
+### L-011
+- **Tags:** #webaudio #offlineaudiocontext #stems #wav #pcm
+- **Síntoma:** La exportación de audio en tiempo real requiere esperar la duración completa de la canción y se ve afectada por fluctuaciones de CPU del navegador.
+- **Causa raíz:** Usar nodos en tiempo real (`MediaRecorder` o `AudioDestinationNode`) para exportación de audio puro.
+- **Solución:** Emplear `OfflineAudioContext(channels, length, sampleRate)` con `BufferSourceNode` y los mismos filtros Biquad, ejecutando `startRendering()`. Esto procesa el audio a máxima velocidad de hardware en segundos sin latencia, y construir el contenedor RIFF WAVE directamente en memoria (`DataView`) con cabecera estándar de 44 bytes para 16-bit PCM o 32-bit Float.
+- **Trigger:** Al implementar exportación de pistas o stems en Web Audio API.
+
+---
+
+### L-012
+- **Tags:** #gemini-api #flash-lite #fallback #telemetry #audit
+- **Síntoma:** El visualizador muestra un prompt estático repetitivo pero el selector indica "Google Gemini API (Cloud LLM)", haciendo dudar al usuario de si realmente se está usando el LLM o un generador local.
+- **Causa raíz:** 
+  1. El endpoint `gemini-3.5-flash` sufre picos temporales de error HTTP 503 ("This model is currently experiencing high demand").
+  2. En el bloque `catch`, el error de la API llamaba inmediatamente a `generateHeuristicPrompt()`, el cual sobreescribía el texto del error en microsegundos con una plantilla hardcodeada fija (`aiThemes.energetic`), ocultando el fallo de conexión.
+  3. No existía un indicador visual permanente que auditara la fuente del prompt (Cloud vs Local) ni la latencia.
+- **Solución:**
+  1. Configurar `models/gemini-3.5-flash-lite` como modelo primario (responde en ~300ms con alta disponibilidad), con lista de fallback a `gemini-3.5-flash` y `gemini-flash-latest`.
+  2. Incorporar badges de estado en vivo en la UI: `🟢 LLM EN VIVO (gemini-3.5-flash-lite) • ⚡ Latencia • Tokens` vs `🟡 MOTOR HEURÍSTICO LOCAL` vs `🔴 FALLBACK (Error API)`.
+  3. Añadir botón interactivo "⚡ Probar Conexión LLM" que ejecuta un ping de verificación en caliente y expone el estado de la API al usuario.
+- **Trigger:** Al depurar llamadas a Gemini API y fallbacks de prompts generativos.
+
+---
+
+### L-013
+- **Tags:** #threejs #pointlight #color-lerp #ai-palette #shaders
+- **Síntoma:** Al actualizar la directiva de arte IA, los colores cambiaban de forma brusca e instantánea, y la luz puntual `pointLight` no reflejaba el color de la IA, manteniéndose en un espectro fijo azul-verde-rojo.
+- **Causa raíz:**
+  1. En el render loop a 60 FPS (`renderThreeFrame`), `pLight.color.setHSL((0.66 + sPresence * 0.4) % 1.0, 1.0, 0.6)` se ejecutaba cada 16.6ms, destruyendo y sobreescribiendo inmediatamente cualquier color asignado por `applyAiDirectionToThree`.
+  2. La mutación directa de `material.color.copy()` en el callback de la IA genera un salto cromático abrupto (corte óptico duro).
+- **Solución:**
+  1. Desacoplar el estado cromático en dos objetos: `aiColorsCurrent` y `aiColorsTarget` (`prim`, `accent`, `fog`).
+  2. Interpolar suavemente en cada frame mediante `aiColorsCurrent.lerp(aiColorsTarget, 0.05)` a 60 FPS.
+  3. Fijar `pLight.color.copy(aiColorsCurrent.prim)` preservando el matiz de la IA y modular dinámicamente su intensidad y transitorios con `(2.0 + sPresence * 3.5) * (liveAudioMetrics.isOnset ? 1.5 : 1.0)`.
+  4. Pasar la paleta interpolada a todas las escenas (Nebulosa, Túnel, Monolito, Raymarching Procedural y FBO GPGPU 65k).
+- **Trigger:** Al vincular paletas cromáticas externas o generativas con el grafo de escena Three.js y shaders WebGL.
+
+---
+
+### L-014
+- **Tags:** #threejs #offscreen-canvas #canvas-texture #performance #fft-halftone
+- **Síntoma:** Al renderizar gráficos vectoriales y tipografía procedimental en un canvas 2D para proyectarlo en Three.js con `CanvasTexture`, redibujar todo el canvas en cada fotograma a 60 FPS colapsa la CPU del navegador.
+- **Causa raíz:** Las operaciones de texto (`ctx.fillText`, `ctx.strokeRect`, `measureText`) sobre un canvas de 1024x1024 px son costosas y saturan el hilo principal del DOM.
+- **Solución:**
+  1. Dibujar la estructura estática (fondos, cabeceras, columnas de texto y marcos) una sola vez al concebir el mundo (`renderCanvas()`).
+  2. Almacenar el bounding box del marco fotográfico dinámico (`this.photoRect`).
+  3. En cada fotograma del render loop, redibujar únicamente la sub-región del marco fotográfico (`updateLivePhotoFrame()`) con las barras FFT / trama de semitonos y activar `canvasTexture.needsUpdate = true`.
+- **Trigger:** Al proyectar canvas 2D dinámicos o interfaces gráficas sobre texturas de Three.js.
+
+---
+
+### L-015
+- **Tags:** #threejs #glsl #raymarching #cymatics #thin-film #uniforms #webgl
+- **Síntoma:** Errores de compilación WebGL (`undeclared identifier: uPresence`) en shaders procedurales complejos, o caídas severas de FPS al intentar representar superficies acústicas continuas (Cimática / Chladni) mediante geometrías poligonales tradicionales.
+- **Causa raíz:**
+  1. Las superficies nodales tridimensionales continuas generan millones de polígonos que colapsan la memoria si se triangulan en CPU.
+  2. Omitir la declaración explícita de uno o más stems Biquad DSP en los uniforms GLSL interrumpe el pipeline de renderizado y dispara errores WebGL en consola.
+- **Solución:**
+  1. Emplear raymarching volumétrico sobre un quad de pantalla completa evaluando la distancia estimada implícita analítica $d = \frac{|F|}{\|\nabla F\|} - \text{thickness}$ y aproximando el vector normal mediante gradientes numéricos $\nabla F$ en GPU.
+  2. Declarar sistemáticamente los 8 stems Biquad como bloque uniforme completo (`uSub`, `uBass`, `uLowmid`, `uMid`, `uHighmid`, `uPresence`, `uTreble`, `uAir`) en todos los shaders de la suite.
+  3. Para efectos de iridiscencia nacarada física sobre ferrofluidos, calcular analíticamente la interferencia óptica de ondas multiespectral ($\lambda = 650, 532, 440\,\text{nm}$) en vez de mapear gradientes de color estáticos, obteniendo variación angular natural dependiente del punto de vista.
+- **Trigger:** Al desarrollar shaders matemáticos avanzados, raymarching analítico o simulaciones de óptica ondulatoria en GLSL.
+
+
+
+
+

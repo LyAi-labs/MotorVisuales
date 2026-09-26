@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"secondary-fixed":"#ffd9e1","surface-container-lowest":"#0e0e12","surface-container-high":"#2a292e","outline":"#849495","background":"#131317","on-secondary-fixed-variant":"#8f0044","surface-dim":"#131317","error-container":"#93000a","on-secondary-container":"#590028","tertiary-fixed":"#ffddb4","surface":"#131317","on-secondary-fixed":"#3f001a","secondary-container":"#ff4a8d","surface-container":"#1f1f23","tertiary":"#fff9f5","primary-fixed":"#63f7ff","on-error":"#690005","on-surface-variant":"#b9caca","secondary":"#ffb1c4","surface-tint":"#00dce5","outline-variant":"#3a494a","on-error-container":"#ffdad6","inverse-on-surface":"#303034","surface-bright":"#39393d","on-primary-fixed-variant":"#004f53","error":"#ffb4ab","inverse-primary":"#00696e","secondary-fixed-dim":"#ffb1c4","on-tertiary-fixed-variant":"#633f00","on-tertiary":"#452b00","on-surface":"#e5e1e7","tertiary-container":"#ffd7a4","on-secondary":"#65002e","tertiary-fixed-dim":"#ffb952","on-primary-fixed":"#002021","on-primary-container":"#006c71","primary-container":"#00f5ff","surface-variant":"#353439","on-background":"#e5e1e7","on-tertiary-fixed":"#291800","surface-container-highest":"#353439","primary-fixed-dim":"#00dce5","on-tertiary-container":"#865700","surface-container-low":"#1b1b1f","primary":"#e9feff","inverse-surface":"#e5e1e7","on-primary":"#003739"},"borderRadius":{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},"spacing":{"gutter":"0.5rem","space-xs":"0.125rem","space-md":"0.5rem","space-sm":"0.25rem","space-xl":"1.5rem","margin":"0.75rem","space-lg":"1rem"},"fontFamily":{"title-md":["Inter"],"label-md":["JetBrains Mono"],"label-sm":["JetBrains Mono"],"body-sm":["Inter"],"headline-md":["Inter"],"body-md":["Inter"],"headline-sm":["Inter"],"label-lg":["JetBrains Mono"],"headline-lg":["Inter"]},"fontSize":{"title-md":["14px",{"lineHeight":"18px","fontWeight":"500"}],"label-md":["11px",{"lineHeight":"14px","fontWeight":"500"}],"label-sm":["9px",{"lineHeight":"12px","fontWeight":"600"}],"body-sm":["11px",{"lineHeight":"15px","fontWeight":"400"}],"headline-md":["22px",{"lineHeight":"28px","fontWeight":"600"}],"body-md":["13px",{"lineHeight":"18px","fontWeight":"400"}],"headline-sm":["16px",{"lineHeight":"22px","fontWeight":"600"}],"label-lg":["12px",{"lineHeight":"16px","fontWeight":"500"}],"headline-lg":["32px",{"lineHeight":"38px","fontWeight":"600"}]}}}}</script></head><body class="bg-surface-container-lowest font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 left-0 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-xl z-50 px-margin flex items-center justify-between shadow-[0_1px_8px_rgba(0,0,0,0.4)]"><div class="flex items-center gap-space-lg"><div class="flex items-center gap-space-sm"><img alt="MotorVisuales Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1Xe4j-RebysG9C6FLI9lafti49bNh-RcbwqFBcZWbanyWV5vpUZSSsvfJK6Vxj54lVq_Zs7H4dBSXN_7Yc64AFEU7PY-yA7LRtu_TxUDCJmc0UsII8S9dCmj_3h_3nmhnT9tFjXSoMwI4aWbfDVnqJZFqpIfFqVa4VrwC7SUkCebs7-zGRJALse2H78sOw9RKgiiEFzyC-F1EWmOmoZZzP3RKXYPSa5t9hRy6mJZB5oo28WpucLcGG8Kg"/><span class="font-headline-sm text-headline-sm uppercase tracking-wider text-primary">MotorVisuales</span><span class="font-label-sm text-label-sm px-space-xs py-0.5 rounded bg-surface-container-high text-primary-fixed font-semibold tracking-widest">v4.2-PRO</span></div><div class="h-8 w-[1px] bg-outline-variant/40"></div><div class="flex items-center gap-space-sm px-space-sm py-1 bg-surface-container-low/80 rounded"><div class="flex flex-col"><span class="font-label-sm text-label-sm text-outline">CLOCK</span><span class="font-label-md text-label-md text-primary-fixed font-mono" id="header-bpm">128.00 BPM</span></div><div class="flex flex-col pl-space-xs"><span class="font-label-sm text-label-sm text-outline">SYNC</span><span class="font-label-sm text-label-sm text-secondary-fixed-dim">EXT LINK</span></div><div class="flex flex-col pl-space-xs"><span class="font-label-sm text-label-sm text-outline">BAR</span><span class="font-label-md text-label-md text-on-surface" id="header-bar">32.4</span></div></div><div class="hidden 2xl:flex items-center gap-space-md font-label-sm text-label-sm text-on-surface-variant bg-surface-container-low/50 px-space-md py-1 rounded"><span class="text-primary-fixed" id="header-fps">FPS: 120.0</span><span class="text-outline-variant">|</span><span id="header-frame-time">FRAME: 8.3ms</span><span class="text-outline-variant">|</span><span>VRAM: 3.4/16GB</span><span class="text-outline-variant">|</span><span id="header-gpu">GPU: 38%</span><span class="text-outline-variant">|</span><span id="header-audio-lat">AUDIO: 64spls (0.67ms)</span></div></div><div class="flex items-center gap-space-lg"><nav class="flex items-center gap-space-xs bg-surface-container-low p-space-xs rounded-lg" data-active-classes="bg-primary-container text-on-primary-container shadow-[0_0_12px_rgba(0,245,255,0.3)]"><a class="px-space-md py-1 font-label-md text-label-md uppercase tracking-wider transition-all duration-150 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high" data-path="live-runner" href="#">Live Runner</a><a class="px-space-md py-1 font-label-md text-label-md uppercase tracking-wider transition-all duration-150 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high" data-path="graph-composer" href="#">Graph Composer</a><a class="px-space-md py-1 font-label-md text-label-md uppercase tracking-wider transition-all duration-150 rounded bg-primary-container text-on-primary-container shadow-[0_0_12px_rgba(0,245,255,0.4)] font-semibold" data-path="audio-dsp" href="#">Audio DSP</a><a class="px-space-md py-1 font-label-md text-label-md uppercase tracking-wider transition-all duration-150 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high" data-path="node-patcher" href="#">Node Patcher</a><a class="px-space-md py-1 font-label-md text-label-md uppercase tracking-wider transition-all duration-150 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high" data-path="system-config" href="#">System Config</a></nav><div class="flex items-center gap-space-sm"><div class="hidden xl:flex items-center gap-space-xs px-space-sm py-1 bg-surface-container-low rounded font-label-sm text-label-sm"><span class="w-1.5 h-1.5 rounded-full bg-primary-fixed shadow-[0_0_6px_#63f7ff]"></span><span class="text-on-surface-variant">DP 4K @120Hz</span></div><div class="hidden lg:flex items-center gap-space-xs px-space-sm py-1 bg-surface-container-low rounded font-label-sm text-label-sm"><span class="text-secondary-fixed-dim">LIMITER: -0.2dB</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><aside class="fixed left-0 top-16 bottom-0 w-64 bg-surface-container-lowest/80 backdrop-blur-xl z-40 p-margin flex flex-col justify-between shadow-[1px_0_12px_rgba(0,0,0,0.5)]"><div class="space-y-space-lg"><div class="space-y-space-sm"><span class="font-label-sm text-label-sm tracking-widest text-outline uppercase block px-space-sm">Hardware Transport</span><div class="grid grid-cols-2 gap-space-xs"><button class="flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-surface-container-low rounded hover:bg-error-container hover:text-on-error transition-colors font-label-sm text-label-sm text-error" type="button"><span class="w-2 h-2 rounded-full bg-error"></span>REC</button><button class="flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-surface-container-low rounded hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-sm text-label-sm text-on-surface-variant" id="btn-transport-stop" type="button"><span class="material-symbols-outlined text-[14px]">stop</span>STOP</button><button class="flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-primary-container text-on-primary-container rounded font-label-sm text-label-sm shadow-[0_0_8px_rgba(0,245,255,0.4)]" id="btn-transport-play" type="button"><span class="material-symbols-outlined text-[14px]">play_arrow</span>PLAY</button><button class="flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-surface-container-low rounded hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-sm text-label-sm text-tertiary-fixed-dim" id="btn-transport-freeze" type="button"><span class="material-symbols-outlined text-[14px]">pause</span>FREEZE</button><button class="flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-surface-container-low rounded hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-sm text-label-sm text-on-surface-variant" type="button"><span class="material-symbols-outlined text-[14px]">flashlight_off</span>BLACKOUT</button><button class="flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-surface-container-high text-primary-fixed rounded font-label-sm text-label-sm shadow-[0_0_6px_rgba(99,247,255,0.2)]" type="button"><span class="material-symbols-outlined text-[14px]">sensors</span>NDI OUT</button></div></div><div class="space-y-space-sm"><span class="font-label-sm text-label-sm tracking-widest text-outline uppercase block px-space-sm">Signal Matrices</span><nav class="space-y-space-xs" data-active-classes="bg-surface-container-high text-primary-fixed font-semibold"><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="live-runner" href="#"><span>Master Pipe 01</span><span class="font-label-sm text-label-sm text-primary-fixed">60Hz</span></a><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="graph-composer" href="#"><span>Shader Engine</span><span class="font-label-sm text-label-sm text-secondary-fixed-dim">Hot-Reload</span></a><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md bg-surface-container-high text-primary-fixed font-semibold" data-path="audio-dsp" href="#"><span>FFT Analysis 8ch</span><span class="font-label-sm text-label-sm text-tertiary-fixed-dim">-12dB</span></a><a class="flex items-center justify-between px-space-sm py-1.5 rounded font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-all" data-path="node-patcher" href="#"><span>OSC / MIDI Nodes</span><span class="font-label-sm text-label-sm text-on-surface-variant">Ch 1-16</span></a></nav></div></div><div class="space-y-space-xs pt-space-md"><div class="p-space-sm rounded bg-surface-container-low/70 space-y-1"><div class="flex justify-between items-center font-label-sm text-label-sm"><span class="text-outline">CHASSIS TEMP</span><span class="text-on-surface" id="chassis-temp">42°C</span></div><div class="flex justify-between items-center font-label-sm text-label-sm"><span class="text-outline">SESSION LOCK</span><span class="text-primary-fixed">ENGAGED</span></div></div><div class="font-label-sm text-label-sm text-outline text-center py-space-xs">MOTORVISUALES RT CORE v4.2</div></div></aside><div class="pl-64"><main class="relative w-full pt-16 min-h-screen px-margin bg-surface-container-lowest"><div class="flex flex-col w-full space-y-gutter pb-12 select-none">
+<!-- TOP DECK: HARDWARE INGEST & DSP MASTER TELEMETRY -->
+<section class="grid grid-cols-1 xl:grid-cols-12 gap-gutter">
+<!-- I/O ENGINE CHASSIS CARD -->
+<div class="xl:col-span-4 bg-surface-container-lowest/90 backdrop-blur-xl rounded p-space-md relative overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.6)] flex flex-col justify-between">
+<!-- Specular Hardware Rim -->
+<div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-primary-container/40 to-transparent"></div>
+<div>
+<div class="flex items-center justify-between pb-space-sm mb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="w-2 h-2 rounded-full bg-primary-fixed animate-pulse shadow-[0_0_8px_#63f7ff]" id="dsp-pulse-led"></span>
+<span class="font-label-md text-label-md tracking-wider uppercase text-primary">COREAUDIO ULTRALOW-DSP</span>
+</div>
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm text-outline">
+<span class="w-1.5 h-1.5 rounded-full bg-surface-container-highest"></span>
+<span>CHASSIS 01-DSP</span>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-space-xs bg-surface-container-low/90 p-space-xs rounded mb-space-sm font-label-sm text-label-sm text-center">
+<div class="flex flex-col py-1 bg-surface-container-lowest/80 rounded">
+<span class="text-outline text-[8px]">SAMPLE RATE</span>
+<span class="text-primary-fixed font-semibold">96.000 kHz</span>
+</div>
+<div class="flex flex-col py-1 bg-surface-container-lowest/80 rounded">
+<span class="text-outline text-[8px]">PRECISION</span>
+<span class="text-on-surface">32-bit LE</span>
+</div>
+<div class="flex flex-col py-1 bg-surface-container-lowest/80 rounded">
+<span class="text-outline text-[8px]">BUFFER</span>
+<span class="text-primary-fixed">64 spls</span>
+</div>
+<div class="flex flex-col py-1 bg-surface-container-lowest/80 rounded">
+<span class="text-outline text-[8px]">LATENCY</span>
+<span class="text-secondary-fixed-dim font-bold" id="telemetry-latency">0.67 ms</span>
+</div>
+</div>
+<!-- Input Source Selector Tabs -->
+<div class="space-y-space-xs">
+<span class="font-label-sm text-label-sm tracking-widest text-outline uppercase block">ACTIVE INGEST BUS</span>
+<div class="grid grid-cols-4 gap-space-xs" id="ingest-bus-tabs">
+<button class="ingest-btn py-1 px-space-xs rounded font-label-sm text-label-sm uppercase bg-primary-container text-on-primary-container font-semibold shadow-[0_0_8px_rgba(0,245,255,0.3)]">
+              LINE 1-8
+            </button>
+<button class="ingest-btn py-1 px-space-xs rounded font-label-sm text-label-sm uppercase bg-surface-container-high/60 text-on-surface-variant hover:text-on-surface transition-colors">
+              LOOPBACK
+            </button>
+<button class="ingest-btn py-1 px-space-xs rounded font-label-sm text-label-sm uppercase bg-surface-container-high/60 text-on-surface-variant hover:text-on-surface transition-colors">
+              DANTE IP
+            </button>
+<button class="ingest-btn py-1 px-space-xs rounded font-label-sm text-label-sm uppercase bg-surface-container-high/60 text-on-surface-variant hover:text-on-surface transition-colors">
+              NDI BUS
+            </button>
+</div>
+</div>
+</div>
+<!-- Channel Multi-strip Activity Indicators -->
+<div class="pt-space-sm mt-space-sm flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-outline">RX PHY:</span>
+<div class="flex items-center gap-1">
+<span class="px-1 py-0.5 rounded bg-primary-container/20 text-primary-fixed text-[8px] font-bold transition-opacity" id="rx-ch1">CH1: ACTIVE</span>
+<span class="px-1 py-0.5 rounded bg-primary-container/20 text-primary-fixed text-[8px] font-bold transition-opacity" id="rx-ch2">CH2: ACTIVE</span>
+<span class="px-1 py-0.5 rounded bg-surface-container text-outline text-[8px]">CH3</span>
+<span class="px-1 py-0.5 rounded bg-surface-container text-outline text-[8px]">CH4</span>
+<span class="px-1 py-0.5 rounded bg-surface-container text-outline text-[8px]">CH5-8</span>
+</div>
+</div>
+</div>
+<!-- MASTER GAIN, DYNAMICS & LOUDNESS CONSOLE -->
+<div class="xl:col-span-8 bg-surface-container-lowest/90 backdrop-blur-xl rounded p-space-md relative overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.6)] flex flex-col justify-between">
+<div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-tertiary-container/30 to-transparent"></div>
+<div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-space-md">
+<!-- Tactile Encoder 1: Ingest Gain -->
+<div class="flex items-center gap-space-md p-space-sm bg-surface-container-low/70 rounded">
+<div class="relative w-12 h-12 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 48 48">
+<circle cx="24" cy="24" fill="none" r="18" stroke="#2a292e" stroke-width="4"></circle>
+<circle cx="24" cy="24" fill="none" id="knob-gain-circle" r="18" stroke="#63f7ff" stroke-dasharray="113" stroke-dashoffset="38" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+<div class="absolute w-7 h-7 rounded-full bg-surface-container-highest flex items-center justify-center shadow-inner">
+<span class="w-1 h-3 rounded-full bg-primary-fixed -translate-y-1"></span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">INPUT GAIN</span>
+<span class="font-label-md text-label-md text-primary-fixed font-bold" id="val-input-gain">+3.20 dB</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">ANALOG TRIM</span>
+</div>
+</div>
+<!-- Tactile Encoder 2: Peak Limiter -->
+<div class="flex items-center gap-space-md p-space-sm bg-surface-container-low/70 rounded">
+<div class="relative w-12 h-12 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 48 48">
+<circle cx="24" cy="24" fill="none" r="18" stroke="#2a292e" stroke-width="4"></circle>
+<circle cx="24" cy="24" fill="none" id="knob-limiter-circle" r="18" stroke="#ffb952" stroke-dasharray="113" stroke-dashoffset="24" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+<div class="absolute w-7 h-7 rounded-full bg-surface-container-highest flex items-center justify-center shadow-inner">
+<span class="w-1 h-3 rounded-full bg-tertiary-fixed-dim -translate-y-1"></span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">BRICKWALL LIMITER</span>
+<span class="font-label-md text-label-md text-tertiary-fixed-dim font-bold" id="val-limiter-gain">-0.10 dBFS</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">LOOKAHEAD 1.2ms</span>
+</div>
+</div>
+<!-- Tactile Encoder 3: High-Pass Rumble Filter -->
+<div class="flex items-center gap-space-md p-space-sm bg-surface-container-low/70 rounded">
+<div class="relative w-12 h-12 flex items-center justify-center">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 48 48">
+<circle cx="24" cy="24" fill="none" r="18" stroke="#2a292e" stroke-width="4"></circle>
+<circle cx="24" cy="24" fill="none" id="knob-hpf-circle" r="18" stroke="#ff4a8d" stroke-dasharray="113" stroke-dashoffset="65" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+<div class="absolute w-7 h-7 rounded-full bg-surface-container-highest flex items-center justify-center shadow-inner">
+<span class="w-1 h-3 rounded-full bg-secondary -translate-y-1"></span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline">SUB HPF 24dB</span>
+<span class="font-label-md text-label-md text-secondary font-bold" id="val-hpf-cutoff">28.5 Hz</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">DC ISOLATION</span>
+</div>
+</div>
+<!-- True-Peak / Integrated LUFS Readout -->
+<div class="flex flex-col justify-center bg-surface-container-low/90 p-space-sm rounded min-w-[140px]">
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-outline">LUFS (INT)</span>
+<span class="font-label-md text-label-md font-bold text-primary-fixed" id="readout-lufs">-14.2 LUFS</span>
+</div>
+<div class="flex items-center justify-between mb-1">
+<span class="font-label-sm text-label-sm text-outline">TRUE PEAK</span>
+<span class="font-label-md text-label-md font-bold text-tertiary-fixed-dim" id="readout-peak">-0.28 dBTP</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline">DYN RANGE</span>
+<span class="font-label-sm text-label-sm text-on-surface" id="readout-dyn">9.6 LU</span>
+</div>
+</div>
+</div>
+<!-- Segmented Master Output Stereo Meter Ladder -->
+<div class="mt-space-md pt-space-xs space-y-1">
+<!-- CH L -->
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm text-outline w-6">L</span>
+<div class="flex-1 grid grid-cols-48 gap-[2px] h-3 bg-surface-container-low p-[1px] rounded-xs" id="meter-ladder-l">
+<!-- Dynamic segments populated via JS -->
+</div>
+<span class="font-label-sm text-label-sm text-primary-fixed w-12 text-right" id="meter-val-l">-4.2dB</span>
+</div>
+<!-- CH R -->
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm text-outline w-6">R</span>
+<div class="flex-1 grid grid-cols-48 gap-[2px] h-3 bg-surface-container-low p-[1px] rounded-xs" id="meter-ladder-r">
+<!-- Dynamic segments populated via JS -->
+</div>
+<span class="font-label-sm text-label-sm text-primary-fixed w-12 text-right" id="meter-val-r">-4.9dB</span>
+</div>
+</div>
+</div>
+</section>
+<!-- INTERACTIVE AUDIO PRESETS BAR -->
+<section class="w-full bg-surface-container-lowest/90 backdrop-blur-xl rounded p-space-xs relative overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.5)] border border-surface-container-high/60" id="audio-presets-bar">
+<div class="flex flex-col md:flex-row items-center justify-between gap-space-xs p-1">
+<div class="flex items-center gap-space-sm pl-space-sm">
+<span class="material-symbols-outlined text-primary-fixed text-[18px]">tune</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">Acoustic Profiles</span>
+<span class="font-label-sm text-[10px] text-primary-fixed font-bold" id="active-preset-title">STAGE RAVE (ACTIVE)</span>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-space-xs w-full md:w-auto" id="preset-buttons-container">
+<!-- PRESET 1: STAGE RAVE -->
+<button class="preset-btn px-space-md py-1.5 rounded flex items-center justify-between gap-space-sm transition-all duration-200 border border-primary-container bg-primary-container/20 text-primary-fixed shadow-[0_0_12px_rgba(0,245,255,0.35)]" data-preset="stage-rave" type="button">
+<div class="flex flex-col text-left">
+<span class="font-label-sm text-label-sm font-bold tracking-wider">STAGE RAVE</span>
+<span class="font-label-sm text-[8px] text-on-surface-variant">4/4 Punch • EDM</span>
+</div>
+<span class="font-label-sm text-label-sm font-mono px-1 py-0.5 rounded bg-surface-container-highest/80 text-primary-fixed">128</span>
+</button>
+<!-- PRESET 2: AMBIENT SPHERE -->
+<button class="preset-btn px-space-md py-1.5 rounded flex items-center justify-between gap-space-sm transition-all duration-200 border border-transparent bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface" data-preset="ambient-sphere" type="button">
+<div class="flex flex-col text-left">
+<span class="font-label-sm text-label-sm font-bold tracking-wider">AMBIENT SPHERE</span>
+<span class="font-label-sm text-[8px] text-on-surface-variant">Ethereal Drone</span>
+</div>
+<span class="font-label-sm text-label-sm font-mono px-1 py-0.5 rounded bg-surface-container-highest/80 text-secondary">74</span>
+</button>
+<!-- PRESET 3: DRUM & BASS 174 -->
+<button class="preset-btn px-space-md py-1.5 rounded flex items-center justify-between gap-space-sm transition-all duration-200 border border-transparent bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface" data-preset="drum-bass" type="button">
+<div class="flex flex-col text-left">
+<span class="font-label-sm text-label-sm font-bold tracking-wider">DRUM &amp; BASS 174</span>
+<span class="font-label-sm text-[8px] text-on-surface-variant">Amen &amp; Reese Sub</span>
+</div>
+<span class="font-label-sm text-label-sm font-mono px-1 py-0.5 rounded bg-surface-container-highest/80 text-tertiary-fixed-dim">174</span>
+</button>
+<!-- PRESET 4: PEAK TECHNO 135 -->
+<button class="preset-btn px-space-md py-1.5 rounded flex items-center justify-between gap-space-sm transition-all duration-200 border border-transparent bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface" data-preset="peak-techno" type="button">
+<div class="flex flex-col text-left">
+<span class="font-label-sm text-label-sm font-bold tracking-wider">PEAK TECHNO 135</span>
+<span class="font-label-sm text-[8px] text-on-surface-variant">Rumble Sub • Heavy</span>
+</div>
+<span class="font-label-sm text-label-sm font-mono px-1 py-0.5 rounded bg-surface-container-highest/80 text-primary-fixed">135</span>
+</button>
+</div>
+</div>
+</section>
+<!-- CENTER DECK: 64-BAND REALTIME FFT SPECTRUM & ENVELOPE STEM EXTRACTORS -->
+<section class="grid grid-cols-1 xl:grid-cols-12 gap-gutter">
+<!-- HERO FFT SPECTRUM ANALYZER (8 COLS) -->
+<div class="xl:col-span-8 bg-surface-container-lowest/90 backdrop-blur-xl rounded p-space-md relative overflow-hidden shadow-[0_4px_28px_rgba(0,0,0,0.7)] flex flex-col justify-between">
+<div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-primary-container/60 via-primary-fixed to-transparent"></div>
+<!-- Analyzer Header & Realtime Controls -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm mb-space-md pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary-fixed text-[18px]">equalizer</span>
+<span class="font-headline-sm text-headline-sm tracking-wide text-primary">64-BAND LOGARITHMIC FFT SPECTROGRAM</span>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface-container-high text-primary-fixed" id="status-live-badge">REALTIME 120 FPS</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<!-- Window Function Selector -->
+<div class="flex items-center bg-surface-container-low p-0.5 rounded" id="fft-window-selector">
+<button class="win-btn px-2 py-0.5 font-label-sm text-label-sm rounded bg-primary-container text-on-primary-container font-semibold transition-all" data-window="Hann">Hann</button>
+<button class="win-btn px-2 py-0.5 font-label-sm text-label-sm rounded text-on-surface-variant hover:text-on-surface transition-all" data-window="Blackman">Blackman</button>
+<button class="win-btn px-2 py-0.5 font-label-sm text-label-sm rounded text-on-surface-variant hover:text-on-surface transition-all" data-window="FlatTop">FlatTop</button>
+<button class="win-btn px-2 py-0.5 font-label-sm text-label-sm rounded text-on-surface-variant hover:text-on-surface transition-all" data-window="Kaiser">Kaiser</button>
+</div>
+<!-- FFT Size Selector -->
+<div class="flex items-center gap-1 font-label-sm text-label-sm text-outline bg-surface-container-low px-2 py-1 rounded">
+<span>RES:</span>
+<span class="text-primary-fixed font-bold">4096 PTS</span>
+</div>
+</div>
+</div>
+<!-- LIVE FREQUENCY TELEMETRY HUD BAR -->
+<div class="grid grid-cols-2 md:grid-cols-6 gap-space-xs bg-surface-container-low/80 p-space-xs rounded mb-space-sm font-label-sm text-label-sm">
+<div class="flex flex-col px-space-xs">
+<span class="text-outline text-[8px]">DOMINANT PITCH</span>
+<span class="text-primary-fixed font-bold font-label-md text-label-md" id="hud-dominant-pitch">52.4 Hz (A#0)</span>
+<span class="text-[8px] text-tertiary-fixed-dim" id="hud-pitch-peak">-2.1 dBFS Peak</span>
+</div>
+<div class="flex flex-col px-space-xs">
+<span class="text-outline text-[8px]">SPECTRAL CENTROID</span>
+<span class="text-on-surface font-semibold font-label-md text-label-md" id="hud-centroid">1,482 Hz</span>
+<span class="text-[8px] text-outline">Mean Center</span>
+</div>
+<div class="flex flex-col px-space-xs">
+<span class="text-outline text-[8px]">SPECTRAL FLUX</span>
+<span class="text-secondary font-semibold font-label-md text-label-md" id="hud-flux">0.842 Δ/dt</span>
+<span class="text-[8px] text-outline">Dynamic Delta</span>
+</div>
+<div class="flex flex-col px-space-xs">
+<span class="text-outline text-[8px]">ZERO-CROSS RATE</span>
+<span class="text-on-surface font-semibold font-label-md text-label-md" id="hud-zcr">312 / sec</span>
+<span class="text-[8px] text-outline">Noisiness Coeff</span>
+</div>
+<div class="flex flex-col px-space-xs">
+<span class="text-outline text-[8px]">HARMONIC RATIO</span>
+<span class="text-primary-fixed font-semibold font-label-md text-label-md" id="hud-harmonic">0.76 H/N</span>
+<span class="text-[8px] text-outline">Tonal Purity</span>
+</div>
+<button class="flex flex-col px-space-xs items-center justify-center bg-secondary-container/20 hover:bg-secondary-container/30 active:scale-95 transition-all rounded cursor-pointer border border-secondary-container/30" id="btn-transient-trigger">
+<span class="text-secondary text-[8px] font-bold tracking-widest uppercase">TRANSIENT BURST</span>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="w-2 h-2 rounded-full bg-secondary-container shadow-[0_0_8px_#ff4a8d] animate-ping" id="trigger-pip"></span>
+<span class="font-label-md text-label-md font-bold text-secondary">TRIGGER</span>
+</div>
+</button>
+</div>
+<!-- MAIN 64-BAND SPECTRUM CANVAS / SVG RENDER FRAME -->
+<div class="relative w-full h-64 bg-surface-container-lowest rounded overflow-hidden flex flex-col justify-end p-space-sm group cursor-crosshair" id="spectrum-viewport">
+<!-- Frequency Grid Matrix Background -->
+<div class="absolute inset-0 opacity-15 pointer-events-none flex flex-col justify-between p-space-xs">
+<div class="w-full h-[1px] bg-outline"></div>
+<div class="w-full h-[1px] bg-outline"></div>
+<div class="w-full h-[1px] bg-outline"></div>
+<div class="w-full h-[1px] bg-outline"></div>
+</div>
+<div class="absolute inset-y-0 left-[12%] w-[1px] bg-outline/20"></div>
+<div class="absolute inset-y-0 left-[28%] w-[1px] bg-outline/20"></div>
+<div class="absolute inset-y-0 left-[45%] w-[1px] bg-outline/20"></div>
+<div class="absolute inset-y-0 left-[68%] w-[1px] bg-outline/20"></div>
+<div class="absolute inset-y-0 left-[84%] w-[1px] bg-outline/20"></div>
+<!-- Spectrogram Hover Cursor HUD & Tooltip -->
+<div class="absolute top-0 bottom-0 w-[1px] bg-primary-fixed/80 pointer-events-none hidden z-30 shadow-[0_0_8px_#00f5ff]" id="fft-crosshair"></div>
+<div class="absolute pointer-events-none hidden z-40 bg-surface-container-high/95 backdrop-blur-md border border-primary-container/40 px-2 py-1 rounded text-primary-fixed font-label-sm text-[10px] shadow-[0_4px_16px_rgba(0,0,0,0.8)] -translate-x-1/2 -translate-y-full" id="fft-tooltip">
+<div class="flex items-center gap-1.5 whitespace-nowrap" id="fft-tooltip-content">
+<span class="font-bold text-primary">52.4 Hz</span>
+<span class="text-outline">|</span>
+<span class="text-tertiary-fixed-dim">-3.2 dB</span>
+<span class="text-outline">|</span>
+<span class="text-secondary font-semibold">A#0</span>
+</div>
+</div>
+<!-- 64 Luminescent Frequency Bands Container -->
+<div class="relative z-10 w-full h-full flex items-end justify-between gap-[2px] pt-4 pointer-events-auto" id="fft-bars-container">
+<!-- Injected dynamically via script for 64 interactive responsive bars -->
+</div>
+</div>
+<!-- Frequency Band Label Legend Strip -->
+<div class="grid grid-cols-7 text-center font-label-sm text-label-sm text-outline pt-space-xs mt-1">
+<div class="flex flex-col items-center">
+<span class="text-primary-fixed font-bold">SUB</span>
+<span class="text-[8px]">20-60 Hz</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-primary-fixed font-bold">BASS</span>
+<span class="text-[8px]">60-250 Hz</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-on-surface">LOW-MID</span>
+<span class="text-[8px]">250-500 Hz</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-on-surface">MID</span>
+<span class="text-[8px]">500-2k Hz</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-on-surface">HI-MID</span>
+<span class="text-[8px]">2k-4k Hz</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-tertiary-fixed-dim">PRESENCE</span>
+<span class="text-[8px]">4k-8k Hz</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-secondary-fixed-dim">AIR</span>
+<span class="text-[8px]">8k-20k Hz</span>
+</div>
+</div>
+<!-- Falloff & Smoothing Sliders Footer -->
+<div class="pt-space-sm mt-space-sm flex flex-wrap items-center justify-between gap-space-md bg-surface-container-low/50 px-space-sm py-1.5 rounded">
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm text-outline">DECAY FALLOFF:</span>
+<div class="w-28 h-1.5 bg-surface-container-high rounded-full relative cursor-pointer" id="decay-slider-track">
+<div class="absolute left-0 top-0 bottom-0 w-3/5 bg-primary-container rounded-full" id="decay-slider-fill"></div>
+<div class="absolute left-[60%] top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary-fixed shadow-[0_0_6px_#63f7ff]" id="decay-slider-thumb"></div>
+</div>
+<span class="font-label-sm text-label-sm text-primary-fixed font-bold" id="decay-val-text">140 ms</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<span class="font-label-sm text-label-sm text-outline">SMOOTH CURVE:</span>
+<div class="w-28 h-1.5 bg-surface-container-high rounded-full relative">
+<div class="absolute left-0 top-0 bottom-0 w-4/5 bg-tertiary-fixed-dim rounded-full"></div>
+<div class="absolute left-[80%] top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-tertiary-fixed-dim shadow-[0_0_6px_#ffb952]"></div>
+</div>
+<span class="font-label-sm text-label-sm text-tertiary-fixed-dim font-bold">0.82 Exp</span>
+</div>
+<div class="flex items-center gap-space-xs font-label-sm text-label-sm">
+<button class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface hover:text-primary-fixed transition-colors" id="btn-peak-hold-toggle">PEAK HOLD: 1.5s</button>
+<button class="px-2 py-0.5 rounded bg-surface-container-high text-on-surface hover:text-primary-fixed transition-colors">WEIGHT: A-CURVE</button>
+</div>
+</div>
+</div>
+<!-- STEM SEPARATION & ENVELOPE FOLLOWERS (4 COLS) -->
+<div class="xl:col-span-4 bg-surface-container-lowest/90 backdrop-blur-xl rounded p-space-md relative overflow-hidden shadow-[0_4px_28px_rgba(0,0,0,0.7)] flex flex-col justify-between">
+<div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-secondary-container via-secondary to-transparent"></div>
+<div>
+<div class="flex items-center justify-between pb-space-sm mb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[18px]">graphic_eq</span>
+<span class="font-headline-sm text-headline-sm tracking-wide text-primary">REALTIME STEMS (DSP AI)</span>
+</div>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-secondary-container/20 text-secondary font-bold">4 STREAMS</span>
+</div>
+<!-- 4 STEM CHANNEL STRIPS -->
+<div class="space-y-space-sm">
+<!-- STEM 1: KICK -->
+<div class="bg-surface-container-low/90 p-space-xs rounded space-y-1">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary-container shadow-[0_0_8px_#00f5ff] transition-transform" id="stem-led-kick"></span>
+<span class="font-bold text-on-surface">KICK / SUB-TRANSIENT</span>
+</div>
+<span class="text-primary-fixed font-bold">u_kick_hit [GLSL]</span>
+</div>
+<!-- Oscilloscope Canvas Strip -->
+<div class="w-full h-8 bg-surface-container-lowest rounded relative overflow-hidden flex items-center">
+<canvas class="w-full h-full block" height="32" id="stem-canvas-kick" width="320"></canvas>
+<div class="absolute right-2 top-1 flex items-center gap-1 font-label-sm text-[8px] text-primary-fixed">
+<span>ATK: 2ms</span>
+<span>|</span>
+<span>REL: 45ms</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-[9px] font-label-sm text-outline">
+<span>RMS: <span class="text-on-surface font-semibold" id="stem-rms-kick">-3.8 dB</span></span>
+<span class="text-primary-fixed font-semibold">TRIG VELOCITY: <span id="stem-vel-kick">118</span></span>
+<span class="text-tertiary-fixed-dim">REACTION: 99.4%</span>
+</div>
+</div>
+<!-- STEM 2: BASSLINE -->
+<div class="bg-surface-container-low/90 p-space-xs rounded space-y-1">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim shadow-[0_0_8px_#ffb952] transition-transform" id="stem-led-bass"></span>
+<span class="font-bold text-on-surface">BASSLINE / SYNTH SUB</span>
+</div>
+<span class="text-tertiary-fixed-dim font-bold">u_bass_energy [GLSL]</span>
+</div>
+<!-- Oscilloscope Canvas Strip -->
+<div class="w-full h-8 bg-surface-container-lowest rounded relative overflow-hidden flex items-center">
+<canvas class="w-full h-full block" height="32" id="stem-canvas-bass" width="320"></canvas>
+<div class="absolute right-2 top-1 flex items-center gap-1 font-label-sm text-[8px] text-tertiary-fixed-dim">
+<span>ATK: 12ms</span>
+<span>|</span>
+<span>REL: 180ms</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-[9px] font-label-sm text-outline">
+<span>RMS: <span class="text-on-surface font-semibold" id="stem-rms-bass">-6.4 dB</span></span>
+<span class="text-tertiary-fixed-dim font-semibold">SUSTAIN: <span id="stem-sus-bass">0.81</span></span>
+<span id="stem-pitch-bass">PITCH: F#1</span>
+</div>
+</div>
+<!-- STEM 3: VOCALS / LEAD -->
+<div class="bg-surface-container-low/90 p-space-xs rounded space-y-1">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#ffb1c4] transition-transform" id="stem-led-vocal"></span>
+<span class="font-bold text-on-surface">VOCALS &amp; TOP LEAD</span>
+</div>
+<span class="text-secondary font-bold">u_vocal_formant [GLSL]</span>
+</div>
+<!-- Oscilloscope Canvas Strip -->
+<div class="w-full h-8 bg-surface-container-lowest rounded relative overflow-hidden flex items-center">
+<canvas class="w-full h-full block" height="32" id="stem-canvas-vocal" width="320"></canvas>
+<div class="absolute right-2 top-1 flex items-center gap-1 font-label-sm text-[8px] text-secondary">
+<span>ATK: 8ms</span>
+<span>|</span>
+<span>REL: 220ms</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-[9px] font-label-sm text-outline">
+<span>RMS: <span class="text-on-surface font-semibold" id="stem-rms-vocal">-9.2 dB</span></span>
+<span class="text-secondary font-semibold">FORMANT F1: <span id="stem-formant-vocal">680Hz</span></span>
+<span>ISOLATION: 92%</span>
+</div>
+</div>
+<!-- STEM 4: PERCUSSION & CYMBALS -->
+<div class="bg-surface-container-low/90 p-space-xs rounded space-y-1">
+<div class="flex items-center justify-between font-label-sm text-label-sm">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary-fixed shadow-[0_0_8px_#63f7ff] transition-transform" id="stem-led-hat"></span>
+<span class="font-bold text-on-surface">PERCUSSION / HI-HATS</span>
+</div>
+<span class="text-primary-fixed font-bold">u_hat_trigger [GLSL]</span>
+</div>
+<!-- Oscilloscope Canvas Strip -->
+<div class="w-full h-8 bg-surface-container-lowest rounded relative overflow-hidden flex items-center">
+<canvas class="w-full h-full block" height="32" id="stem-canvas-hat" width="320"></canvas>
+<div class="absolute right-2 top-1 flex items-center gap-1 font-label-sm text-[8px] text-primary-fixed">
+<span>ATK: 0.5ms</span>
+<span>|</span>
+<span>REL: 25ms</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-[9px] font-label-sm text-outline">
+<span>RMS: <span class="text-on-surface font-semibold" id="stem-rms-hat">-11.5 dB</span></span>
+<span class="text-primary-fixed font-semibold" id="stem-pattern-hat">16TH-NOTE FLUX</span>
+<span id="stem-bpm-hat">128.0 BPM</span>
+</div>
+</div>
+</div>
+</div>
+<!-- STEM ASSIGNMENT QUICK ACTION -->
+<div class="pt-space-sm mt-space-sm flex items-center justify-between font-label-sm text-label-sm">
+<span class="text-outline">MODEL: MDX-NET REALTIME</span>
+<button class="px-space-sm py-1 rounded bg-surface-container-high text-primary-fixed hover:bg-surface-container-highest active:scale-95 transition-all font-bold uppercase" id="btn-retrain">
+          RE-TRAIN SENSITIVITY
+        </button>
+</div>
+</div>
+</section>
+<!-- BOTTOM DECK: OSC TELEMETRY & INTERACTIVE CROSS-POINT PATCHBAY MATRIX -->
+<section class="grid grid-cols-1 xl:grid-cols-12 gap-gutter">
+<!-- LEFT: OSC & NETWORK TELEMETRY (4 COLS) -->
+<div class="xl:col-span-4 bg-surface-container-lowest/90 backdrop-blur-xl rounded p-space-md relative overflow-hidden shadow-[0_4px_28px_rgba(0,0,0,0.7)] flex flex-col justify-between">
+<div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-primary-container via-transparent to-transparent"></div>
+<div>
+<div class="flex items-center justify-between pb-space-sm mb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary-fixed text-[18px]">lan</span>
+<span class="font-headline-sm text-headline-sm tracking-wide text-primary">OSC PORT MANAGER</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-primary-fixed shadow-[0_0_8px_#63f7ff]" id="osc-ping-led"></span>
+<span class="font-label-sm text-label-sm text-primary-fixed font-bold" id="osc-packet-rate">120 PKT/S</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-space-xs bg-surface-container-low/90 p-space-xs rounded mb-space-sm font-label-sm text-label-sm">
+<div class="flex flex-col p-space-xs bg-surface-container-lowest/80 rounded">
+<span class="text-outline text-[8px]">RX INBOUND (CLIENT)</span>
+<span class="text-primary-fixed font-bold">PORT 8000 (UDP)</span>
+<span class="text-[8px] text-outline">IP: 127.0.0.1</span>
+</div>
+<div class="flex flex-col p-space-xs bg-surface-container-lowest/80 rounded">
+<span class="text-outline text-[8px]">TX BROADCAST (GLSL)</span>
+<span class="text-secondary font-bold">PORT 9000 (UDP)</span>
+<span class="text-[8px] text-outline">MULTICAST 239.255.0.1</span>
+</div>
+</div>
+<!-- REALTIME OSC PACKET FEED TERMINAL -->
+<div class="space-y-space-xs">
+<div class="flex items-center justify-between font-label-sm text-label-sm text-outline px-1">
+<span>LIVE INCOMING PACKET LOG</span>
+<span class="text-primary-fixed" id="osc-jitter-val">JITTER: &lt;0.4ms</span>
+</div>
+<div class="h-44 bg-surface-container-lowest rounded p-space-xs font-label-sm text-label-sm font-mono space-y-1 overflow-y-auto" id="osc-terminal">
+<div class="flex items-center justify-between text-primary-fixed">
+<span class="truncate">/motor/beat [float]</span>
+<span class="font-bold val-dynamic">1.0000</span>
+</div>
+<div class="flex items-center justify-between text-on-surface">
+<span class="truncate">/stem/kick/rms [float]</span>
+<span class="val-dynamic">0.9142</span>
+</div>
+<div class="flex items-center justify-between text-tertiary-fixed-dim">
+<span class="truncate">/stem/bass/freq [float]</span>
+<span class="val-dynamic">55.000</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant">
+<span class="truncate">/eq/band/32/amp [float]</span>
+<span class="val-dynamic">0.7285</span>
+</div>
+<div class="flex items-center justify-between text-secondary">
+<span class="truncate">/transient/burst [int]</span>
+<span class="font-bold val-dynamic">1</span>
+</div>
+<div class="flex items-center justify-between text-on-surface">
+<span class="truncate">/stem/vocal/f1 [float]</span>
+<span class="val-dynamic">680.40</span>
+</div>
+<div class="flex items-center justify-between text-primary-fixed">
+<span class="truncate">/motor/clock/phase [float]</span>
+<span class="val-dynamic">0.2500</span>
+</div>
+</div>
+</div>
+</div>
+<!-- MIDI STATUS MINI FOOTER -->
+<div class="pt-space-sm mt-space-sm bg-surface-container-low/70 p-space-xs rounded flex items-center justify-between font-label-sm text-label-sm">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-tertiary-fixed-dim">cable</span>
+<span class="text-on-surface font-semibold">MIDI CLOCK: MASTER</span>
+</div>
+<span class="text-primary-fixed font-bold font-mono" id="midi-clock-readout">128.00 BPM</span>
+<button class="px-2 py-0.5 rounded bg-primary-container text-on-primary-container font-semibold text-[8px] active:scale-95 transition-transform" id="btn-cc-learn">
+          CC LEARN
+        </button>
+</div>
+</div>
+<!-- RIGHT: INTERACTIVE CROSS-POINT MATRIX PATCHBAY ROUTER (8 COLS) -->
+<div class="xl:col-span-8 bg-surface-container-lowest/90 backdrop-blur-xl rounded p-space-md relative overflow-hidden shadow-[0_4px_28px_rgba(0,0,0,0.7)] flex flex-col justify-between">
+<div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-secondary via-primary-container to-transparent"></div>
+<div>
+<div class="flex flex-wrap items-center justify-between pb-space-sm mb-space-sm gap-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary-container text-[18px]">hub</span>
+<span class="font-headline-sm text-headline-sm tracking-wide text-primary">DSP MATRIX PATCHBAY (SOURCES → SINKS)</span>
+</div>
+<div class="flex items-center gap-space-sm font-label-sm text-label-sm">
+<span class="flex items-center gap-1 text-primary-fixed"><span class="w-2 h-2 rounded-full bg-primary-fixed"></span>AUDIO SOURCE</span>
+<span class="flex items-center gap-1 text-secondary"><span class="w-2 h-2 rounded-full bg-secondary"></span>MOD ROUTE</span>
+</div>
+</div>
+<!-- MATRIX ROUTING GRID -->
+<div class="overflow-x-auto">
+<table class="w-full text-left font-label-sm text-label-sm border-separate border-spacing-1" id="dsp-matrix-table">
+<thead>
+<tr class="text-outline text-[9px] uppercase">
+<th class="py-1 px-2">SOURCE SIGNAL</th>
+<th class="py-1 text-center text-primary-fixed">u_displacement</th>
+<th class="py-1 text-center text-primary-fixed">u_chroma_aberr</th>
+<th class="py-1 text-center text-primary-fixed">u_raymarch_step</th>
+<th class="py-1 text-center text-secondary">MIDI CC #20</th>
+<th class="py-1 text-center text-secondary">MIDI CC #21</th>
+<th class="py-1 text-center text-tertiary-fixed-dim">DMX CH 1-4</th>
+<th class="py-1 text-center text-primary-fixed">OSC /mod/1</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-transparent">
+<!-- ROW 1: Kick Transient -->
+<tr class="bg-surface-container-low/50 hover:bg-surface-container-low transition-colors">
+<td class="py-1.5 px-2 font-bold text-on-surface flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+<span>STEM: Kick Pulse</span>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-[0_0_10px_#00f5ff] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-secondary-container text-on-secondary flex items-center justify-center shadow-[0_0_10px_#ff4a8d] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-tertiary-fixed-dim text-on-tertiary flex items-center justify-center shadow-[0_0_8px_#ffb952] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+</tr>
+<!-- ROW 2: Sub-Bass RMS -->
+<tr class="bg-surface-container-low/50 hover:bg-surface-container-low transition-colors">
+<td class="py-1.5 px-2 font-bold text-on-surface flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-fixed"></span>
+<span>FFT: Sub 20-60Hz</span>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-[0_0_10px_#00f5ff] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-secondary-container text-on-secondary flex items-center justify-center shadow-[0_0_10px_#ff4a8d] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-[0_0_10px_#00f5ff] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</button>
+</td>
+</tr>
+<!-- ROW 3: Vocal / Mid Formants -->
+<tr class="bg-surface-container-low/50 hover:bg-surface-container-low transition-colors">
+<td class="py-1.5 px-2 font-bold text-on-surface flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>STEM: Vocal Formant</span>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-secondary-container text-on-secondary flex items-center justify-center shadow-[0_0_10px_#ff4a8d] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-[0_0_10px_#00f5ff] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</button>
+</td>
+</tr>
+<!-- ROW 4: Spectral Centroid Flux -->
+<tr class="bg-surface-container-low/50 hover:bg-surface-container-low transition-colors">
+<td class="py-1.5 px-2 font-bold text-on-surface flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+<span>ANALYSIS: Centroid</span>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-secondary-container text-on-secondary flex items-center justify-center shadow-[0_0_10px_#ff4a8d] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-tertiary-fixed-dim text-on-tertiary flex items-center justify-center shadow-[0_0_8px_#ffb952] active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[12px] font-bold">check</span>
+</button>
+</td>
+<td class="text-center">
+<button class="matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform"></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- MATRIX CONFIG CONTROLS -->
+<div class="pt-space-sm mt-space-sm flex flex-wrap items-center justify-between gap-space-sm bg-surface-container-low/60 p-space-xs rounded">
+<div class="flex items-center gap-space-sm font-label-sm text-label-sm">
+<span class="text-outline">ACTIVE PATCH CORDS: <span class="text-primary-fixed font-bold" id="matrix-active-count">9 CONNECTED</span></span>
+<span class="text-outline">|</span>
+<span class="text-outline">REMAP CURVE: <span class="text-tertiary-fixed-dim font-bold">LOGARITHMIC S-CURVE</span></span>
+</div>
+<div class="flex items-center gap-space-xs">
+<button class="px-space-sm py-1 rounded bg-surface-container-high text-on-surface hover:text-primary-fixed transition-colors font-label-sm text-label-sm active:scale-95" id="btn-clear-matrix">
+            CLEAR MATRIX
+          </button>
+<button class="px-space-sm py-1 rounded bg-primary-container text-on-primary-container font-semibold shadow-[0_0_8px_rgba(0,245,255,0.3)] font-label-sm text-label-sm active:scale-95 transition-transform" id="btn-save-preset">
+            SAVE PRESET: "STAGE_RAVE_4K"
+          </button>
+</div>
+</div>
+</div>
+</section>
+</div></main></div>
+<!-- REALTIME SIMULATION & INTERACTIVE AUDIO ENGINE SCRIPT -->
+<script>
+(function() {
+  // Preset Profiles Dictionary
+  const PRESET_PROFILES = {
+    'stage-rave': {
+      name: 'STAGE RAVE (ACTIVE)',
+      bpm: 128.0,
+      dominantPitch: '52.4 Hz (A#0)',
+      pitchPeak: '-2.1 dBFS Peak',
+      centroid: 1482,
+      zcr: 312,
+      harmonic: '0.76 H/N',
+      kickWeight: 1.0,
+      bassWobble: 0.8,
+      hatSpeed: 1.0,
+      vocalWeight: 0.9,
+      subBoost: 1.0,
+      activeColor: 'primary',
+      presetPresetName: 'STAGE_RAVE_4K',
+      hatPattern: '16TH-NOTE FLUX',
+      bassPitch: 'PITCH: F#1'
+    },
+    'ambient-sphere': {
+      name: 'AMBIENT SPHERE (ACTIVE)',
+      bpm: 74.0,
+      dominantPitch: '38.9 Hz (D#0)',
+      pitchPeak: '-5.8 dBFS Peak',
+      centroid: 820,
+      zcr: 118,
+      harmonic: '0.94 H/N',
+      kickWeight: 0.22,
+      bassWobble: 0.45,
+      hatSpeed: 0.35,
+      vocalWeight: 1.4,
+      subBoost: 0.65,
+      activeColor: 'secondary',
+      presetPresetName: 'ETH_DRONE_74',
+      hatPattern: 'SWEEP TEXTURE',
+      bassPitch: 'PITCH: C1'
+    },
+    'drum-bass': {
+      name: 'DRUM & BASS 174 (ACTIVE)',
+      bpm: 174.0,
+      dominantPitch: '43.65 Hz (F0)',
+      pitchPeak: '-0.9 dBFS Peak',
+      centroid: 2150,
+      zcr: 540,
+      harmonic: '0.62 H/N',
+      kickWeight: 1.25,
+      bassWobble: 1.4,
+      hatSpeed: 1.6,
+      vocalWeight: 0.6,
+      subBoost: 1.35,
+      activeColor: 'tertiary',
+      presetPresetName: 'AMEN_REESE_174',
+      hatPattern: 'AMEN 32ND FLUX',
+      bassPitch: 'PITCH: REESE G0'
+    },
+    'peak-techno': {
+      name: 'PEAK TECHNO 135 (ACTIVE)',
+      bpm: 135.0,
+      dominantPitch: '48.9 Hz (G0)',
+      pitchPeak: '-0.4 dBFS Peak',
+      centroid: 1240,
+      zcr: 420,
+      harmonic: '0.58 H/N',
+      kickWeight: 1.45,
+      bassWobble: 0.65,
+      hatSpeed: 1.15,
+      vocalWeight: 0.4,
+      subBoost: 1.5,
+      activeColor: 'primary',
+      presetPresetName: 'BERLIN_RUMBLE_135',
+      hatPattern: 'RUMBLE OFFBEAT',
+      bassPitch: 'PITCH: RUMBLE G0'
+    }
+  };
+
+  let currentPresetKey = 'stage-rave';
+  let currentProfile = PRESET_PROFILES[currentPresetKey];
+
+  // Global Animation State
+  let isPlaying = true;
+  let animFrameId = null;
+  let time = 0;
+  let transientBurstEnergy = 0;
+
+  // UI Elements
+  const headerBpm = document.getElementById('header-bpm');
+  const midiClock = document.getElementById('midi-clock-readout');
+  const btnPlay = document.getElementById('btn-transport-play');
+  const btnFreeze = document.getElementById('btn-transport-freeze');
+  const btnStop = document.getElementById('btn-transport-stop');
+  const btnTrigger = document.getElementById('btn-transient-trigger');
+  const triggerPip = document.getElementById('trigger-pip');
+  const liveBadge = document.getElementById('status-live-badge');
+  const activePresetTitle = document.getElementById('active-preset-title');
+  const btnSavePreset = document.getElementById('btn-save-preset');
+  const stemPatternHat = document.getElementById('stem-pattern-hat');
+  const stemBpmHat = document.getElementById('stem-bpm-hat');
+  const stemPitchBass = document.getElementById('stem-pitch-bass');
+
+  // Master Meter DOM
+  const ladderL = document.getElementById('meter-ladder-l');
+  const ladderR = document.getElementById('meter-ladder-r');
+  const meterValL = document.getElementById('meter-val-l');
+  const meterValR = document.getElementById('meter-val-r');
+  const TOTAL_LEDS = 48;
+
+  // Build Master LED Segments
+  function buildLedSegments(container) {
+    container.innerHTML = '';
+    for (let i = 0; i < TOTAL_LEDS; i++) {
+      const seg = document.createElement('div');
+      seg.className = 'h-full rounded-[0.5px] transition-colors duration-75';
+      if (i < 32) {
+        seg.dataset.activeClass = 'bg-primary-container';
+      } else if (i < 42) {
+        seg.dataset.activeClass = 'bg-tertiary-fixed-dim';
+      } else {
+        seg.dataset.activeClass = 'bg-secondary-container';
+      }
+      seg.dataset.inactiveClass = 'bg-surface-container-high opacity-30';
+      seg.className = `h-full rounded-[0.5px] ${seg.dataset.inactiveClass}`;
+      container.appendChild(seg);
+    }
+  }
+  buildLedSegments(ladderL);
+  buildLedSegments(ladderR);
+
+  // 64 FFT Bands Setup
+  const fftContainer = document.getElementById('fft-bars-container');
+  const NUM_BANDS = 64;
+  const bandElements = [];
+  const bandHeights = new Float32Array(NUM_BANDS);
+  const bandPeakHold = new Float32Array(NUM_BANDS);
+  const bandVelocities = new Float32Array(NUM_BANDS);
+
+  // Center frequencies for 64 log bands (20Hz - 20kHz)
+  const bandFrequencies = [];
+  const minFreq = 20;
+  const maxFreq = 20000;
+  for (let i = 0; i < NUM_BANDS; i++) {
+    const f = minFreq * Math.pow(maxFreq / minFreq, i / (NUM_BANDS - 1));
+    bandFrequencies.push(Math.round(f));
+  }
+
+  // Musical note conversion for tooltip
+  function freqToNote(f) {
+    const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const semitones = 12 * (Math.log2(f / 440));
+    const midi = Math.round(69 + semitones);
+    const note = notes[(midi % 12 + 12) % 12];
+    const octave = Math.floor(midi / 12) - 1;
+    return `${note}${octave}`;
+  }
+
+  // Create 64 DOM bars
+  fftContainer.innerHTML = '';
+  for (let i = 0; i < NUM_BANDS; i++) {
+    const col = document.createElement('div');
+    col.className = 'flex-1 h-full flex flex-col justify-end relative group/bar';
+    col.dataset.bandIndex = i;
+
+    let gradientClass = 'bg-primary-container';
+    if (i < 8) {
+      gradientClass = 'bg-gradient-to-t from-primary-container via-primary-fixed to-secondary-container';
+    } else if (i < 16) {
+      gradientClass = 'bg-gradient-to-t from-primary-container via-primary-fixed to-tertiary-fixed-dim';
+    } else if (i >= 26 && i <= 36) {
+      gradientClass = 'bg-gradient-to-t from-primary-container via-primary-fixed to-secondary-container';
+    } else if (i >= 38 && i <= 44) {
+      gradientClass = 'bg-gradient-to-t from-primary-container via-primary-fixed to-tertiary-fixed-dim';
+    } else if (i > 56) {
+      gradientClass = 'bg-gradient-to-t from-primary-container via-primary-fixed to-secondary-container';
+    }
+
+    const bar = document.createElement('div');
+    bar.className = `w-full rounded-xs transition-[height] duration-[32ms] ease-out ${gradientClass}`;
+    bar.style.height = '30%';
+
+    const peak = document.createElement('span');
+    peak.className = 'absolute inset-x-0 h-0.5 bg-primary-fixed shadow-[0_0_6px_#63f7ff] pointer-events-none transition-all duration-75';
+    peak.style.bottom = '32%';
+
+    col.appendChild(bar);
+    col.appendChild(peak);
+    fftContainer.appendChild(col);
+
+    bandElements.push({ col, bar, peak });
+  }
+
+  // Tooltip & Hover interaction on spectrogram
+  const tooltip = document.getElementById('fft-tooltip');
+  const tooltipContent = document.getElementById('fft-tooltip-content');
+  const crosshair = document.getElementById('fft-crosshair');
+  const spectrumViewport = document.getElementById('spectrum-viewport');
+
+  spectrumViewport.addEventListener('mousemove', (e) => {
+    const rect = spectrumViewport.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (x < 0 || x > rect.width) return;
+
+    crosshair.style.display = 'block';
+    crosshair.style.left = `${x}px`;
+
+    const ratio = Math.max(0, Math.min(1, x / rect.width));
+    const bandIdx = Math.min(NUM_BANDS - 1, Math.floor(ratio * NUM_BANDS));
+    const freq = bandFrequencies[bandIdx];
+    const currentHeight = bandHeights[bandIdx];
+    const dbVal = (-48 + (currentHeight / 100) * 48).toFixed(1);
+    const note = freqToNote(freq);
+
+    tooltip.style.display = 'block';
+    tooltip.style.left = `${Math.min(rect.width - 60, Math.max(60, x))}px`;
+    tooltip.style.top = `${Math.max(24, y - 10)}px`;
+
+    tooltipContent.innerHTML = `
+      <span class="font-bold text-primary">${freq >= 1000 ? (freq/1000).toFixed(1) + ' kHz' : freq + ' Hz'}</span>
+      <span class="text-outline">|</span>
+      <span class="text-tertiary-fixed-dim">${dbVal} dBFS</span>
+      <span class="text-outline">|</span>
+      <span class="text-secondary font-semibold">${note}</span>
+    `;
+  });
+
+  spectrumViewport.addEventListener('mouseleave', () => {
+    crosshair.style.display = 'none';
+    tooltip.style.display = 'none';
+  });
+
+  // Transient trigger impulse
+  function fireTransientBurst() {
+    transientBurstEnergy = 1.0;
+    triggerPip.classList.remove('animate-ping');
+    void triggerPip.offsetWidth;
+    triggerPip.classList.add('animate-ping');
+    triggerPip.classList.add('scale-150');
+    setTimeout(() => triggerPip.classList.remove('scale-150'), 180);
+    addOscLog('/transient/burst [int]', '1', 'text-secondary font-bold');
+  }
+
+  btnTrigger.addEventListener('click', fireTransientBurst);
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && e.target === document.body) {
+      e.preventDefault();
+      fireTransientBurst();
+    }
+  });
+
+  // Transport button events
+  btnPlay.addEventListener('click', () => {
+    isPlaying = true;
+    btnPlay.className = 'flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-primary-container text-on-primary-container rounded font-label-sm text-label-sm shadow-[0_0_8px_rgba(0,245,255,0.4)]';
+    btnFreeze.className = 'flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-surface-container-low rounded hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-sm text-label-sm text-tertiary-fixed-dim';
+    liveBadge.textContent = 'REALTIME 120 FPS';
+    liveBadge.className = 'font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface-container-high text-primary-fixed';
+  });
+
+  btnFreeze.addEventListener('click', () => {
+    isPlaying = false;
+    btnFreeze.className = 'flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-tertiary-fixed-dim text-on-tertiary rounded font-label-sm text-label-sm shadow-[0_0_8px_#ffb952] font-semibold';
+    btnPlay.className = 'flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-surface-container-low rounded hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-sm text-label-sm text-primary-fixed';
+    liveBadge.textContent = 'FROZEN [HOLD]';
+    liveBadge.className = 'font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-tertiary-fixed-dim/20 text-tertiary-fixed-dim font-bold';
+  });
+
+  btnStop.addEventListener('click', () => {
+    isPlaying = false;
+    btnPlay.className = 'flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-surface-container-low rounded hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-sm text-label-sm text-on-surface-variant';
+    btnFreeze.className = 'flex items-center justify-center gap-space-xs py-space-sm px-space-xs bg-surface-container-low rounded hover:bg-surface-container-high hover:text-on-surface transition-colors font-label-sm text-label-sm text-tertiary-fixed-dim';
+    bandHeights.fill(5);
+    bandPeakHold.fill(6);
+    updateMasterMeters(0.01, 0.01);
+  });
+
+  // Preset Selection Handling
+  const presetButtons = document.querySelectorAll('.preset-btn');
+  const hudDominantPitch = document.getElementById('hud-dominant-pitch');
+  const hudPitchPeak = document.getElementById('hud-pitch-peak');
+  const hudCentroid = document.getElementById('hud-centroid');
+  const hudFlux = document.getElementById('hud-flux');
+  const hudZcr = document.getElementById('hud-zcr');
+  const hudHarmonic = document.getElementById('hud-harmonic');
+
+  function applyPreset(key) {
+    const prof = PRESET_PROFILES[key];
+    if (!prof) return;
+    currentPresetKey = key;
+    currentProfile = prof;
+
+    // Update Presets Button Styles
+    presetButtons.forEach(btn => {
+      const pKey = btn.dataset.preset;
+      if (pKey === key) {
+        if (prof.activeColor === 'primary') {
+          btn.className = 'preset-btn px-space-md py-1.5 rounded flex items-center justify-between gap-space-sm transition-all duration-200 border border-primary-container bg-primary-container/20 text-primary-fixed shadow-[0_0_12px_rgba(0,245,255,0.35)]';
+        } else if (prof.activeColor === 'secondary') {
+          btn.className = 'preset-btn px-space-md py-1.5 rounded flex items-center justify-between gap-space-sm transition-all duration-200 border border-secondary-container bg-secondary-container/20 text-secondary shadow-[0_0_12px_rgba(255,74,141,0.35)]';
+        } else if (prof.activeColor === 'tertiary') {
+          btn.className = 'preset-btn px-space-md py-1.5 rounded flex items-center justify-between gap-space-sm transition-all duration-200 border border-tertiary-fixed-dim bg-tertiary-fixed-dim/20 text-tertiary-fixed-dim shadow-[0_0_12px_rgba(255,185,82,0.35)]';
+        }
+      } else {
+        btn.className = 'preset-btn px-space-md py-1.5 rounded flex items-center justify-between gap-space-sm transition-all duration-200 border border-transparent bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface';
+      }
+    });
+
+    // Update UI Readouts
+    headerBpm.textContent = `${prof.bpm.toFixed(2)} BPM`;
+    midiClock.textContent = `${prof.bpm.toFixed(2)} BPM`;
+    stemBpmHat.textContent = `${prof.bpm.toFixed(1)} BPM`;
+    stemPatternHat.textContent = prof.hatPattern;
+    stemPitchBass.textContent = prof.bassPitch;
+    activePresetTitle.textContent = prof.name;
+    hudDominantPitch.textContent = prof.dominantPitch;
+    hudPitchPeak.textContent = prof.pitchPeak;
+    hudCentroid.textContent = `${prof.centroid.toLocaleString()} Hz`;
+    hudZcr.textContent = `${prof.zcr} / sec`;
+    hudHarmonic.textContent = prof.harmonic;
+    btnSavePreset.textContent = `SAVE PRESET: "${prof.presetPresetName}"`;
+
+    // Log to OSC Terminal
+    addOscLog(`/preset/load [str]`, prof.presetPresetName, 'text-primary-fixed font-bold');
+  }
+
+  presetButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      applyPreset(btn.dataset.preset);
+    });
+  });
+
+  // Windowing button toggles
+  const winBtns = document.querySelectorAll('.win-btn');
+  winBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      winBtns.forEach(b => {
+        b.className = 'win-btn px-2 py-0.5 font-label-sm text-label-sm rounded text-on-surface-variant hover:text-on-surface transition-all';
+      });
+      btn.className = 'win-btn px-2 py-0.5 font-label-sm text-label-sm rounded bg-primary-container text-on-primary-container font-semibold transition-all shadow-[0_0_8px_rgba(0,245,255,0.3)]';
+    });
+  });
+
+  // Ingest Bus buttons
+  const ingestBtns = document.querySelectorAll('.ingest-btn');
+  ingestBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      ingestBtns.forEach(b => {
+        b.className = 'ingest-btn py-1 px-space-xs rounded font-label-sm text-label-sm uppercase bg-surface-container-high/60 text-on-surface-variant hover:text-on-surface transition-colors';
+      });
+      btn.className = 'ingest-btn py-1 px-space-xs rounded font-label-sm text-label-sm uppercase bg-primary-container text-on-primary-container font-semibold shadow-[0_0_8px_rgba(0,245,255,0.3)]';
+    });
+  });
+
+  // Matrix Interactive Pin toggle
+  const matrixTable = document.getElementById('dsp-matrix-table');
+  const matrixCountSpan = document.getElementById('matrix-active-count');
+  const btnClearMatrix = document.getElementById('btn-clear-matrix');
+
+  function updateMatrixCount() {
+    const active = matrixTable.querySelectorAll('.matrix-pin span').length;
+    matrixCountSpan.textContent = `${active} CONNECTED`;
+  }
+
+  matrixTable.addEventListener('click', (e) => {
+    const pin = e.target.closest('.matrix-pin');
+    if (!pin) return;
+    const hasCheck = pin.querySelector('span');
+    if (hasCheck) {
+      pin.innerHTML = '';
+      pin.className = 'matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform';
+    } else {
+      const colIdx = pin.closest('td').cellIndex;
+      if (colIdx >= 4 && colIdx <= 5) {
+        pin.className = 'matrix-pin w-5 h-5 mx-auto rounded-full bg-secondary-container text-on-secondary flex items-center justify-center shadow-[0_0_10px_#ff4a8d] active:scale-90 transition-transform';
+      } else if (colIdx === 6) {
+        pin.className = 'matrix-pin w-5 h-5 mx-auto rounded-full bg-tertiary-fixed-dim text-on-tertiary flex items-center justify-center shadow-[0_0_8px_#ffb952] active:scale-90 transition-transform';
+      } else {
+        pin.className = 'matrix-pin w-5 h-5 mx-auto rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-[0_0_10px_#00f5ff] active:scale-90 transition-transform';
+      }
+      pin.innerHTML = '<span class="material-symbols-outlined text-[12px] font-bold">check</span>';
+    }
+    updateMatrixCount();
+  });
+
+  btnClearMatrix.addEventListener('click', () => {
+    matrixTable.querySelectorAll('.matrix-pin').forEach(pin => {
+      pin.innerHTML = '';
+      pin.className = 'matrix-pin w-5 h-5 mx-auto rounded-full bg-surface-container-highest hover:bg-surface-bright flex items-center justify-center text-outline active:scale-90 transition-transform';
+    });
+    updateMatrixCount();
+  });
+
+  // Stems Oscilloscope Canvases
+  const canvasKick = document.getElementById('stem-canvas-kick');
+  const canvasBass = document.getElementById('stem-canvas-bass');
+  const canvasVocal = document.getElementById('stem-canvas-vocal');
+  const canvasHat = document.getElementById('stem-canvas-hat');
+
+  const ctxKick = canvasKick.getContext('2d');
+  const ctxBass = canvasBass.getContext('2d');
+  const ctxVocal = canvasVocal.getContext('2d');
+  const ctxHat = canvasHat.getContext('2d');
+
+  // OSC Feed Terminal
+  const oscTerminal = document.getElementById('osc-terminal');
+  const oscRateEl = document.getElementById('osc-packet-rate');
+  const oscPingLed = document.getElementById('osc-ping-led');
+
+  function addOscLog(path, val, styleClass = 'text-on-surface') {
+    const row = document.createElement('div');
+    row.className = `flex items-center justify-between ${styleClass} transition-opacity duration-300`;
+    row.innerHTML = `<span class="truncate">${path}</span><span class="font-mono">${val}</span>`;
+    oscTerminal.insertBefore(row, oscTerminal.firstChild);
+    if (oscTerminal.children.length > 8) {
+      oscTerminal.removeChild(oscTerminal.lastChild);
+    }
+  }
+
+  // OSC Stream ticker simulation
+  let oscTickTimer = 0;
+  function updateOscStream(dt, beatInterval) {
+    oscTickTimer += dt;
+    if (oscTickTimer > 0.22) {
+      oscTickTimer = 0;
+      const rate = 120 + Math.floor(Math.random() * 9);
+      oscRateEl.textContent = `${rate} PKT/S`;
+      oscPingLed.classList.toggle('opacity-50');
+
+      const items = [
+        { p: '/motor/beat [float]', v: (1.0).toFixed(4), c: 'text-primary-fixed font-bold' },
+        { p: '/stem/kick/rms [float]', v: (0.8 * currentProfile.kickWeight + Math.random() * 0.15).toFixed(4), c: 'text-on-surface' },
+        { p: '/stem/bass/freq [float]', v: (54 + Math.random() * 2).toFixed(3), c: 'text-tertiary-fixed-dim' },
+        { p: '/eq/band/32/amp [float]', v: (0.65 + Math.random() * 0.25).toFixed(4), c: 'text-on-surface-variant' },
+        { p: '/stem/vocal/f1 [float]', v: (670 + Math.random() * 30).toFixed(2), c: 'text-on-surface' },
+        { p: '/motor/clock/phase [float]', v: ((time % beatInterval) / beatInterval).toFixed(4), c: 'text-primary-fixed' }
+      ];
+      const pick = items[Math.floor(Math.random() * items.length)];
+      addOscLog(pick.p, pick.v, pick.c);
+    }
+  }
+
+  // Master Meter update
+  function updateMasterMeters(levelL, levelR) {
+    const activeCountL = Math.min(TOTAL_LEDS, Math.floor(levelL * TOTAL_LEDS));
+    const activeCountR = Math.min(TOTAL_LEDS, Math.floor(levelR * TOTAL_LEDS));
+
+    Array.from(ladderL.children).forEach((seg, i) => {
+      if (i < activeCountL) {
+        seg.className = `h-full rounded-[0.5px] ${seg.dataset.activeClass}`;
+      } else {
+        seg.className = `h-full rounded-[0.5px] ${seg.dataset.inactiveClass}`;
+      }
+    });
+
+    Array.from(ladderR.children).forEach((seg, i) => {
+      if (i < activeCountR) {
+        seg.className = `h-full rounded-[0.5px] ${seg.dataset.activeClass}`;
+      } else {
+        seg.className = `h-full rounded-[0.5px] ${seg.dataset.inactiveClass}`;
+      }
+    });
+
+    const dbL = (-36 + levelL * 36 - 4.2).toFixed(1);
+    const dbR = (-36 + levelR * 36 - 4.9).toFixed(1);
+    meterValL.textContent = `${dbL}dB`;
+    meterValR.textContent = `${dbR}dB`;
+  }
+
+  // Draw Stems Waveforms adapted to current preset
+  function drawStemWaveforms(kickEnergy, bassEnergy, vocalEnergy, hatEnergy) {
+    // 1. Kick
+    ctxKick.clearRect(0, 0, 320, 32);
+    ctxKick.strokeStyle = '#00f5ff';
+    ctxKick.lineWidth = 1.8;
+    ctxKick.beginPath();
+    const isAmbient = currentPresetKey === 'ambient-sphere';
+    for (let x = 0; x < 320; x++) {
+      const norm = x / 320;
+      let y = 16;
+      if (isAmbient) {
+        y = 16 - Math.sin(norm * 4 * Math.PI) * (4 * kickEnergy);
+      } else if (norm < 0.45) {
+        const decay = Math.exp(-norm * 12);
+        const freq = 45 * Math.PI * norm;
+        y = 16 - Math.sin(freq) * (14 * kickEnergy * decay);
+      }
+      if (x === 0) ctxKick.moveTo(x, y);
+      else ctxKick.lineTo(x, y);
+    }
+    ctxKick.stroke();
+
+    // 2. Bass (DnB Reese vs Techno Rumble vs Ambient Drone vs EDM)
+    ctxBass.clearRect(0, 0, 320, 32);
+    ctxBass.strokeStyle = '#ffb952';
+    ctxBass.lineWidth = 1.8;
+    ctxBass.beginPath();
+    const isDnB = currentPresetKey === 'drum-bass';
+    for (let x = 0; x < 320; x++) {
+      const norm = x / 320;
+      let y = 16;
+      if (isDnB) {
+        // Jagged reese detune spikes
+        const phase1 = norm * 14 * Math.PI - time * 24;
+        const phase2 = norm * 15 * Math.PI - time * 22;
+        y = 16 - (Math.sin(phase1) + Math.cos(phase2) * 0.8) * (7 * bassEnergy);
+      } else if (isAmbient) {
+        // Gentle expansive swell
+        const phase = norm * 3 * Math.PI - time * 2;
+        y = 16 - Math.sin(phase) * (11 * bassEnergy);
+      } else {
+        const phase = norm * 8 * Math.PI - time * 14;
+        const harmonic = Math.sin(phase * 2) * 0.35;
+        y = 16 - (Math.sin(phase) + harmonic) * (11 * bassEnergy);
+      }
+      if (x === 0) ctxBass.moveTo(x, y);
+      else ctxBass.lineTo(x, y);
+    }
+    ctxBass.stroke();
+
+    // 3. Vocals: Fluid vocal formant wave
+    ctxVocal.clearRect(0, 0, 320, 32);
+    ctxVocal.strokeStyle = '#ffb1c4';
+    ctxVocal.lineWidth = 1.8;
+    ctxVocal.beginPath();
+    for (let x = 0; x < 320; x++) {
+      const p1 = (x / 320) * 14 * Math.PI - time * 9;
+      const p2 = (x / 320) * 5 * Math.PI + time * 4;
+      const envelope = Math.sin((x / 320) * Math.PI);
+      const y = 16 - (Math.sin(p1) * 0.7 + Math.cos(p2) * 0.5) * (12 * vocalEnergy * envelope);
+      if (x === 0) ctxVocal.moveTo(x, y);
+      else ctxVocal.lineTo(x, y);
+    }
+    ctxVocal.stroke();
+
+    // 4. Hi-Hats: Rapid transient bursts & noise spikes
+    ctxHat.clearRect(0, 0, 320, 32);
+    ctxHat.strokeStyle = '#63f7ff';
+    ctxHat.lineWidth = 1.4;
+    ctxHat.beginPath();
+    const speedFactor = currentProfile.hatSpeed;
+    for (let x = 0; x < 320; x++) {
+      const noise = (Math.random() - 0.5) * 2;
+      const pattern = (Math.sin(x * 0.4 + time * 30 * speedFactor) > 0.5) ? 1 : 0.15;
+      const y = 16 - noise * (12 * hatEnergy * pattern);
+      if (x === 0) ctxHat.moveTo(x, y);
+      else ctxHat.lineTo(x, y);
+    }
+    ctxHat.stroke();
+  }
+
+  // Telemetry HUD elements
+  const headerBar = document.getElementById('header-bar');
+  const headerFrame = document.getElementById('header-frame-time');
+  const headerGpu = document.getElementById('header-gpu');
+
+  // Stems telemetry
+  const stemRmsKick = document.getElementById('stem-rms-kick');
+  const stemVelKick = document.getElementById('stem-vel-kick');
+  const stemRmsBass = document.getElementById('stem-rms-bass');
+  const stemRmsVocal = document.getElementById('stem-rms-vocal');
+  const stemRmsHat = document.getElementById('stem-rms-hat');
+  const stemLedKick = document.getElementById('stem-led-kick');
+  const stemLedBass = document.getElementById('stem-led-bass');
+  const stemLedVocal = document.getElementById('stem-led-vocal');
+  const stemLedHat = document.getElementById('stem-led-hat');
+
+  // Main Audio Loop
+  let lastTimestamp = performance.now();
+
+  function audioLoop(currentTimestamp) {
+    const dt = Math.min(0.1, (currentTimestamp - lastTimestamp) / 1000);
+    lastTimestamp = currentTimestamp;
+
+    if (isPlaying) {
+      time += dt;
+
+      const currentBpm = currentProfile.bpm;
+      const beatInterval = 60 / currentBpm;
+
+      // Rhythm calculations based on preset BPM
+      const beatPhase = (time % beatInterval) / beatInterval;
+      const barNum = Math.floor(time / (beatInterval * 4));
+      const currentSubBeat = Math.floor(beatPhase * 4) + 1;
+      headerBar.textContent = `${(barNum % 64) + 1}.${currentSubBeat}`;
+
+      // Preset specific kick profile
+      let kickHit = 0;
+      if (currentPresetKey === 'ambient-sphere') {
+        kickHit = 0.2 + 0.1 * Math.sin(time * 1.5);
+      } else {
+        const kickSharpness = currentPresetKey === 'peak-techno' ? 2.5 : 3.2;
+        const kickEnvelope = Math.pow(Math.max(0, 1 - beatPhase * kickSharpness), 2.2);
+        kickHit = Math.max(kickEnvelope * currentProfile.kickWeight, transientBurstEnergy);
+      }
+
+      // Bassline rhythm
+      const bassPhase = (time % (beatInterval / 2)) / (beatInterval / 2);
+      const wobbleRate = currentPresetKey === 'drum-bass' ? 24.0 : 16.5;
+      const bassEnergy = (0.5 + 0.45 * Math.sin(time * wobbleRate) * (1 - bassPhase * 0.7)) * currentProfile.bassWobble;
+
+      // Vocal presence
+      const vocalEnergy = (0.4 + 0.38 * Math.sin(time * 2.3) + 0.15 * Math.cos(time * 5.1)) * currentProfile.vocalWeight;
+
+      // Hi-hats
+      const hatPhase = (time % (beatInterval / (4 * currentProfile.hatSpeed))) / (beatInterval / (4 * currentProfile.hatSpeed));
+      const hatHit = Math.pow(Math.max(0, 1 - hatPhase * 4.5), 1.8);
+      const hatEnergy = (0.2 + 0.7 * hatHit) * Math.min(1.2, currentProfile.hatSpeed);
+
+      // Decay transient burst
+      if (transientBurstEnergy > 0) {
+        transientBurstEnergy = Math.max(0, transientBurstEnergy - dt * 3.5);
+      }
+
+      // Calculate 64 FFT bands based on active preset profile
+      let totalEnergy = 0;
+      let weightedSum = 0;
+
+      for (let i = 0; i < NUM_BANDS; i++) {
+        let bandVal = 0;
+        const norm = i / (NUM_BANDS - 1);
+
+        if (currentPresetKey === 'ambient-sphere') {
+          // Lush, wide, mid/high drone without aggressive kick
+          const drone1 = Math.sin(time * 2 + norm * 8) * 18;
+          const drone2 = Math.cos(time * 3.5 + norm * 12) * 14;
+          bandVal = 28 + drone1 + drone2 + (norm > 0.3 && norm < 0.7 ? 35 : 10);
+        } else if (currentPresetKey === 'drum-bass') {
+          // Sub bass canyon + prominent sharp 16th hats
+          if (i < 10) {
+            bandVal = 65 + 30 * currentProfile.subBoost * Math.sin(time * 12 + i);
+          } else if (i < 24) {
+            bandVal = 25 + Math.sin(time * 20 + i) * 15;
+          } else if (i < 48) {
+            bandVal = 35 + hatEnergy * 25;
+          } else {
+            bandVal = 40 + hatEnergy * 45 + Math.random() * 8;
+          }
+        } else if (currentPresetKey === 'peak-techno') {
+          // Heavy, rolling rumble sub + dark high end
+          if (i < 14) {
+            bandVal = 70 + 26 * kickHit * currentProfile.subBoost;
+          } else if (i < 30) {
+            bandVal = 38 + bassEnergy * 25;
+          } else if (i < 48) {
+            bandVal = 24 + kickHit * 12;
+          } else {
+            bandVal = 14 + hatEnergy * 20;
+          }
+        } else {
+          // Stage Rave balanced EDM
+          if (i < 8) {
+            const subBase = 60 + 35 * kickHit;
+            const subWobble = Math.sin(time * 30 + i) * 6;
+            bandVal = subBase + subWobble + (transientBurstEnergy * 30);
+          } else if (i < 16) {
+            bandVal = 40 + bassEnergy * 45 + kickHit * 25;
+          } else if (i < 25) {
+            bandVal = 32 + Math.sin(time * 8 + i * 0.5) * 12 + bassEnergy * 15;
+          } else if (i < 37) {
+            bandVal = 30 + vocalEnergy * 55 + Math.sin(time * 14 + i * 0.8) * 8;
+          } else if (i < 49) {
+            bandVal = 28 + (kickHit * 15) + (vocalEnergy * 25) + Math.sin(time * 20 + i) * 7;
+          } else if (i < 57) {
+            bandVal = 20 + hatEnergy * 45 + (Math.random() - 0.5) * 6;
+          } else {
+            bandVal = 10 + hatEnergy * 30 * (1 - (i - 57) / 7) + Math.random() * 8;
+          }
+        }
+
+        if (transientBurstEnergy > 0) {
+          bandVal += transientBurstEnergy * (65 - norm * 35);
+        }
+
+        bandVal = Math.max(5, Math.min(98, bandVal));
+
+        // Smooth attack & gravity decay
+        const prevH = bandHeights[i];
+        if (bandVal > prevH) {
+          bandHeights[i] = prevH + (bandVal - prevH) * 0.75;
+        } else {
+          bandHeights[i] = prevH - (prevH - bandVal) * 0.22;
+        }
+
+        // Peak Hold logic
+        if (bandHeights[i] >= bandPeakHold[i]) {
+          bandPeakHold[i] = bandHeights[i];
+          bandVelocities[i] = 0;
+        } else {
+          bandVelocities[i] += 0.45;
+          bandPeakHold[i] = Math.max(bandHeights[i], bandPeakHold[i] - bandVelocities[i]);
+        }
+
+        const h = bandHeights[i];
+        const peakH = bandPeakHold[i];
+        bandElements[i].bar.style.height = `${h.toFixed(1)}%`;
+        bandElements[i].peak.style.bottom = `${peakH.toFixed(1)}%`;
+
+        totalEnergy += h;
+        weightedSum += h * bandFrequencies[i];
+      }
+
+      // Draw Stems Waveforms
+      drawStemWaveforms(kickHit, bassEnergy, vocalEnergy, hatEnergy);
+
+      // Stems RMS / Velocity text updates
+      stemRmsKick.textContent = `${(-2.5 - (1 - kickHit) * 12).toFixed(1)} dB`;
+      stemVelKick.textContent = Math.round(95 + kickHit * 32);
+      stemRmsBass.textContent = `${(-5.0 - (1 - bassEnergy) * 8).toFixed(1)} dB`;
+      stemRmsVocal.textContent = `${(-8.0 - (1 - vocalEnergy) * 10).toFixed(1)} dB`;
+      stemRmsHat.textContent = `${(-9.5 - (1 - hatEnergy) * 12).toFixed(1)} dB`;
+
+      // Led pulse scale
+      stemLedKick.style.transform = `scale(${1 + kickHit * 0.45})`;
+      stemLedBass.style.transform = `scale(${1 + bassEnergy * 0.3})`;
+      stemLedVocal.style.transform = `scale(${1 + vocalEnergy * 0.3})`;
+      stemLedHat.style.transform = `scale(${1 + hatEnergy * 0.4})`;
+
+      // Master output levels
+      const masterL = Math.min(1.0, 0.44 + kickHit * 0.28 + vocalEnergy * 0.14);
+      const masterR = Math.min(1.0, 0.42 + kickHit * 0.25 + bassEnergy * 0.16);
+      updateMasterMeters(masterL, masterR);
+
+      // HUD Telemetry dynamic updates
+      const centroid = Math.round(weightedSum / Math.max(1, totalEnergy));
+      hudCentroid.textContent = `${centroid.toLocaleString()} Hz`;
+      hudFlux.textContent = `${(0.68 + (kickHit * 0.35)).toFixed(3)} Δ/dt`;
+
+      // Telemetry small jitter updates
+      updateOscStream(dt, beatInterval);
+
+      // Frame time jitter
+      if (Math.random() < 0.05) {
+        headerFrame.textContent = `FRAME: ${(8.2 + Math.random() * 0.3).toFixed(1)}ms`;
+        headerGpu.textContent = `GPU: ${Math.floor(36 + Math.random() * 5)}%`;
+      }
+    }
+
+    animFrameId = requestAnimationFrame(audioLoop);
+  }
+
+  // Start Animation Loop
+  animFrameId = requestAnimationFrame(audioLoop);
+
+  // Peak hold button toggle
+  const btnPeakHold = document.getElementById('btn-peak-hold-toggle');
+  let peakHoldMode = true;
+  btnPeakHold.addEventListener('click', () => {
+    peakHoldMode = !peakHoldMode;
+    btnPeakHold.textContent = peakHoldMode ? 'PEAK HOLD: 1.5s' : 'PEAK HOLD: OFF';
+    btnPeakHold.className = peakHoldMode
+      ? 'px-2 py-0.5 rounded bg-surface-container-high text-on-surface hover:text-primary-fixed transition-colors'
+      : 'px-2 py-0.5 rounded bg-surface-container text-outline hover:text-on-surface transition-colors';
+  });
+
+  // Retrain button click effect
+  const btnRetrain = document.getElementById('btn-retrain');
+  btnRetrain.addEventListener('click', () => {
+    btnRetrain.textContent = 'CALIBRATING...';
+    btnRetrain.classList.add('text-secondary-fixed-dim');
+    setTimeout(() => {
+      btnRetrain.textContent = 'SENSITIVITY LOCKED';
+      setTimeout(() => {
+        btnRetrain.textContent = 'RE-TRAIN SENSITIVITY';
+        btnRetrain.classList.remove('text-secondary-fixed-dim');
+      }, 1200);
+    }, 800);
+  });
+
+  // Save preset interaction
+  btnSavePreset.addEventListener('click', () => {
+    const orig = btnSavePreset.textContent;
+    btnSavePreset.textContent = 'PRESET SAVED TO EEPROM';
+    btnSavePreset.classList.add('bg-tertiary-fixed-dim', 'text-on-tertiary');
+    setTimeout(() => {
+      btnSavePreset.textContent = orig;
+      btnSavePreset.classList.remove('bg-tertiary-fixed-dim', 'text-on-tertiary');
+    }, 1500);
+  });
+})();
+</script>
+</body></html>

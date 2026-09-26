@@ -7,3 +7,11 @@ Thumbs.db
 # Entornos y editores
 .vscode/
 .idea/
+
+# Claves de API y configuraciones locales
+config.js
+.env*
+*.env*
+settings.env
+
+
