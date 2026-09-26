@@ -2880,6 +2880,23 @@
                 }
                 updateBadge('Cargando YouTube...', 'bg-rose-900 text-rose-300 border-rose-500');
 
+                // 1. Prioridad: Gateway de streaming propio LyAi / Hetzner (/api/yt-stream)
+                const gatewayBase = window.STREAM_GATEWAY_URL || '';
+                const streamUrl = `${gatewayBase}/api/yt-stream?url=${encodeURIComponent(url)}`;
+                try {
+                    // Verificamos conexión con el stream gateway
+                    const gwProbe = await fetch(`${gatewayBase}/health`, { method: 'GET', signal: AbortSignal.timeout(2500) });
+                    if (gwProbe.ok) {
+                        playPresetTrack(streamUrl, `YouTube (${videoId})`);
+                        if (typeof showToast === 'function') {
+                            showToast("YouTube Conectado", `Stream activo vía Gateway LyAi Hetzner`, "success");
+                        }
+                        return;
+                    }
+                } catch(gwErr) {
+                    console.log("Gateway propio local no activo, probando stream directo o fallbacks...", gwErr);
+                }
+
                 // Lista de instancias públicas activas de Invidious / Piped para audio stream
                 const endpoints = [
                     `https://invidious.nerdvpn.de/api/v1/videos/${videoId}`,
