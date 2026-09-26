@@ -2699,11 +2699,12 @@
                 }
                 updateBadge('Cargando YouTube...', 'bg-rose-900 text-rose-300 border-rose-500');
 
-                // Lista de instancias públicas de Invidious / Piped para audio stream
+                // Lista de instancias públicas activas de Invidious / Piped para audio stream
                 const endpoints = [
+                    `https://invidious.nerdvpn.de/api/v1/videos/${videoId}`,
+                    `https://yewtu.be/api/v1/videos/${videoId}`,
                     `https://pipedapi.kavin.rocks/streams/${videoId}`,
-                    `https://api.invidious.io/api/v1/videos/${videoId}`,
-                    `https://invidious.nerdvpn.de/api/v1/videos/${videoId}`
+                    `https://api.invidious.io/api/v1/videos/${videoId}`
                 ];
 
                 let streamFound = false;
