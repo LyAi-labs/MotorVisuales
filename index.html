@@ -5,6 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>MotorVisuales • Motor de Síntesis Audiovisual, DSP Stems & Shaders GLSL</title>
     
+    <!-- PWA / Web App Manifest & Android Mobile Integration -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="MotorVisuales">
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="shortcut icon" href="icons/favicon.ico">
+    
     <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -282,6 +294,11 @@
 
                 <!-- Right Actions: Record, Screenshot, Studio Mode & Fullscreen -->
                 <div class="flex items-center space-x-2">
+                    <!-- PWA Install Action Button (Visible when installable) -->
+                    <button onclick="installPWA()" id="btn-pwa-install" class="hidden px-2.5 py-1.5 bg-gradient-to-r from-cyan-600 via-indigo-600 to-fuchsia-600 hover:from-cyan-500 hover:to-fuchsia-500 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 transition shadow-lg border border-cyan-400/40 animate-pulse" title="Instalar MotorVisuales como App nativa en Android">
+                        <span>📲</span>
+                        <span class="inline">Instalar App</span>
+                    </button>
                     <button onclick="toggleStudioMode()" id="btn-studio-mode" class="px-2.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-cyan-300 border border-cyan-500/30 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition shadow-sm" title="Alternar Modo Studio Cinema (Pantalla Expandida y Docking Colapsable)">
                         <span id="studio-icon">🎬</span>
                         <span class="hidden sm:inline">Studio</span>
@@ -2721,6 +2738,9 @@
                 }
                 currentSourceType = 'file';
                 isAudioRunning = true;
+                if (typeof requestScreenWakeLock === 'function') {
+                    requestScreenWakeLock();
+                }
                 const badgeColor = srcUrl === 'section-63.mp3' ? 'bg-red-600 text-white border-red-400' : 'bg-pink-600 text-white border-pink-400';
                 updateBadge(`Reproduciendo: ${title}`, badgeColor);
                 if (typeof showToast === 'function') {
@@ -3120,6 +3140,9 @@
             }
             isAudioRunning = false;
             currentSourceType = 'none';
+            if (typeof releaseScreenWakeLock === 'function') {
+                releaseScreenWakeLock();
+            }
             const synthBtn = document.getElementById('txt-synth');
             if (synthBtn) synthBtn.innerText = "Demo Synth Beat";
             updateBadge('En espera', 'bg-slate-800 text-slate-400 border-slate-700');
@@ -11071,6 +11094,124 @@ Respond ONLY with valid JSON with:
             } else if (e.key === 'Escape') {
                 closeScreenshotModal();
                 closeStemsExportModal();
+            }
+        });
+
+        // =========================================================================
+        // 13. PWA (PROGRESSIVE WEB APP) SERVICE WORKER, INSTALL PROMPT & WAKE LOCK
+        // =========================================================================
+        let deferredPwaPrompt = null;
+        let screenWakeLock = null;
+
+        // Registro de Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => {
+                        console.log('[PWA] Service Worker registrado correctamente. Ámbito:', reg.scope);
+                    })
+                    .catch((err) => {
+                        console.warn('[PWA] Error al registrar Service Worker:', err);
+                    });
+            });
+        }
+
+        // Captura del prompt de instalación en Android / Chrome
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPwaPrompt = e;
+            const btnInstall = document.getElementById('btn-pwa-install');
+            if (btnInstall) {
+                btnInstall.classList.remove('hidden');
+            }
+            console.log('[PWA] Evento beforeinstallprompt capturado. Listo para instalar.');
+        });
+
+        // Función global para disparar la instalación
+        window.installPWA = async function() {
+            if (!deferredPwaPrompt) {
+                if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                    showToast('MotorVisuales ya está ejecutándose como aplicación instalada.', 'info');
+                } else {
+                    showToast('Para instalar en Android: pulsa ⋮ en Chrome y selecciona "Instalar aplicación" o "Añadir a pantalla de inicio".', 'info');
+                }
+                return;
+            }
+            deferredPwaPrompt.prompt();
+            const { outcome } = await deferredPwaPrompt.userChoice;
+            console.log('[PWA] Resultado de instalación:', outcome);
+            if (outcome === 'accepted') {
+                showToast('🎉 Instalando MotorVisuales en tu dispositivo...', 'success');
+                const btnInstall = document.getElementById('btn-pwa-install');
+                if (btnInstall) btnInstall.classList.add('hidden');
+            }
+            deferredPwaPrompt = null;
+        };
+
+        // Confirmación de instalación completada
+        window.addEventListener('appinstalled', () => {
+            console.log('[PWA] MotorVisuales instalada satisfactoriamente');
+            const btnInstall = document.getElementById('btn-pwa-install');
+            if (btnInstall) btnInstall.classList.add('hidden');
+            showToast('🚀 ¡MotorVisuales instalada con éxito en tu pantalla de inicio!', 'success');
+        });
+
+        // Screen Wake Lock API (Evita que la pantalla del móvil se apague al escuchar o ver visuales)
+        async function requestScreenWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    screenWakeLock = await navigator.wakeLock.request('screen');
+                    screenWakeLock.addEventListener('release', () => {
+                        screenWakeLock = null;
+                    });
+                    console.log('[PWA] Screen Wake Lock activo (pantalla siempre encendida).');
+                } catch (err) {
+                    console.warn('[PWA] WakeLock no disponible:', err);
+                }
+            }
+        }
+
+        function releaseScreenWakeLock() {
+            if (screenWakeLock !== null) {
+                screenWakeLock.release().then(() => {
+                    screenWakeLock = null;
+                    console.log('[PWA] Screen Wake Lock liberado.');
+                }).catch(() => {});
+            }
+        }
+
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible' && audioElement && !audioElement.paused) {
+                await requestScreenWakeLock();
+            }
+        });
+
+        // Enrutamiento y activación según parámetros de URL de la PWA (Shortcuts de inicio)
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sourceParam = urlParams.get('source');
+            const viewParam = urlParams.get('view');
+
+            if (sourceParam === 'youtube') {
+                setTimeout(() => {
+                    selectYouTubeMobileSource();
+                }, 800);
+            }
+
+            if (viewParam) {
+                setTimeout(() => {
+                    if (viewParam === 'shader') {
+                        setThreeSceneMode('custom_shader');
+                    } else if (typeof switchV4View === 'function') {
+                        switchV4View(viewParam);
+                    }
+                }, 500);
+            }
+
+            // Ocultar botón de instalación si ya estamos en modo standalone
+            if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+                const btnInstall = document.getElementById('btn-pwa-install');
+                if (btnInstall) btnInstall.classList.add('hidden');
             }
         });
     </script>

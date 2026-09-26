@@ -132,6 +132,23 @@ async def stream_youtube(request: Request, url: str = Query(..., description="UR
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error en stream proxy: {str(e)}")
 
+# Endpoints optimizados para PWA
+@app.get("/sw.js")
+def get_service_worker():
+    return FileResponse(
+        "sw.js", 
+        media_type="application/javascript", 
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate", "Service-Worker-Allowed": "/"}
+    )
+
+@app.get("/manifest.json")
+def get_manifest():
+    return FileResponse(
+        "manifest.json", 
+        media_type="application/manifest+json",
+        headers={"Cache-Control": "public, max-age=3600"}
+    )
+
 # Servir archivos estáticos del frontend (index.html, three.min.js, audio, etc.)
 if os.path.exists("index.html"):
     app.mount("/", StaticFiles(directory=".", html=True), name="static")

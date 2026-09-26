@@ -13,5 +13,8 @@ config.js
 .env*
 *.env*
 settings.env
+__pycache__/
+*.pyc
+cookies.txt
 
 

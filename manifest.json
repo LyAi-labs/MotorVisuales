@@ -1,0 +1,95 @@
+{
+  "id": "motorvisuales-pro",
+  "name": "MotorVisuales PRO — Estación Audiovisual & DSP",
+  "short_name": "MotorVisuales",
+  "description": "Visualizador de audio reactivo en tiempo real con DSP de 8 stems, shaders WebGL 3D, simulación FBO compute de 65k partículas y suite de atractores caóticos.",
+  "start_url": "./index.html?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "theme_color": "#0a0a0f",
+  "background_color": "#050508",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": [
+    "music",
+    "entertainment",
+    "utilities",
+    "multimedia"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Section 63 (YouTube Móvil)",
+      "short_name": "YouTube",
+      "description": "Reproducir audio HQ con balance estéreo L / R",
+      "url": "./index.html?source=youtube",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Estudio de Shaders 3D",
+      "short_name": "Shaders",
+      "description": "Explorar los 19 presets GLSL y FBO Compute",
+      "url": "./index.html?view=shader",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Chaos Lab & Atractores",
+      "short_name": "Chaos Lab",
+      "description": "Simulación matemática de Lorenz, Rössler y Chen",
+      "url": "./index.html?view=chaos",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
