@@ -113,6 +113,13 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - Botón de acción instantánea en `▶ YouTube Móvil`: reproduce de inmediato el tema de YouTube a través de Web Audio API, alimentando el analizador DSP de 8 stems a 60 FPS y enviando audio estéreo a `stereoSplitterNode -> gainLeftNode / gainRightNode -> stereoMergerNode -> outputMasterGain -> destination`.
   - Los faders Master, L (izquierdo) y R (derecho) modulan con precisión el volumen de cada auricular, resolviendo el problema de aislamiento de Android.
   - Botón de configuración (`⚙️`) con modal asistente de 4 métodos e información clara sobre el sandboxing del sistema operativo móvil.
+- ✅ **Progressive Web App (PWA) de Alto Rendimiento para Android (D-021):**
+  - **Web App Manifest (`manifest.json`):** Configurado con `display: standalone`, `display_override: ["window-controls-overlay", "standalone", "minimal-ui"]`, `theme_color: #0a0a0f`, `background_color: #050508`, accesos directos (*shortcuts*) a YouTube Móvil, Shaders 3D y Chaos Lab.
+  - **Iconografía Cyberpunk Multiresolución (`icons/`):** Generados iconos PNG estándar y *maskable* (con padding de zona segura para Android 8+) a 192x192 y 512x512 px, además de `favicon.ico` y vector `icon.svg`.
+  - **Service Worker (`sw.js`):** Precaché del App Shell (`index.html`, `three.min.js`, iconos, manifiesto) con estrategia *Stale-While-Revalidate* y bypass absoluto de red para peticiones de streaming (`/api/yt-stream`, `Range: bytes=...`, archivos `.mp3`/`.wav`) garantizando que Web Audio API y el reproductor multimedia operen sin cortes ni corrupción de búfer.
+  - **Prompt de Instalación Nativo:** Captura del evento `beforeinstallprompt` con botón táctico `[📲 Instalar App]` visible en la cabecera cuando el navegador móvil lo permite.
+  - **Screen Wake Lock API:** Mantiene la pantalla del teléfono Android encendida automáticamente mientras suena la música o se proyectan los visuales 3D, liberando el bloqueo al pausar.
+  - **Despliegue Sincronizado en Hetzner (`motorvisuales.site`):** Servido bajo Traefik con SSL Let's Encrypt y volumen montado en el contenedor para actualizaciones en caliente sin rebuild.
 
 ## Próximas Ideas / Pendientes
 - [ ] Visualizador de fase goniométrica y correlación estéreo Lissajous (X/Y phase scope)

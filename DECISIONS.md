@@ -458,6 +458,34 @@
   2. ✅ Modulación física estéreo en tiempo real por cada canal de auricular (L / R).
   3. ✅ Experiencia de usuario inmediata sin fricción ni bloqueos por permisos del sistema operativo.
 
+---
+
+### D-021 — Progressive Web App (PWA) para Android con Web App Manifest, Service Worker y Screen Wake Lock API
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:** 
+  1. El usuario solicitó preparar la aplicación como una PWA nativa para Android, permitiendo instalar MotorVisuales directamente desde Chrome sin pasar por la Google Play Store.
+  2. Una PWA de síntesis audiovisual y audio en vivo requiere: (a) Manifiesto completo con iconos de alta resolución y soporte *maskable* para launchers Android 8+, (b) Un Service Worker que precachee el shell de la aplicación sin interferir en los streams de audio por rangos HTTP (206) ni en los análisis Web Audio API, (c) Prevención de apagado de pantalla mientras el usuario observa las visuales 3D o escucha música (Screen Wake Lock API), y (d) Botón táctico de instalación en UI capturando `beforeinstallprompt`.
+- **Decisión:**
+  1. **Web App Manifest (`manifest.json`):**
+     - Metadatos: `name: "MotorVisuales PRO — Estación Audiovisual & DSP"`, `short_name: "MotorVisuales"`, `theme_color: "#0a0a0f"`, `background_color: "#050508"`, `display: "standalone"`.
+     - Accesos directos integrados (*Shortcuts*): "Section 63 (YouTube)", "Shaders WebGL 3D" y "Chaos Lab & Atractores".
+  2. **Suite de Iconos Multiresolución (`icons/`):**
+     - Generados automáticamente con Pillow en Python: `icon-192.png`, `icon-512.png`, `icon-maskable-192.png`, `icon-maskable-512.png`, `icon.svg` y `favicon.ico`. Los iconos *maskable* aplican un área segura del 72% con fondo envolvente para garantizar adaptabilidad a iconos redondos, cuadrados y squircle en Android.
+  3. **Service Worker Especializado (`sw.js`):**
+     - Estrategia *Stale-While-Revalidate* para el core (`index.html`, `three.min.js`, scripts, CSS e iconos).
+     - **Regla Crítica de Streaming:** Bypass absoluto e incondicional de cualquier petición dirigida a `/api/`, peticiones con cabecera `Range` o archivos `.mp3`/`.wav`, previniendo distorsión en buffers o bloqueos en la reproducción.
+     - Activación inmediata con `skipWaiting()` y `clients.claim()`.
+  4. **Screen Wake Lock API:**
+     - Solicitud de `navigator.wakeLock.request('screen')` vinculada al inicio de cualquier pista o entrada de audio para mantener encendida la pantalla AMOLED de los móviles Android durante la experiencia visual. Liberación automática en `stopAudio()`.
+  5. **Despliegue y Validación:**
+     - Soporte nativo HTTPS en producción (`https://motorvisuales.site`) bajo Traefik con Let's Encrypt, requisito obligatorio de Google Chrome para activar la instalación PWA en Android.
+- **Consecuencias:**
+  - ✅ Instalación en un toque desde Chrome Android como app de pantalla completa independiente.
+  - ✅ Experiencia de app nativa sin barras de navegación del navegador, a 60 FPS estables.
+  - ✅ Carga instantánea del shell incluso con conexiones intermitentes.
+
+
 
 
 
