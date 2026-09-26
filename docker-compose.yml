@@ -5,6 +5,8 @@ services:
     build: .
     container_name: motorvisuales
     restart: unless-stopped
+    volumes:
+      - ./cookies.txt:/app/cookies.txt:ro
     networks:
       - traefik_traefik
     labels:

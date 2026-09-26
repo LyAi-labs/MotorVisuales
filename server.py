@@ -44,6 +44,8 @@ def get_youtube_info(url: str = Query(..., description="URL o ID de YouTube")):
         'extract_flat': False,
         'skip_download': True
     }
+    if os.path.exists("cookies.txt") and os.path.getsize("cookies.txt") > 10:
+        ydl_opts['cookiefile'] = "cookies.txt"
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(target, download=False)
@@ -69,6 +71,8 @@ async def stream_youtube(request: Request, url: str = Query(..., description="UR
         'no_warnings': True,
         'skip_download': True
     }
+    if os.path.exists("cookies.txt") and os.path.getsize("cookies.txt") > 10:
+        ydl_opts['cookiefile'] = "cookies.txt"
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(target, download=False)
