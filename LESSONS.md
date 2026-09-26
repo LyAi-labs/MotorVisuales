@@ -180,6 +180,25 @@
   3. Para efectos de iridiscencia nacarada física sobre ferrofluidos, calcular analíticamente la interferencia óptica de ondas multiespectral ($\lambda = 650, 532, 440\,\text{nm}$) en vez de mapear gradientes de color estáticos, obteniendo variación angular natural dependiente del punto de vista.
 - **Trigger:** Al desarrollar shaders matemáticos avanzados, raymarching analítico o simulaciones de óptica ondulatoria en GLSL.
 
+---
+
+### L-016
+- **Tags:** #mobile #touch #pinch-to-zoom #responsive #webaudio #android
+- **Síntoma:** En navegadores móviles (Chrome Android / Safari iOS), el usuario no puede hacer zoom en la app, la navegación superior ocupa ~200px empujando el canvas 3D y controles fuera de pantalla, la escena 3D no responde a gestos táctiles ni pellizco, y el audio puede quedar silenciado.
+- **Causa raíz:**
+  1. Meta viewport sin `user-scalable=yes` ni rango permitido de escala.
+  2. `threeCanvas` solo escuchaba eventos de ratón (`mousedown`, `mousemove`, `wheel`), sin listeners `touchstart`/`touchmove` para rotación 3D ni cálculo de distancia euclidiana para pinch-to-zoom.
+  3. La barra de navegación V4.2 envolvía múltiples filas verticales en anchos pequeños (<640px).
+  4. Ausencia de desbloqueo proactivo de `AudioContext` en gestos táctiles en navegadores móviles.
+- **Solución:**
+  1. Configurar `<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">` y restringir `touch-action: none` únicamente a los canvas interactivos (`#threeCanvas`, `#vectorXySurface`, `#merCanvas`).
+  2. Implementar soporte táctil dual en `threeCanvas`: 1 dedo para rotación orbital/manual y actualización de `uMouse` para GLSL; 2 dedos con cálculo de `Math.hypot(dx, dy)` para pinch-to-zoom suave sobre `cameraOrbitRadius` / `camera.position.z`.
+  3. Incorporar botones flotantes de zoom en pantalla (`+`, `−`, `↺`) accesibles para cualquier tamaño de pantalla.
+  4. Transformar el cockpit bar en un strip horizontal deslizante con etiquetas responsivas compactas.
+  5. Registrar listeners pasivos de desbloqueo de `AudioContext` en `touchstart`/`click` y validar compatibilidad de `getDisplayMedia` en `startTabCapture`.
+- **Trigger:** Al optimizar interfaces 3D WebGL / Web Audio para dispositivos táctiles móviles.
+
+
 
 
 

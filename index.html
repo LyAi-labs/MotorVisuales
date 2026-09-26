@@ -2,7 +2,7 @@
 <html lang="es" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>MotorVisuales • Motor de Síntesis Audiovisual, DSP Stems & Shaders GLSL</title>
     
     <!-- Google Fonts: Inter & JetBrains Mono -->
@@ -199,9 +199,27 @@
                 linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
             background-size: 20px 20px;
         }
+        /* Mobile horizontal scroll styling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Canvas touch action isolation */
+        #threeCanvas {
+            touch-action: none;
+        }
+        #vectorXySurface {
+            touch-action: none;
+        }
+        #merCanvas {
+            touch-action: none;
+        }
     </style>
 </head>
-<body class="text-zinc-200 font-sans antialiased min-h-screen flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200 transition-colors duration-300">
+<body class="text-zinc-200 font-sans antialiased min-h-screen flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200 transition-colors duration-300 overflow-x-hidden w-full">
 
     <!-- Header / Navigation & Global Recorder Controls -->
     <header class="glass-panel sticky top-0 z-50 border-b border-white/[0.08] shadow-2xl transition-all duration-300">
@@ -286,31 +304,31 @@
     </header>
 
     <!-- v4.2-PRO ROUTE MATRIX NAVIGATION -->
-    <div class="glass-panel border-b border-white/[0.08] bg-[#090c15]/95 sticky top-14 z-40 px-4 py-2 transition-all">
-        <div class="max-w-[1720px] mx-auto flex flex-wrap items-center justify-between gap-3">
-            <div class="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider">
-                <span class="text-zinc-500 font-bold mr-1 text-[10px] hidden sm:inline">V4.2 COCKPIT:</span>
-                <button onclick="switchV4View('live-runner')" id="nav-btn-live-runner" class="v4-tab-btn px-3 py-1.5 rounded-lg v4-tab-active flex items-center gap-1.5 transition">
-                    <span>🚀</span><span>LIVE RUNNER</span>
+    <div class="glass-panel border-b border-white/[0.08] bg-[#090c15]/95 sticky top-14 z-40 px-3 py-1.5 transition-all">
+        <div class="max-w-[1720px] mx-auto flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+            <div class="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider flex-nowrap shrink-0">
+                <span class="text-zinc-500 font-bold mr-1 text-[10px] hidden md:inline">V4.2 COCKPIT:</span>
+                <button onclick="switchV4View('live-runner')" id="nav-btn-live-runner" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg v4-tab-active flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                    <span>🚀</span><span>LIVE<span class="hidden sm:inline"> RUNNER</span></span>
                 </button>
-                <button onclick="switchV4View('audio-dsp')" id="nav-btn-audio-dsp" class="v4-tab-btn px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition">
-                    <span>🎛️</span><span>AUDIO DSP (64-BAND)</span>
+                <button onclick="switchV4View('audio-dsp')" id="nav-btn-audio-dsp" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                    <span>🎛️</span><span>DSP<span class="hidden sm:inline"> (64-BAND)</span></span>
                 </button>
-                <button onclick="switchV4View('rf-sdr')" id="nav-btn-rf-sdr" class="v4-tab-btn px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition">
+                <button onclick="switchV4View('rf-sdr')" id="nav-btn-rf-sdr" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
                     <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                    <span>RF / SDR MATRIX</span>
+                    <span>RF / SDR<span class="hidden sm:inline"> MATRIX</span></span>
                 </button>
-                <button onclick="switchV4View('chaos-lab')" id="nav-btn-chaos-lab" class="v4-tab-btn px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition">
+                <button onclick="switchV4View('chaos-lab')" id="nav-btn-chaos-lab" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
                     <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
-                    <span>CHAOS LAB (LORENZ / XY PAD)</span>
+                    <span>CHAOS<span class="hidden sm:inline"> LAB</span></span>
                 </button>
-                <button onclick="switchV4View('system-config')" id="nav-btn-system-config" class="v4-tab-btn px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition">
-                    <span>⚙️</span><span>CONFIG &amp; MCP</span>
+                <button onclick="switchV4View('system-config')" id="nav-btn-system-config" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                    <span>⚙️</span><span>CONFIG<span class="hidden sm:inline"> &amp; MCP</span></span>
                 </button>
             </div>
             
-            <!-- Live Register Bus Mini Telemetry Strip -->
-            <div class="flex items-center gap-3 font-mono text-[10px] text-zinc-400 bg-black/60 px-3 py-1 rounded-lg border border-white/5">
+            <!-- Live Register Bus Mini Telemetry Strip (Desktop / Tablet) -->
+            <div class="hidden lg:flex items-center gap-3 font-mono text-[10px] text-zinc-400 bg-black/60 px-3 py-1 rounded-lg border border-white/5 shrink-0 whitespace-nowrap">
                 <span class="text-cyan-400 font-bold flex items-center gap-1">
                     <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
                     q1: <span id="mini-q1">0.00</span>
@@ -323,6 +341,12 @@
                 <span class="text-emerald-400 font-bold">BURST: <span id="mini-burst-state">NOMINAL</span></span>
                 <span>|</span>
                 <span class="text-zinc-300 font-bold">XY: <span id="mini-xy-coords">[0.50, 0.50]</span></span>
+            </div>
+
+            <!-- Mobile Compact Telemetry Indicator -->
+            <div class="flex lg:hidden items-center gap-2 font-mono text-[9px] text-zinc-400 bg-black/70 px-2 py-1 rounded-lg border border-white/5 shrink-0 whitespace-nowrap">
+                <span class="text-cyan-400 font-bold">q1:<span id="mini-q1-m">0.00</span></span>
+                <span id="mini-burst-state-m" class="text-emerald-400 font-bold text-[8px] px-1 py-0.2 rounded bg-emerald-950/80">OK</span>
             </div>
         </div>
     </div>
@@ -562,7 +586,7 @@
                     </div>
 
                     <!-- THREE.JS CANVAS CONTAINER -->
-                    <div id="three-canvas-container" class="relative w-full h-[460px] sm:h-[520px] lg:h-[580px] bg-black rounded-xl overflow-hidden border border-white/[0.08] shadow-inner flex items-center justify-center transition-all duration-300">
+                    <div id="three-canvas-container" class="relative w-full h-[360px] sm:h-[480px] lg:h-[580px] bg-black rounded-xl overflow-hidden border border-white/[0.08] shadow-inner flex items-center justify-center transition-all duration-300">
                         <canvas id="threeCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
                         
                         <!-- Floating Glass HUD Overlay -->
@@ -570,6 +594,13 @@
                             <div>MODO: <span id="hud-camera-mode" class="text-cyan-400 font-semibold">Manual (Arrastrar / Zoom)</span></div>
                             <div>DISTANCIA: <span id="hud-camera-zoom" class="text-amber-400">400</span></div>
                             <div id="hud-stem-status" class="text-zinc-500">Stems activos: Sub, Bass, Treble</div>
+                        </div>
+
+                        <!-- On-Screen Touch Zoom & Camera Controls for Mobile & Desktop -->
+                        <div class="absolute bottom-3 right-3 flex items-center gap-1.5 z-20 select-none">
+                            <button onclick="zoomScene(-60)" class="w-8 h-8 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 hover:border-cyan-400 text-cyan-300 font-bold text-base flex items-center justify-center active:scale-90 shadow-xl transition" title="Acercar (Zoom In)">+</button>
+                            <button onclick="zoomScene(60)" class="w-8 h-8 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 hover:border-cyan-400 text-cyan-300 font-bold text-base flex items-center justify-center active:scale-90 shadow-xl transition" title="Alejar (Zoom Out)">−</button>
+                            <button onclick="resetCameraZoom()" class="h-8 px-2 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 hover:border-cyan-400 text-zinc-300 hover:text-white font-mono text-[9px] font-bold flex items-center justify-center active:scale-90 shadow-xl transition" title="Reset Cámara & Zoom">↺</button>
                         </div>
 
                         <!-- Floating Autonomous Genesis Concept Card -->
@@ -2426,6 +2457,10 @@
         }
 
         async function startTabCapture() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                alert("La captura de pestaña con audio solo está disponible en Chrome para Escritorio (PC/Mac/Linux).\n\nEn tu dispositivo móvil, usa el botón 'Micrófono', 'Archivo' de audio o la demo 'Synth Beat'.");
+                return;
+            }
             try {
                 stopAudio();
                 initAudioContext();
@@ -2436,7 +2471,7 @@
                 
                 const audioTracks = micStream.getAudioTracks();
                 if (audioTracks.length === 0) {
-                    alert("No se detectó audio. Por favor, asegúrate de activar la casilla 'Compartir audio de la pestaña' al seleccionar la pestaña de YouTube.");
+                    alert("No se detectó audio. Por favor, asegúrate de activar la casilla 'Compartir audio de la pestaña' al seleccionar la pestaña.");
                     micStream.getTracks().forEach(t => t.stop());
                     return;
                 }
@@ -3199,6 +3234,88 @@
                 }
             }, { passive: false });
 
+            // Touch Gestures: 1 dedo = Rotación 3D / Shader Mouse | 2 dedos = Pinch-to-Zoom
+            let isTouchInteracting = false;
+            let touchStartX = 0, touchStartY = 0;
+            let touchStartDist = 0;
+            let touchInitialCamDist = 400;
+
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isTouchInteracting = true;
+                    touchStartX = e.touches[0].clientX;
+                    touchStartY = e.touches[0].clientY;
+                    const rect = canvas.getBoundingClientRect();
+                    const normX = Math.max(0, Math.min(1, (touchStartX - rect.left) / rect.width));
+                    const normY = Math.max(0, Math.min(1, 1.0 - ((touchStartY - rect.top) / rect.height)));
+                    if (customShaderUniforms && customShaderUniforms.uMouse) {
+                        customShaderUniforms.uMouse.value.set(normX, normY);
+                    }
+                } else if (e.touches.length === 2) {
+                    isTouchInteracting = true;
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    touchStartDist = Math.hypot(dx, dy);
+                    touchInitialCamDist = cameraOrbitEnabled ? cameraOrbitRadius : (threeCamera ? threeCamera.position.z : 400);
+                }
+                e.preventDefault();
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (!isTouchInteracting) return;
+                const rect = canvas.getBoundingClientRect();
+
+                if (e.touches.length === 1) {
+                    const curX = e.touches[0].clientX;
+                    const curY = e.touches[0].clientY;
+                    const deltaX = curX - touchStartX;
+                    const deltaY = curY - touchStartY;
+
+                    const normX = Math.max(0, Math.min(1, (curX - rect.left) / rect.width));
+                    const normY = Math.max(0, Math.min(1, 1.0 - ((curY - rect.top) / rect.height)));
+                    if (customShaderUniforms && customShaderUniforms.uMouse) {
+                        customShaderUniforms.uMouse.value.set(normX, normY);
+                    }
+
+                    if (cameraOrbitEnabled) {
+                        cameraManualAzimuth -= deltaX * 0.007;
+                        cameraManualElevation = Math.max(-Math.PI * 0.42, Math.min(Math.PI * 0.42, cameraManualElevation + deltaY * 0.007));
+                    } else {
+                        targetRotY += deltaX * 0.007;
+                        targetRotX += deltaY * 0.007;
+                    }
+
+                    touchStartX = curX;
+                    touchStartY = curY;
+                } else if (e.touches.length === 2) {
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const curDist = Math.hypot(dx, dy);
+                    if (touchStartDist > 0 && curDist > 0) {
+                        const distDiff = touchStartDist - curDist;
+                        const zoomSensitivity = 1.25;
+
+                        if (cameraOrbitEnabled) {
+                            cameraOrbitRadius = Math.max(80, Math.min(1400, touchInitialCamDist + distDiff * zoomSensitivity));
+                            const zoomHud = document.getElementById('hud-camera-zoom');
+                            if (zoomHud) zoomHud.innerText = Math.round(cameraOrbitRadius);
+                        } else if (threeCamera) {
+                            threeCamera.position.z = Math.max(10, Math.min(1500, touchInitialCamDist + distDiff * zoomSensitivity));
+                            const zoomHud = document.getElementById('hud-camera-zoom');
+                            if (zoomHud) zoomHud.innerText = Math.round(threeCamera.position.z);
+                        }
+                    }
+                }
+                e.preventDefault();
+            }, { passive: false });
+
+            const endTouch = () => {
+                isTouchInteracting = false;
+                touchStartDist = 0;
+            };
+            canvas.addEventListener('touchend', endTouch);
+            canvas.addEventListener('touchcancel', endTouch);
+
             window.addEventListener('resize', () => {
                 triggerThreeResize();
             });
@@ -3603,11 +3720,32 @@
             cameraOrbitRadius = 400;
             cameraTargetLookAt.set(0, 0, 0);
             cameraCurrentLookAt.set(0, 0, 0);
-            threeCamera.position.set(0, 0, 400);
-            threeCamera.lookAt(0, 0, 0);
+            if (threeCamera) {
+                threeCamera.position.set(0, 0, 400);
+                threeCamera.lookAt(0, 0, 0);
+            }
             const zoomHud = document.getElementById('hud-camera-zoom');
             if (zoomHud) zoomHud.innerText = '400';
         }
+
+        function zoomScene(delta) {
+            if (cameraOrbitEnabled) {
+                cameraOrbitRadius += delta;
+                cameraOrbitRadius = Math.max(80, Math.min(1400, cameraOrbitRadius));
+                const zoomHud = document.getElementById('hud-camera-zoom');
+                if (zoomHud) zoomHud.innerText = Math.round(cameraOrbitRadius);
+            } else if (threeCamera) {
+                threeCamera.position.z += delta;
+                threeCamera.position.z = Math.max(10, Math.min(1500, threeCamera.position.z));
+                const zoomHud = document.getElementById('hud-camera-zoom');
+                if (zoomHud) zoomHud.innerText = Math.round(threeCamera.position.z);
+            }
+        }
+
+        function resetCameraZoom() {
+            resetThreeCamera();
+        }
+
 
         function toggleFullscreen() {
             const container = document.getElementById('threeCanvas').parentElement;
@@ -4806,16 +4944,42 @@ Write a single concise image prompt (1-2 sentences) for an abstract visualizer. 
         }
 
         function handleMerClick(e) {
-            document.getElementById('mer-auto-track').checked = false;
-            const rect = e.currentTarget.getBoundingClientRect();
-            merX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-            merY = Math.max(0, Math.min(1, 1 - ((e.clientY - rect.top) / rect.height)));
+            const trackChk = document.getElementById('mer-auto-track');
+            if (trackChk) trackChk.checked = false;
+            const padEl = document.getElementById('mer-pad');
+            const targetEl = padEl || (e.currentTarget || e.target);
+            const rect = targetEl.getBoundingClientRect();
+            const clientX = (e.touches && e.touches.length > 0) ? e.touches[0].clientX : (e.clientX !== undefined ? e.clientX : 0);
+            const clientY = (e.touches && e.touches.length > 0) ? e.touches[0].clientY : (e.clientY !== undefined ? e.clientY : 0);
+            merX = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+            merY = Math.max(0, Math.min(1, 1 - ((clientY - rect.top) / rect.height)));
             drawMerPad();
             updateMerInfo();
         }
 
+        // Inicializar listeners táctiles de arrastre para MER Pad
+        function initMerPadTouch() {
+            const padEl = document.getElementById('mer-pad');
+            if (!padEl) return;
+            let isDraggingMer = false;
+            padEl.addEventListener('touchstart', (e) => {
+                isDraggingMer = true;
+                handleMerClick(e);
+                e.preventDefault();
+            }, { passive: false });
+            padEl.addEventListener('touchmove', (e) => {
+                if (isDraggingMer) {
+                    handleMerClick(e);
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            window.addEventListener('touchend', () => { isDraggingMer = false; });
+            window.addEventListener('touchcancel', () => { isDraggingMer = false; });
+        }
+
         function updateMerInfo() {
             const lbl = document.getElementById('mer-emotion-label');
+            if (!lbl) return;
             if (merX >= 0.5 && merY >= 0.5) lbl.innerText = "Energía Elevada / Alegre";
             else if (merX < 0.5 && merY >= 0.5) lbl.innerText = "Tensión / Caótico";
             else if (merX < 0.5 && merY < 0.5) lbl.innerText = "Melancolía / Calma Triste";
@@ -9403,19 +9567,33 @@ Respond ONLY with valid JSON with:
                 window.qVars[8 + idx] = stemsData[c.id]?.value || 0.0;
             });
 
-            // Update mini telemetry header
+            // Update mini telemetry header (Desktop & Mobile)
             const miniQ1 = document.getElementById('mini-q1');
             if (miniQ1) miniQ1.innerText = window.qVars[0].toFixed(2);
+            const miniQ1M = document.getElementById('mini-q1-m');
+            if (miniQ1M) miniQ1M.innerText = window.qVars[0].toFixed(2);
+
             const miniQ2 = document.getElementById('mini-q2');
             if (miniQ2) miniQ2.innerText = window.qVars[1].toFixed(2);
             const miniBurst = document.getElementById('mini-burst-state');
-            if (miniBurst) {
-                if (dE > 2.2) {
+            const miniBurstM = document.getElementById('mini-burst-state-m');
+            if (dE > 2.2) {
+                if (miniBurst) {
                     miniBurst.innerText = 'HIGH IMPACT!';
                     miniBurst.className = 'text-pink-400 font-bold animate-pulse';
-                } else {
+                }
+                if (miniBurstM) {
+                    miniBurstM.innerText = 'BURST!';
+                    miniBurstM.className = 'text-pink-400 font-bold text-[8px] px-1 py-0.2 rounded bg-pink-950/80 animate-pulse';
+                }
+            } else {
+                if (miniBurst) {
                     miniBurst.innerText = 'NOMINAL';
                     miniBurst.className = 'text-emerald-400 font-bold';
+                }
+                if (miniBurstM) {
+                    miniBurstM.innerText = 'OK';
+                    miniBurstM.className = 'text-emerald-400 font-bold text-[8px] px-1 py-0.2 rounded bg-emerald-950/80';
                 }
             }
             const miniXy = document.getElementById('mini-xy-coords');
@@ -9790,11 +9968,22 @@ Respond ONLY with valid JSON with:
             renderThreeFrame(time);
         }
 
+        // Desbloqueo de AudioContext ante gestos táctiles (Mobile Autoplay Policy para Android Chrome / iOS Safari)
+        function unlockAudioOnGesture() {
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+        window.addEventListener('touchstart', unlockAudioOnGesture, { passive: true });
+        window.addEventListener('touchend', unlockAudioOnGesture, { passive: true });
+        window.addEventListener('click', unlockAudioOnGesture, { passive: true });
+
         window.addEventListener('DOMContentLoaded', () => {
             initThreeEngine();
             initShaderEditor();
             initFrequencyChart();
             drawMerPad();
+            initMerPadTouch();
             initVectorXyPad();
             startAiDirectorLoop();
             masterRenderLoop();
