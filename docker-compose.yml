@@ -6,7 +6,8 @@ services:
     container_name: motorvisuales
     restart: unless-stopped
     volumes:
-      - ./cookies.txt:/app/cookies.txt:ro
+      - .:/app
+      - ./cookies.txt:/app/cookies.txt:rw
     networks:
       - traefik_traefik
     labels:
