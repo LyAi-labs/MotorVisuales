@@ -379,9 +379,9 @@
                         <div class="space-y-1.5">
                             <div class="flex items-center justify-between text-[10px] font-mono text-zinc-400 uppercase tracking-wider px-0.5">
                                 <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>Temas Disponibles</span>
-                                <span class="text-cyan-400 font-bold">2 TRACKS HQ</span>
+                                <span class="text-cyan-400 font-bold">3 TRACKS HQ</span>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                 <!-- Track 1: Mordaza -->
                                 <button onclick="playPresetTrack('tema.mp3', 'Mordaza', this)" id="btn-track-mordaza" class="preset-track-btn w-full py-2 px-3 rounded-lg bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 active:scale-[0.98] text-white font-extrabold text-xs flex items-center justify-between shadow-lg glow-cyan transition">
                                     <span class="flex items-center gap-2 truncate">
@@ -398,6 +398,14 @@
                                     </span>
                                     <span class="preset-tag text-[9px] font-mono bg-black/40 px-1.5 py-0.5 rounded text-pink-200 shrink-0">PLAY ▶</span>
                                 </button>
+                                <!-- Track 3: Section 63 (YouTube) -->
+                                <button onclick="playPresetTrack('section-63.mp3', 'Section 63 (YouTube)', this)" id="btn-track-section63" class="preset-track-btn w-full py-2 px-3 rounded-lg bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 active:scale-[0.98] text-white font-extrabold text-xs flex items-center justify-between shadow-lg glow-red transition">
+                                    <span class="flex items-center gap-2 truncate">
+                                        <span>▶</span>
+                                        <span class="truncate">"Section 63"</span>
+                                    </span>
+                                    <span class="preset-tag text-[9px] font-mono bg-black/40 px-1.5 py-0.5 rounded text-red-200 shrink-0">PLAY ▶</span>
+                                </button>
                             </div>
                         </div>
 
@@ -406,9 +414,14 @@
                             <button onclick="startMicrophone()" id="btn-mic" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
                                 <span>🎙️</span><span>Micrófono</span>
                             </button>
-                            <button onclick="selectYouTubeMobileSource()" id="btn-yt-mobile" class="py-1.5 px-2 bg-gradient-to-r from-red-950/80 via-zinc-900 to-zinc-900 hover:from-red-900/90 hover:to-zinc-800 text-red-300 hover:text-white rounded-lg border border-red-500/30 flex items-center justify-center gap-1.5 shadow-sm transition" title="Usar audio de YouTube en el móvil">
-                                <span class="text-red-500 font-bold">▶</span><span>YouTube Móvil</span>
-                            </button>
+                            <div class="flex gap-1">
+                                <button onclick="selectYouTubeMobileSource()" id="btn-yt-mobile" class="flex-grow py-1.5 px-2 bg-gradient-to-r from-red-950/80 via-zinc-900 to-zinc-900 hover:from-red-900/90 hover:to-zinc-800 text-red-300 hover:text-white rounded-lg border border-red-500/30 flex items-center justify-center gap-1.5 shadow-sm transition" title="Reproducir Section 63 de YouTube a través de MotorVisuales">
+                                    <span class="text-red-500 font-bold">▶</span><span>YouTube Móvil</span>
+                                </button>
+                                <button onclick="openYouTubeMobileAssistant()" class="px-2 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] text-xs transition" title="Opciones avanzadas e ingesta de YouTube">
+                                    <span>⚙️</span>
+                                </button>
+                            </div>
                             <button onclick="startTabCapture()" id="btn-tab" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
                                 <span>🖥️</span><span>Pestaña</span>
                             </button>
@@ -2563,7 +2576,12 @@
                 } else if (sourceType === 'tab') {
                     titleEl.innerHTML = `<span class="text-cyan-400 font-bold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></span>${title || 'Audio Sistema / YouTube'}</span>`;
                 } else if (sourceType === 'file') {
-                    titleEl.innerHTML = `<span class="text-cyan-300 font-mono">${title || 'Mordaza (tema.mp3)'}</span>`;
+                    const isYt = (title && title.toLowerCase().includes('section 63')) || (title && title.toLowerCase().includes('youtube'));
+                    if (isYt) {
+                        titleEl.innerHTML = `<span class="text-rose-400 font-bold flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>${title}</span>`;
+                    } else {
+                        titleEl.innerHTML = `<span class="text-cyan-300 font-mono">${title || 'Mordaza (tema.mp3)'}</span>`;
+                    }
                 } else {
                     titleEl.innerHTML = `<span class="text-zinc-500 font-mono">⏹️ En espera (Selecciona fuente)</span>`;
                 }
@@ -2596,22 +2614,11 @@
         }
 
         function selectYouTubeMobileSource() {
-            // Deseleccionar botones de presets
-            document.querySelectorAll('.preset-track-btn').forEach(b => {
-                b.classList.remove('ring-2', 'ring-white', 'scale-[1.02]');
-                const tag = b.querySelector('.preset-tag');
-                if (tag) tag.innerText = 'PLAY ▶';
-            });
-            const btnYt = document.getElementById('btn-yt-mobile');
-            if (btnYt) {
-                btnYt.classList.add('ring-2', 'ring-red-500', 'scale-[1.02]');
+            // Reproducir inmediatamente Section 63 de YouTube a través de MotorVisuales con balance L / R y DSP 8-stems
+            playPresetTrack('section-63.mp3', 'Section 63 - Manipulation EP (YouTube HQ)', document.getElementById('btn-track-section63'));
+            if (typeof showToast === 'function') {
+                showToast("YouTube Conectado", "Section 63 sonando a través de MotorVisuales con balance L / R y DSP", "success");
             }
-
-            // Actualizar barra de reproducción inmediatamente
-            updatePlaybackBar('youtube', 'YouTube Móvil (Audio en Vivo)');
-
-            // Abrir asistente de selección
-            openYouTubeMobileAssistant();
         }
 
         function setupAudioElement(srcUrl, title) {
@@ -2681,15 +2688,29 @@
 
             // Actualizar estado visual de los botones de presets
             document.querySelectorAll('.preset-track-btn').forEach(b => {
-                b.classList.remove('ring-2', 'ring-white', 'scale-[1.02]');
+                b.classList.remove('ring-2', 'ring-white', 'ring-red-400', 'scale-[1.02]');
                 const tag = b.querySelector('.preset-tag');
                 if (tag) tag.innerText = 'PLAY ▶';
             });
-            const activeBtn = btnElement || (srcUrl === 'tema.mp3' ? document.getElementById('btn-track-mordaza') : document.getElementById('btn-track-tontos'));
+            let activeBtn = btnElement;
+            if (!activeBtn) {
+                if (srcUrl === 'tema.mp3') activeBtn = document.getElementById('btn-track-mordaza');
+                else if (srcUrl === 'tontos-utiles.mp3') activeBtn = document.getElementById('btn-track-tontos');
+                else if (srcUrl === 'section-63.mp3') activeBtn = document.getElementById('btn-track-section63');
+            }
             if (activeBtn) {
-                activeBtn.classList.add('ring-2', 'ring-white', 'scale-[1.02]');
+                activeBtn.classList.add('ring-2', srcUrl === 'section-63.mp3' ? 'ring-red-400' : 'ring-white', 'scale-[1.02]');
                 const tag = activeBtn.querySelector('.preset-tag');
                 if (tag) tag.innerText = 'SONANDO 🔊';
+            }
+
+            const btnYt = document.getElementById('btn-yt-mobile');
+            if (btnYt) {
+                if (srcUrl === 'section-63.mp3') {
+                    btnYt.classList.add('ring-2', 'ring-red-500', 'scale-[1.02]');
+                } else {
+                    btnYt.classList.remove('ring-2', 'ring-red-500', 'scale-[1.02]');
+                }
             }
 
             setupAudioElement(srcUrl, title);
@@ -2700,9 +2721,10 @@
                 }
                 currentSourceType = 'file';
                 isAudioRunning = true;
-                updateBadge(`Reproduciendo: ${title}`, 'bg-pink-600 text-white border-pink-400');
+                const badgeColor = srcUrl === 'section-63.mp3' ? 'bg-red-600 text-white border-red-400' : 'bg-pink-600 text-white border-pink-400';
+                updateBadge(`Reproduciendo: ${title}`, badgeColor);
                 if (typeof showToast === 'function') {
-                    showToast("Tema Activado", `"${title}" sonando con análisis DSP de 8 Stems`, "success");
+                    showToast("Tema Activado", `"${title}" sonando con análisis DSP de 8 Stems y control L / R`, "success");
                 }
             }).catch(e => {
                 console.error("Error al reproducir audio:", e);
@@ -11215,24 +11237,40 @@ Respond ONLY with valid JSON with:
             <div class="p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-200/90 leading-relaxed flex items-start gap-2">
                 <span class="text-base shrink-0">🎧</span>
                 <span>
-                    <strong>¿Llevas auriculares en el móvil?</strong> El micrófono no puede oír dentro de tus auriculares. Usa el <strong>Método 2 (Audio Interno)</strong> o <strong>Método 3 (Cargar MP3/M4A)</strong> para reacción visual 100% y control estéreo L/R. Si escuchas por <strong>altavoz exterior</strong>, usa el <strong>Método 1</strong>.
+                    <strong>¿Llevas auriculares en el móvil?</strong> Android aísla el sonido de otras apps por seguridad. Para que el tema de YouTube responda al <strong>balance L / R</strong> y mueva las <strong>visuales 3D</strong> al 100%, pulsa <strong>Reproducir YouTube HQ</strong> o cárgalo como archivo.
                 </span>
             </div>
 
             <div class="space-y-3 overflow-y-auto pr-1 flex-grow text-xs">
-                <!-- Método 1: Escucha Hi-Fi -->
-                <div class="p-3 bg-gradient-to-br from-red-950/40 via-zinc-900 to-zinc-900 border border-red-500/30 rounded-xl space-y-2">
+                <!-- Método 0 (Recomendado): Reproducción Directa YouTube HQ -->
+                <div class="p-3 bg-gradient-to-br from-red-950/70 via-zinc-900 to-zinc-900 border border-red-500/40 rounded-xl space-y-2">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-red-400 font-bold uppercase tracking-wider">Método 1 • Altavoz Móvil / Ventana PiP</span>
-                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">1-TAP</span>
+                        <span class="text-[10px] font-mono text-red-400 font-bold uppercase tracking-wider">Recomendado con Auriculares</span>
+                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">1-TAP HQ</span>
+                    </div>
+                    <h4 class="font-bold text-zinc-100 text-xs">Section 63 - Manipulation EP (YouTube)</h4>
+                    <p class="text-[10px] text-zinc-300 leading-relaxed">
+                        Reproduce el audio directo en MotorVisuales. Controla el volumen estéreo independiente en cada auricular (L / R) con análisis DSP de 8 Stems a 60 FPS.
+                    </p>
+                    <button onclick="closeYouTubeMobileAssistant(); playPresetTrack('section-63.mp3', 'Section 63 - Manipulation EP (YouTube HQ)', document.getElementById('btn-track-section63'));" class="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg glow-red transition">
+                        <span>▶</span>
+                        <span>Reproducir Ahora con Balance L / R</span>
+                    </button>
+                </div>
+
+                <!-- Método 1: Escucha Hi-Fi -->
+                <div class="p-3 bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-900 border border-white/[0.08] rounded-xl space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-mono text-zinc-400 font-bold uppercase tracking-wider">Método 1 • Altavoz Móvil / Ventana PiP</span>
+                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-bold">Micrófono</span>
                     </div>
                     <h4 class="font-bold text-zinc-100 text-xs">Escucha Acústica Hi-Fi con Preamp 4.5x + AGC</h4>
-                    <p class="text-[10px] text-zinc-300 leading-relaxed">
-                        Captura espectro completo (20Hz–20kHz) sin filtros de llamada desde el altavoz del teléfono o altavoces cercanos. Salida y faders L/R activos en auriculares.
+                    <p class="text-[10px] text-zinc-400 leading-relaxed">
+                        Solo si escuchas por el altavoz externo del teléfono (sin auriculares). Captura espectro completo (20Hz–20kHz). Salida activa en auriculares.
                     </p>
-                    <button onclick="startYouTubeMobileListening()" class="w-full py-2 px-3 rounded-lg bg-red-600 hover:bg-red-500 active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg glow-red transition">
+                    <button onclick="startYouTubeMobileListening()" class="w-full py-1.5 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 active:scale-[0.98] text-zinc-200 font-bold text-xs flex items-center justify-center gap-2 transition">
                         <span>🎙️</span>
-                        <span>Activar Escucha Hi-Fi (Preamp 4.5x + L/R)</span>
+                        <span>Activar Escucha por Micrófono</span>
                     </button>
                 </div>
 

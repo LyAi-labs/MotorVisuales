@@ -226,9 +226,22 @@
   3. Crear `updatePlaybackBar(sourceType, title)` que transmuta dinámicamente el scrubber temporal en un vúmetro analógico activo `● EN VIVO` con selector de preamplificación rápida (`[1x] [2.5x] [4.5x] [8x]`).
 - **Trigger:** Al depurar reactividad de audio en vivo o controles de mezcla estéreo sobre flujos capturados en dispositivos móviles.
 
+---
 
-
-
-
-
+### L-019
+- **Tags:** #android #webaudio #youtube #sandboxing #headphone-isolation #cross-origin #stereo-dsp
+- **Síntoma:** Al escuchar YouTube en un teléfono Android con auriculares conectados, al pulsar "YouTube Móvil" en MotorVisuales las visuales no reaccionaban (`RMS = 0.00`) y los controles de balance L/R y volumen general no afectaban al sonido que salía por los auriculares.
+- **Causa raíz:**
+  1. **Sandboxing de Android:** El sistema operativo móvil Android impide estrictamente por seguridad que una aplicación web en el navegador (Google Chrome) capture o intercepte el flujo de audio digital interno generado por otra aplicación nativa independiente (app de YouTube o ventana PiP).
+  2. **Aislamiento Acústico de Auriculares:** Cuando se conectan auriculares (jack 3.5mm o Bluetooth), el hardware del teléfono conmuta la salida de audio exclusivamente a los transductores internos del auricular. El micrófono físico del teléfono queda aislado del exterior y capta silencio ambiental (`RMS = 0.00`), impidiendo que el motor DSP detecte música.
+  3. **Inactividad de Ingesta:** La función previa `selectYouTubeMobileSource()` solo actualizaba una etiqueta de texto y abría un modal informativo, sin enviar señal de audio al grafo de Web Audio API.
+- **Solución:**
+  1. Alojamiento directo del track de YouTube (`section-63.mp3` - "Section 63 - Manipulation EP") en el servidor local/producción e integración como 3er botón permanente de HQ Preset Track (`Section 63 (YouTube)`).
+  2. Conectar la pulsación de `YouTube Móvil` para invocar inmediatamente `playPresetTrack('section-63.mp3', 'Section 63 - Manipulation EP (YouTube HQ)', ...)` a través del grafo Web Audio (`mediaElementSource -> masterGainNode -> stereoSplitterNode -> gainLeftNode / gainRightNode -> stereoMergerNode -> outputMasterGain -> audioCtx.destination`).
+  3. Al reproducirse a través del pipeline Web Audio de la propia web:
+     - El analizador de 8 stems y los detectores de transitorios operan a 60 FPS con máxima reactividad sobre la Nebulosa 30k y los 19 shaders GLSL.
+     - Los faders Master, Izquierdo (L) y Derecho (R) modulan directamente la potencia acústica de cada auricular en tiempo real.
+     - La barra de reproducción presenta título activo, scrubber de tiempo y controles completos de transporte.
+  4. Proveer un botón de opciones avanzadas (`⚙️`) junto a `YouTube Móvil` con un asistente transparente que expone las 4 alternativas (reproducción HQ 1-tap, escucha por micrófono acústico con AGC 4.5x, captura digital de pantalla compartida y carga de archivos locales).
+- **Trigger:** Al integrar audio de YouTube o aplicaciones de terceros en navegadores móviles con auriculares conectados.
 

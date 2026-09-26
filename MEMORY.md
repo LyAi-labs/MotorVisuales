@@ -107,6 +107,12 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - Botón de monitoreo `[🎧 Monitoreo: ACTIVO / MUTE]` para alternar la salida de audio sin desconectar el análisis DSP.
   - Actualización inmediata de la barra de reproducción (`updatePlaybackBar`): al activar YouTube, se muestra el título dinámico `🔴 YouTube Móvil (Audio en Vivo)`, el scrubber de archivo se transmuta en un vúmetro en vivo con indicador de nivel dB y botones de preamplificación rápida (`[1x] [2.5x] [4.5x] [8x]`).
   - Control Automático de Ganancia (AGC) adaptativo y detector de onsets por pico relativo de flujo espectral (`flux > avgSpectralFlux * 1.35`), logrando que las visuales 3D y los 8 stems Biquad reaccionen con máxima contundencia ante cualquier nivel de audio de YouTube.
+- ✅ **Ingesta Directa YouTube HQ, 3 Tracks HQ y Balance Estéreo L/R en Auriculares (D-018 / L-019):**
+  - Incorporación permanente de `section-63.mp3` ("Section 63 - Manipulation EP") descargado en alta calidad.
+  - Ampliación del rack de temas disponibles a `3 TRACKS HQ` ("Mordaza", "Tontos Útiles", "Section 63 (YouTube)").
+  - Botón de acción instantánea en `▶ YouTube Móvil`: reproduce de inmediato el tema de YouTube a través de Web Audio API, alimentando el analizador DSP de 8 stems a 60 FPS y enviando audio estéreo a `stereoSplitterNode -> gainLeftNode / gainRightNode -> stereoMergerNode -> outputMasterGain -> destination`.
+  - Los faders Master, L (izquierdo) y R (derecho) modulan con precisión el volumen de cada auricular, resolviendo el problema de aislamiento de Android.
+  - Botón de configuración (`⚙️`) con modal asistente de 4 métodos e información clara sobre el sandboxing del sistema operativo móvil.
 
 ## Próximas Ideas / Pendientes
 - [ ] Visualizador de fase goniométrica y correlación estéreo Lissajous (X/Y phase scope)

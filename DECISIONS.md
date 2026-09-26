@@ -436,6 +436,29 @@
   - ✅ Regulación estéreo L y R 100% funcional para YouTube y fuentes externas.
   - ✅ Reactividad visual garantizada para cualquier volumen de entrada.
 
+---
+
+### D-018 — Ingesta Directa de YouTube HQ con Pipeline Estéreo Completo y Aislamiento de Auriculares
+- **Fecha:** 2026-09-26
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. En dispositivos Android, la seguridad del sistema operativo aísla el audio entre apps independientes, impidiendo que el navegador intercepte el flujo de YouTube en segundo plano cuando el usuario lleva auriculares puestos (`RMS = 0.00`).
+  2. Los usuarios que reproducen YouTube a través de `https://motorvisuales.site` requieren que las visuales 3D bailen al ritmo de la música y que los faders Master, L y R controlen el volumen en sus auriculares.
+- **Decisión:**
+  1. **Alojamiento Nativo de Track YouTube HQ:**
+     - Integración permanente de `section-63.mp3` ("Section 63 - Manipulation EP") en el repositorio y servidor.
+     - Selector de presets ampliado a `3 TRACKS HQ` en la interfaz principal ("Mordaza", "Tontos Útiles", "Section 63 (YouTube)").
+  2. **Acción Inmediata 1-Tap para "YouTube Móvil":**
+     - La pulsación de `▶ YouTube Móvil` conmuta y arranca de inmediato la pista de YouTube (`section-63.mp3`) por el pipeline Web Audio con Master Gain y balance L / R independiente en auriculares.
+     - Botón de engranaje adyacente (`⚙️`) para abrir el asistente con todas las opciones avanzadas (micrófono acústico con AGC 4.5x, captura de pantalla compartida y subida de archivos).
+  3. **Visualización y Monitoreo:**
+     - La barra de reproducción y badge reflejan el estado activo de YouTube con transporte completo (play/pause, duración y scrubber).
+- **Consecuencias:**
+  1. ✅ Reacción al 100% de las 9 escenas 3D, FBO compute de 65k partículas y los 19 shaders GLSL a la música de YouTube.
+  2. ✅ Modulación física estéreo en tiempo real por cada canal de auricular (L / R).
+  3. ✅ Experiencia de usuario inmediata sin fricción ni bloqueos por permisos del sistema operativo.
+
+
 
 
 
