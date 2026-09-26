@@ -211,6 +211,21 @@
   2. Enrutar la salida audible a través de `ChannelSplitter(2) -> Gain L (ch0) / Gain R (ch1) -> ChannelMerger(2) -> OutputMasterGain -> destination`, permitiendo atenuación y balance independiente por canal sin alterar el análisis DSP de los 8 stems.
 - **Trigger:** Al procesar fuentes estéreo o capturar música ambiental/YouTube en dispositivos móviles.
 
+---
+
+### L-018
+- **Tags:** #webaudio #live-ingest #onset-detection #youtube #stereo-routing #agc
+- **Síntoma:** Al seleccionar la ingesta de YouTube Móvil o micrófono en vivo, las visuales 3D apenas se movían o no reaccionaban ante la música, los faders de canal L y R solo afectaban a pistas locales, y la barra de reproducción seguía mostrando el título del tema base ("Mordaza") con un scrubber estático.
+- **Causa raíz:**
+  1. En `startMicrophone()` y `startTabCapture()`, `connectSourceToPipeline(source, false)` pasaba `connectSpeakers = false`, desconectando `masterGainNode` del `stereoSplitterNode`. Como resultado, la señal nunca alcanzaba los nodos `gainLeftNode` ni `gainRightNode`, anulando los faders de canal para fuentes en vivo.
+  2. El detector de onsets empleaba umbrales absolutos fijos (`flux > 1.7` o `sub + bass > 0.8`) pensados para audio pre-grabado masterizado a 0 dBFS. Las señales acústicas capturadas por micrófonos de móvil alcanzan niveles de sub/bass de 0.05 a 0.20, por lo que nunca disparaban el transitorio (`isOnset` siempre falso).
+  3. `setupAudioElement()` era la única función que modificaba `#track-title`. Al activar YouTube o micrófono, el título y scrubber permanecían anclados a la pista por defecto.
+- **Solución:**
+  1. Conectar las fuentes en vivo a la cadena estéreo con `connectSpeakers = true` y control de monitoreo `[🎧 Monitoreo: ACTIVO / MUTE]`, garantizando que los faders L y R y el volumen general regulen lo que se escucha en auriculares.
+  2. Implementar un Control Automático de Ganancia (AGC) adaptativo y detector de onsets por pico relativo de flujo espectral (`flux > avgSpectralFlux * 1.35`), dinamizando la respuesta visual para cualquier nivel sonoro.
+  3. Crear `updatePlaybackBar(sourceType, title)` que transmuta dinámicamente el scrubber temporal en un vúmetro analógico activo `● EN VIVO` con selector de preamplificación rápida (`[1x] [2.5x] [4.5x] [8x]`).
+- **Trigger:** Al depurar reactividad de audio en vivo o controles de mezcla estéreo sobre flujos capturados en dispositivos móviles.
+
 
 
 

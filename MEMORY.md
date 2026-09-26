@@ -102,6 +102,11 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Consola DSP de 64 Bandas:** FFT logarítmica con gradiente cian-fucsia y 4 perfiles acústicos de género (*Stage Rave*, *Ambient Sphere*, *Drum & Bass*, *Peak Techno*).
   - **Preset 19 GLSL & Proyección 3D Directa:** Shader procedimental `attractor_quantum_rf` acoplado al bus $Q_1..Q_{64}$ y al atractor caótico activo, con botón instantáneo `👁️ Proyectar en Viewport 3D` desde Chaos Lab y RF/SDR Matrix.
   - **Cockpit Multivista Modular:** Barra de sub-navegación con 5 vistas (`LIVE RUNNER`, `AUDIO DSP`, `RF / SDR MATRIX`, `CHAOS LAB`, `SYSTEM CONFIG`) y chips de telemetría viva en la cabecera.
+- ✅ **Enrutamiento Estéreo Universal, HUD Live Dinámico y Reactividad YouTube (D-017 / L-018):**
+  - Conexión del grafo estéreo `stereoSplitterNode -> gainLeftNode / gainRightNode -> stereoMergerNode -> outputMasterGain` a todas las entradas en vivo (YouTube Móvil, Micrófono y Audio de Pestaña/Sistema), permitiendo que los faders L y R y el volumen general regulen directamente la escucha en auriculares.
+  - Botón de monitoreo `[🎧 Monitoreo: ACTIVO / MUTE]` para alternar la salida de audio sin desconectar el análisis DSP.
+  - Actualización inmediata de la barra de reproducción (`updatePlaybackBar`): al activar YouTube, se muestra el título dinámico `🔴 YouTube Móvil (Audio en Vivo)`, el scrubber de archivo se transmuta en un vúmetro en vivo con indicador de nivel dB y botones de preamplificación rápida (`[1x] [2.5x] [4.5x] [8x]`).
+  - Control Automático de Ganancia (AGC) adaptativo y detector de onsets por pico relativo de flujo espectral (`flux > avgSpectralFlux * 1.35`), logrando que las visuales 3D y los 8 stems Biquad reaccionen con máxima contundencia ante cualquier nivel de audio de YouTube.
 
 ## Próximas Ideas / Pendientes
 - [ ] Visualizador de fase goniométrica y correlación estéreo Lissajous (X/Y phase scope)

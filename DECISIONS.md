@@ -411,6 +411,31 @@
   - ✅ Control de mezcla estéreo profesional y balance L/R sin cortes de audio ni distorsión.
   - ✅ Compatibilidad completa con YouTube en teléfonos Android / iOS sin requerir permisos root o de sistema.
 
+---
+
+### D-017 — Enrutamiento Estéreo Universal, HUD Live Reactivo y Detección Relativa de Onsets
+- **Fecha:** 2026-09-26
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. Al seleccionar "YouTube Móvil" o fuentes en vivo, la barra de reproducción seguía mostrando el título estático de "Mordaza (tema.mp3)" y un scrubber temporal `00:00 / 03:18`.
+  2. Los visualizadores 3D no reaccionaban ante el audio capturado de YouTube/móvil por umbrales de onset fijos (`flux > 1.7`, `sub+bass > 0.8`) diseñados para masterings a 0 dBFS.
+  3. Los faders de canal izquierdo (L), canal derecho (R) y volumen general no afectaban a YouTube porque las fuentes en vivo se conectaban con `connectSpeakers = false`, desconectando el divisor estéreo de la salida de audio.
+- **Decisión:**
+  1. **Enrutamiento Estéreo Universal con Monitoreo:**
+     - Conectar todas las fuentes en vivo (YouTube Móvil, Micrófono Hi-Fi, Captura de Pestaña/Sistema) a través de `masterGainNode -> ChannelSplitter(2) -> Gain L / Gain R -> ChannelMerger(2) -> OutputMasterGain -> audioCtx.destination`.
+     - Incorporar control de monitoreo `[🎧 Monitoreo: ACTIVO / MUTE]` para permitir audición en auriculares y balance L/R inmediato, con opción de silenciar para evitar acoples si se usa altavoz sin auriculares.
+  2. **HUD Dinámico de Reproducción (`updatePlaybackBar`):**
+     - Actualizar inmediatamente el título al seleccionar YouTube: `🔴 YouTube Móvil (Audio en Vivo)`.
+     - Ocultar el scrubber de archivo y desplegar un vúmetro analógico en tiempo real con indicador `● EN VIVO (DSP INGEST)`, lectura en decibelios y selector rápido de preamplificación (`[1x] [2.5x] [4.5x] [8x]`).
+     - Reconfigurar el botón de reproducción como parada limpia de ingesta en vivo (`⏹`).
+  3. **Control Automático de Ganancia (AGC) y Onset Relativo:**
+     - Algoritmo de adaptación dinámica de pico (`dynamicLivePeak`) y seguimiento del flujo espectral medio (`avgSpectralFlux`).
+     - Disparo de onsets mediante umbral adaptativo relativo (`flux > avgSpectralFlux * 1.35`), garantizando que la Nebulosa de 30.000 partículas y los 19 presets WebGL reaccionen con máxima energía incluso ante audio acústico o de altavoz móvil.
+- **Consecuencias:**
+  - ✅ Feedback visual inmediato y claro de la fuente activa en el reproductor.
+  - ✅ Regulación estéreo L y R 100% funcional para YouTube y fuentes externas.
+  - ✅ Reactividad visual garantizada para cualquier volumen de entrada.
+
 
 
 
