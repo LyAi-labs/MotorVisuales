@@ -389,6 +389,29 @@
   - ✅ Fusión sin precedentes entre acústica digital, dinámica no lineal y electromagnetismo de radiofrecuencia en una sola estación WebGL/WebGPU.
   - ✅ Arquitectura 100% modular y preservación de todas las escenas previas (Nebulosa, Túnel, Monolito, FBO 65k, Génesis Autónoma y los 18 presets GLSL).
 
+---
+
+### D-016 — Procesador Estéreo L/R, Presets Multi-Track y Asistente YouTube en Móvil
+- **Fecha:** 2026-09-26
+- **Estado:** ✅ Aceptada
+- **Contexto:** 
+  1. El reproductor requería control de volumen general y regulación independiente por canal izquierdo y derecho (L / R).
+  2. Integrar el nuevo track "Tontos Útiles" permanentemente junto a "Mordaza".
+  3. Permitir capturar y visualizar en tiempo real el audio de YouTube desde navegadores móviles en `https://motorvisuales.site`.
+- **Decisión:**
+  1. **Grafo Estéreo Web Audio:**
+     - Separación de canal con `ChannelSplitter(2)`.
+     - Control independiente de ganancia con `gainLeftNode` y `gainRightNode` alimentando `ChannelMerger(2)`.
+     - Atenuación global de salida mediante `outputMasterGain` conectada a `audioCtx.destination`, desacoplada de la sensibilidad de análisis DSP.
+  2. **Presets de Pistas Permanentes:**
+     - Botonera dual de presets para "Mordaza" (`tema.mp3`) y "Tontos Útiles" (`tontos-utiles.mp3`) con feedback visual de reproducción y selección automática en el exportador de stems WAV.
+  3. **Asistente de Ingesta YouTube en Móviles:**
+     - Modal dedicado con modo de escucha acústica Hi-Fi sin procesadores de llamada telefónica (`echoCancellation: false`, `noiseSuppression: false`, `autoGainControl: false`), resolución de streams online y carga de archivos descargados.
+- **Consecuencias:**
+  - ✅ Control de mezcla estéreo profesional y balance L/R sin cortes de audio ni distorsión.
+  - ✅ Compatibilidad completa con YouTube en teléfonos Android / iOS sin requerir permisos root o de sistema.
+
+
 
 
 

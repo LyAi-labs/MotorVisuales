@@ -198,6 +198,20 @@
   5. Registrar listeners pasivos de desbloqueo de `AudioContext` en `touchstart`/`click` y validar compatibilidad de `getDisplayMedia` en `startTabCapture`.
 - **Trigger:** Al optimizar interfaces 3D WebGL / Web Audio para dispositivos táctiles móviles.
 
+---
+
+### L-017
+- **Tags:** #webaudio #stereo-panning #mobile-audio #youtube #getusermedia
+- **Síntoma:** Al capturar música sonando en el móvil (ej. YouTube por altavoz o split-screen), los graves y agudos desaparecen y el espectro se aplana. Además, no se podía regular independientemente el volumen del canal izquierdo y derecho de la música.
+- **Causa raíz:**
+  1. `getUserMedia({ audio: true })` activa por defecto en Android e iOS los procesadores DSP de llamada de voz (`echoCancellation: true`, `noiseSuppression: true`), los cuales detectan la música continua y las frecuencias subgraves como ruido indeseado y las cancelan.
+  2. La salida a altavoces estaba conectada en bloque monoaural `masterGainNode -> audioCtx.destination` sin separación de canales estéreo.
+- **Solución:**
+  1. Crear un modo de escucha musical Hi-Fi móvil con constraints explícitos `{ echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 2 }`, preservando el rango dinámico completo de 20Hz a 20kHz.
+  2. Enrutar la salida audible a través de `ChannelSplitter(2) -> Gain L (ch0) / Gain R (ch1) -> ChannelMerger(2) -> OutputMasterGain -> destination`, permitiendo atenuación y balance independiente por canal sin alterar el análisis DSP de los 8 stems.
+- **Trigger:** Al procesar fuentes estéreo o capturar música ambiental/YouTube en dispositivos móviles.
+
+
 
 
 

@@ -373,18 +373,41 @@
                         <span class="text-[9px] font-mono text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-white/[0.06]">FFT 2048</span>
                     </div>
 
-                    <!-- Primary Ingest Actions -->
+                    <!-- Primary Ingest Actions: Temas Disponibles -->
                     <div class="space-y-2">
-                        <!-- Hero User Track Button -->
-                        <button onclick="playUserUploadedTrack()" id="btn-user-track" class="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 active:scale-[0.99] text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg glow-cyan transition">
-                            <span>🔥</span>
-                            <span>Reproducir Mi Tema ("Mordaza")</span>
-                        </button>
+                        <!-- Primary Preset Tracks Selector -->
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between text-[10px] font-mono text-zinc-400 uppercase tracking-wider px-0.5">
+                                <span class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>Temas Disponibles</span>
+                                <span class="text-cyan-400 font-bold">2 TRACKS HQ</span>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                <!-- Track 1: Mordaza -->
+                                <button onclick="playPresetTrack('tema.mp3', 'Mordaza', this)" id="btn-track-mordaza" class="preset-track-btn w-full py-2 px-3 rounded-lg bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 active:scale-[0.98] text-white font-extrabold text-xs flex items-center justify-between shadow-lg glow-cyan transition">
+                                    <span class="flex items-center gap-2 truncate">
+                                        <span>🔥</span>
+                                        <span class="truncate">"Mordaza"</span>
+                                    </span>
+                                    <span class="preset-tag text-[9px] font-mono bg-black/40 px-1.5 py-0.5 rounded text-cyan-200 shrink-0">PLAY ▶</span>
+                                </button>
+                                <!-- Track 2: Tontos Útiles -->
+                                <button onclick="playPresetTrack('tontos-utiles.mp3', 'Tontos Útiles', this)" id="btn-track-tontos" class="preset-track-btn w-full py-2 px-3 rounded-lg bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 hover:from-purple-500 hover:to-rose-500 active:scale-[0.98] text-white font-extrabold text-xs flex items-center justify-between shadow-lg glow-pink transition">
+                                    <span class="flex items-center gap-2 truncate">
+                                        <span>⚡</span>
+                                        <span class="truncate">"Tontos Útiles"</span>
+                                    </span>
+                                    <span class="preset-tag text-[9px] font-mono bg-black/40 px-1.5 py-0.5 rounded text-pink-200 shrink-0">PLAY ▶</span>
+                                </button>
+                            </div>
+                        </div>
 
                         <!-- Secondary Sources Grid -->
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs font-medium">
                             <button onclick="startMicrophone()" id="btn-mic" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
                                 <span>🎙️</span><span>Micrófono</span>
+                            </button>
+                            <button onclick="openYouTubeMobileAssistant()" id="btn-yt-mobile" class="py-1.5 px-2 bg-gradient-to-r from-red-950/80 via-zinc-900 to-zinc-900 hover:from-red-900/90 hover:to-zinc-800 text-red-300 hover:text-white rounded-lg border border-red-500/30 flex items-center justify-center gap-1.5 shadow-sm transition" title="Usar audio de YouTube en el móvil">
+                                <span class="text-red-500 font-bold">▶</span><span>YouTube Móvil</span>
                             </button>
                             <button onclick="startTabCapture()" id="btn-tab" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
                                 <span>🖥️</span><span>Pestaña</span>
@@ -396,7 +419,7 @@
                             <button onclick="toggleSynthDemo()" id="btn-synth" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
                                 <span>⚡</span><span id="txt-synth">Synth Beat</span>
                             </button>
-                            <button onclick="stopAudio()" id="btn-stop" class="col-span-2 sm:col-span-2 py-1.5 px-2 bg-zinc-900/90 hover:bg-rose-950/60 text-zinc-400 hover:text-rose-300 rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
+                            <button onclick="stopAudio()" id="btn-stop" class="col-span-2 sm:col-span-1 py-1.5 px-2 bg-zinc-900/90 hover:bg-rose-950/60 text-zinc-400 hover:text-rose-300 rounded-lg border border-white/[0.08] flex items-center justify-center gap-1.5 transition">
                                 <span>⏹️</span><span>Detener Audio</span>
                             </button>
                         </div>
@@ -405,12 +428,12 @@
                     <!-- HTML5 Audio Element persistente en DOM -->
                     <audio id="html5-audio-player" preload="auto" crossorigin="anonymous" class="hidden"></audio>
 
-                    <!-- Dedicated Track Scrubber & Controls -->
-                    <div id="track-player-controls" class="hidden p-2.5 bg-black/60 rounded-lg border border-white/[0.08] space-y-1.5 text-xs">
+                    <!-- Dedicated Track Scrubber & Master Stereo Controls -->
+                    <div id="track-player-controls" class="p-2.5 bg-black/70 rounded-lg border border-white/[0.08] space-y-2 text-xs">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2 truncate">
                                 <button onclick="togglePlayPauseUserTrack()" id="btn-play-pause-track" class="w-6 h-6 rounded-full bg-cyan-500 hover:bg-cyan-400 flex items-center justify-center font-bold text-black shadow transition">▶</button>
-                                <span id="track-title" class="font-mono text-[11px] text-cyan-300 truncate max-w-[180px]">tema.mp3</span>
+                                <span id="track-title" class="font-mono text-[11px] text-cyan-300 truncate max-w-[180px]">Mordaza (tema.mp3)</span>
                             </div>
                             <label class="flex items-center gap-1.5 text-[10px] text-zinc-400 font-mono cursor-pointer">
                                 <span>LOOP</span>
@@ -421,6 +444,47 @@
                             <span id="track-current-time" class="font-mono text-[10px] text-zinc-500 w-8">00:00</span>
                             <input type="range" id="track-progress" min="0" max="100" value="0" step="0.1" oninput="seekUserTrack(this.value)" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-800 rounded-lg">
                             <span id="track-duration" class="font-mono text-[10px] text-zinc-500 w-8 text-right">03:18</span>
+                        </div>
+
+                        <!-- Master & Stereo L / R Controls Rack -->
+                        <div class="pt-2 border-t border-white/[0.06] space-y-1.5">
+                            <!-- Volumen General -->
+                            <div class="flex items-center justify-between text-[10px] font-mono">
+                                <span class="text-zinc-300 flex items-center gap-1.5 font-bold">
+                                    <span>🔊</span><span>Volumen General:</span>
+                                </span>
+                                <span id="val-vol-master" class="text-cyan-400 font-bold">100%</span>
+                            </div>
+                            <input type="range" id="slider-vol-master" min="0" max="1.5" step="0.01" value="1.0" oninput="updateMasterVolume(this.value)" class="w-full accent-cyan-400 h-1.5 cursor-pointer bg-zinc-800 rounded-lg" title="Volumen Master General">
+
+                            <!-- Canales L y R -->
+                            <div class="grid grid-cols-2 gap-2 pt-0.5 text-[9px] font-mono">
+                                <!-- Canal Izquierdo (L) -->
+                                <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-cyan-500/20 space-y-1">
+                                    <div class="flex items-center justify-between text-cyan-300 font-bold">
+                                        <span>CANAL L (IZQ)</span>
+                                        <span id="val-vol-left">100%</span>
+                                    </div>
+                                    <input type="range" id="slider-vol-left" min="0" max="1.0" step="0.01" value="1.0" oninput="updateLeftVolume(this.value)" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-950 rounded" title="Volumen Canal Izquierdo">
+                                </div>
+                                <!-- Canal Derecho (R) -->
+                                <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-pink-500/20 space-y-1">
+                                    <div class="flex items-center justify-between text-pink-300 font-bold">
+                                        <span>CANAL R (DER)</span>
+                                        <span id="val-vol-right">100%</span>
+                                    </div>
+                                    <input type="range" id="slider-vol-right" min="0" max="1.0" step="0.01" value="1.0" oninput="updateRightVolume(this.value)" class="w-full accent-pink-400 h-1 cursor-pointer bg-zinc-950 rounded" title="Volumen Canal Derecho">
+                                </div>
+                            </div>
+
+                            <!-- Botón Reset Estéreo -->
+                            <div class="flex items-center justify-between pt-0.5 text-[9px] font-mono">
+                                <button onclick="resetStereoVolume()" class="text-zinc-400 hover:text-white hover:underline transition">↺ Resetear Estéreo (100% / 100%)</button>
+                                <span class="text-zinc-500 flex items-center gap-1">
+                                    <span>DSP L/R</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -1874,6 +1938,16 @@
         let isAudioRunning = false;
         let currentSourceType = 'none';
 
+        // Procesador Estéreo L / R y Master Output Gain
+        let outputMasterGain = null;
+        let stereoSplitterNode = null;
+        let gainLeftNode = null;
+        let gainRightNode = null;
+        let stereoMergerNode = null;
+        let currentVolumeMaster = 1.0;
+        let currentVolumeLeft = 1.0;
+        let currentVolumeRight = 1.0;
+
         const FFT_SIZE = 2048;
         let mainAnalyser = null;
         let freqDataArray = new Uint8Array(FFT_SIZE / 2);
@@ -1915,7 +1989,7 @@
                 mainAnalyser.smoothingTimeConstant = 0.75;
 
                 masterGainNode = audioCtx.createGain();
-                masterGainNode.gain.value = parseFloat(document.getElementById('input-gain').value);
+                masterGainNode.gain.value = parseFloat(document.getElementById('input-gain') ? document.getElementById('input-gain').value : '1.5');
 
                 audioDestNode = audioCtx.createMediaStreamDestination();
 
@@ -1926,6 +2000,24 @@
                 // Enrutar masterGainNode de forma permanente a mainAnalyser y audioDestNode
                 masterGainNode.connect(mainAnalyser);
                 masterGainNode.connect(audioDestNode);
+
+                // Cadena de Salida Estéreo: Splitter -> Gain L / Gain R -> Merger -> Master Output -> Destination
+                outputMasterGain = audioCtx.createGain();
+                outputMasterGain.gain.value = currentVolumeMaster;
+
+                stereoSplitterNode = audioCtx.createChannelSplitter(2);
+                gainLeftNode = audioCtx.createGain();
+                gainLeftNode.gain.value = currentVolumeLeft;
+                gainRightNode = audioCtx.createGain();
+                gainRightNode.gain.value = currentVolumeRight;
+                stereoMergerNode = audioCtx.createChannelMerger(2);
+
+                stereoSplitterNode.connect(gainLeftNode, 0);
+                stereoSplitterNode.connect(gainRightNode, 1);
+                gainLeftNode.connect(stereoMergerNode, 0, 0);
+                gainRightNode.connect(stereoMergerNode, 0, 1);
+                stereoMergerNode.connect(outputMasterGain);
+                outputMasterGain.connect(audioCtx.destination);
 
                 // Build 8 Stems UI & Audio Nodes
                 const container = document.getElementById('stems-ui-container');
@@ -1998,12 +2090,62 @@
                 }
             }
 
-            // Gestionar salida de altavoces
+            // Gestionar salida de altavoces a través del procesador estéreo L / R
             if (masterGainNode && audioCtx) {
+                if (stereoSplitterNode) {
+                    try { masterGainNode.disconnect(stereoSplitterNode); } catch(e){}
+                }
                 try { masterGainNode.disconnect(audioCtx.destination); } catch(e){}
                 if (connectSpeakers) {
-                    try { masterGainNode.connect(audioCtx.destination); } catch(e){}
+                    if (stereoSplitterNode) {
+                        try { masterGainNode.connect(stereoSplitterNode); } catch(e){}
+                    } else {
+                        try { masterGainNode.connect(audioCtx.destination); } catch(e){}
+                    }
                 }
+            }
+        }
+
+        // Control de Volumen Master y Canales Estéreo Independientes L / R
+        function updateMasterVolume(val) {
+            currentVolumeMaster = parseFloat(val);
+            if (outputMasterGain && audioCtx) {
+                outputMasterGain.gain.setTargetAtTime(currentVolumeMaster, audioCtx.currentTime, 0.015);
+            }
+            const valEl = document.getElementById('val-vol-master');
+            if (valEl) valEl.innerText = Math.round(currentVolumeMaster * 100) + '%';
+        }
+
+        function updateLeftVolume(val) {
+            currentVolumeLeft = parseFloat(val);
+            if (gainLeftNode && audioCtx) {
+                gainLeftNode.gain.setTargetAtTime(currentVolumeLeft, audioCtx.currentTime, 0.015);
+            }
+            const valEl = document.getElementById('val-vol-left');
+            if (valEl) valEl.innerText = Math.round(currentVolumeLeft * 100) + '%';
+        }
+
+        function updateRightVolume(val) {
+            currentVolumeRight = parseFloat(val);
+            if (gainRightNode && audioCtx) {
+                gainRightNode.gain.setTargetAtTime(currentVolumeRight, audioCtx.currentTime, 0.015);
+            }
+            const valEl = document.getElementById('val-vol-right');
+            if (valEl) valEl.innerText = Math.round(currentVolumeRight * 100) + '%';
+        }
+
+        function resetStereoVolume() {
+            updateMasterVolume(1.0);
+            updateLeftVolume(1.0);
+            updateRightVolume(1.0);
+            const sldM = document.getElementById('slider-vol-master');
+            const sldL = document.getElementById('slider-vol-left');
+            const sldR = document.getElementById('slider-vol-right');
+            if (sldM) sldM.value = 1.0;
+            if (sldL) sldL.value = 1.0;
+            if (sldR) sldR.value = 1.0;
+            if (typeof showToast === 'function') {
+                showToast("Volumen Estéreo Restaurado", "Master: 100% | L: 100% | R: 100%", "info");
             }
         }
 
@@ -2379,38 +2521,58 @@
             }
         }
 
-        // --- AUDIO SOURCE TRACKING FOR STEMS EXPORT ---
+        // --- AUDIO SOURCE TRACKING FOR STEMS EXPORT & PRESET TRACKS ---
         let currentUploadedAudioFile = null;
         let currentAudioTrackSource = 'tema.mp3';
         let currentTrackTitle = 'Mordaza (tema.mp3)';
 
-        function playUserUploadedTrack() {
+        function playPresetTrack(srcUrl, title, btnElement) {
             stopAudio();
             initAudioContext();
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
             currentUploadedAudioFile = null;
-            currentAudioTrackSource = 'tema.mp3';
-            currentTrackTitle = 'Tu Tema ("Mordaza")';
+            currentAudioTrackSource = srcUrl;
+            currentTrackTitle = title;
 
-            setupAudioElement('tema.mp3', 'Tu Tema ("Mordaza")');
+            // Actualizar estado visual de los botones de presets
+            document.querySelectorAll('.preset-track-btn').forEach(b => {
+                b.classList.remove('ring-2', 'ring-white', 'scale-[1.02]');
+                const tag = b.querySelector('.preset-tag');
+                if (tag) tag.innerText = 'PLAY ▶';
+            });
+            const activeBtn = btnElement || (srcUrl === 'tema.mp3' ? document.getElementById('btn-track-mordaza') : document.getElementById('btn-track-tontos'));
+            if (activeBtn) {
+                activeBtn.classList.add('ring-2', 'ring-white', 'scale-[1.02]');
+                const tag = activeBtn.querySelector('.preset-tag');
+                if (tag) tag.innerText = 'SONANDO 🔊';
+            }
+
+            setupAudioElement(srcUrl, title);
             audioElement.play().then(() => {
                 if (audioCtx && audioCtx.state === 'suspended') {
                     audioCtx.resume();
                 }
                 currentSourceType = 'file';
                 isAudioRunning = true;
-                updateBadge('Reproduciendo: Tu Tema (MP3)', 'bg-pink-600 text-white border-pink-400');
+                updateBadge(`Reproduciendo: ${title}`, 'bg-pink-600 text-white border-pink-400');
+                if (typeof showToast === 'function') {
+                    showToast("Tema Activado", `"${title}" sonando con análisis DSP de 8 Stems`, "success");
+                }
             }).catch(e => {
                 console.error("Error al reproducir audio:", e);
                 alert("Aviso al reproducir tema: " + e.message);
             });
         }
 
+        function playUserUploadedTrack() {
+            playPresetTrack('tema.mp3', 'Mordaza', document.getElementById('btn-track-mordaza'));
+        }
+
         function togglePlayPauseUserTrack() {
             if (!audioElement || !audioElement.src) {
-                playUserUploadedTrack();
+                playPresetTrack(currentAudioTrackSource || 'tema.mp3', currentTrackTitle || 'Mordaza');
                 return;
             }
             if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
@@ -2418,8 +2580,14 @@
                 audioElement.play().then(() => {
                     isAudioRunning = true;
                     currentSourceType = 'file';
-                    const title = document.getElementById('track-title')?.innerText || 'MP3';
+                    const title = document.getElementById('track-title')?.innerText || currentTrackTitle || 'MP3';
                     updateBadge(`Reproduciendo: ${title}`, 'bg-pink-600 text-white border-pink-400');
+                    document.querySelectorAll('.preset-track-btn').forEach(b => {
+                        if (b.classList.contains('ring-2')) {
+                            const tag = b.querySelector('.preset-tag');
+                            if (tag) tag.innerText = 'SONANDO 🔊';
+                        }
+                    });
                 }).catch(e => {
                     console.error("Error al reanudar audio:", e);
                 });
@@ -2427,6 +2595,12 @@
                 audioElement.pause();
                 isAudioRunning = false;
                 updateBadge('En pausa', 'bg-slate-800 text-slate-400 border-slate-700');
+                document.querySelectorAll('.preset-track-btn').forEach(b => {
+                    if (b.classList.contains('ring-2')) {
+                        const tag = b.querySelector('.preset-tag');
+                        if (tag) tag.innerText = 'PAUSA ⏸';
+                    }
+                });
             }
         }
 
@@ -2440,25 +2614,143 @@
         }
 
         // --- AUDIO INPUT HANDLERS ---
-        async function startMicrophone() {
+        async function startMicrophone(isStudioMusicMode = false) {
             try {
                 stopAudio();
                 initAudioContext();
-                micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                
+                // En modo Hi-Fi (YouTube Móvil) deshabilitamos filtros de voz (echoCancellation, noiseSuppression) para capturar toda la banda sonora
+                const constraints = isStudioMusicMode ? {
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false,
+                        channelCount: 2
+                    },
+                    video: false
+                } : { audio: true, video: false };
+
+                micStream = await navigator.mediaDevices.getUserMedia(constraints);
                 const source = audioCtx.createMediaStreamSource(micStream);
                 connectSourceToPipeline(source, false); // Micrófono sin salida a altavoces para prevenir acople
 
                 currentSourceType = 'mic';
                 isAudioRunning = true;
-                updateBadge('Micrófono Activo', 'bg-indigo-600 text-white border-indigo-400');
+
+                if (isStudioMusicMode) {
+                    const gainInput = document.getElementById('input-gain');
+                    if (gainInput) {
+                        gainInput.value = "2.8";
+                        updateGain();
+                    }
+                    updateBadge('YouTube Móvil (Hi-Fi Mic)', 'bg-rose-600 text-white border-rose-400');
+                    if (typeof showToast === 'function') {
+                        showToast("Escucha YouTube Móvil Activa", "Micrófono Hi-Fi sin filtros de ruido. Pon tu música en YouTube.", "success");
+                    }
+                } else {
+                    updateBadge('Micrófono Activo', 'bg-indigo-600 text-white border-indigo-400');
+                }
             } catch (err) {
-                alert('Acceso a micrófono denegado: ' + err.message);
+                alert('Acceso a micrófono no concedido: ' + err.message);
+            }
+        }
+
+        // --- ASISTENTE DE INGESTA DE YOUTUBE EN MÓVIL ---
+        function openYouTubeMobileAssistant() {
+            const modal = document.getElementById('yt-mobile-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeYouTubeMobileAssistant() {
+            const modal = document.getElementById('yt-mobile-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function startYouTubeMobileListening() {
+            closeYouTubeMobileAssistant();
+            startMicrophone(true);
+        }
+
+        async function handleOnlineUrlSubmit() {
+            const input = document.getElementById('yt-url-input');
+            if (!input || !input.value.trim()) return;
+            const url = input.value.trim();
+
+            closeYouTubeMobileAssistant();
+
+            // Si es un archivo de audio directo (.mp3, .ogg, .wav, .m4a)
+            if (url.match(/\.(mp3|wav|ogg|m4a|aac)(\?.*)?$/i)) {
+                playPresetTrack(url, 'Stream: ' + url.split('/').pop().split('?')[0]);
+                return;
+            }
+
+            // Si es un enlace de YouTube, intentamos resolver stream de audio a través de un proxy libre de CORS
+            const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|v\/|shorts\/))([\w-]{11})/);
+            if (ytMatch) {
+                const videoId = ytMatch[1];
+                if (typeof showToast === 'function') {
+                    showToast("Conectando con YouTube", "Extrayendo canal de audio libre de CORS...", "info");
+                }
+                updateBadge('Cargando YouTube...', 'bg-rose-900 text-rose-300 border-rose-500');
+
+                // Lista de instancias públicas de Invidious / Piped para audio stream
+                const endpoints = [
+                    `https://pipedapi.kavin.rocks/streams/${videoId}`,
+                    `https://api.invidious.io/api/v1/videos/${videoId}`,
+                    `https://invidious.nerdvpn.de/api/v1/videos/${videoId}`
+                ];
+
+                let streamFound = false;
+                for (const ep of endpoints) {
+                    try {
+                        const controller = new AbortController();
+                        const to = setTimeout(() => controller.abort(), 4000);
+                        const res = await fetch(ep, { signal: controller.signal });
+                        clearTimeout(to);
+                        if (!res.ok) continue;
+                        const data = await res.json();
+                        
+                        let audioUrl = null;
+                        if (data.audioStreams && data.audioStreams.length > 0) {
+                            audioUrl = data.audioStreams[0].url;
+                        } else if (data.adaptiveFormats) {
+                            const af = data.adaptiveFormats.find(f => f.type && f.type.startsWith('audio'));
+                            if (af) audioUrl = af.url;
+                        }
+
+                        if (audioUrl) {
+                            streamFound = true;
+                            playPresetTrack(audioUrl, data.title || `YouTube (${videoId})`);
+                            if (typeof showToast === 'function') {
+                                showToast("YouTube Reproduciendo", data.title || videoId, "success");
+                            }
+                            break;
+                        }
+                    } catch(err) {
+                        // Intentar siguiente endpoint
+                    }
+                }
+
+                if (!streamFound) {
+                    if (typeof showToast === 'function') {
+                        showToast("Usando Modo Escucha Hi-Fi", "Iniciando captura acústica musical directa.", "info");
+                    }
+                    startMicrophone(true);
+                }
+            } else {
+                playPresetTrack(url, 'Stream Online');
             }
         }
 
         async function startTabCapture() {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
-                alert("La captura de pestaña con audio solo está disponible en Chrome para Escritorio (PC/Mac/Linux).\n\nEn tu dispositivo móvil, usa el botón 'Micrófono', 'Archivo' de audio o la demo 'Synth Beat'.");
+                openYouTubeMobileAssistant();
                 return;
             }
             try {
@@ -2471,7 +2763,7 @@
                 
                 const audioTracks = micStream.getAudioTracks();
                 if (audioTracks.length === 0) {
-                    alert("No se detectó audio. Por favor, asegúrate de activar la casilla 'Compartir audio de la pestaña' al seleccionar la pestaña.");
+                    alert("No se detectó canal de audio. Al proyectar la pantalla o pestaña, asegúrate de activar la casilla 'Compartir audio del dispositivo' / 'Audio de pestaña'.\n\nTambién puedes usar el botón 'YouTube Móvil' para cargar la pista directamente.");
                     micStream.getTracks().forEach(t => t.stop());
                     return;
                 }
@@ -2482,10 +2774,13 @@
                 
                 currentSourceType = 'tab';
                 isAudioRunning = true;
-                updateBadge('Captura de Pestaña Activa', 'bg-cyan-600 text-white border-cyan-400');
+                updateBadge('Audio Sistema / YouTube Activo', 'bg-cyan-600 text-white border-cyan-400');
+                if (typeof showToast === 'function') {
+                    showToast("Audio de Pantalla Activo", "Capturando audio del sistema en tiempo real", "success");
+                }
             } catch (err) {
                 if (err.name !== 'NotAllowedError') {
-                    alert('Error al capturar la pestaña: ' + err.message);
+                    openYouTubeMobileAssistant();
                 }
             }
         }
@@ -2613,6 +2908,13 @@
             const synthBtn = document.getElementById('txt-synth');
             if (synthBtn) synthBtn.innerText = "Demo Synth Beat";
             updateBadge('En espera', 'bg-slate-800 text-slate-400 border-slate-700');
+
+            // Reset visual state of preset track buttons
+            document.querySelectorAll('.preset-track-btn').forEach(b => {
+                b.classList.remove('ring-2', 'ring-white', 'scale-[1.02]');
+                const tag = b.querySelector('.preset-tag');
+                if (tag) tag.innerText = 'PLAY ▶';
+            });
         }
 
         function updateBadge(text, classes) {
@@ -10321,8 +10623,9 @@ Respond ONLY with valid JSON with:
             if (currentUploadedAudioFile) {
                 arrayBuffer = await currentUploadedAudioFile.arrayBuffer();
             } else {
-                const resp = await fetch('tema.mp3');
-                if (!resp.ok) throw new Error("No se pudo cargar 'tema.mp3' (HTTP " + resp.status + ")");
+                const targetTrack = currentAudioTrackSource || 'tema.mp3';
+                const resp = await fetch(targetTrack);
+                if (!resp.ok) throw new Error("No se pudo cargar '" + targetTrack + "' (HTTP " + resp.status + ")");
                 arrayBuffer = await resp.arrayBuffer();
             }
 
@@ -10663,6 +10966,71 @@ Respond ONLY with valid JSON with:
                         <!-- Populated dynamically via populateStemsModalList -->
                     </div>
                 </div>
+            </div>
+    <!-- Modal 3: Asistente de Ingesta de YouTube & Streams en Móvil -->
+    <div id="yt-mobile-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-red-500/40 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fadeIn p-5 space-y-4 max-h-[90vh] flex flex-col">
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 font-bold text-base shadow-inner">
+                        ▶
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-black tracking-widest text-zinc-100 uppercase">YouTube en Móvil &amp; Streams</h3>
+                        <p class="text-[10px] text-zinc-400 font-mono">Ingesta de Audio en Vivo para Android / iOS</p>
+                    </div>
+                </div>
+                <button onclick="closeYouTubeMobileAssistant()" class="w-7 h-7 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-white/[0.08] flex items-center justify-center text-xs transition">✕</button>
+            </div>
+
+            <div class="space-y-3.5 overflow-y-auto pr-1 flex-grow text-xs">
+                <!-- Método 1: Recomendado para Móviles -->
+                <div class="p-3.5 bg-gradient-to-br from-red-950/40 via-zinc-900 to-zinc-900 border border-red-500/30 rounded-xl space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-mono text-red-400 font-bold uppercase tracking-wider">Método 1 • Recomendado en Móvil</span>
+                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">1-TAP</span>
+                    </div>
+                    <h4 class="font-bold text-zinc-100 text-sm">Escucha Hi-Fi para YouTube</h4>
+                    <p class="text-[11px] text-zinc-300 leading-relaxed">
+                        Desactiva los filtros de llamada de tu teléfono para capturar la música de YouTube con <strong>graves profundos y espectro completo (20Hz–20kHz)</strong> desde el altavoz del móvil, pantalla dividida o altavoces cercanos.
+                    </p>
+                    <button onclick="startYouTubeMobileListening()" class="w-full py-2.5 px-3 rounded-lg bg-red-600 hover:bg-red-500 active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg glow-red transition">
+                        <span>🎙️</span>
+                        <span>Activar Escucha Hi-Fi para YouTube</span>
+                    </button>
+                </div>
+
+                <!-- Método 2: Pegar Enlace directo de YouTube o Stream -->
+                <div class="p-3 bg-zinc-900/70 border border-white/[0.06] rounded-xl space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">Método 2 • Enlace Web / Stream</span>
+                        <span class="text-[9px] font-mono text-cyan-400">Stream Online</span>
+                    </div>
+                    <p class="text-[10px] text-zinc-400">Pega un enlace de YouTube o una URL directa de audio/stream (.mp3, .m4a, etc.):</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="yt-url-input" placeholder="https://www.youtube.com/watch?v=... o stream" class="flex-grow bg-black border border-white/[0.1] rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-red-500 font-mono">
+                        <button onclick="handleOnlineUrlSubmit()" class="px-3 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shrink-0 transition">Cargar</button>
+                    </div>
+                </div>
+
+                <!-- Método 3: Archivo Descargado -->
+                <div class="p-3 bg-zinc-900/50 border border-white/[0.06] rounded-xl flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block">Método 3 • Audio Descargado</span>
+                        <span class="text-[11px] text-zinc-300">Cargar MP3 / WAV desde tu móvil</span>
+                    </div>
+                    <label class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-xs cursor-pointer border border-white/[0.08] transition">
+                        <span>Abrir Archivo</span>
+                        <input type="file" accept="audio/*" class="hidden" onchange="handleFileUpload(event); closeYouTubeMobileAssistant();">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="border-t border-white/[0.08] pt-2 flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                <span>MotorVisuales Mobile DSP</span>
+                <button onclick="closeYouTubeMobileAssistant()" class="hover:text-zinc-300 transition">Cerrar</button>
             </div>
         </div>
     </div>
