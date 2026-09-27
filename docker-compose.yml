@@ -9,17 +9,9 @@ services:
       - .:/app
       - ./cookies.txt:/app/cookies.txt:rw
     networks:
-      - traefik_traefik
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.motorvisuales-https.rule=Host(`motorvisuales.site`) || Host(`www.motorvisuales.site`)"
-      - "traefik.http.routers.motorvisuales-https.entrypoints=websecure"
-      - "traefik.http.routers.motorvisuales-https.tls.certresolver=letsencrypt"
-      - "traefik.http.routers.motorvisuales-http.rule=Host(`motorvisuales.site`) || Host(`www.motorvisuales.site`)"
-      - "traefik.http.routers.motorvisuales-http.entrypoints=web"
-      - "traefik.http.routers.motorvisuales-http.middlewares=redirect-https"
-      - "traefik.http.services.motorvisuales.loadbalancer.server.port=8000"
+      - traefik
 
 networks:
-  traefik_traefik:
+  traefik:
     external: true
+    name: traefik_traefik
