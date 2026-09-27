@@ -463,6 +463,33 @@
   4. Proveer un botón de monitoreo interactivo con estados claros (`🔊 Salida Activa` vs `🔇 Salida Muteada` / `ACTIVO` vs `MUTE`) y reanudar `audioCtx.resume()` tras la interacción con el modal de `getDisplayMedia`.
 - **Trigger:** Al implementar captura de pestañas y enrutamiento de Web Audio API con `getDisplayMedia`.
 
+---
+
+### L-034
+- **Tags:** #webrtc #getdisplaymedia #tab-capture #audio-quality #hifi #dsp #limiter #clipping
+- **Síntoma:** El audio capturado desde una pestaña (Suno, YouTube, Spotify) suena con calidad muy degradada (apagado, sin agudos, como llamada telefónica o bajo el agua) o con distorsión áspera y saturación digital.
+- **Causa raíz:**
+  1. **Filtros de Voz de WebRTC en Chromium:** Al omitir constraints de audio en `getDisplayMedia`, el navegador aplica el procesamiento por defecto para videoconferencias: `echoCancellation` (filtra agudos >8kHz, corta reverberaciones y colapsa la imagen estéreo a mono), `noiseSuppression` (elimina platillos y armónicos como "ruido") y `autoGainControl` (bombea volumen).
+  2. **Clipping Digital por Preamp Ingest:** En el rack de entrada en vivo, un selector de preamp elevado (ej. 4.5x para micrófonos débiles) multiplica la señal de la pestaña (ya masterizada a 0 dBFS) hasta amplitudes de 4.5, recortando brutalmente contra el techo de `audioCtx.destination` sin limitador.
+- **Solución:**
+  1. Declarar restricciones explícitas de audio Hi-Fi en `getDisplayMedia`: `{ suppressLocalAudioPlayback: true, echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: { ideal: 2, min: 2 }, sampleRate: { ideal: 48000 } }`.
+  2. Forzar `audioTrack.applyConstraints({ echoCancellation: false, noiseSuppression: false, autoGainControl: false, channelCount: 2 })` tras adquirir el stream.
+  3. Configurar por defecto el preamp en `1.0x Hi-Fi Puro` para fuentes digitales de pestaña y colocar un limitador transparente (`DynamicsCompressorNode` con umbral -0.3 dBFS, ratio 20:1 y ataque 1 ms) antes de `audioCtx.destination` para inmunidad total al clipping.
+- **Trigger:** Al capturar o reproducir audio de pestañas o pantallas para escucha musical de alta fidelidad.
+
+---
+
+### L-035
+- **Tags:** #threejs #glsl #shader-compilation #webglprogram #diagnostics #ui
+- **Síntoma:** Al editar código en el IDE de shaders (Laboratorio GLSL) e introducir errores de sintaxis (borrar bloques, omitir `void main()` o tipos incompatibles) y pulsar "Compilar", la interfaz muestra falsamente `✓ Compilado OK` en verde y no reporta ningún error.
+- **Causa raíz:** En Three.js, el método `renderer.compile(scene, camera)` **no arroja excepciones JavaScript** cuando un shader falla al compilar o vincular en la GPU. Three.js captura el fallo internamente, escribe en `console.error` y almacena `{ runnable: false }` en `WebGLProgram.diagnostics`. Por ende, un bloque `try { renderer.compile(...) } catch (err)` nunca se entera del error.
+- **Solución:**
+  1. Validar sintácticamente que tanto Vertex como Fragment Shader incluyan `void main()`.
+  2. Interceptar temporalmente `console.error` y `console.warn` durante la invocación de `renderer.compile()` para atrapar los logs formateados de Three.js.
+  3. Inspeccionar `renderer.properties.get(testMat).programs` buscando si algún programa tiene `diagnostics.runnable === false`, extrayendo los logs de `fragmentShader.log`, `vertexShader.log` y `programLog`.
+  4. Si se detecta cualquier falla, lanzar un `Error` explícito para activar el bloque `catch`, pintar el badge en rojo palpitante (`✕ Error de Compilación`) y renderizar el registro con línea exacta en la consola del editor.
+- **Trigger:** Al crear editores de shaders GLSL en vivo o herramientas de compilación dinámica en Three.js.
+
 
 
 

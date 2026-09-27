@@ -635,12 +635,14 @@
                                 <div id="live-meter-fill" class="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 w-0 transition-all duration-75 rounded-full" style="box-shadow: 0 0 8px rgba(244,63,94,0.6)"></div>
                             </div>
                             <div class="flex items-center justify-between text-[9px] font-mono text-zinc-400 pt-0.5">
-                                <span class="text-zinc-400">Preamp / Boost:</span>
+                                <span class="text-zinc-400 flex items-center gap-1">
+                                    <span>Preamp / Sensibilidad:</span>
+                                </span>
                                 <div class="flex items-center gap-1">
-                                    <button onclick="setLiveBoost(1.0)" id="btn-boost-1x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300">1x</button>
-                                    <button onclick="setLiveBoost(2.5)" id="btn-boost-2x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300">2.5x</button>
-                                    <button onclick="setLiveBoost(4.5)" id="btn-boost-4x" class="px-1.5 py-0.5 rounded bg-red-600 text-white font-bold shadow">4.5x 🔥</button>
-                                    <button onclick="setLiveBoost(8.0)" id="btn-boost-8x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300">8x 🚀</button>
+                                    <button onclick="setLiveBoost(1.0)" id="btn-boost-1x" class="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-bold shadow" title="1.0x Ganancia Hi-Fi pura transparente (Sin compresión ni saturación)">1x Hi-Fi</button>
+                                    <button onclick="setLiveBoost(2.5)" id="btn-boost-2x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="2.5x Boost moderado">2.5x</button>
+                                    <button onclick="setLiveBoost(4.5)" id="btn-boost-4x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="4.5x Boost para micrófono débil">4.5x</button>
+                                    <button onclick="setLiveBoost(8.0)" id="btn-boost-8x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="8.0x Boost extremo">8x</button>
                                 </div>
                             </div>
                         </div>
@@ -3219,6 +3221,7 @@
 
         // Procesador Estéreo L / R y Master Output Gain
         let outputMasterGain = null;
+        let masterLimiterNode = null;
         let stereoSplitterNode = null;
         let gainLeftNode = null;
         let gainRightNode = null;
@@ -3302,14 +3305,22 @@
                 gainRightNode.gain.value = currentVolumeRight;
                 stereoMergerNode = audioCtx.createChannelMerger(2);
 
-                // Cableado fijo y seguro del bus de salida estéreo
+                // Cableado fijo y seguro del bus de salida estéreo con Limitador Hi-Fi transparente
+                masterLimiterNode = audioCtx.createDynamicsCompressor();
+                masterLimiterNode.threshold.value = -0.3; // -0.3 dBFS ceiling
+                masterLimiterNode.knee.value = 0.0;       // Brickwall curve
+                masterLimiterNode.ratio.value = 20.0;     // Limitador de seguridad anti-clipping
+                masterLimiterNode.attack.value = 0.001;   // 1 ms ataque ultra-rápido transparente
+                masterLimiterNode.release.value = 0.05;   // 50 ms caída natural
+
                 masterGainNode.connect(stereoSplitterNode);
                 stereoSplitterNode.connect(gainLeftNode, 0);
                 stereoSplitterNode.connect(gainRightNode, 1);
                 gainLeftNode.connect(stereoMergerNode, 0, 0);
                 gainRightNode.connect(stereoMergerNode, 0, 1);
                 stereoMergerNode.connect(outputMasterGain);
-                outputMasterGain.connect(audioCtx.destination);
+                outputMasterGain.connect(masterLimiterNode);
+                masterLimiterNode.connect(audioCtx.destination);
 
                 // Analizadores dedicados de fase y goniómetro para canales L y R
                 phaseAnalyserL = audioCtx.createAnalyser();
@@ -10389,7 +10400,35 @@ void main() {
 
             if (!threeRenderer || !threeScene) return;
 
+            let glslErrors = [];
+            const origConsoleError = console.error;
+            const origConsoleWarn = console.warn;
+
+            // Interceptar temporalmente console.error/warn para capturar los diagnósticos de Three.js / WebGL
+            console.error = function(...args) {
+                const text = args.map(a => (typeof a === 'object' ? (a?.message || JSON.stringify(a)) : String(a))).join(' ');
+                if (text.includes('THREE.WebGLProgram') || text.includes('shader error') || text.includes('gl.getProgramInfoLog') || text.includes('ERROR:')) {
+                    glslErrors.push(text);
+                }
+                origConsoleError.apply(console, args);
+            };
+            console.warn = function(...args) {
+                const text = args.map(a => (typeof a === 'object' ? (a?.message || JSON.stringify(a)) : String(a))).join(' ');
+                if (text.includes('THREE.WebGLProgram') || text.includes('gl.getProgramInfoLog')) {
+                    glslErrors.push(text);
+                }
+                origConsoleWarn.apply(console, args);
+            };
+
             try {
+                // Validación sintáctica previa básica: debe contener void main
+                if (!fragSrc || (!fragSrc.includes('void main') && !fragSrc.includes('void  main'))) {
+                    throw new Error("Sintaxis GLSL inválida: El Fragment Shader no contiene la función de entrada obligatoria 'void main()'.");
+                }
+                if (!vertSrc || (!vertSrc.includes('void main') && !vertSrc.includes('void  main'))) {
+                    throw new Error("Sintaxis GLSL inválida: El Vertex Shader no contiene la función de entrada obligatoria 'void main()'.");
+                }
+
                 // Crear un material temporal para probar compilación WebGL sin romper la escena
                 const testMat = new THREE.ShaderMaterial({
                     uniforms: customShaderUniforms,
@@ -10405,6 +10444,28 @@ void main() {
                 testScene.add(testMesh);
                 
                 threeRenderer.compile(testScene, threeCamera);
+
+                // Comprobar diagnósticos internos de WebGLProgram en Three.js
+                const matProps = threeRenderer.properties ? threeRenderer.properties.get(testMat) : null;
+                if (matProps && matProps.programs) {
+                    for (const prog of matProps.programs.values()) {
+                        if (prog && prog.diagnostics && prog.diagnostics.runnable === false) {
+                            const d = prog.diagnostics;
+                            const fragLog = d.fragmentShader?.log || '';
+                            const vertLog = d.vertexShader?.log || '';
+                            const progLog = d.programLog || '';
+                            const detail = (fragLog ? `\n[Fragment Shader]:\n${fragLog}` : '') +
+                                           (vertLog ? `\n[Vertex Shader]:\n${vertLog}` : '') +
+                                           (progLog ? `\n[Linker]:\n${progLog}` : '');
+                            glslErrors.push(detail.trim() || "Fallo en compilación WebGL");
+                        }
+                    }
+                }
+
+                // Si Three.js o el hook detectaron error, lanzar excepción
+                if (glslErrors.length > 0) {
+                    throw new Error(glslErrors.join('\n'));
+                }
 
                 // Si no arrojó excepción, aplicar al mesh principal
                 if (customShaderMesh) {
@@ -10426,23 +10487,26 @@ void main() {
                 }
                 if (consoleInd) consoleInd.className = "w-2 h-2 rounded-full bg-emerald-400";
                 if (consoleLog) {
-                    consoleLog.className = "text-emerald-400 text-[11px] max-h-24 overflow-y-auto custom-scrollbar whitespace-pre-wrap";
+                    consoleLog.className = "text-emerald-400 text-[11px] max-h-24 overflow-y-auto custom-scrollbar whitespace-pre-wrap font-mono";
                     consoleLog.innerText = `[${now}] ✓ Shader compilado y vinculado exitosamente con WebGL.\nTodos los uniforms (8 stems DSP, uTime, uMouse, uResolution) vinculados.`;
                 }
 
             } catch (err) {
                 // Feedback UI: Rojo / Error con mensaje de GPU
-                console.warn("Error de compilación GLSL:", err);
+                console.warn("Error de compilación GLSL capturado:", err);
 
                 if (statusBadge) {
-                    statusBadge.className = "text-xs font-mono text-rose-400 bg-rose-950/80 px-2 py-0.5 rounded border border-rose-500/40";
+                    statusBadge.className = "text-xs font-mono text-rose-400 bg-rose-950/80 px-2 py-0.5 rounded border border-rose-500/40 animate-pulse";
                     statusBadge.innerText = "✕ Error de Compilación";
                 }
                 if (consoleInd) consoleInd.className = "w-2 h-2 rounded-full bg-rose-500 animate-ping";
                 if (consoleLog) {
-                    consoleLog.className = "text-rose-400 font-bold text-[11px] max-h-24 overflow-y-auto custom-scrollbar whitespace-pre-wrap";
+                    consoleLog.className = "text-rose-400 font-bold text-[11px] max-h-36 overflow-y-auto custom-scrollbar whitespace-pre-wrap font-mono p-2 bg-black/60 rounded border border-rose-500/30";
                     consoleLog.innerText = `[${now}] ✕ ERROR DE COMPILACIÓN GLSL:\n${err.message || err}`;
                 }
+            } finally {
+                console.error = origConsoleError;
+                console.warn = origConsoleWarn;
             }
         }
 
