@@ -386,6 +386,10 @@
                     <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
                     <span>CHAOS<span class="hidden sm:inline"> LAB</span></span>
                 </button>
+                <button onclick="openAiClipStudioModal()" id="nav-btn-clip-studio" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-purple-300 hover:text-white hover:bg-purple-950/60 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap border border-purple-500/30 shadow-sm" title="Estudio de Creación Narrativa & Clips IA Multicapa">
+                    <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
+                    <span>🎬 CLIPS IA<span class="hidden sm:inline"> &amp; STORY</span></span>
+                </button>
                 <button onclick="switchV4View('system-config')" id="nav-btn-system-config" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
                     <span>⚙️</span><span>CONFIG<span class="hidden sm:inline"> &amp; MCP</span></span>
                 </button>
@@ -826,6 +830,10 @@
                                     <span>🧊</span>
                                     <span class="hidden xl:inline">Freeze 3D</span>
                                 </button>
+                                <button onclick="openAiClipStudioModal()" class="px-2 py-1 bg-purple-950/60 hover:bg-purple-900 text-purple-300 hover:text-white rounded-lg border border-purple-500/40 text-[11px] transition flex items-center gap-1 font-medium shadow-sm" title="Estudio de Creación Narrativa & Clips IA Multicapa">
+                                    <span>🎬</span>
+                                    <span class="hidden xl:inline">Clips IA</span>
+                                </button>
                                 <button onclick="resetThreeCamera()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-white/[0.08] text-zinc-400 hover:text-white text-[11px] transition">Reset</button>
                             </div>
                         </div>
@@ -962,6 +970,7 @@
                             <button onclick="triggerAutonomousGenesis()" class="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1" title="Génesis Autónoma de Arte">🔮 Génesis</button>
                             <button onclick="focusVjTimeline()" class="text-teal-300 hover:text-teal-200 font-bold flex items-center gap-1" title="Timeline VJ">⏱️ VJ</button>
                             <button onclick="openMeshFreezeModal()" class="text-amber-300 hover:text-amber-200 font-bold flex items-center gap-1" title="Escultura 3D STL/OBJ">🧊 3D</button>
+                            <button onclick="openAiClipStudioModal()" class="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1" title="Estudio de Creación Narrativa & Clips IA">🎬 Clips</button>
                             <button onclick="captureUltraScreenshot('4k', true)" class="text-zinc-200 hover:text-amber-300 font-medium flex items-center gap-1" title="Captura 4K instantánea [P]">📸 4K</button>
                             <button onclick="toggleCameraOrbit()" class="text-zinc-200 hover:text-indigo-300 font-medium flex items-center gap-1">🎥 Órbita</button>
                             <button onclick="toggleFullscreen()" class="text-zinc-200 hover:text-white font-medium flex items-center gap-1">⛶ Fullscreen</button>
@@ -4922,6 +4931,7 @@
         let vjSessionTimelineEngine = null;
         let meshFreeze3DEngine = null;
         let liveVideoIngestEngine = null;
+        let aiClipStudioEngine = null;
         let gpuComputeManager = null;
         let audioDataTexture = null;
         let audioTextureBytes = null;
@@ -7192,8 +7202,14 @@
                 if (audioDataTexture && customShaderUniforms.uAudioTexture) {
                     customShaderUniforms.uAudioTexture.value = audioDataTexture;
                 }
+                let activeVideoTex = null;
                 if (liveVideoIngestEngine && liveVideoIngestEngine.isActive && liveVideoIngestEngine.videoTexture) {
-                    if (customShaderUniforms.uVideoTexture) customShaderUniforms.uVideoTexture.value = liveVideoIngestEngine.videoTexture;
+                    activeVideoTex = liveVideoIngestEngine.videoTexture;
+                } else if (aiClipStudioEngine && aiClipStudioEngine.isActive && aiClipStudioEngine.getTexture()) {
+                    activeVideoTex = aiClipStudioEngine.getTexture();
+                }
+                if (activeVideoTex) {
+                    if (customShaderUniforms.uVideoTexture) customShaderUniforms.uVideoTexture.value = activeVideoTex;
                     if (customShaderUniforms.uVideoActive) customShaderUniforms.uVideoActive.value = 1.0;
                 } else if (customShaderUniforms.uVideoActive) {
                     customShaderUniforms.uVideoActive.value = 0.0;
@@ -17095,6 +17111,1453 @@ Respond ONLY with valid JSON with:
             if (liveVideoIngestEngine) liveVideoIngestEngine.setChromaKey(liveVideoIngestEngine.chromaKey.enabled, null, tol);
         }
 
+
+        // =========================================================================
+        // ESTUDIO DE CREACIÓN NARRATIVA & CLIPS IA MULTICAPA (D-040)
+        // 6 Arquetipos: Anime Sakuga, Cómic Noir & Halftone, Cine 35mm,
+        // Aventura & Fantasía, Cyberpunk & Sci-Fi, Acuarela & Óleo Onírico.
+        // Storyboards Autónomos con Gemini API & Fallback Heurístico Local,
+        // Proyección en Three.js & GLSL uVideoTexture a 60 FPS.
+        // =========================================================================
+
+        class AiClipStudioEngine {
+            constructor() {
+                this.isActive = true;
+                this.isPlaying = true;
+                this.activeArchetype = 'anime'; // 'anime', 'comic', 'cinema', 'adventure', 'cyberpunk', 'watercolor'
+                this.activeSource = 'procedural'; // 'procedural' or 'user_video'
+                this.styleFilter = 'none'; // 'none', 'comic_ink', 'anime_cel', 'quantum_holo', 'cyber_glitch'
+                this.projectionTarget = 'all'; // 'all', 'monolith', 'shaders', 'pip'
+                this.pipVisible = false;
+
+                this.reactivity = {
+                    speedRamp: true,
+                    speedSens: 1.5,
+                    beatJump: true,
+                    subBassZoom: true,
+                    chromaEnabled: false,
+                    chromaColor: 'green',
+                    chromaTol: 0.45,
+                    opacity: 1.0,
+                    scale: 1.0
+                };
+
+                // Offscreen Canvas de alta fidelidad 60 FPS
+                this.width = 640;
+                this.height = 360;
+                this.canvas = document.createElement('canvas');
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+                this.ctx = this.canvas.getContext('2d');
+
+                // CanvasTexture para Three.js y Shaders GLSL
+                this.texture = new THREE.CanvasTexture(this.canvas);
+                this.texture.minFilter = THREE.LinearFilter;
+                this.texture.magFilter = THREE.LinearFilter;
+                this.texture.generateMipmaps = false;
+
+                // Reproductor de video de usuario (archivos locales .mp4, .webm, .gif)
+                this.userVideo = document.createElement('video');
+                this.userVideo.crossOrigin = 'anonymous';
+                this.userVideo.loop = true;
+                this.userVideo.muted = true;
+                this.userVideo.playsInline = true;
+                this.hasUserVideo = false;
+                this.userVideoTexture = null;
+
+                // Variables de estado procedimental
+                this.virtualTime = 0.0;
+                this.impactTimer = 0.0;
+                this.currentComicWord = "POW!";
+                this.comicWordTimer = 0.0;
+                this.comicWords = ["POW!", "BOOM!", "BASS!", "DROP!", "KAPOW!", "SHOCK!", "ZENITH!"];
+
+                // Partículas y semilleros procedimentales
+                this.stars = [];
+                for (let i = 0; i < 70; i++) {
+                    this.stars.push({
+                        x: Math.random() * this.width,
+                        y: Math.random() * this.height,
+                        r: 0.5 + Math.random() * 1.5,
+                        twinkle: Math.random() * 6.28,
+                        speed: 0.2 + Math.random() * 0.8
+                    });
+                }
+
+                this.cyberRain = [];
+                for (let i = 0; i < 36; i++) {
+                    this.cyberRain.push({
+                        x: (i / 36) * this.width + (Math.random() * 10 - 5),
+                        y: Math.random() * this.height,
+                        speed: 80 + Math.random() * 180,
+                        len: 5 + Math.floor(Math.random() * 8),
+                        chars: "0101XYZΩΨ01"
+                    });
+                }
+
+                this.watercolorBlooms = [];
+                const colors = [
+                    'rgba(30, 58, 138, 0.7)',   // Ultramarine
+                    'rgba(190, 24, 93, 0.7)',   // Magenta quinacridone
+                    'rgba(4, 120, 87, 0.65)',   // Emerald
+                    'rgba(217, 119, 6, 0.6)',   // Amber gold
+                    'rgba(109, 40, 217, 0.65)'  // Violet
+                ];
+                for (let i = 0; i < 14; i++) {
+                    this.watercolorBlooms.push({
+                        x: Math.random() * this.width,
+                        y: Math.random() * this.height,
+                        baseR: 35 + Math.random() * 55,
+                        color: colors[i % colors.length],
+                        phase: Math.random() * 6.28,
+                        speed: 0.3 + Math.random() * 0.7,
+                        harmonics: [Math.random() * 0.3, Math.random() * 0.2, Math.random() * 0.15]
+                    });
+                }
+
+                // Storyboard Autónomo
+                this.storyboard = [];
+                this.currentSceneIdx = 0;
+                this.autoSyncAudio = true;
+                this.trackDuration = 180;
+
+                // Elementos 3D
+                this.holoMaterial = null;
+                this.monolithScreenMesh = null;
+                this.crystalScreenMesh = null;
+                this.generalScreenMesh = null;
+
+                // Preview Canvases
+                this.modalPreviewCanvas = null;
+                this.modalPreviewCtx = null;
+                this.pipCanvas = null;
+                this.pipCtx = null;
+            }
+
+            init() {
+                this.generateDefaultStoryboard();
+                this.setupHoloMaterial();
+                this.attachToThreeScene();
+                this.setupUserVideoEvents();
+                console.log("[AiClipStudioEngine] Inicializado con 6 arquetipos y proyección universal.");
+            }
+
+            setupHoloMaterial() {
+                const vert = `
+                    varying vec2 vUv;
+                    varying vec3 vNormal;
+                    uniform float uTime;
+                    uniform float uBassZoom;
+                    void main() {
+                        vUv = uv;
+                        vNormal = normalize(normalMatrix * normal);
+                        vec3 pos = position;
+                        // Curvatura cilíndrica sutil de pantalla IMAX
+                        pos.z += (1.0 - pow(uv.x * 2.0 - 1.0, 2.0)) * 4.0;
+                        // Micro-pulso con graves
+                        pos *= (1.0 + uBassZoom * 0.08);
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                    }
+                `;
+
+                const frag = `
+                    varying vec2 vUv;
+                    varying vec3 vNormal;
+                    uniform sampler2D uTexture;
+                    uniform float uTime;
+                    uniform float uOpacity;
+                    uniform float uAudioGlitch;
+                    uniform float uChromaEnabled;
+                    uniform vec3 uChromaColor;
+                    uniform float uChromaTol;
+
+                    void main() {
+                        vec2 uv = vUv;
+                        // Audio Glitch horizontal slices
+                        if (uAudioGlitch > 0.05) {
+                            float slice = sin(uv.y * 60.0 + uTime * 40.0);
+                            if (slice > 0.7) {
+                                uv.x += sin(uTime * 30.0) * 0.03 * uAudioGlitch;
+                            }
+                        }
+
+                        vec4 tex = texture2D(uTexture, uv);
+
+                        // Chroma Key GPU
+                        if (uChromaEnabled > 0.5) {
+                            float dist = distance(tex.rgb, uChromaColor);
+                            float alpha = smoothstep(uChromaTol, uChromaTol + 0.15, dist);
+                            tex.a *= alpha;
+                        }
+
+                        // Scanlines CRT sutiles
+                        float scan = 0.92 + 0.08 * sin(uv.y * 500.0);
+                        tex.rgb *= scan;
+
+                        // Fresnel Rim Glow
+                        float rim = 1.0 - max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0);
+                        vec3 rimColor = vec3(0.6, 0.2, 1.0) * pow(rim, 3.0) * 0.8;
+                        tex.rgb += rimColor;
+
+                        gl_FragColor = vec4(tex.rgb, tex.a * uOpacity);
+                    }
+                `;
+
+                this.holoMaterial = new THREE.ShaderMaterial({
+                    vertexShader: vert,
+                    fragmentShader: frag,
+                    uniforms: {
+                        uTexture: { value: this.texture },
+                        uTime: { value: 0.0 },
+                        uOpacity: { value: this.reactivity.opacity },
+                        uBassZoom: { value: 0.0 },
+                        uAudioGlitch: { value: 0.0 },
+                        uChromaEnabled: { value: this.reactivity.chromaEnabled ? 1.0 : 0.0 },
+                        uChromaColor: { value: new THREE.Color(0x00ff00) },
+                        uChromaTol: { value: this.reactivity.chromaTol }
+                    },
+                    transparent: true,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                });
+            }
+
+            attachToThreeScene() {
+                if (!threeScene) return;
+
+                // 1. Pantalla en Océano de Mercurio (ScenicWorldEngine)
+                if (scenicWorldEngine && scenicWorldEngine.mercuryGroup && !this.monolithScreenMesh) {
+                    const geom = new THREE.PlaneGeometry(90, 130, 32, 32);
+                    this.monolithScreenMesh = new THREE.Mesh(geom, this.holoMaterial);
+                    this.monolithScreenMesh.position.set(0, 85, -230);
+                    scenicWorldEngine.mercuryGroup.add(this.monolithScreenMesh);
+                }
+
+                // 2. Pantalla en Valle de Cristales
+                if (scenicWorldEngine && scenicWorldEngine.crystalGroup && !this.crystalScreenMesh) {
+                    const geom2 = new THREE.PlaneGeometry(75, 110, 24, 24);
+                    this.crystalScreenMesh = new THREE.Mesh(geom2, this.holoMaterial);
+                    this.crystalScreenMesh.position.set(0, 110, -180);
+                    scenicWorldEngine.crystalGroup.add(this.crystalScreenMesh);
+                }
+
+                // 3. Pantalla flotante en escenas estándar (Nebulosa, Túnel, Monolito)
+                if (!this.generalScreenMesh) {
+                    const geom3 = new THREE.PlaneGeometry(55, 80, 24, 24);
+                    this.generalScreenMesh = new THREE.Mesh(geom3, this.holoMaterial);
+                    this.generalScreenMesh.position.set(0, 0, -160);
+                    threeScene.add(this.generalScreenMesh);
+                }
+            }
+
+            setupUserVideoEvents() {
+                this.userVideo.addEventListener('loadeddata', () => {
+                    this.hasUserVideo = true;
+                    this.userVideoTexture = new THREE.VideoTexture(this.userVideo);
+                    this.userVideoTexture.minFilter = THREE.LinearFilter;
+                    this.userVideoTexture.magFilter = THREE.LinearFilter;
+                    this.activeSource = 'user_video';
+                    if (typeof showToast === 'function') {
+                        showToast("Video de Usuario Listo", "Reproduciendo clip local en bucle reactivo.", "success", 3000);
+                    }
+                    this.updateUI();
+                });
+            }
+
+            loadUserVideoFile(file) {
+                if (!file) return;
+                const url = URL.createObjectURL(file);
+                this.userVideo.src = url;
+                this.userVideo.play().catch(e => console.warn("[AiClipStudio] Video play error:", e));
+            }
+
+            getTexture() {
+                if (this.hasUserVideo && this.activeSource === 'user_video') {
+                    return this.userVideoTexture || this.texture;
+                }
+                return this.texture;
+            }
+
+            // =====================================================================
+            // BUCLE DE ACTUALIZACIÓN & RENDERIZADO 60 FPS
+            // =====================================================================
+            update(time, dt) {
+                if (!this.isActive) return;
+
+                // 1. Telemetría de Audio Reactiva
+                const bass = (stemsData && stemsData['bass']) ? stemsData['bass'].value : 0.0;
+                const sub = (stemsData && stemsData['sub']) ? stemsData['sub'].value : 0.0;
+                const mid = (stemsData && stemsData['mid']) ? stemsData['mid'].value : 0.0;
+                const highmid = (stemsData && stemsData['highmid']) ? stemsData['highmid'].value : 0.0;
+                const treble = (stemsData && stemsData['treble']) ? stemsData['treble'].value : 0.0;
+                const rms = liveAudioMetrics ? (liveAudioMetrics.rms || 0.0) : 0.0;
+                const isOnset = liveAudioMetrics ? !!liveAudioMetrics.isOnset : false;
+
+                // 2. Modulación de velocidad y tiempo virtual
+                let speedMult = 1.0;
+                if (this.reactivity.speedRamp) {
+                    speedMult = 0.8 + (rms * 1.5 + bass * 0.7) * this.reactivity.speedSens;
+                }
+                if (this.isPlaying) {
+                    this.virtualTime += dt * speedMult;
+                }
+
+                // 3. Temporizadores de impacto y cómics
+                if (isOnset && this.reactivity.beatJump) {
+                    this.impactTimer = 0.18;
+                    this.comicWordTimer = 0.45;
+                    this.currentComicWord = this.comicWords[Math.floor(Math.random() * this.comicWords.length)];
+                } else {
+                    if (this.impactTimer > 0) this.impactTimer -= dt;
+                    if (this.comicWordTimer > 0) this.comicWordTimer -= dt;
+                }
+
+                // 4. Sincronización con Storyboard si está activo
+                if (this.autoSyncAudio && this.storyboard.length > 0) {
+                    this.syncStoryboard();
+                }
+
+                // 5. Renderizado a Canvas según Fuente
+                const audio = { bass, sub, mid, highmid, treble, rms, isOnset, speed: speedMult };
+                const ctx = this.ctx;
+                const w = this.width;
+                const h = this.height;
+
+                if (this.activeSource === 'user_video' && this.hasUserVideo) {
+                    // Renderiza video del usuario
+                    try {
+                        ctx.drawImage(this.userVideo, 0, 0, w, h);
+                    } catch (e) {}
+                } else {
+                    // Renderiza Arquetipo Procedural
+                    switch (this.activeArchetype) {
+                        case 'anime':
+                            this.drawAnime(ctx, w, h, this.virtualTime, audio);
+                            break;
+                        case 'comic':
+                            this.drawComic(ctx, w, h, this.virtualTime, audio);
+                            break;
+                        case 'cinema':
+                            this.drawCinema(ctx, w, h, this.virtualTime, audio);
+                            break;
+                        case 'adventure':
+                            this.drawAdventure(ctx, w, h, this.virtualTime, audio);
+                            break;
+                        case 'cyberpunk':
+                            this.drawCyberpunk(ctx, w, h, this.virtualTime, audio);
+                            break;
+                        case 'watercolor':
+                        default:
+                            this.drawWatercolor(ctx, w, h, this.virtualTime, audio);
+                            break;
+                    }
+                }
+
+                // 6. Aplicar Filtro de Estilo
+                if (this.styleFilter !== 'none') {
+                    this.applyStyleFilter(ctx, w, h, this.virtualTime, audio);
+                }
+
+                // 7. Notificar a Three.js que la textura cambió
+                this.texture.needsUpdate = true;
+
+                // 8. Actualizar uniforms del material holográfico
+                if (this.holoMaterial) {
+                    this.holoMaterial.uniforms.uTime.value = time;
+                    this.holoMaterial.uniforms.uOpacity.value = this.reactivity.opacity;
+                    this.holoMaterial.uniforms.uBassZoom.value = this.reactivity.subBassZoom ? (bass * 0.8 + sub * 0.4) : 0.0;
+                    this.holoMaterial.uniforms.uAudioGlitch.value = (isOnset && this.reactivity.beatJump) ? 0.4 : 0.0;
+                    this.holoMaterial.uniforms.uChromaEnabled.value = this.reactivity.chromaEnabled ? 1.0 : 0.0;
+                    this.holoMaterial.uniforms.uChromaTol.value = this.reactivity.chromaTol;
+                    let c = new THREE.Color(0x00ff00);
+                    if (this.reactivity.chromaColor === 'blue') c.setHex(0x0000ff);
+                    else if (this.reactivity.chromaColor === 'black') c.setHex(0x050505);
+                    this.holoMaterial.uniforms.uChromaColor.value = c;
+                }
+
+                // 9. Actualizar orientación de pantallas 3D
+                this.update3DScreens(time, bass);
+
+                // 10. Actualizar Vistas Previas (Modal y PiP)
+                this.updatePreviewCanvases();
+            }
+
+            update3DScreens(time, bass) {
+                const currentSceneIdx = (typeof currentThreeSceneIdx !== 'undefined') ? currentThreeSceneIdx : 12;
+                const isScenic = (currentSceneIdx === 12 || currentSceneIdx === 13);
+
+                if (this.monolithScreenMesh) {
+                    this.monolithScreenMesh.visible = (this.projectionTarget === 'all' || this.projectionTarget === 'monolith') && isScenic;
+                    this.monolithScreenMesh.position.y = 85 + Math.sin(time * 1.1) * 3.5;
+                    this.monolithScreenMesh.rotation.y = Math.sin(time * 0.3) * 0.05;
+                }
+
+                if (this.crystalScreenMesh) {
+                    this.crystalScreenMesh.visible = (this.projectionTarget === 'all' || this.projectionTarget === 'crystals') && (currentSceneIdx === 13);
+                    this.crystalScreenMesh.position.y = 110 + Math.cos(time * 0.8) * 4.0;
+                }
+
+                if (this.generalScreenMesh) {
+                    this.generalScreenMesh.visible = (this.projectionTarget === 'all' || this.projectionTarget === 'monolith') && !isScenic;
+                    this.generalScreenMesh.position.y = Math.sin(time * 1.2) * 2.0;
+                    this.generalScreenMesh.rotation.y = Math.sin(time * 0.4) * 0.08;
+                }
+            }
+
+            // =====================================================================
+            // 6 ARQUETIPOS PROCEDURALES GENERATIVOS
+            // =====================================================================
+
+            // 1. Anime Sakuga & Cel-Shading
+            drawAnime(ctx, w, h, t, audio) {
+                // Cielo atardecer cyberpunk anime
+                const grad = ctx.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0, '#0f051d');
+                grad.addColorStop(0.5, '#4a0e4e');
+                grad.addColorStop(0.8, '#b80c57');
+                grad.addColorStop(1, '#ff5e36');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+
+                // Líneas de velocidad dinámicas (Action Speed Lines)
+                ctx.save();
+                const speedLineCount = 18 + Math.floor(audio.treble * 35);
+                const lineSpeed = (t * 600 + audio.bass * 200) % w;
+                ctx.lineWidth = 1.5 + audio.treble * 2.0;
+                for (let i = 0; i < speedLineCount; i++) {
+                    const ly = (i / speedLineCount) * h + (Math.sin(t * 3.0 + i) * 15);
+                    const lx1 = (w - ((lineSpeed + i * 45) % w));
+                    const len = 60 + Math.sin(i * 1.7) * 40 + audio.highmid * 100;
+                    ctx.strokeStyle = (i % 3 === 0) ? 'rgba(0, 245, 255, 0.7)' : 'rgba(255, 255, 255, 0.5)';
+                    ctx.beginPath();
+                    ctx.moveTo(lx1, ly);
+                    ctx.lineTo(lx1 - len, ly);
+                    ctx.stroke();
+                }
+                ctx.restore();
+
+                // Siluetas de edificios lejanos con scroll de paralaje
+                ctx.fillStyle = '#08020f';
+                const cityOffset = (t * 80) % 120;
+                for (let x = -120; x < w + 120; x += 35) {
+                    const bh = 70 + ((Math.sin(x * 0.04) * 40) + 40);
+                    ctx.fillRect(x - cityOffset, h - bh, 30, bh);
+                }
+
+                // Héroe Anime en carrera / salto (Silueta con bufanda y espada de neón)
+                const heroX = w * 0.48 + Math.sin(t * 4.0) * 15;
+                const heroY = h * 0.62 + Math.abs(Math.sin(t * 8.0)) * -18;
+
+                ctx.save();
+                // Bufanda / Capa flameante
+                ctx.fillStyle = '#ff0055';
+                ctx.beginPath();
+                ctx.moveTo(heroX - 10, heroY - 35);
+                ctx.bezierCurveTo(heroX - 45, heroY - 45 + Math.sin(t * 12) * 12, heroX - 85, heroY - 20 + Math.cos(t * 10) * 15, heroX - 110, heroY - 30);
+                ctx.bezierCurveTo(heroX - 75, heroY - 10, heroX - 40, heroY - 20, heroX - 10, heroY - 25);
+                ctx.fill();
+
+                // Silueta de cuerpo
+                ctx.fillStyle = '#05010a';
+                ctx.beginPath();
+                // Cabeza
+                ctx.arc(heroX, heroY - 42, 10, 0, Math.PI * 2);
+                // Torso
+                ctx.moveTo(heroX - 8, heroY - 32);
+                ctx.lineTo(heroX + 12, heroY - 22);
+                ctx.lineTo(heroX + 4, heroY + 8);
+                ctx.lineTo(heroX - 10, heroY);
+                ctx.closePath();
+                ctx.fill();
+
+                // Piernas en carrera
+                const legPhase = t * 16.0;
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = '#05010a';
+                // Pierna delantera
+                ctx.beginPath();
+                ctx.moveTo(heroX - 4, heroY + 5);
+                ctx.lineTo(heroX + Math.sin(legPhase) * 22, heroY + 22);
+                ctx.lineTo(heroX + Math.sin(legPhase) * 25 + 10, heroY + 38);
+                ctx.stroke();
+                // Pierna trasera
+                ctx.beginPath();
+                ctx.moveTo(heroX - 4, heroY + 5);
+                ctx.lineTo(heroX - Math.sin(legPhase) * 22, heroY + 20);
+                ctx.lineTo(heroX - Math.sin(legPhase) * 25 - 8, heroY + 36);
+                ctx.stroke();
+
+                // Katana de Neón Cyan (Sakuga Blade Glow)
+                ctx.shadowColor = '#00f5ff';
+                ctx.shadowBlur = 15 + audio.treble * 20;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 3.5;
+                ctx.beginPath();
+                ctx.moveTo(heroX + 8, heroY - 20);
+                ctx.lineTo(heroX + 45 + Math.sin(t * 6) * 10, heroY - 55);
+                ctx.stroke();
+                ctx.restore();
+
+                // Impacto Sakuga en Drop / Onset (Inversión / Destello instantáneo)
+                if (this.impactTimer > 0) {
+                    ctx.fillStyle = 'rgba(255, 240, 50, 0.4)';
+                    ctx.fillRect(0, 0, w, h);
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 4;
+                    for (let a = 0; a < 8; a++) {
+                        const ang = (a / 8) * Math.PI * 2;
+                        ctx.beginPath();
+                        ctx.moveTo(heroX, heroY - 20);
+                        ctx.lineTo(heroX + Math.cos(ang) * 220, heroY - 20 + Math.sin(ang) * 220);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // 2. Cómic Noir & Halftone
+            drawComic(ctx, w, h, t, audio) {
+                // Fondo amarillo cómic vintage
+                ctx.fillStyle = '#fce444';
+                ctx.fillRect(0, 0, w, h);
+
+                // Trama Halftone Ben-Day Dots reactiva a graves
+                ctx.fillStyle = '#111015';
+                const dotStep = 18;
+                const maxR = 3.5 + audio.bass * 4.5;
+                for (let x = 0; x < w; x += dotStep) {
+                    for (let y = 0; y < h; y += dotStep) {
+                        const d = Math.hypot(x - w * 0.5, y - h * 0.5) / (w * 0.5);
+                        const r = Math.max(0.5, maxR * (1.0 - d * 0.6));
+                        ctx.beginPath();
+                        ctx.arc(x, y, r, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                // Silueta de Gotham / Ciudad Noir
+                ctx.fillStyle = '#09080d';
+                ctx.beginPath();
+                ctx.moveTo(0, h);
+                ctx.lineTo(0, h - 140);
+                ctx.lineTo(90, h - 160);
+                ctx.lineTo(90, h - 110);
+                ctx.lineTo(190, h - 190);
+                ctx.lineTo(240, h - 190);
+                ctx.lineTo(240, h - 130);
+                ctx.lineTo(340, h - 230);
+                ctx.lineTo(390, h - 230);
+                ctx.lineTo(440, h - 150);
+                ctx.lineTo(540, h - 210);
+                ctx.lineTo(w, h - 160);
+                ctx.lineTo(w, h);
+                ctx.closePath();
+                ctx.fill();
+
+                // Ventanas amarillas encendidas
+                ctx.fillStyle = '#ffea55';
+                for (let wx = 30; wx < w - 40; wx += 45) {
+                    if ((wx % 90) === 0) {
+                        ctx.fillRect(wx, h - 110, 8, 14);
+                        ctx.fillRect(wx + 12, h - 110, 8, 14);
+                    }
+                }
+
+                // Gárgola y Vigilante Noir en primer plano
+                const vx = w * 0.28;
+                const vy = h * 0.58;
+                ctx.fillStyle = '#000000';
+                // Cabeza y capucha
+                ctx.beginPath();
+                ctx.arc(vx, vy - 45, 12, 0, Math.PI * 2);
+                ctx.fill();
+                // Gabardina larga ondeando
+                ctx.beginPath();
+                ctx.moveTo(vx - 8, vy - 35);
+                ctx.lineTo(vx + 16, vy - 20);
+                ctx.lineTo(vx + 8 + Math.sin(t * 5) * 20, vy + 40);
+                ctx.lineTo(vx - 25 + Math.cos(t * 4) * 25, vy + 35);
+                ctx.closePath();
+                ctx.fill();
+
+                // Lluvia diagonal Noir
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.lineWidth = 1.2;
+                const rainSeed = (t * 700) % 200;
+                for (let r = 0; r < 35; r++) {
+                    const rx = (r * 22 + rainSeed) % w;
+                    const ry = ((r * 37 + rainSeed * 1.5) % h);
+                    ctx.beginPath();
+                    ctx.moveTo(rx, ry);
+                    ctx.lineTo(rx - 15, ry + 25);
+                    ctx.stroke();
+                }
+
+                // Marco de Viñeta Cómic grueso
+                ctx.strokeStyle = '#000000';
+                ctx.lineWidth = 8;
+                ctx.strokeRect(4, 4, w - 8, h - 8);
+
+                // Onomatopeya Splash ("POW!", "BOOM!", "BASS!") en Onsets
+                if (this.comicWordTimer > 0) {
+                    ctx.save();
+                    const cx = w * 0.68;
+                    const cy = h * 0.38;
+                    const scale = 1.0 + Math.sin(this.comicWordTimer * 10) * 0.25;
+
+                    ctx.translate(cx, cy);
+                    ctx.scale(scale, scale);
+                    ctx.rotate(-0.15);
+
+                    // Estrella de impacto cómic
+                    ctx.fillStyle = '#ff2233';
+                    ctx.strokeStyle = '#000000';
+                    ctx.lineWidth = 5;
+                    ctx.beginPath();
+                    const spikes = 12;
+                    for (let s = 0; s < spikes * 2; s++) {
+                        const radius = (s % 2 === 0) ? 75 : 42;
+                        const ang = (s / (spikes * 2)) * Math.PI * 2;
+                        const px = Math.cos(ang) * radius;
+                        const py = Math.sin(ang) * radius;
+                        if (s === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Tipografía de Acción Cómic
+                    ctx.font = "900 36px Impact, sans-serif";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "#ffffff";
+                    ctx.strokeStyle = "#000000";
+                    ctx.lineWidth = 6;
+                    ctx.strokeText(this.currentComicWord, 0, 0);
+                    ctx.fillText(this.currentComicWord, 0, 0);
+                    ctx.restore();
+                }
+            }
+
+            // 3. Cinematografía Realista 35mm
+            drawCinema(ctx, w, h, t, audio) {
+                // Fondo oscuro de escenario teatral
+                ctx.fillStyle = '#060609';
+                ctx.fillRect(0, 0, w, h);
+
+                // Foco Cenital Volumétrico (Overhead Spotlight)
+                const spotX = w * 0.5 + Math.sin(t * 0.8) * 20;
+                const spotY = 20;
+                const spotGrad = ctx.createRadialGradient(spotX, spotY, 10, spotX, h * 0.75, 260);
+                spotGrad.addColorStop(0, 'rgba(255, 245, 220, 0.45)');
+                spotGrad.addColorStop(0.3, 'rgba(56, 189, 248, 0.22)');
+                spotGrad.addColorStop(0.8, 'rgba(15, 23, 42, 0.08)');
+                spotGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = spotGrad;
+                ctx.beginPath();
+                ctx.moveTo(spotX - 15, spotY);
+                ctx.lineTo(spotX + 15, spotY);
+                ctx.lineTo(spotX + 180, h);
+                ctx.lineTo(spotX - 180, h);
+                ctx.closePath();
+                ctx.fill();
+
+                // Destello Anamórfico Horizontal (35mm Anamorphic Lens Flare)
+                const flareWidth = 160 + audio.mid * 380;
+                const flareGrad = ctx.createLinearGradient(spotX - flareWidth, spotY + 60, spotX + flareWidth, spotY + 60);
+                flareGrad.addColorStop(0, 'rgba(0, 245, 255, 0)');
+                flareGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.8)');
+                flareGrad.addColorStop(1, 'rgba(0, 245, 255, 0)');
+                ctx.fillStyle = flareGrad;
+                ctx.fillRect(spotX - flareWidth, spotY + 58, flareWidth * 2, 4);
+
+                // Cantante Realista ante el micrófono (Silueta con Rim Light dorado)
+                const singX = w * 0.5;
+                const singY = h * 0.68;
+
+                ctx.save();
+                // Rim Light sutil en bordes
+                ctx.shadowColor = '#ffd066';
+                ctx.shadowBlur = 12 + audio.presence * 15;
+
+                // Soporte de Micrófono Vintage
+                ctx.strokeStyle = '#22222a';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(singX - 15, singY + 60);
+                ctx.lineTo(singX - 15, singY - 20);
+                ctx.stroke();
+
+                // Micrófono
+                ctx.fillStyle = '#666675';
+                ctx.beginPath();
+                ctx.arc(singX - 15, singY - 25, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Silueta Cantante
+                ctx.fillStyle = '#0a0a0f';
+                // Cabeza
+                ctx.beginPath();
+                ctx.arc(singX + 8, singY - 32, 14, 0, Math.PI * 2);
+                ctx.fill();
+                // Cabello / Peinado con movimiento sutil
+                ctx.beginPath();
+                ctx.moveTo(singX + 2, singY - 45);
+                ctx.bezierCurveTo(singX + 25, singY - 48, singX + 28, singY - 25, singX + 22, singY - 10);
+                ctx.lineTo(singX + 6, singY - 20);
+                ctx.fill();
+                // Torso & Hombros
+                ctx.beginPath();
+                ctx.moveTo(singX - 6, singY - 18);
+                ctx.lineTo(singX + 26, singY - 18);
+                ctx.lineTo(singX + 38, singY + 50);
+                ctx.lineTo(singX - 22, singY + 50);
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+
+                // Manos del público en la penumbra agitando al compás
+                ctx.fillStyle = '#040407';
+                for (let px = 20; px < w; px += 35) {
+                    const wave = Math.sin(t * 3.5 + px * 0.1) * 12 * (0.6 + audio.bass);
+                    ctx.beginPath();
+                    ctx.arc(px, h - 18 + wave, 7, 0, Math.PI * 2);
+                    ctx.rect(px - 4, h - 18 + wave, 8, 30);
+                    ctx.fill();
+                }
+
+                // Partículas Bokeh flotantes en el haz de luz
+                ctx.fillStyle = 'rgba(255, 235, 180, 0.45)';
+                for (let b = 0; b < 18; b++) {
+                    const bx = (b * 37 + t * 20) % (w * 0.6) + (w * 0.2);
+                    const by = (b * 29 + Math.sin(t + b) * 30) % (h * 0.7) + 40;
+                    const br = 1.2 + (Math.sin(b + t) * 1.5 + 1.5);
+                    ctx.beginPath();
+                    ctx.arc(bx, by, br, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Barras Cinemáticas 2.39:1 Letterbox (Panavision Cinema)
+                ctx.fillStyle = '#000000';
+                const barH = 28;
+                ctx.fillRect(0, 0, w, barH);
+                ctx.fillRect(0, h - barH, w, barH);
+            }
+
+            // 4. Aventura & Fantasía Épica
+            drawAdventure(ctx, w, h, t, audio) {
+                // Cielo cósmico crepuscular con nebulosa púrpura
+                const skyGrad = ctx.createLinearGradient(0, 0, 0, h);
+                skyGrad.addColorStop(0, '#040212');
+                skyGrad.addColorStop(0.4, '#1b0a3a');
+                skyGrad.addColorStop(0.8, '#0b3c5d');
+                skyGrad.addColorStop(1, '#0e5f76');
+                ctx.fillStyle = skyGrad;
+                ctx.fillRect(0, 0, w, h);
+
+                // Estrellas titilantes
+                ctx.fillStyle = '#ffffff';
+                for (const s of this.stars) {
+                    const alpha = 0.3 + 0.7 * Math.sin(t * s.speed + s.twinkle);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Lunas Gemelas con Anillos Planetarios
+                const moonX = w * 0.78;
+                const moonY = h * 0.28;
+                // Anillo
+                ctx.save();
+                ctx.translate(moonX, moonY);
+                ctx.rotate(-0.35);
+                ctx.strokeStyle = 'rgba(167, 243, 208, 0.45)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 48, 14, 0, 0, Math.PI * 2);
+                ctx.stroke();
+                // Luna principal
+                const moonGrad = ctx.createRadialGradient(-6, -6, 2, 0, 0, 26);
+                moonGrad.addColorStop(0, '#ffffff');
+                moonGrad.addColorStop(0.5, '#6ee7b7');
+                moonGrad.addColorStop(1, '#064e3b');
+                ctx.fillStyle = moonGrad;
+                ctx.beginPath();
+                ctx.arc(0, 0, 24, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                // Cintas de Aurora Boreal ondulante (reactiva a armónicos medios)
+                ctx.save();
+                for (let a = 0; a < 3; a++) {
+                    const aurY = h * 0.25 + a * 25;
+                    ctx.beginPath();
+                    ctx.moveTo(0, aurY);
+                    for (let x = 0; x <= w; x += 40) {
+                        const wave = Math.sin(x * 0.015 + t * 1.5 + a) * 25 * (0.8 + audio.mid);
+                        ctx.lineTo(x, aurY + wave);
+                    }
+                    ctx.lineTo(w, h);
+                    ctx.lineTo(0, h);
+                    ctx.closePath();
+                    ctx.fillStyle = (a === 0) ? 'rgba(6, 182, 212, 0.15)' : 'rgba(236, 72, 153, 0.12)';
+                    ctx.fill();
+                }
+                ctx.restore();
+
+                // Islas Flotantes con cascadas de cuarzo
+                const isleX = w * 0.32 + Math.sin(t * 0.5) * 10;
+                const isleY = h * 0.52 + Math.cos(t * 0.6) * 6;
+                ctx.fillStyle = '#0a1622';
+                ctx.beginPath();
+                ctx.moveTo(isleX - 90, isleY);
+                ctx.bezierCurveTo(isleX - 40, isleY - 22, isleX + 40, isleY - 22, isleX + 90, isleY);
+                ctx.bezierCurveTo(isleX + 60, isleY + 45, isleX, isleY + 70, isleX - 90, isleY);
+                ctx.fill();
+
+                // Cascada luminosa
+                ctx.strokeStyle = 'rgba(103, 232, 249, 0.8)';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(isleX + 15, isleY - 5);
+                ctx.lineTo(isleX + 15, isleY + 65);
+                ctx.stroke();
+
+                // Dragón Alado / Nave Titánica surcando el cielo
+                const dragX = w * 0.55 + Math.cos(t * 1.2) * 140;
+                const dragY = h * 0.38 + Math.sin(t * 2.4) * 35;
+                const wingFlap = Math.sin(t * 8.0) * 22;
+
+                ctx.save();
+                ctx.fillStyle = '#020617';
+                // Cuerpo
+                ctx.beginPath();
+                ctx.ellipse(dragX, dragY, 20, 6, 0.1, 0, Math.PI * 2);
+                ctx.fill();
+                // Ala superior
+                ctx.beginPath();
+                ctx.moveTo(dragX - 4, dragY);
+                ctx.lineTo(dragX + 8, dragY - 28 + wingFlap);
+                ctx.lineTo(dragX + 22, dragY);
+                ctx.closePath();
+                ctx.fill();
+                // Ala inferior
+                ctx.beginPath();
+                ctx.moveTo(dragX - 4, dragY);
+                ctx.lineTo(dragX + 8, dragY + 22 - wingFlap);
+                ctx.lineTo(dragX + 22, dragY);
+                ctx.closePath();
+                ctx.fill();
+                // Estela de propulsión de energía
+                ctx.strokeStyle = 'rgba(244, 63, 94, 0.8)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(dragX - 18, dragY);
+                ctx.lineTo(dragX - 55, dragY + Math.sin(t * 12) * 5);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // 5. Cyberpunk 2099 & Sci-Fi
+            drawCyberpunk(ctx, w, h, t, audio) {
+                // Fondo Megaciudad nocturna
+                ctx.fillStyle = '#030206';
+                ctx.fillRect(0, 0, w, h);
+
+                // Cuadrícula en perspectiva (Horizon Synthwave Grid)
+                const horizonY = h * 0.65;
+                ctx.strokeStyle = 'rgba(236, 72, 153, 0.28)';
+                ctx.lineWidth = 1;
+                // Líneas horizontales con perspectiva logarítmica
+                for (let i = 0; i < 9; i++) {
+                    const gy = horizonY + Math.pow(i / 8, 2.0) * (h - horizonY);
+                    ctx.beginPath();
+                    ctx.moveTo(0, gy);
+                    ctx.lineTo(w, gy);
+                    ctx.stroke();
+                }
+                // Líneas de fuga
+                for (let f = -w * 0.5; f <= w * 1.5; f += 50) {
+                    ctx.beginPath();
+                    ctx.moveTo(w * 0.5, horizonY);
+                    ctx.lineTo(f, h);
+                    ctx.stroke();
+                }
+
+                // Lluvia digital de glifos estilo Matrix Neón
+                ctx.font = "10px monospace";
+                for (const col of this.cyberRain) {
+                    col.y = (col.y + col.speed * 0.016 * (1.0 + audio.speed * 0.5)) % h;
+                    ctx.fillStyle = 'rgba(0, 255, 200, 0.8)';
+                    ctx.fillText(col.chars[Math.floor(t * 8) % col.chars.length], col.x, col.y);
+                    ctx.fillStyle = 'rgba(0, 180, 140, 0.25)';
+                    for (let c = 1; c < col.len; c++) {
+                        ctx.fillText(col.chars[(c + Math.floor(t)) % col.chars.length], col.x, (col.y - c * 11 + h) % h);
+                    }
+                }
+
+                // Silueta de Androide / Cyborg con Circuitos Neuronales de Neón
+                const andX = w * 0.5;
+                const andY = h * 0.45;
+
+                ctx.save();
+                // Cabeza
+                ctx.fillStyle = '#080811';
+                ctx.beginPath();
+                ctx.arc(andX, andY - 30, 32, 0, Math.PI * 2);
+                ctx.fill();
+                // Mandíbula y cuello cibernético
+                ctx.beginPath();
+                ctx.moveTo(andX - 22, andY - 10);
+                ctx.lineTo(andX - 14, andY + 30);
+                ctx.lineTo(andX + 14, andY + 30);
+                ctx.lineTo(andX + 22, andY - 10);
+                ctx.closePath();
+                ctx.fill();
+
+                // Circuitos neuronales iluminados en rostro y cuello
+                ctx.shadowColor = '#00f5ff';
+                ctx.shadowBlur = 10 + audio.highmid * 15;
+                ctx.strokeStyle = '#00f5ff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(andX - 18, andY - 35);
+                ctx.lineTo(andX - 6, andY - 25);
+                ctx.lineTo(andX - 6, andY);
+                ctx.lineTo(andX - 14, andY + 20);
+                ctx.moveTo(andX + 18, andY - 35);
+                ctx.lineTo(andX + 6, andY - 25);
+                ctx.lineTo(andX + 6, andY);
+                ctx.lineTo(andX + 14, andY + 20);
+                ctx.stroke();
+
+                // Ojos Visor Cibernético
+                ctx.fillStyle = '#ff007f';
+                ctx.shadowColor = '#ff007f';
+                ctx.shadowBlur = 14;
+                ctx.fillRect(andX - 18, andY - 32, 36, 5);
+                ctx.restore();
+
+                // HUD Reticle Overlay & Mini Osciloscopio
+                ctx.strokeStyle = 'rgba(0, 245, 255, 0.6)';
+                ctx.lineWidth = 1.5;
+                ctx.strokeRect(w * 0.5 - 55, andY - 55, 110, 110);
+                // Esquinas tácticas
+                const corner = 12;
+                ctx.beginPath();
+                ctx.moveTo(w * 0.5 - 55, andY - 55 + corner); ctx.lineTo(w * 0.5 - 55, andY - 55); ctx.lineTo(w * 0.5 - 55 + corner, andY - 55);
+                ctx.moveTo(w * 0.5 + 55, andY - 55 + corner); ctx.lineTo(w * 0.5 + 55, andY - 55); ctx.lineTo(w * 0.5 + 55 - corner, andY - 55);
+                ctx.stroke();
+
+                // Mini Osciloscopio en esquina inferior derecha
+                ctx.fillStyle = 'rgba(10, 10, 20, 0.7)';
+                ctx.fillRect(w - 110, h - 50, 100, 40);
+                ctx.strokeStyle = '#10b981';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                for (let ox = 0; ox < 90; ox += 5) {
+                    const oy = h - 30 + Math.sin(ox * 0.2 + t * 15.0) * (6 + audio.bass * 12);
+                    if (ox === 0) ctx.moveTo(w - 105 + ox, oy);
+                    else ctx.lineTo(w - 105 + ox, oy);
+                }
+                ctx.stroke();
+            }
+
+            // 6. Acuarela & Óleo Onírico
+            drawWatercolor(ctx, w, h, t, audio) {
+                // Fondo de papel pergamino texturizado
+                ctx.fillStyle = '#f8f5ee';
+                ctx.fillRect(0, 0, w, h);
+
+                // Manchas de Pigmentos Acuosos Orgánicos (Wet-on-wet watercolor bleeding)
+                ctx.save();
+                for (const b of this.watercolorBlooms) {
+                    const r = b.baseR * (1.0 + Math.sin(t * b.speed + b.phase) * 0.25 + audio.rms * 0.6);
+                    ctx.fillStyle = b.color;
+                    ctx.beginPath();
+                    const pts = 24;
+                    for (let p = 0; p < pts; p++) {
+                        const ang = (p / pts) * Math.PI * 2;
+                        const perturb = 1.0 + Math.sin(ang * 4.0 + t + b.phase) * b.harmonics[0]
+                                            + Math.cos(ang * 7.0 - t * 1.5) * b.harmonics[1];
+                        const rad = r * perturb;
+                        const px = b.x + Math.cos(ang) * rad;
+                        const py = b.y + Math.sin(ang) * rad;
+                        if (p === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                ctx.restore();
+
+                // Pinceladas caligráficas fluidas
+                ctx.strokeStyle = 'rgba(15, 23, 42, 0.45)';
+                ctx.lineWidth = 4 + audio.mid * 6;
+                ctx.beginPath();
+                ctx.moveTo(w * 0.15, h * 0.7);
+                ctx.bezierCurveTo(w * 0.35, h * 0.3 + Math.sin(t) * 30, w * 0.65, h * 0.8 + Math.cos(t) * 30, w * 0.88, h * 0.35);
+                ctx.stroke();
+
+                // Salpicaduras de oro y purpurina metálica (Gold Leaf Speckles)
+                ctx.fillStyle = '#f59e0b';
+                for (let g = 0; g < 30; g++) {
+                    const gx = (g * 43 + Math.sin(g + t) * 20) % w;
+                    const gy = (g * 31 + Math.cos(g + t) * 20) % h;
+                    const gr = 1.0 + Math.sin(g * 2.3 + t * 4) * 1.2;
+                    ctx.beginPath();
+                    ctx.arc(gx, gy, Math.max(0.5, gr), 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // =====================================================================
+            // FILTROS DE ESTILO GLSL & TRANSMUTACIÓN EN VIVO
+            // =====================================================================
+            applyStyleFilter(ctx, w, h, t, audio) {
+                switch (this.styleFilter) {
+                    case 'comic_ink':
+                        // Binarización y contraste extremo estilo tinta cómic
+                        ctx.fillStyle = 'rgba(255, 240, 0, 0.15)';
+                        ctx.fillRect(0, 0, w, h);
+                        break;
+                    case 'anime_cel':
+                        // Posterización y realce de contornos
+                        ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(2, 2, w - 4, h - 4);
+                        break;
+                    case 'quantum_holo':
+                        // Tinte Cyan + Scanlines densas + Dispersión
+                        ctx.fillStyle = 'rgba(0, 240, 255, 0.18)';
+                        ctx.fillRect(0, 0, w, h);
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                        for (let y = 0; y < h; y += 3) {
+                            ctx.fillRect(0, y, w, 1);
+                        }
+                        break;
+                    case 'cyber_glitch':
+                        // Slicing horizontal en onsets
+                        if (audio.isOnset) {
+                            const sliceY = Math.random() * (h - 30);
+                            const sliceH = 15 + Math.random() * 25;
+                            const shift = (Math.random() - 0.5) * 40;
+                            ctx.drawImage(this.canvas, 0, sliceY, w, sliceH, shift, sliceY, w, sliceH);
+                        }
+                        break;
+                }
+            }
+
+            // =====================================================================
+            // DIRECTOR NARRATIVO IA & STORYBOARDS MUSICALES
+            // =====================================================================
+            generateDefaultStoryboard(trackName = "") {
+                const name = trackName || (document.getElementById('audio-file-name')?.innerText) || "Mordaza (Live)";
+                this.storyboard = [
+                    {
+                        index: 0,
+                        name: "01. Génesis & Pigmento Onírico (Intro)",
+                        timeRange: "0:00 - 0:30",
+                        startTime: 0,
+                        endTime: 30,
+                        archetype: "watercolor",
+                        styleFilter: "none",
+                        prompt: "Acuarela etérea disolviéndose en el vacío, pigmentos de oro y azul ultramar anunciando el despertar.",
+                        cameraMotion: "orbit_slow",
+                        speedRamp: 1.0,
+                        beatJump: false
+                    },
+                    {
+                        index: 1,
+                        name: "02. Despertar de la Megaciudad (Verso 1)",
+                        timeRange: "0:30 - 1:05",
+                        startTime: 30,
+                        endTime: 65,
+                        archetype: "cyberpunk",
+                        styleFilter: "quantum_holo",
+                        prompt: "Androide con circuitos neuronales despertando bajo la lluvia de neón de una megaciudad futurista.",
+                        cameraMotion: "fpv_cruise",
+                        speedRamp: 1.2,
+                        beatJump: true
+                    },
+                    {
+                        index: 2,
+                        name: "03. Tensión & Sombras Noir (Buildup)",
+                        timeRange: "1:05 - 1:40",
+                        startTime: 65,
+                        endTime: 100,
+                        archetype: "comic",
+                        styleFilter: "comic_ink",
+                        prompt: "Viñetas de cómic dinámicas con tramas halftone, vigilante acechando en las cornisas con truenos.",
+                        cameraMotion: "crash_zoom",
+                        speedRamp: 1.8,
+                        beatJump: true
+                    },
+                    {
+                        index: 3,
+                        name: "04. Sakuga Zenith & Clímax (Drop)",
+                        timeRange: "1:40 - 2:25",
+                        startTime: 100,
+                        endTime: 145,
+                        archetype: "anime",
+                        styleFilter: "cyber_glitch",
+                        prompt: "Secuencia Sakuga desatada, guerrero a hipervelocidad con cortes de luz, impacto de energía pura y destellos dorados.",
+                        cameraMotion: "lemniscate",
+                        speedRamp: 2.4,
+                        beatJump: true
+                    },
+                    {
+                        index: 4,
+                        name: "05. Introspección & Resonancia (Breakdown)",
+                        timeRange: "2:25 - 2:55",
+                        startTime: 145,
+                        endTime: 175,
+                        archetype: "cinema",
+                        styleFilter: "none",
+                        prompt: "Voz solitaria en spotlight cenital, humo volumétrico y flares anamórficos dorados con público en comunión.",
+                        cameraMotion: "orbit_slow",
+                        speedRamp: 1.0,
+                        beatJump: false
+                    },
+                    {
+                        index: 5,
+                        name: "06. Trascendencia Cósmica (Outro)",
+                        timeRange: "2:55 - Fin",
+                        startTime: 175,
+                        endTime: 360,
+                        archetype: "adventure",
+                        styleFilter: "anime_cel",
+                        prompt: "Criatura alada surcando auroras boreales hacia islas flotantes y un horizonte infinito de estrellas.",
+                        cameraMotion: "fpv_cruise",
+                        speedRamp: 1.1,
+                        beatJump: false
+                    }
+                ];
+                this.renderStoryboardUI();
+            }
+
+            async generateGeminiStoryboard() {
+                const apiKey = localStorage.getItem('motor_gemini_key');
+                if (!apiKey) {
+                    if (typeof showToast === 'function') {
+                        showToast("API Key Requerida", "Configura tu clave de Gemini en Ajustes o usa el Generador Local.", "warning", 3500);
+                    }
+                    this.generateDefaultStoryboard();
+                    return;
+                }
+
+                const trackName = (document.getElementById('audio-file-name')?.innerText) || "Tema Musical";
+                if (typeof showToast === 'function') {
+                    showToast("Consultando a Gemini 2.5...", "Generando guión cinematográfico y storyboard multicapa.", "info", 3000);
+                }
+
+                try {
+                    const promptText = `Eres un Director de Cine y Animación Musical para videoclips de vanguardia.
+Crea un storyboard estructurado en 6 escenas para la pista musical: "${trackName}".
+Los arquetipos visuales permitidos son: anime, comic, cinema, adventure, cyberpunk, watercolor.
+Los filtros de estilo permitidos son: none, comic_ink, anime_cel, quantum_holo, cyber_glitch.
+Devuelve EXACTAMENTE un arreglo JSON de 6 objetos con esta estructura:
+[
+  {
+    "index": 0,
+    "name": "Título de la Escena",
+    "timeRange": "0:00 - 0:30",
+    "startTime": 0,
+    "endTime": 30,
+    "archetype": "watercolor",
+    "styleFilter": "none",
+    "prompt": "Descripción visual cinematográfica detallada",
+    "cameraMotion": "orbit_slow",
+    "speedRamp": 1.0,
+    "beatJump": false
+  }
+]`;
+
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: promptText }] }],
+                            generationConfig: {
+                                responseMimeType: "application/json"
+                            }
+                        })
+                    });
+
+                    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                    const data = await res.json();
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) {
+                        const parsed = JSON.parse(text);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            this.storyboard = parsed;
+                            this.renderStoryboardUI();
+                            this.activateScene(0);
+                            if (typeof showToast === 'function') {
+                                showToast("Storyboard Generado con Éxito", "Gemini 2.5 ha estructurado la narrativa visual musical.", "success", 4000);
+                            }
+                            return;
+                        }
+                    }
+                    throw new Error("Respuesta JSON inválida de Gemini");
+                } catch (err) {
+                    console.warn("[AiClipStudio] Fallback a generador local heurístico:", err);
+                    if (typeof showToast === 'function') {
+                        showToast("Modo Offline Heurístico", "Generando storyboard adaptativo local instantáneo.", "info", 3000);
+                    }
+                    this.generateDefaultStoryboard(trackName);
+                }
+            }
+
+            syncStoryboard() {
+                const audioEl = document.getElementById('html5-audio-player');
+                const currentTime = (audioEl && !audioEl.paused && !isNaN(audioEl.currentTime)) ? audioEl.currentTime : (this.virtualTime % 180);
+
+                for (let i = 0; i < this.storyboard.length; i++) {
+                    const sc = this.storyboard[i];
+                    if (currentTime >= sc.startTime && currentTime < sc.endTime) {
+                        if (this.currentSceneIdx !== i) {
+                            this.activateScene(i, false);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            activateScene(idx, manual = true) {
+                if (!this.storyboard[idx]) return;
+                this.currentSceneIdx = idx;
+                const sc = this.storyboard[idx];
+                this.activeArchetype = sc.archetype;
+                this.styleFilter = sc.styleFilter || 'none';
+                this.reactivity.beatJump = sc.beatJump !== undefined ? sc.beatJump : true;
+
+                if (manual) {
+                    const audioEl = document.getElementById('html5-audio-player');
+                    if (audioEl && !isNaN(audioEl.duration)) {
+                        audioEl.currentTime = sc.startTime;
+                    }
+                }
+
+                this.renderStoryboardUI();
+                this.updateUI();
+
+                if (typeof showToast === 'function' && manual) {
+                    showToast(`Escena ${idx + 1}: ${sc.name}`, `${sc.archetype.toUpperCase()} • ${sc.prompt.substring(0, 45)}...`, "info", 2500);
+                }
+            }
+
+            renderStoryboardUI() {
+                const container = document.getElementById('clip-storyboard-list');
+                if (!container) return;
+
+                let html = '';
+                this.storyboard.forEach((sc, i) => {
+                    const isActive = (i === this.currentSceneIdx);
+                    const borderCls = isActive ? 'border-purple-400 bg-purple-950/40 ring-1 ring-purple-400' : 'border-white/[0.08] bg-zinc-900/60 hover:bg-zinc-800/60';
+                    const badgeCls = isActive ? 'bg-purple-500 text-white' : 'bg-zinc-800 text-zinc-400';
+
+                    html += `
+                        <div onclick="jumpToStoryboardScene(${i})" class="p-3 rounded-xl border ${borderCls} cursor-pointer transition flex flex-col gap-1.5 shadow-sm">
+                            <div class="flex items-center justify-between text-xs font-semibold">
+                                <div class="flex items-center gap-2">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold ${badgeCls}">#${i + 1}</span>
+                                    <span class="text-zinc-200">${sc.name}</span>
+                                </div>
+                                <span class="font-mono text-[10px] text-purple-300">${sc.timeRange}</span>
+                            </div>
+                            <p class="text-[11px] text-zinc-400 italic line-clamp-2">"${sc.prompt}"</p>
+                            <div class="flex items-center gap-2 pt-1 text-[10px] text-zinc-500 font-mono">
+                                <span>🎨 Arquetipo: <strong class="text-zinc-300">${sc.archetype}</strong></span>
+                                <span>•</span>
+                                <span>🔮 Filtro: <strong class="text-zinc-300">${sc.styleFilter}</strong></span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            // =====================================================================
+            // VISTAS PREVIAS & PIP
+            // =====================================================================
+            updatePreviewCanvases() {
+                // Vista previa en modal
+                if (!this.modalPreviewCanvas) {
+                    this.modalPreviewCanvas = document.getElementById('ai-clip-preview-canvas');
+                    if (this.modalPreviewCanvas) {
+                        this.modalPreviewCtx = this.modalPreviewCanvas.getContext('2d');
+                    }
+                }
+                if (this.modalPreviewCtx && this.modalPreviewCanvas.offsetParent !== null) {
+                    this.modalPreviewCtx.drawImage(this.canvas, 0, 0, this.modalPreviewCanvas.width, this.modalPreviewCanvas.height);
+                }
+
+                // Vista PiP flotante
+                if (!this.pipCanvas) {
+                    this.pipCanvas = document.getElementById('ai-clip-pip-canvas');
+                    if (this.pipCanvas) {
+                        this.pipCtx = this.pipCanvas.getContext('2d');
+                    }
+                }
+                if (this.pipCtx && this.pipVisible) {
+                    this.pipCtx.drawImage(this.canvas, 0, 0, this.pipCanvas.width, this.pipCanvas.height);
+                }
+            }
+
+            togglePip() {
+                this.pipVisible = !this.pipVisible;
+                const el = document.getElementById('ai-clip-pip-hud');
+                if (el) {
+                    if (this.pipVisible) el.classList.remove('hidden');
+                    else el.classList.add('hidden');
+                }
+            }
+
+            updateUI() {
+                // Actualiza selectores y badges en modal
+                const archBadge = document.getElementById('clip-preview-archetype-badge');
+                if (archBadge) {
+                    const names = {
+                        anime: '🌸 Anime Sakuga',
+                        comic: '💥 Cómic Noir',
+                        cinema: '🎥 Cine 35mm',
+                        adventure: '🐉 Aventura Épica',
+                        cyberpunk: '🤖 Cyberpunk 2099',
+                        watercolor: '🎨 Acuarela Onírica'
+                    };
+                    archBadge.innerText = names[this.activeArchetype] || this.activeArchetype;
+                }
+
+                const styleBadge = document.getElementById('clip-preview-filter-badge');
+                if (styleBadge) {
+                    styleBadge.innerText = `Filtro: ${this.styleFilter}`;
+                }
+
+                const timecode = document.getElementById('clip-preview-timecode');
+                if (timecode) {
+                    const audioEl = document.getElementById('html5-audio-player');
+                    const cur = (audioEl && !isNaN(audioEl.currentTime)) ? audioEl.currentTime : this.virtualTime;
+                    const m = Math.floor(cur / 60);
+                    const s = Math.floor(cur % 60);
+                    timecode.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                }
+            }
+        }
+
+        // Funciones puente de UI para el modal de Clips IA
+        function openAiClipStudioModal() {
+            if (!aiClipStudioEngine) initVjEngines();
+            const modal = document.getElementById('ai-clip-studio-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+            if (aiClipStudioEngine) {
+                aiClipStudioEngine.updateUI();
+                aiClipStudioEngine.renderStoryboardUI();
+            }
+        }
+
+        function closeAiClipStudioModal() {
+            const modal = document.getElementById('ai-clip-studio-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function switchClipStudioTab(tabId) {
+            const tabs = ['storyboard', 'gallery', 'styles', 'reactivity'];
+            tabs.forEach(t => {
+                const pane = document.getElementById(`clip-tab-${t}`);
+                const btn = document.getElementById(`tab-btn-clip-${t}`);
+                if (pane) pane.classList.toggle('hidden', t !== tabId);
+                if (btn) {
+                    if (t === tabId) {
+                        btn.classList.add('bg-purple-600', 'text-white', 'border-purple-400');
+                        btn.classList.remove('bg-zinc-900', 'text-zinc-400', 'border-transparent');
+                    } else {
+                        btn.classList.remove('bg-purple-600', 'text-white', 'border-purple-400');
+                        btn.classList.add('bg-zinc-900', 'text-zinc-400', 'border-transparent');
+                    }
+                }
+            });
+        }
+
+        function selectClipArchetype(arch) {
+            if (!aiClipStudioEngine) initVjEngines();
+            aiClipStudioEngine.activeArchetype = arch;
+            aiClipStudioEngine.activeSource = 'procedural';
+            aiClipStudioEngine.updateUI();
+            if (typeof showToast === 'function') {
+                showToast("Arquetipo Seleccionado", `Modo activo: ${arch.toUpperCase()}`, "info", 2000);
+            }
+        }
+
+        function selectStyleFilter(filter) {
+            if (!aiClipStudioEngine) initVjEngines();
+            aiClipStudioEngine.styleFilter = filter;
+            aiClipStudioEngine.updateUI();
+            if (typeof showToast === 'function') {
+                showToast("Filtro GLSL Aplicado", `Transmutación: ${filter}`, "info", 2000);
+            }
+        }
+
+        function toggleClipPlayback() {
+            if (!aiClipStudioEngine) initVjEngines();
+            aiClipStudioEngine.isPlaying = !aiClipStudioEngine.isPlaying;
+            const btn = document.getElementById('btn-clip-playback');
+            if (btn) btn.innerText = aiClipStudioEngine.isPlaying ? '⏸ Pausa' : '▶ Reproducir';
+        }
+
+        function jumpToStoryboardScene(idx) {
+            if (!aiClipStudioEngine) initVjEngines();
+            aiClipStudioEngine.activateScene(idx, true);
+        }
+
+        function triggerGeminiStoryboard() {
+            if (!aiClipStudioEngine) initVjEngines();
+            aiClipStudioEngine.generateGeminiStoryboard();
+        }
+
+        function triggerLocalStoryboard() {
+            if (!aiClipStudioEngine) initVjEngines();
+            aiClipStudioEngine.generateDefaultStoryboard();
+            if (typeof showToast === 'function') {
+                showToast("Storyboard Local Listo", "Estructura generada en 6 escenas adaptadas a la música.", "success", 2500);
+            }
+        }
+
+        function toggleClipPip() {
+            if (!aiClipStudioEngine) initVjEngines();
+            aiClipStudioEngine.togglePip();
+        }
+
+        function handleClipFileUpload(event) {
+            const file = event.target.files && event.target.files[0];
+            if (file && aiClipStudioEngine) {
+                aiClipStudioEngine.loadUserVideoFile(file);
+            }
+        }
+
+        function setClipProjectionTarget(target) {
+            if (aiClipStudioEngine) aiClipStudioEngine.projectionTarget = target;
+        }
+
+        function setClipOpacity(val) {
+            if (aiClipStudioEngine) {
+                aiClipStudioEngine.reactivity.opacity = parseFloat(val);
+            }
+        }
+
+        function toggleClipReactivity(key, checked) {
+            if (aiClipStudioEngine && aiClipStudioEngine.reactivity) {
+                aiClipStudioEngine.reactivity[key] = checked;
+            }
+        }
+    
         function initVjEngines() {
             if (!vjSessionTimelineEngine) {
                 vjSessionTimelineEngine = new VjSessionTimelineEngine();
@@ -17106,6 +18569,10 @@ Respond ONLY with valid JSON with:
             if (!liveVideoIngestEngine) {
                 liveVideoIngestEngine = new LiveVideoIngestEngine();
                 liveVideoIngestEngine.init();
+            }
+            if (!aiClipStudioEngine) {
+                aiClipStudioEngine = new AiClipStudioEngine();
+                aiClipStudioEngine.init();
             }
         }
 
@@ -20545,6 +22012,11 @@ void main() {
                 liveVideoIngestEngine.update(time, dt);
             }
 
+            // 4.6 Estudio de Creación Narrativa & Clips IA Multicapa
+            if (aiClipStudioEngine) {
+                aiClipStudioEngine.update(time, dt);
+            }
+
             // 5. Renderizado de Canvases v4.2 activos según vista
             if (currentV4View === 'chaos-lab') {
                 renderChaosCanvas();
@@ -21919,6 +23391,249 @@ void main() {
         </div>
     </div>
 
+    
+    <!-- ===================================================================== -->
+    <!-- MODAL: ESTUDIO DE CREACIÓN NARRATIVA & CLIPS IA MULTICAPA (D-040) -->
+    <!-- ===================================================================== -->
+    <div id="ai-clip-studio-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[100] hidden items-center justify-center p-2 sm:p-4">
+        <div class="bg-zinc-950 border border-purple-500/40 rounded-2xl max-w-5xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-white/[0.08] px-5 py-3.5 bg-gradient-to-r from-purple-950/40 via-zinc-950 to-zinc-950">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 text-lg shadow-inner">
+                        🎬
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm font-bold text-white tracking-wide">ESTUDIO DE CREACIÓN NARRATIVA &amp; CLIPS IA</h3>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-900/60 text-purple-300 border border-purple-500/40 animate-pulse">ON AIR • 60 FPS</span>
+                        </div>
+                        <p class="text-[11px] text-zinc-400">Storyboards Musicales con Gemini IA • 6 Arquetipos Procedurales • Ingesta Multicapa Three.js &amp; GLSL</p>
+                    </div>
+                </div>
+                <button onclick="closeAiClipStudioModal()" class="w-8 h-8 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center text-sm font-bold border border-white/5 transition">✕</button>
+            </div>
+
+            <!-- Modal Content (Two Columns Layout) -->
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <!-- Columna Izquierda: Vista Previa, Controles de Transporte y Ruteo 3D (5 Cols) -->
+                <div class="lg:col-span-5 flex flex-col gap-3">
+                    <!-- Frame de Vista Previa -->
+                    <div class="relative w-full aspect-video rounded-xl overflow-hidden border border-purple-500/30 bg-black shadow-lg">
+                        <canvas id="ai-clip-preview-canvas" width="640" height="360" class="w-full h-full object-contain"></canvas>
+                        <!-- Overlay Badges -->
+                        <div class="absolute top-2 left-2 flex items-center gap-1.5 pointer-events-none">
+                            <span id="clip-preview-archetype-badge" class="px-2 py-0.5 rounded bg-black/75 backdrop-blur border border-purple-500/40 text-[10px] font-bold text-purple-300 shadow">🌸 Anime Sakuga</span>
+                            <span id="clip-preview-filter-badge" class="px-1.5 py-0.5 rounded bg-black/75 backdrop-blur border border-white/10 text-[9px] font-mono text-zinc-400">Filtro: none</span>
+                        </div>
+                        <div class="absolute bottom-2 right-2 pointer-events-none">
+                            <span id="clip-preview-timecode" class="px-2 py-0.5 rounded bg-black/80 backdrop-blur font-mono text-[10px] text-emerald-400 border border-emerald-500/30">00:00</span>
+                        </div>
+                    </div>
+
+                    <!-- Botonera de Transporte & PiP -->
+                    <div class="flex items-center gap-2">
+                        <button onclick="toggleClipPlayback()" id="btn-clip-playback" class="flex-1 py-1.5 px-3 rounded-lg bg-purple-900/60 hover:bg-purple-800 text-purple-200 hover:text-white border border-purple-500/40 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow">
+                            ⏸ Pausa
+                        </button>
+                        <button onclick="toggleClipPip()" class="py-1.5 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 text-xs font-medium transition flex items-center gap-1 shadow" title="Activar ventana flotante PiP">
+                            🖼️ PiP HUD
+                        </button>
+                    </div>
+
+                    <!-- Enrutamiento 3D & Proyección -->
+                    <div class="p-3 rounded-xl bg-zinc-900/70 border border-white/[0.08] space-y-2.5">
+                        <div class="flex items-center justify-between text-[11px] font-bold text-zinc-300">
+                            <span>📡 DESTINO DE PROYECCIÓN:</span>
+                            <span class="text-[9px] text-purple-400 font-mono">uVideoTexture</span>
+                        </div>
+                        <select id="clip-projection-target" onchange="setClipProjectionTarget(this.value)" class="w-full bg-zinc-950 border border-purple-500/30 rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-purple-400">
+                            <option value="all">🌐 Todos (Monolito 3D + Cristales + Shaders GLSL)</option>
+                            <option value="monolith">🌊 Monolito Escénico (Océano de Mercurio)</option>
+                            <option value="crystals">💎 Valle de Cristales &amp; Nebulosa</option>
+                            <option value="shaders">⚡ Solo Shaders GLSL (Laboratorio Split-View)</option>
+                            <option value="pip">🖼️ Solo Ventana PiP HUD</option>
+                        </select>
+
+                        <div class="space-y-1 pt-1">
+                            <div class="flex items-center justify-between text-[10px] text-zinc-400">
+                                <span>Opacidad / Mezcla 3D:</span>
+                                <span id="clip-opacity-display" class="font-mono text-purple-300">100%</span>
+                            </div>
+                            <input type="range" id="clip-opacity-slider" min="0" max="1" step="0.05" value="1.0" oninput="setClipOpacity(this.value); document.getElementById('clip-opacity-display').innerText = Math.round(this.value*100)+'%';" class="w-full accent-purple-400 h-1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Tabs de Configuración (7 Cols) -->
+                <div class="lg:col-span-7 flex flex-col gap-3">
+                    <!-- Sub-tabs Navigation -->
+                    <div class="flex items-center gap-1.5 p-1 bg-zinc-900/90 rounded-xl border border-white/[0.08] overflow-x-auto shrink-0">
+                        <button onclick="switchClipStudioTab('storyboard')" id="tab-btn-clip-storyboard" class="flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold bg-purple-600 text-white border border-purple-400 transition whitespace-nowrap">
+                            📑 Storyboard IA
+                        </button>
+                        <button onclick="switchClipStudioTab('gallery')" id="tab-btn-clip-gallery" class="flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold bg-zinc-900 text-zinc-400 border border-transparent hover:text-white transition whitespace-nowrap">
+                            🎨 Arquetipos &amp; Ingesta
+                        </button>
+                        <button onclick="switchClipStudioTab('styles')" id="tab-btn-clip-styles" class="flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold bg-zinc-900 text-zinc-400 border border-transparent hover:text-white transition whitespace-nowrap">
+                            🔮 Transmutación GLSL
+                        </button>
+                        <button onclick="switchClipStudioTab('reactivity')" id="tab-btn-clip-reactivity" class="flex-1 py-1.5 px-2.5 rounded-lg text-xs font-bold bg-zinc-900 text-zinc-400 border border-transparent hover:text-white transition whitespace-nowrap">
+                            ⚡ Reactividad
+                        </button>
+                    </div>
+
+                    <!-- TAB 1: STORYBOARD IA -->
+                    <div id="clip-tab-storyboard" class="flex flex-col gap-3">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="triggerGeminiStoryboard()" class="flex-1 min-w-[140px] py-2 px-3 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-1.5">
+                                <span>✨</span>
+                                <span>Generar con Gemini IA</span>
+                            </button>
+                            <button onclick="triggerLocalStoryboard()" class="py-2 px-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/10 font-bold text-xs transition flex items-center justify-center gap-1.5">
+                                <span>⚡</span>
+                                <span>Generador Local</span>
+                            </button>
+                        </div>
+
+                        <!-- Lista de Escenas del Storyboard -->
+                        <div id="clip-storyboard-list" class="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+                            <!-- Inyectado dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: ARQUETIPOS & INGESTA -->
+                    <div id="clip-tab-gallery" class="hidden flex flex-col gap-3">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                            <button onclick="selectClipArchetype('anime')" class="p-2.5 rounded-xl border border-purple-500/30 bg-purple-950/20 hover:bg-purple-950/40 text-left transition flex flex-col gap-1">
+                                <span class="text-base">🌸</span>
+                                <span class="text-xs font-bold text-purple-200">Anime Sakuga</span>
+                                <span class="text-[9px] text-zinc-400">Cel-shading, líneas de velocidad, katana neón.</span>
+                            </button>
+                            <button onclick="selectClipArchetype('comic')" class="p-2.5 rounded-xl border border-yellow-500/30 bg-yellow-950/20 hover:bg-yellow-950/40 text-left transition flex flex-col gap-1">
+                                <span class="text-base">💥</span>
+                                <span class="text-xs font-bold text-yellow-200">Cómic Noir</span>
+                                <span class="text-[9px] text-zinc-400">Halftone Ben-Day, lluvia noir, POW/BOOM en drops.</span>
+                            </button>
+                            <button onclick="selectClipArchetype('cinema')" class="p-2.5 rounded-xl border border-cyan-500/30 bg-cyan-950/20 hover:bg-cyan-950/40 text-left transition flex flex-col gap-1">
+                                <span class="text-base">🎥</span>
+                                <span class="text-xs font-bold text-cyan-200">Cine 35mm</span>
+                                <span class="text-[9px] text-zinc-400">Cantante en spotlight, flares anamórficos, público.</span>
+                            </button>
+                            <button onclick="selectClipArchetype('adventure')" class="p-2.5 rounded-xl border border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-950/40 text-left transition flex flex-col gap-1">
+                                <span class="text-base">🐉</span>
+                                <span class="text-xs font-bold text-emerald-200">Aventura Épica</span>
+                                <span class="text-[9px] text-zinc-400">Islas flotantes, auroras boreales, dragón cósmico.</span>
+                            </button>
+                            <button onclick="selectClipArchetype('cyberpunk')" class="p-2.5 rounded-xl border border-pink-500/30 bg-pink-950/20 hover:bg-pink-950/40 text-left transition flex flex-col gap-1">
+                                <span class="text-base">🤖</span>
+                                <span class="text-xs font-bold text-pink-200">Cyberpunk 2099</span>
+                                <span class="text-[9px] text-zinc-400">Androide neural, lluvia de glifos, retícula HUD.</span>
+                            </button>
+                            <button onclick="selectClipArchetype('watercolor')" class="p-2.5 rounded-xl border border-amber-500/30 bg-amber-950/20 hover:bg-amber-950/40 text-left transition flex flex-col gap-1">
+                                <span class="text-base">🎨</span>
+                                <span class="text-xs font-bold text-amber-200">Acuarela Onírica</span>
+                                <span class="text-[9px] text-zinc-400">Pigmentos que se disuelven, oro y tintas fluidas.</span>
+                            </button>
+                        </div>
+
+                        <!-- Zona de Ingesta de Video de Usuario -->
+                        <div class="p-3.5 rounded-xl border border-dashed border-purple-500/40 bg-zinc-900/60 flex flex-col items-center justify-center text-center gap-2">
+                            <span class="text-2xl">📁</span>
+                            <span class="text-xs font-bold text-zinc-200">Cargar Video o GIF Local Propio</span>
+                            <p class="text-[10px] text-zinc-400">Arrastra o selecciona un archivo .mp4, .webm o .gif para integrarlo en el flujo 3D.</p>
+                            <input type="file" id="clip-file-input" accept="video/mp4,video/webm,video/ogg,image/gif" onchange="handleClipFileUpload(event)" class="hidden">
+                            <button onclick="document.getElementById('clip-file-input').click()" class="mt-1 py-1.5 px-4 rounded-lg bg-purple-900/60 hover:bg-purple-800 text-purple-200 hover:text-white border border-purple-500/40 text-xs font-semibold transition">
+                                Explorar Archivo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: TRANSMUTACIÓN GLSL -->
+                    <div id="clip-tab-styles" class="hidden flex flex-col gap-2.5">
+                        <span class="text-[11px] font-bold text-zinc-300">FILTROS DE TRANSMUTACIÓN EN TIEMPO REAL:</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <button onclick="selectStyleFilter('none')" class="p-2.5 rounded-xl border border-white/10 bg-zinc-900/70 hover:bg-zinc-800 text-left transition">
+                                <span class="text-xs font-bold text-zinc-200">Pure Original</span>
+                                <p class="text-[10px] text-zinc-400">Sin procesamiento, estética nativa del arquetipo.</p>
+                            </button>
+                            <button onclick="selectStyleFilter('comic_ink')" class="p-2.5 rounded-xl border border-yellow-500/30 bg-yellow-950/20 hover:bg-yellow-950/40 text-left transition">
+                                <span class="text-xs font-bold text-yellow-300">Cómic Ink &amp; Halftone</span>
+                                <p class="text-[10px] text-zinc-400">Tinta negra densa y amarillos vibrantes de novela gráfica.</p>
+                            </button>
+                            <button onclick="selectStyleFilter('anime_cel')" class="p-2.5 rounded-xl border border-purple-500/30 bg-purple-950/20 hover:bg-purple-950/40 text-left transition">
+                                <span class="text-xs font-bold text-purple-300">Anime Cel-Shading</span>
+                                <p class="text-[10px] text-zinc-400">Bordes acentuados y cuantización de color en planos.</p>
+                            </button>
+                            <button onclick="selectStyleFilter('quantum_holo')" class="p-2.5 rounded-xl border border-cyan-500/30 bg-cyan-950/20 hover:bg-cyan-950/40 text-left transition">
+                                <span class="text-xs font-bold text-cyan-300">Holograma Cuántico</span>
+                                <p class="text-[10px] text-zinc-400">Tinte cyan luminoso, scanlines CRT y dispersión RGB.</p>
+                            </button>
+                            <button onclick="selectStyleFilter('cyber_glitch')" class="p-2.5 rounded-xl border border-pink-500/30 bg-pink-950/20 hover:bg-pink-950/40 text-left transition">
+                                <span class="text-xs font-bold text-pink-300">Cyber Glitch &amp; Slices</span>
+                                <p class="text-[10px] text-zinc-400">Desplazamiento horizontal por bloques activado por bombos.</p>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: AUDIO-REACTIVIDAD -->
+                    <div id="clip-tab-reactivity" class="hidden flex flex-col gap-3">
+                        <div class="p-3 rounded-xl bg-zinc-900/60 border border-white/[0.08] space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-zinc-200">🚀 Speed Ramping Rítmico</span>
+                                <input type="checkbox" id="clip-react-speed" checked onchange="toggleClipReactivity('speedRamp', this.checked)" class="accent-purple-500 w-4 h-4">
+                            </div>
+                            <p class="text-[10px] text-zinc-400">Acelera la velocidad de reproducción de la animación según el RMS y la energía musical.</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-zinc-900/60 border border-white/[0.08] space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-zinc-200">💥 Beat Jump Cuts &amp; Sakuga Flash</span>
+                                <input type="checkbox" id="clip-react-beat" checked onchange="toggleClipReactivity('beatJump', this.checked)" class="accent-purple-500 w-4 h-4">
+                            </div>
+                            <p class="text-[10px] text-zinc-400">Dispara flashes de impacto visual, onomatopeyas cómic y saltos de fotograma en transitorios de audio (onsets).</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-zinc-900/60 border border-white/[0.08] space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-zinc-200">🔊 Sub-Bass Zoom Pulse</span>
+                                <input type="checkbox" id="clip-react-zoom" checked onchange="toggleClipReactivity('subBassZoom', this.checked)" class="accent-purple-500 w-4 h-4">
+                            </div>
+                            <p class="text-[10px] text-zinc-400">Modula el tamaño y curvatura de la pantalla monolítica al ritmo del sub-grave y bombo.</p>
+                        </div>
+
+                        <div class="p-3 rounded-xl bg-zinc-900/60 border border-white/[0.08] space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-zinc-200">🟢 Chroma Key en GPU</span>
+                                <input type="checkbox" id="clip-react-chroma" onchange="toggleClipReactivity('chromaEnabled', this.checked)" class="accent-purple-500 w-4 h-4">
+                            </div>
+                            <p class="text-[10px] text-zinc-400">Elimina el fondo verde, azul o negro para proyectar los personajes directamente sobre el Océano de Mercurio.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="border-t border-white/[0.08] px-5 py-3 flex items-center justify-between text-[11px] font-mono text-zinc-400 bg-zinc-950">
+                <span>WebGL CanvasTexture 640x360 @ 60 FPS • Multi-layer Video Engine</span>
+                <button onclick="closeAiClipStudioModal()" class="px-4 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-bold border border-white/10 transition">
+                    Cerrar Estudio
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating PiP HUD para Clips IA -->
+    <div id="ai-clip-pip-hud" class="fixed bottom-16 right-5 z-[80] hidden flex-col w-72 rounded-xl bg-zinc-950/90 border border-purple-500/40 shadow-2xl backdrop-blur-md overflow-hidden animate-fadeIn">
+        <div class="flex items-center justify-between px-3 py-1.5 bg-purple-950/60 border-b border-purple-500/30 text-[10px] font-bold text-purple-200">
+            <span>🎬 CLIPS IA // PIP HUD</span>
+            <button onclick="toggleClipPip()" class="hover:text-white transition">✕</button>
+        </div>
+        <div class="w-full aspect-video bg-black">
+            <canvas id="ai-clip-pip-canvas" width="320" height="180" class="w-full h-full object-contain"></canvas>
+        </div>
+    </div>
+    
     <!-- Master Toast Notification Layer -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-[110] flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 </body>

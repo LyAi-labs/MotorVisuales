@@ -921,6 +921,36 @@
   - ✅ Convergencia total entre síntesis procedural, audio-reactividad y video real en tiempo real.
   - ✅ Versatilidad para directos de música electrónica, festivales y transmisiones en streaming.
 
+---
+
+### D-040 — Estudio de Creación Narrativa & Clips IA Multicapa (AiClipStudioEngine)
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - Evolucionar MotorVisuales desde la abstracción geométrica hacia un sistema de creación artística narrativa y cinematográfica viva: animaciones de dibujo anime, cómic noir con tramas halftone, escenas de personas reales (35mm), aventura/fantasía épica, cyberpunk y acuarelas fluidas, organizados en storyboards musicales autónomos que reaccionan al audio y se proyectan en los mundos 3D y shaders GLSL.
+- **Decisión:**
+  - **Motor Generativo `AiClipStudioEngine` (60 FPS):**
+    - Renderizador offscreen de 640x360 con `THREE.CanvasTexture` para máximo rendimiento y latencia cero.
+    - **6 Arquetipos Procedurales Vivos:**
+      1. *Anime Sakuga & Cel-Shading:* Líneas de velocidad dinámicas, guerrero en carrera con katana cyan de neón y destellos de impacto en drops.
+      2. *Cómic Noir & Halftone:* Tramas Ben-Day moduladas por graves, silueta de vigilante en gárgola bajo la lluvia y onomatopeyas explosivas ("POW!", "BOOM!", "BASS!", "DROP!") en transitorios.
+      3. *Cinematografía Realista 35mm:* Letterbox 2.39:1, foco cenital volumétrico, silueta de cantante ante micrófono vintage, lens flares anamórficos y público en comunión.
+      4. *Aventura & Fantasía Épica:* Lunas gemelas con anillos, auroras boreales, islas flotantes con cascadas y dragón alado surcando el firmamento.
+      5. *Cyberpunk 2099 & Sci-Fi:* Cuadrícula synthwave en perspectiva, lluvia Matrix de glifos, androide con circuitos neuronales y mini osciloscopio en vivo.
+      6. *Acuarela & Óleo Onírico:* Pigmentos orgánicos acuosos que sangran y se mezclan con RMS, pinceladas caligráficas y oro líquido flotante.
+  - **Director Narrativo & Storyboard Autónomo:**
+    - Estructura cinematográfica de 6 partes (Intro, Verso 1, Buildup, Drop Clímax, Breakdown, Outro).
+    - Doble motor de generación: API de Gemini 2.5 Flash con salida JSON estructurada y fallback heurístico local instantáneo (100% offline).
+    - Sincronización automática de escenas con el tiempo de reproducción de audio o timeline VJ.
+  - **Transmutación Estética GLSL & Ingesta Multicapa:**
+    - Filtros en tiempo real: Cómic Ink, Anime Cel-Shading, Holograma Cuántico y Cyber Glitch.
+    - Ingesta de video de usuario por Drag & Drop (`.mp4`, `.webm`, `.gif`).
+    - Inyección universal en `customShaderUniforms.uVideoTexture` (los 22 shaders GLSL), pantallas monolíticas 3D en Océano de Mercurio y Valle de Cristales, y ventana flotante PiP HUD.
+- **Consecuencias:**
+  - ✅ Capacidad de generar y proyectar videoclips musicales narrativos completos sin salir de la herramienta.
+  - ✅ Coexistencia fluida entre video en vivo (cámara/NDI) y clips generativos IA en el pipeline de Three.js y WebGL.
+
+
 
 
 

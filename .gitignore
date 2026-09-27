@@ -16,5 +16,7 @@ settings.env
 __pycache__/
 *.pyc
 cookies.txt
+*.mp4
+media/
 
 

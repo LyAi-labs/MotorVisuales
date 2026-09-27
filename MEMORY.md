@@ -52,6 +52,7 @@
    - Orquestador Creativo Autónomo sincronizado con transitorios de audio $dE/dt$, coordenadas MER y arquetipos de IA.
 8. **Agente IA "Director de Arte" & Modelo Afectivo MER:** Russell Circumplex (Valencia x Arousal), auto-tracking basado en RMS + Centroide.
 9. **Grabador de Video & Exportadores:** MediaRecorder WebM 60FPS, WebP Animado cuantizado al tempo y capturas Ultra-HD 4K/8K con SSAA.
+10. **Estudio de Creación Narrativa & Clips IA Multicapa (`AiClipStudioEngine` / D-040):** 6 arquetipos procedurales a 60 FPS (Anime Sakuga, Cómic Noir & Halftone, Cine 35mm, Aventura/Fantasía, Cyberpunk 2099, Acuarela Onírica), storyboards musicales autónomos con Gemini 2.5 Flash, transmutación GLSL y proyección universal en Three.js (`uVideoTexture`).
 
 ### Nodo de Audio (grafo)
 ```
@@ -241,6 +242,12 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Procesador de Chroma Key en GPU:** Eliminación de fondo por color clave (verde, azul, negro) con tolerancia y suavizado `smoothstep`.
   - **Monolito Holográfico Flotante:** Pantalla curva gigante integrada en `ScenicWorldEngine` sobre el Océano de Mercurio con scanlines CRT, halo lumínico y glitch reactivo a los transitorios de audio.
   - **Textura Universal:** Exposición de uniforms `uVideoTexture` y `uVideoActive` en todos los 22 shaders GLSL del Live Shader Studio.
+
+- ✅ **Estudio de Creación Narrativa & Clips IA Multicapa (AiClipStudioEngine / D-040):**
+  - **Motor de Animación & Creación Procedural 60 FPS:** 6 arquetipos estilísticos vivos (Anime Sakuga & Cel-Shading con líneas de velocidad y destellos en drops, Cómic Noir & Halftone con tramas Ben-Day y onomatopeyas POP/POW/BOOM, Cinematografía Realista 35mm con cantante en foco cenital y flares anamórficos, Aventura & Fantasía Épica con islas flotantes y dragón cósmico, Cyberpunk 2099 con androide neural y lluvia Matrix, Acuarela & Óleo Onírico con pigmentos reactivos a RMS).
+  - **Director Narrativo & Storyboard Autónomo:** Generación inteligente de guiones visuales en 6 escenas sincronizadas con la música utilizando la API de Gemini 2.5 Flash (`application/json`) y fallback heurístico local instantáneo (100% offline).
+  - **Transmutación Estética en Vivo:** Filtros de post-procesado GLSL (Cómic Ink, Anime Cel, Holograma Cuántico, Cyber Glitch) y módulo de audio-reactividad con Speed Ramping, Beat Jump Cuts, Sub-Bass Zoom Pulse y Chroma Key.
+  - **Proyección Universal 3D:** Inyección de textura en `customShaderUniforms.uVideoTexture` para los 22 shaders GLSL, pantallas holográficas en el Océano de Mercurio y Valle de Cristales, y ventana flotante PiP HUD en el Viewport 3D.
 
 ## Próximas Ideas / Pendientes
 - [ ] Universo Escénico 14: "Abismo Oceánico & Enjambre de Boids 3D (4.096 Peces Bioluminiscentes en GPGPU)".
