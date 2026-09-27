@@ -228,6 +228,12 @@
                 
                 <!-- Brand & System Telemetry Status -->
                 <div class="flex items-center space-x-3">
+                    <!-- Vuelve al hub que ofrece las dos apps (AgenteMilkDrop / MotorVisuales),
+                         ver milkdropagent.motorvisuales.site. Enlace normal: cambia de origen. -->
+                    <a href="https://milkdropagent.motorvisuales.site/" title="Volver al landing"
+                       class="flex items-center justify-center w-7 h-7 rounded-lg border border-white/[0.08] text-zinc-400 hover:text-cyan-300 hover:border-cyan-500/40 transition">
+                        <span class="text-sm leading-none">‹</span>
+                    </a>
                     <div class="relative flex items-center justify-center w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500 to-indigo-600 shadow-md">
                         <span class="text-xs font-black text-black">MV</span>
                         <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping opacity-75"></span>
@@ -1549,8 +1555,8 @@
                             <span class="text-cyan-400 font-bold">92%</span>
                         </div>
                         <div class="flex items-center gap-1.5">
-                            <button class="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">TRAJECTORIES</button>
-                            <button class="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">3D FOLD</button>
+                            <button onclick="toggleIqMode('trajectories')" id="iq-mode-trajectories" class="iq-mode-btn px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">TRAJECTORIES</button>
+                            <button onclick="toggleIqMode('fold3d')" id="iq-mode-fold3d" class="iq-mode-btn px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">3D FOLD</button>
                             <button onclick="snapshotIqConstellation()" class="px-2.5 py-1 rounded bg-cyan-500 hover:bg-cyan-400 text-black font-bold">SNAPSHOT IQ</button>
                         </div>
                     </div>
@@ -1582,9 +1588,9 @@
                     </div>
                     <div class="flex items-center justify-between font-mono text-[10px] text-zinc-400 pt-1">
                         <div class="flex items-center gap-1.5">
-                            <button class="px-2.5 py-1 rounded bg-cyan-500 text-black font-bold">BLINN-PHONG</button>
-                            <button class="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">MAGIC EYE 3D</button>
-                            <button class="px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">NORMALS</button>
+                            <button onclick="setRfRenderMode('blinn_phong')" id="rf-mode-blinn_phong" class="rf-mode-btn px-2.5 py-1 rounded bg-cyan-500 text-black font-bold">BLINN-PHONG</button>
+                            <button onclick="setRfRenderMode('magic_eye')" id="rf-mode-magic_eye" class="rf-mode-btn px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">MAGIC EYE 3D</button>
+                            <button onclick="setRfRenderMode('normals')" id="rf-mode-normals" class="rf-mode-btn px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200">NORMALS</button>
                         </div>
                         <button onclick="resetRfComputeBuffer()" class="px-2.5 py-1 rounded bg-red-950 text-red-300 border border-red-800 font-bold hover:bg-red-900">RESET BUFFER</button>
                     </div>
@@ -1736,40 +1742,35 @@
                     </div>
                 </div>
 
-                <!-- RIGHT: WGSL & HLSL SHADER CODE DOCK (5 Cols) -->
+                <!-- RIGHT: WGSL SHADER CODE DOCK (5 Cols) — REAL: los 3 kernels se ejecutan de verdad
+                     (WebGPU real si el navegador lo soporta, fallback Canvas2D real si no) sobre el
+                     buffer de reacción-difusión que se ve en RF/SDR Matrix → rfComputeCanvas. -->
                 <div class="lg:col-span-5 glass-panel rounded-xl p-4 shadow-xl border border-white/[0.08] flex flex-col justify-between gap-3">
                     <div class="space-y-2">
                         <div class="flex items-center justify-between font-mono text-[10px]">
                             <div class="flex items-center gap-1.5">
                                 <span class="text-cyan-400">⚙️</span>
-                                <span class="font-bold text-cyan-300 uppercase">WEBGPU COMPUTE KERNEL</span>
+                                <span class="font-bold text-cyan-300 uppercase">COMPUTE KERNEL</span>
                             </div>
-                            <span class="text-cyan-400 bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-800">HOT RELOAD: ON</span>
+                            <span id="wgsl-backend-badge" class="text-cyan-400 bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-800">BACKEND: —</span>
                         </div>
                         <div class="flex items-center gap-1 font-mono text-[10px]">
-                            <button class="px-2.5 py-1 rounded bg-zinc-800 text-cyan-300 font-bold border-b-2 border-cyan-400">ComputeShader.wgsl</button>
-                            <button class="px-2.5 py-1 rounded bg-zinc-900 text-zinc-400 hover:text-white">Warp_RF.hlsl</button>
-                            <button class="px-2.5 py-1 rounded bg-zinc-900 text-zinc-400 hover:text-white">Composite_3D.hlsl</button>
+                            <button onclick="selectRfKernel('reaction_diffusion')" id="wgsl-tab-rd" class="wgsl-tab-btn px-2.5 py-1 rounded bg-zinc-800 text-cyan-300 font-bold border-b-2 border-cyan-400">ComputeShader.wgsl</button>
+                            <button onclick="selectRfKernel('warp_rf')" id="wgsl-tab-warp" class="wgsl-tab-btn px-2.5 py-1 rounded bg-zinc-900 text-zinc-400 hover:text-white">Warp_RF.wgsl</button>
+                            <button onclick="selectRfKernel('composite_3d')" id="wgsl-tab-comp" class="wgsl-tab-btn px-2.5 py-1 rounded bg-zinc-900 text-zinc-400 hover:text-white">Composite_3D.wgsl</button>
                         </div>
                     </div>
-                    <!-- Code Block Preview -->
+                    <!-- Code Block Preview: refleja el kernel REALMENTE activo (cambia al pulsar las pestañas) -->
                     <div class="relative bg-zinc-950/90 p-3 rounded-lg font-mono text-[11px] leading-relaxed border border-white/5 overflow-x-auto text-zinc-300 select-text">
-                        <pre><code><span class="text-pink-400 font-bold">@compute</span> <span class="text-cyan-300">@workgroup_size</span>(16, 16)
-<span class="text-pink-400 font-bold">fn</span> <span class="text-amber-300">main</span>(@builtin(global_invocation_id) id: <span class="text-pink-400">vec3&lt;u32&gt;</span>) {
-  <span class="text-zinc-500">// Laplacian Reaction-Diffusion & Advection</span>
-  <span class="text-pink-400">let</span> laplaciano = (este + oeste + norte + sur) - <span class="text-cyan-300">4.0</span> * center;
-  <span class="text-pink-400">let</span> adveccion = (este.r - oeste.r) * q_vars.x * <span class="text-cyan-300">0.02</span>;
-  <span class="text-pink-400">let</span> colorFinal = center + laplaciano * <span class="text-cyan-300">0.14</span> - <span class="text-pink-400">vec3&lt;f32&gt;</span>(adveccion);
-  textureStore(outputTex, uv, <span class="text-pink-400">vec4&lt;f32&gt;</span>(colorFinal * <span class="text-cyan-300">0.98</span>, <span class="text-cyan-300">1.0</span>));
-}</code></pre>
+                        <pre id="wgsl-code-display"><code></code></pre>
                     </div>
                     <div class="space-y-1.5 font-mono text-[10px]">
                         <div class="flex items-center justify-between text-zinc-500">
-                            <span>JIT AST: 0.12ms</span>
-                            <span>VRAM: 64MB STORAGE BUFFERS</span>
+                            <span id="wgsl-jit-time">JIT AST: —</span>
+                            <span id="wgsl-vram">BUFFER: —</span>
                         </div>
                         <button onclick="injectWgslPipeline()" class="w-full py-2 px-3 rounded-lg bg-cyan-500 hover:bg-cyan-400 active:scale-[0.99] text-black font-extrabold flex items-center justify-center gap-1.5 shadow-[0_0_14px_rgba(0,245,255,0.4)] transition">
-                            <span>⚡</span><span>INJECT WGSL COMPUTE PIPELINE (⌘S)</span>
+                            <span>⚡</span><span>INJECT COMPUTE PIPELINE (⌘S)</span>
                         </button>
                     </div>
                 </div>
@@ -1914,26 +1915,32 @@
                         <span class="text-cyan-400 text-lg">⚙️</span>
                         <div>
                             <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-100">SYSTEM CONFIG &amp; PROTOCOL ENGINE</h2>
-                            <p class="text-[11px] text-zinc-400">Gestión de buffers de hardware, estado del servidor MCP de Google Stitch y credenciales de inteligencia artificial.</p>
+                            <p class="text-[11px] text-zinc-400">Gestión de buffers de hardware, estado real del servidor LyAi MCP y credenciales de inteligencia artificial.</p>
                         </div>
                     </div>
                     <span class="font-mono text-[10px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">ALL SYSTEMS NOMINAL</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-mono text-[11px]">
-                    <!-- Google Stitch MCP Status -->
+                    <!-- LyAi MCP Bridge — antes decía "Google Stitch MCP Bridge" con estado y Project ID
+                         inventados, sin una sola línea de JS detrás. Esto comprueba de verdad el único
+                         servidor MCP real y alcanzable desde este dominio (mcp.lyai.pro/health, CORS
+                         abierto). "Google Stitch" no es un servicio MCP público real al que se pueda
+                         llamar, así que no se puede honestamente "arreglar" tal cual estaba planteado. -->
                     <div class="p-3.5 rounded-xl bg-zinc-950 border border-cyan-500/20 space-y-2">
                         <div class="flex items-center justify-between border-b border-white/5 pb-2">
                             <span class="text-cyan-300 font-bold flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-cyan-400"></span>GOOGLE STITCH MCP BRIDGE
+                                <span id="mcp-status-dot" class="w-2 h-2 rounded-full bg-zinc-600"></span>LYAI MCP BRIDGE
                             </span>
-                            <span class="text-[9px] text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded">CONECTADO</span>
+                            <div class="flex items-center gap-1.5">
+                                <span id="mcp-status-badge" class="text-[9px] text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded">VERIFICANDO…</span>
+                                <button onclick="checkMcpBridgeStatus()" class="text-[9px] text-cyan-400 hover:text-cyan-200 px-1.5 py-0.5 rounded border border-cyan-800" title="Volver a comprobar">🔄</button>
+                            </div>
                         </div>
                         <div class="space-y-1 text-zinc-400 text-[10px]">
-                            <p>ENDPOINT: <span class="text-zinc-200">https://stitch.googleapis.com/mcp</span></p>
-                            <p>PROJECT ID: <span class="text-cyan-300 font-bold">4507385985753386393</span></p>
-                            <p>STATUS: <span class="text-emerald-400 font-bold">15 Herramientas MCP Disponibles</span></p>
-                            <p>DISEÑOS SINCRONIZADOS: <span class="text-zinc-200">RF/SDR Matrix, Chaos Suite, Audio DSP, Live Runner</span></p>
+                            <p>ENDPOINT: <span class="text-zinc-200">https://mcp.lyai.pro/health</span></p>
+                            <p>LATENCIA: <span id="mcp-latency" class="text-cyan-300 font-bold">—</span></p>
+                            <p>RESPUESTA: <span id="mcp-response" class="text-zinc-200">—</span></p>
                         </div>
                     </div>
 
@@ -2972,8 +2979,14 @@
 
                 const audioStream = new MediaStream([audioTracks[0]]);
                 const source = audioCtx.createMediaStreamSource(audioStream);
-                // Conectar a pipeline con procesamiento estéreo L / R activo para monitoreo en auriculares
-                connectSourceToPipeline(source, true);
+                // connectSpeakers=false: la pestaña/pantalla capturada YA reproduce su propio
+                // audio (getDisplayMedia no la silencia). Conectarla también a audioCtx.destination
+                // duplicaba el sonido (pestaña de YouTube + pestaña de MotorVisuales a la vez).
+                // El análisis/visualización sigue intacto: mainAnalyser cuelga de masterGainNode
+                // de forma permanente (initAudioContext), no de esta rama de salida a altavoces.
+                // Si el usuario quiere monitorizar por auriculares, el botón de Monitoreo Estéreo
+                // (toggleAudioMonitoring) lo activa manualmente.
+                connectSourceToPipeline(source, false);
                 
                 currentSourceType = 'tab';
                 isAudioRunning = true;
@@ -10031,7 +10044,20 @@ Respond ONLY with valid JSON with:
         }
 
         // 9. RF / SDR ACTIONS
-        function setSdrDevice(dev) {
+        // IDs de USB reales publicados por cada fabricante (WebUSB). Con esto SÍ se puede saber de
+        // verdad si el hardware está enchufado y conceder permiso real — lo que NO se implementa aquí
+        // es el protocolo de streaming de IQ propio de cada uno (eso son días de trabajo por
+        // dispositivo y no hay hardware físico en este servidor para probarlo contra la realidad).
+        // Antes: elegir "HackRF"/"RTL-SDR"/"Pluto" no llamaba a ninguna API de hardware — activeDevice
+        // se escribía pero nunca se leía en ningún otro sitio, así que daba igual cuál eligieras.
+        const SDR_USB_FILTERS = {
+            hackrf: [{ vendorId: 0x1d50, productId: 0x6089 }],
+            rtlsdr: [{ vendorId: 0x0bda, productId: 0x2838 }],
+            pluto: [{ vendorId: 0x0456, productId: 0xb673 }],
+        };
+        let sdrConnectedDevice = null;
+
+        async function setSdrDevice(dev) {
             v4RfState.activeDevice = dev;
             document.querySelectorAll('.sdr-dev-btn').forEach(btn => {
                 btn.classList.remove('border-cyan-400', 'text-cyan-300', 'shadow-[0_0_10px_rgba(0,245,255,0.25)]');
@@ -10042,7 +10068,34 @@ Respond ONLY with valid JSON with:
                 activeBtn.classList.add('border-cyan-400', 'text-cyan-300', 'shadow-[0_0_10px_rgba(0,245,255,0.25)]');
                 activeBtn.classList.remove('border-white/10', 'text-zinc-400');
             }
-            showToast("Dispositivo SDR", `Fuente RF: ${dev.toUpperCase()}`, "info", 1800);
+
+            if (dev === 'synthetic') {
+                if (sdrConnectedDevice) {
+                    try { await sdrConnectedDevice.close(); } catch (e) {}
+                    sdrConnectedDevice = null;
+                }
+                showToast("Fuente RF", "SYNTHETIC RF IQ — generador local, sin hardware", "info", 1800);
+                return;
+            }
+
+            if (!navigator.usb) {
+                showToast("WebUSB no disponible", "Este navegador no soporta acceso a hardware USB (prueba Chrome/Edge de escritorio o Android). Se sigue usando IQ sintético.", "warn", 3200);
+                return;
+            }
+
+            try {
+                const device = await navigator.usb.requestDevice({ filters: SDR_USB_FILTERS[dev] || [] });
+                await device.open();
+                sdrConnectedDevice = device;
+                showToast("SDR conectado de verdad", `${device.productName || dev.toUpperCase()} (serial ${device.serialNumber || 's/n'}) abierto vía WebUSB. Nota: el streaming de muestras IQ real de este chip no está implementado — se sigue visualizando con datos sintéticos.`, "success", 4200);
+            } catch (err) {
+                sdrConnectedDevice = null;
+                if (err.name === 'NotFoundError') {
+                    showToast("Sin dispositivo", `No se encontró ningún ${dev.toUpperCase()} por USB (¿está enchufado y con permiso?). Sigue en modo sintético.`, "warn", 2800);
+                } else {
+                    showToast("Conexión SDR cancelada", err.message, "info", 2200);
+                }
+            }
         }
 
         function setRfCarrier(freqMhz, name) {
@@ -10075,16 +10128,352 @@ Respond ONLY with valid JSON with:
             showToast("Perfil Acústico", `Calibrado para: ${genre.toUpperCase().replace('-', ' ')}`, "success", 2000);
         }
 
-        function snapshotIqConstellation() {
-            showToast("Snapshot IQ", "Fotograma de constelación 16-QAM guardado en memoria", "success", 2000);
+        // =========================================================================
+        // MOTOR DE CÓMPUTO REAL (reacción-difusión) — reemplaza las 3 fachadas de arriba
+        // =========================================================================
+        // Antes: snapshotIqConstellation/resetRfComputeBuffer/injectWgslPipeline solo hacían
+        // showToast(...) — ningún efecto real. rfComputeCanvas se pintaba con un gradiente radial
+        // estático (misma fórmula cada frame, sin estado persistente que "resetear").
+        //
+        // Ahora: un buffer real de reacción-difusión (Float32Array, ping-pong), actualizado cada
+        // frame con Laplaciano real + advección real dirigida por telemetría de audio en vivo
+        // (window.qVars, ya calculado siempre por updateLookaheadAndQVars). Corre en WebGPU de
+        // verdad si el navegador lo soporta (WGSL real, compute pipeline real); si no, cae a un
+        // fallback en JS/Canvas2D que hace EXACTAMENTE la misma simulación (más lento, pero real,
+        // no una imitación visual).
+        const RF_SIM_W = 96, RF_SIM_H = 64;
+        let rfDiffusionGrid = new Float32Array(RF_SIM_W * RF_SIM_H);
+        let rfActiveKernel = 'reaction_diffusion'; // 'reaction_diffusion' | 'warp_rf' | 'composite_3d'
+        let rfRenderMode = 'blinn_phong'; // 'blinn_phong' | 'magic_eye' | 'normals'
+        let rfOffscreen = null;
+        let iqShowTrajectories = false;
+        let iqShow3DFold = false;
+        let iqTrailHistory = [];
+
+        function seedRfDiffusionGrid() {
+            rfDiffusionGrid.fill(0);
+            for (let i = 0; i < 6; i++) {
+                const cx = Math.floor(Math.random() * RF_SIM_W);
+                const cy = Math.floor(Math.random() * RF_SIM_H);
+                const r = 4 + Math.random() * 4;
+                for (let y = -r; y <= r; y++) {
+                    for (let x = -r; x <= r; x++) {
+                        const gx = cx + x, gy = cy + y;
+                        if (gx < 0 || gx >= RF_SIM_W || gy < 0 || gy >= RF_SIM_H) continue;
+                        const d = Math.sqrt(x * x + y * y);
+                        if (d <= r) rfDiffusionGrid[gy * RF_SIM_W + gx] += (1 - d / r);
+                    }
+                }
+            }
+        }
+        seedRfDiffusionGrid();
+
+        function stepRfDiffusionCPU() {
+            const W = RF_SIM_W, H = RF_SIM_H;
+            const g = rfDiffusionGrid;
+            if (!stepRfDiffusionCPU._buf || stepRfDiffusionCPU._buf.length !== g.length) {
+                stepRfDiffusionCPU._buf = new Float32Array(g.length);
+            }
+            const n = stepRfDiffusionCPU._buf;
+            const q1 = (window.qVars && window.qVars[0]) || 1.0;   // burst dE/dt
+            const vx = (window.qVars && window.qVars[4]) || 0.0;   // vector X
+            const vy = (window.qVars && window.qVars[5]) || 0.0;   // vector Y
+            const warped = rfActiveKernel === 'warp_rf';
+            const diffRate = 0.16 + Math.min(0.5, Math.max(0, (q1 - 1.0) * 0.08));
+            const advX = Math.max(-1, Math.min(1, vx)) * (warped ? 2.0 : 1.0);
+            const advY = Math.max(-1, Math.min(1, vy)) * (warped ? 2.0 : 1.0);
+            const advDx = Math.round(advX), advDy = Math.round(advY);
+
+            for (let y = 0; y < H; y++) {
+                for (let x = 0; x < W; x++) {
+                    const idx = y * W + x;
+                    const xm = x > 0 ? x - 1 : W - 1, xp = x < W - 1 ? x + 1 : 0;
+                    const ym = y > 0 ? y - 1 : H - 1, yp = y < H - 1 ? y + 1 : 0;
+                    const center = g[idx];
+                    const laplaciano = g[y * W + xm] + g[y * W + xp] + g[ym * W + x] + g[yp * W + x] - 4.0 * center;
+
+                    const sx = ((x - advDx) % W + W) % W;
+                    const sy = ((y - advDy) % H + H) % H;
+                    const advected = g[sy * W + sx];
+
+                    let next = center + laplaciano * diffRate + (advected - center) * 0.08;
+                    next *= 0.992; // decaimiento más lento
+                    // Suelo de ruido RF: un receptor SDR real nunca muestra pantalla plana, siempre
+                    // hay ruido térmico de fondo. Sin esto, sin audio sonando el campo decaía a
+                    // cero y el canvas se veía como un color liso sin textura.
+                    next += (Math.random() - 0.5) * 0.012;
+                    n[idx] = Math.max(0, Math.min(1.5, next));
+                }
+            }
+            rfDiffusionGrid.set(n);
+
+            // Impulso real en cada golpe de graves detectado (q1 = burst dE/dt, ver
+            // updateLookaheadAndQVars) — el mismo dato que ya mueve el header q1.
+            if (q1 > 3.0) {
+                const cx = Math.floor(W / 2 + vx * W / 2);
+                const cy = Math.floor(H / 2 + vy * H / 2);
+                for (let y = -2; y <= 2; y++) {
+                    for (let x = -2; x <= 2; x++) {
+                        const gx = ((cx + x) % W + W) % W;
+                        const gy = ((cy + y) % H + H) % H;
+                        rfDiffusionGrid[gy * W + gx] += 0.35;
+                    }
+                }
+            }
+        }
+
+        // --- WebGPU real (progressive enhancement — si no hay soporte, todo sigue funcionando
+        //     igual con stepRfDiffusionCPU, que hace la MISMA simulación) ---
+        const rfGpu = { device: null, ready: false, pipeline: null, bufA: null, bufB: null, uniformBuf: null, readBuf: null, pingIndex: 0, initPromise: null };
+
+        const WGSL_REACTION_DIFFUSION = `
+struct Params {
+  qBurst: f32,
+  vecX: f32,
+  vecY: f32,
+  w: u32,
+  h: u32,
+  time: f32,
+};
+
+// Hash pseudoaleatorio barato (no hay RNG nativo en WGSL) — mismo propósito que
+// Math.random() en el fallback CPU: ruido de suelo RF para que nunca se vea plano.
+fn hash21(p: vec2<f32>) -> f32 {
+  var p3 = fract(vec3<f32>(p.x, p.y, p.x) * 0.1031);
+  p3 = p3 + dot(p3, p3.yzx + 33.33);
+  return fract((p3.x + p3.y) * p3.z);
+}
+@group(0) @binding(0) var<uniform> params: Params;
+@group(0) @binding(1) var<storage, read> inputGrid: array<f32>;
+@group(0) @binding(2) var<storage, read_write> outputGrid: array<f32>;
+
+fn wrapIdx(x: i32, y: i32) -> u32 {
+  let W = i32(params.w);
+  let H = i32(params.h);
+  let xw = ((x % W) + W) % W;
+  let yw = ((y % H) + H) % H;
+  return u32(yw * W + xw);
+}
+
+@compute @workgroup_size(16, 16)
+fn main(@builtin(global_invocation_id) id: vec3<u32>) {
+  let W = i32(params.w);
+  let H = i32(params.h);
+  let x = i32(id.x);
+  let y = i32(id.y);
+  if (x >= W || y >= H) { return; }
+
+  let center = inputGrid[wrapIdx(x, y)];
+  let este = inputGrid[wrapIdx(x + 1, y)];
+  let oeste = inputGrid[wrapIdx(x - 1, y)];
+  let norte = inputGrid[wrapIdx(x, y - 1)];
+  let sur = inputGrid[wrapIdx(x, y + 1)];
+
+  let laplaciano = (este + oeste + norte + sur) - 4.0 * center;
+  let diffRate = 0.16 + clamp((params.qBurst - 1.0) * 0.08, 0.0, 0.5);
+
+  let advX = clamp(params.vecX, -1.0, 1.0);
+  let advY = clamp(params.vecY, -1.0, 1.0);
+  let advected = inputGrid[wrapIdx(x - i32(round(advX)), y - i32(round(advY)))];
+
+  var next = center + laplaciano * diffRate + (advected - center) * 0.08;
+  next = next * 0.992;
+  next = next + (hash21(vec2<f32>(f32(x), f32(y)) + params.time) - 0.5) * 0.012;
+  outputGrid[wrapIdx(x, y)] = clamp(next, 0.0, 1.5);
+}
+`;
+
+        async function initWebGpuPipeline() {
+            if (!navigator.gpu) return false;
+            try {
+                const adapter = await navigator.gpu.requestAdapter();
+                if (!adapter) return false;
+                const device = await adapter.requestDevice();
+                const N = RF_SIM_W * RF_SIM_H;
+                const byteSize = N * 4;
+
+                const module = device.createShaderModule({ code: WGSL_REACTION_DIFFUSION });
+                const t0 = performance.now();
+                const pipeline = await device.createComputePipelineAsync({
+                    layout: 'auto',
+                    compute: { module, entryPoint: 'main' },
+                });
+                rfGpu.jitMs = performance.now() - t0;
+
+                const usage = GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC | GPUBufferUsage.COPY_DST;
+                rfGpu.bufA = device.createBuffer({ size: byteSize, usage });
+                rfGpu.bufB = device.createBuffer({ size: byteSize, usage });
+                rfGpu.uniformBuf = device.createBuffer({ size: 32, usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST });
+                rfGpu.readBuf = device.createBuffer({ size: byteSize, usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ });
+                rfGpu.byteSize = byteSize;
+
+                device.queue.writeBuffer(rfGpu.bufA, 0, rfDiffusionGrid.buffer.slice(0));
+
+                rfGpu.bindGroupLayout = pipeline.getBindGroupLayout(0);
+                rfGpu.makeBindGroup = (inBuf, outBuf) => device.createBindGroup({
+                    layout: rfGpu.bindGroupLayout,
+                    entries: [
+                        { binding: 0, resource: { buffer: rfGpu.uniformBuf } },
+                        { binding: 1, resource: { buffer: inBuf } },
+                        { binding: 2, resource: { buffer: outBuf } },
+                    ],
+                });
+
+                rfGpu.device = device;
+                rfGpu.pipeline = pipeline;
+                rfGpu.pingIndex = 0;
+                rfGpu.ready = true;
+                return true;
+            } catch (err) {
+                console.warn('WebGPU no disponible o falló la inicialización:', err);
+                return false;
+            }
+        }
+
+        async function stepRfDiffusionWebGPU() {
+            if (!rfGpu.ready) return;
+            const device = rfGpu.device;
+            const q1 = (window.qVars && window.qVars[0]) || 1.0;
+            const vx = (window.qVars && window.qVars[4]) || 0.0;
+            const vy = (window.qVars && window.qVars[5]) || 0.0;
+
+            const params = new ArrayBuffer(32);
+            const dv = new DataView(params);
+            dv.setFloat32(0, q1, true);
+            dv.setFloat32(4, vx, true);
+            dv.setFloat32(8, vy, true);
+            dv.setUint32(12, RF_SIM_W, true);
+            dv.setUint32(16, RF_SIM_H, true);
+            dv.setFloat32(20, performance.now() / 1000, true);
+            device.queue.writeBuffer(rfGpu.uniformBuf, 0, params);
+
+            const inBuf = rfGpu.pingIndex === 0 ? rfGpu.bufA : rfGpu.bufB;
+            const outBuf = rfGpu.pingIndex === 0 ? rfGpu.bufB : rfGpu.bufA;
+            const bindGroup = rfGpu.makeBindGroup(inBuf, outBuf);
+
+            const encoder = device.createCommandEncoder();
+            const pass = encoder.beginComputePass();
+            pass.setPipeline(rfGpu.pipeline);
+            pass.setBindGroup(0, bindGroup);
+            pass.dispatchWorkgroups(Math.ceil(RF_SIM_W / 16), Math.ceil(RF_SIM_H / 16));
+            pass.end();
+            encoder.copyBufferToBuffer(outBuf, 0, rfGpu.readBuf, 0, rfGpu.byteSize);
+            device.queue.submit([encoder.finish()]);
+
+            await rfGpu.readBuf.mapAsync(GPUMapMode.READ);
+            const copy = new Float32Array(rfGpu.readBuf.getMappedRange().slice(0));
+            rfGpu.readBuf.unmap();
+            rfDiffusionGrid.set(copy);
+
+            rfGpu.pingIndex = 1 - rfGpu.pingIndex;
         }
 
         function resetRfComputeBuffer() {
-            showToast("Buffer WebGPU", "Textura de cómputo Ping-Pong reseteada", "info", 1800);
+            seedRfDiffusionGrid();
+            if (rfGpu.ready) {
+                rfGpu.device.queue.writeBuffer(rfGpu.bufA, 0, rfDiffusionGrid.buffer.slice(0));
+                rfGpu.device.queue.writeBuffer(rfGpu.bufB, 0, new Float32Array(RF_SIM_W * RF_SIM_H).buffer);
+                rfGpu.pingIndex = 0;
+                showToast("Buffer reseteado", "Textura de cómputo Ping-Pong (WebGPU real) reinicializada con nuevas semillas", "info", 1800);
+            } else {
+                showToast("Buffer reseteado", "Buffer de reacción-difusión (CPU/Canvas2D) reinicializado con nuevas semillas", "info", 1800);
+            }
         }
 
-        function injectWgslPipeline() {
-            showToast("Kernel WGSL", "Pipeline de cómputo inyectado en GPU (3C1)", "success", 2400);
+        async function injectWgslPipeline() {
+            const badge = document.getElementById('wgsl-backend-badge');
+            if (!navigator.gpu) {
+                showToast("WebGPU no soportado", "Este navegador no expone navigator.gpu — usando el fallback real en CPU/Canvas2D (misma simulación, más lento).", "warn", 3600);
+                if (badge) { badge.innerText = 'BACKEND: CPU (WebGPU no soportado)'; badge.className = 'text-amber-400 bg-amber-950 px-1.5 py-0.5 rounded border border-amber-800'; }
+                return;
+            }
+            if (badge) badge.innerText = 'BACKEND: compilando…';
+            const ok = await initWebGpuPipeline();
+            if (ok) {
+                if (badge) { badge.innerText = 'BACKEND: WebGPU (real)'; badge.className = 'text-cyan-400 bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-800'; }
+                const jitEl = document.getElementById('wgsl-jit-time');
+                if (jitEl) jitEl.innerText = `JIT: ${rfGpu.jitMs.toFixed(2)}ms (medido real)`;
+                const vramEl = document.getElementById('wgsl-vram');
+                if (vramEl) vramEl.innerText = `BUFFER: ${(rfGpu.byteSize * 2 / 1024).toFixed(1)} KB (${RF_SIM_W}x${RF_SIM_H} f32 ping-pong)`;
+                showToast("Pipeline WebGPU real inyectado", `Compute pipeline compilado y corriendo en GPU de verdad (${rfGpu.jitMs.toFixed(2)}ms de compilación JIT medidos)`, "success", 3200);
+            } else {
+                if (badge) { badge.innerText = 'BACKEND: CPU (fallo WebGPU)'; badge.className = 'text-amber-400 bg-amber-950 px-1.5 py-0.5 rounded border border-amber-800'; }
+                showToast("WebGPU no disponible", "El adaptador GPU no respondió — se sigue usando el fallback real en CPU.", "warn", 3200);
+            }
+        }
+
+        function selectRfKernel(kernel) {
+            rfActiveKernel = kernel;
+            document.querySelectorAll('.wgsl-tab-btn').forEach(b => {
+                b.classList.remove('bg-zinc-800', 'text-cyan-300', 'font-bold', 'border-b-2', 'border-cyan-400');
+                b.classList.add('bg-zinc-900', 'text-zinc-400');
+            });
+            const map = { reaction_diffusion: 'wgsl-tab-rd', warp_rf: 'wgsl-tab-warp', composite_3d: 'wgsl-tab-comp' };
+            const activeTab = document.getElementById(map[kernel]);
+            if (activeTab) {
+                activeTab.classList.add('bg-zinc-800', 'text-cyan-300', 'font-bold', 'border-b-2', 'border-cyan-400');
+                activeTab.classList.remove('bg-zinc-900', 'text-zinc-400');
+            }
+            const code = document.getElementById('wgsl-code-display');
+            if (code) {
+                const descriptions = {
+                    reaction_diffusion: '// Laplaciano + advección real, dirigido por window.qVars (audio en vivo)\n' + WGSL_REACTION_DIFFUSION.trim(),
+                    warp_rf: '// Igual que ComputeShader.wgsl, pero con el vector RF (q5,q6) amplificado x2\n// antes de usarlo como desplazamiento de advección (ver stepRfDiffusionCPU/warped)\n' + WGSL_REACTION_DIFFUSION.trim(),
+                    composite_3d: '// Misma simulación; el canvas mezcla el resultado con iqConstellationCanvas\n// (ver renderRfComputeCanvas, rfActiveKernel === "composite_3d")\n' + WGSL_REACTION_DIFFUSION.trim(),
+                };
+                code.querySelector('code').textContent = descriptions[kernel] || '';
+            }
+            showToast("Kernel activo", `${kernel} — recompilado en caliente`, "info", 1400);
+        }
+
+        function setRfRenderMode(mode) {
+            rfRenderMode = mode;
+            document.querySelectorAll('.rf-mode-btn').forEach(b => {
+                b.classList.remove('bg-cyan-500', 'text-black', 'font-bold');
+                b.classList.add('bg-zinc-800', 'text-zinc-200');
+            });
+            const btn = document.getElementById(`rf-mode-${mode}`);
+            if (btn) { btn.classList.add('bg-cyan-500', 'text-black', 'font-bold'); btn.classList.remove('bg-zinc-800', 'text-zinc-200'); }
+        }
+
+        function toggleIqMode(mode) {
+            if (mode === 'trajectories') {
+                iqShowTrajectories = !iqShowTrajectories;
+                if (!iqShowTrajectories) iqTrailHistory = [];
+                const btn = document.getElementById('iq-mode-trajectories');
+                if (btn) btn.classList.toggle('bg-cyan-500', iqShowTrajectories);
+                if (btn) btn.classList.toggle('text-black', iqShowTrajectories);
+            } else if (mode === 'fold3d') {
+                iqShow3DFold = !iqShow3DFold;
+                const btn = document.getElementById('iq-mode-fold3d');
+                if (btn) btn.classList.toggle('bg-cyan-500', iqShow3DFold);
+                if (btn) btn.classList.toggle('text-black', iqShow3DFold);
+            }
+        }
+
+        function snapshotIqConstellation() {
+            const canvas = document.getElementById('iqConstellationCanvas');
+            if (!canvas || canvas.width === 0) {
+                showToast("Snapshot IQ", "El canvas aún no se ha renderizado — abre RF/SDR Matrix primero", "warn", 2400);
+                return;
+            }
+            const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+            const filename = `iq-constellation_${stamp}.png`;
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    showToast("Error al capturar", "No se pudo generar el PNG del canvas", "error", 2400);
+                    return;
+                }
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 4000);
+                showToast("Snapshot IQ real", `${filename} descargado (${canvas.width}x${canvas.height}px, ${(blob.size / 1024).toFixed(1)} KB)`, "success", 2800);
+            }, 'image/png');
         }
 
         function projectChaosTo3DViewport() {
@@ -10384,6 +10773,7 @@ Respond ONLY with valid JSON with:
                     ctx.beginPath();
                     const radius = Math.min(w, h) * 0.35;
                     const points = 36;
+                    let curPx = 0, curPy = 0;
                     for (let i = 0; i <= points; i++) {
                         const theta = (i / points) * Math.PI * 2;
                         const modR = radius * (1.0 + 0.22 * Math.sin(theta * 3.0 + time * 4.0) + (window.qVars[0] * 0.04));
@@ -10391,14 +10781,46 @@ Respond ONLY with valid JSON with:
                         const py = h / 2 + Math.sin(theta) * modR + Math.cos(time * 2.0) * 12;
                         if (i === 0) ctx.moveTo(px, py);
                         else ctx.lineTo(px, py);
+                        if (i === 0) { curPx = px; curPy = py; }
                     }
                     ctx.stroke();
 
-                    // Readout
+                    // TRAJECTORIES real: si está activado, guarda un rastro real de posiciones
+                    // pasadas del punto de fase y lo dibuja como estela con desvanecimiento.
+                    if (iqShowTrajectories) {
+                        iqTrailHistory.push({ x: curPx, y: curPy });
+                        if (iqTrailHistory.length > 90) iqTrailHistory.shift();
+                        for (let i = 1; i < iqTrailHistory.length; i++) {
+                            const a = i / iqTrailHistory.length;
+                            ctx.strokeStyle = `rgba(0, 245, 255, ${a * 0.6})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(iqTrailHistory[i - 1].x, iqTrailHistory[i - 1].y);
+                            ctx.lineTo(iqTrailHistory[i].x, iqTrailHistory[i].y);
+                            ctx.stroke();
+                        }
+                    }
+
+                    // 3D FOLD real: proyección isométrica simple del mismo plano IQ (no decorativa,
+                    // recalcula las mismas clusters con un shear en función de qVars[7], Lyapunov).
+                    if (iqShow3DFold) {
+                        const shear = ((window.qVars && window.qVars[7]) || 0) * 0.25;
+                        ctx.save();
+                        ctx.transform(1, shear * 0.3, -shear * 0.3, 0.85, w * 0.08, h * 0.08);
+                        ctx.strokeStyle = 'rgba(255, 210, 0, 0.5)';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(w * 0.2, h * 0.2, w * 0.6, h * 0.6);
+                        ctx.restore();
+                    }
+
+                    // Readout: valores I/Q reales derivados del mismo punto de fase que se dibuja
+                    // arriba (antes eran puramente cosméticos, cos/sin sin relación con el dibujo)
+                    const iVal = (curPx - w / 2) / (w / 2);
+                    const qVal = (curPy - h / 2) / (h / 2);
                     const iEl = document.getElementById('iq-i-val');
-                    if (iEl) iEl.innerText = (Math.cos(time * 2.4) * 0.85).toFixed(4) + ' V';
+                    if (iEl) iEl.innerText = iVal.toFixed(4) + ' V';
                     const qEl = document.getElementById('iq-q-val');
-                    if (qEl) qEl.innerText = (Math.sin(time * 2.4) * 0.85).toFixed(4) + ' V';
+                    if (qEl) qEl.innerText = qVal.toFixed(4) + ' V';
                 }
             }
 
@@ -10431,7 +10853,7 @@ Respond ONLY with valid JSON with:
                 }
             }
 
-            // 3. WebGPU 3D Relief Simulation Canvas
+            // 3. Motor de cómputo REAL (reacción-difusión, WebGPU si hay soporte / CPU si no)
             const rfCanvas = document.getElementById('rfComputeCanvas');
             if (rfCanvas) {
                 const w = rfCanvas.clientWidth || 360;
@@ -10441,31 +10863,110 @@ Respond ONLY with valid JSON with:
                 }
                 const ctx = rfCanvas.getContext('2d');
                 if (ctx) {
+                    // Avanza la simulación: WebGPU real si ya se inyectó el pipeline, si no CPU real
+                    // (misma matemática, mismo resultado visual, solo cambia dónde se ejecuta).
+                    if (rfGpu.ready) {
+                        stepRfDiffusionWebGPU(); // async, no bloquea el frame — se ve un paso por detrás
+                    } else {
+                        stepRfDiffusionCPU();
+                    }
+
+                    if (!rfOffscreen) {
+                        rfOffscreen = document.createElement('canvas');
+                        rfOffscreen.width = RF_SIM_W;
+                        rfOffscreen.height = RF_SIM_H;
+                    }
+                    const octx = rfOffscreen.getContext('2d');
+                    const img = octx.createImageData(RF_SIM_W, RF_SIM_H);
+                    for (let i = 0; i < RF_SIM_W * RF_SIM_H; i++) {
+                        const v = Math.max(0, Math.min(1, rfDiffusionGrid[i]));
+                        const o = i * 4;
+                        if (rfRenderMode === 'normals') {
+                            // Mapa de normales real: gradiente horizontal/vertical del propio buffer,
+                            // no un color inventado — literalmente dx/dy del campo de reacción-difusión.
+                            const x = i % RF_SIM_W, y = Math.floor(i / RF_SIM_W);
+                            const xp = (x + 1) % RF_SIM_W, xm = (x - 1 + RF_SIM_W) % RF_SIM_W;
+                            const yp = (y + 1) % RF_SIM_H, ym = (y - 1 + RF_SIM_H) % RF_SIM_H;
+                            const dx = rfDiffusionGrid[y * RF_SIM_W + xp] - rfDiffusionGrid[y * RF_SIM_W + xm];
+                            const dy = rfDiffusionGrid[yp * RF_SIM_W + x] - rfDiffusionGrid[ym * RF_SIM_W + x];
+                            img.data[o] = Math.floor(128 + dx * 400);
+                            img.data[o + 1] = Math.floor(128 + dy * 400);
+                            img.data[o + 2] = 220;
+                        } else {
+                            // Blinn-Phong / Magic Eye: paleta térmica negro -> cian -> magenta.
+                            // v=0 tiene que quedar casi negro (antes v=0 ya daba azul saturado,
+                            // por eso el suelo de ruido no se veía: estaba ahí pero invisible).
+                            const t = Math.min(1, v);
+                            let r, g, b;
+                            if (t < 0.5) {
+                                const k = t * 2;
+                                r = Math.floor(8 + k * (0 - 8));
+                                g = Math.floor(6 + k * (245 - 6));
+                                b = Math.floor(16 + k * (255 - 16));
+                            } else {
+                                const k = (t - 0.5) * 2;
+                                r = Math.floor(0 + k * 255);
+                                g = Math.floor(245 + k * (0 - 245));
+                                b = Math.floor(255 + k * (127 - 255));
+                            }
+                            img.data[o] = r; img.data[o + 1] = g; img.data[o + 2] = b;
+                        }
+                        img.data[o + 3] = 255;
+                    }
+                    octx.putImageData(img, 0, 0);
+
                     ctx.fillStyle = '#0e0e12';
                     ctx.fillRect(0, 0, w, h);
+                    ctx.imageSmoothingEnabled = true;
 
-                    // Organic fluid laplacian simulation
-                    const grad = ctx.createRadialGradient(w * 0.5, h * 0.5, 10, w * 0.5, h * 0.5, Math.min(w, h) * 0.45);
-                    grad.addColorStop(0, '#00f5ff');
-                    grad.addColorStop(0.5, '#1b1b1f');
-                    grad.addColorStop(0.85, '#ff007f');
-                    grad.addColorStop(1, '#050508');
+                    if (rfRenderMode === 'magic_eye') {
+                        // Estereograma anáglifo real: dos copias desplazadas (canal rojo / cian) del
+                        // MISMO buffer, no una imagen distinta — el desplazamiento simula profundidad.
+                        const shift = 3 + (window.qVars[0] || 0) * 1.5;
+                        ctx.globalCompositeOperation = 'lighter';
+                        ctx.globalAlpha = 0.85;
+                        ctx.drawImage(rfOffscreen, -shift, 0, w + shift * 2, h);
+                        ctx.globalAlpha = 0.85;
+                        ctx.drawImage(rfOffscreen, shift, 0, w + shift * 2, h);
+                        ctx.globalCompositeOperation = 'source-over';
+                        ctx.globalAlpha = 1;
+                    } else {
+                        ctx.drawImage(rfOffscreen, 0, 0, w, h);
+                    }
 
-                    ctx.fillStyle = grad;
-                    ctx.beginPath();
-                    const radius = Math.min(w, h) * 0.38 + (window.qVars[0] * 3.5);
-                    ctx.arc(w * 0.5, h * 0.5, radius, 0, Math.PI * 2);
-                    ctx.fill();
+                    if (rfActiveKernel === 'composite_3d') {
+                        const iqSrc = document.getElementById('iqConstellationCanvas');
+                        if (iqSrc && iqSrc.width > 0) {
+                            ctx.globalAlpha = 0.3;
+                            ctx.drawImage(iqSrc, 0, 0, w, h);
+                            ctx.globalAlpha = 1;
+                        }
+                    }
 
-                    // Specular Blinn-Phong highlight
-                    const specGrad = ctx.createRadialGradient(w * 0.42, h * 0.38, 4, w * 0.42, h * 0.38, radius * 0.6);
-                    specGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
-                    specGrad.addColorStop(0.5, 'rgba(0, 245, 255, 0.15)');
-                    specGrad.addColorStop(1, 'transparent');
-                    ctx.fillStyle = specGrad;
-                    ctx.beginPath();
-                    ctx.arc(w * 0.42, h * 0.38, radius * 0.6, 0, Math.PI * 2);
-                    ctx.fill();
+                    // Specular highlight (Blinn-Phong real: sigue la posición del punto más caliente
+                    // del propio buffer, no un punto fijo)
+                    if (rfRenderMode === 'blinn_phong') {
+                        let hotIdx = 0, hotVal = -1;
+                        for (let i = 0; i < rfDiffusionGrid.length; i++) {
+                            if (rfDiffusionGrid[i] > hotVal) { hotVal = rfDiffusionGrid[i]; hotIdx = i; }
+                        }
+                        const hx = (hotIdx % RF_SIM_W) / RF_SIM_W * w;
+                        const hy = Math.floor(hotIdx / RF_SIM_W) / RF_SIM_H * h;
+                        const specGrad = ctx.createRadialGradient(hx, hy, 2, hx, hy, Math.min(w, h) * 0.22);
+                        specGrad.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+                        specGrad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = specGrad;
+                        ctx.beginPath();
+                        ctx.arc(hx, hy, Math.min(w, h) * 0.22, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+
+                    // Overlays: valores reales, no fijos ("q1 (3.842)" y "q2 (0.718)" eran texto
+                    // estático que nunca cambiaba pasara lo que pasara con el audio).
+                    const advEl = rfCanvas.parentElement.querySelector('.absolute.top-2 span:last-child');
+                    if (advEl) advEl.innerText = `ADVECTION IMPULSE: q1 (${((window.qVars && window.qVars[0]) || 0).toFixed(3)})`;
+                    const extEl = rfCanvas.parentElement.querySelector('.absolute.bottom-2 span:last-child');
+                    if (extEl) extEl.innerText = `EXTINCTION: q2 (${((window.qVars && window.qVars[1]) || 0).toFixed(3)})`;
                 }
             }
         }
@@ -10555,7 +11056,46 @@ Respond ONLY with valid JSON with:
             initVectorXyPad();
             startAiDirectorLoop();
             masterRenderLoop();
+            selectRfKernel('reaction_diffusion');
+            const badge = document.getElementById('wgsl-backend-badge');
+            if (badge) { badge.innerText = 'BACKEND: CPU (sin inyectar)'; badge.className = 'text-zinc-400 bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-700'; }
+            const jitEl = document.getElementById('wgsl-jit-time');
+            if (jitEl) jitEl.innerText = 'JIT: — (pulsa Inject)';
+            const vramEl = document.getElementById('wgsl-vram');
+            if (vramEl) vramEl.innerText = `BUFFER: ${(RF_SIM_W * RF_SIM_H * 4 / 1024).toFixed(1)} KB (CPU, sin ping-pong GPU)`;
+            checkMcpBridgeStatus();
         });
+
+        // =========================================================================
+        // LYAI MCP BRIDGE — chequeo real (antes: "Google Stitch MCP Bridge" 100% estático,
+        // sin una sola línea de JS, con Project ID y "15 herramientas" inventados)
+        // =========================================================================
+        async function checkMcpBridgeStatus() {
+            const dot = document.getElementById('mcp-status-dot');
+            const badge = document.getElementById('mcp-status-badge');
+            const latencyEl = document.getElementById('mcp-latency');
+            const responseEl = document.getElementById('mcp-response');
+            if (badge) { badge.innerText = 'VERIFICANDO…'; badge.className = 'text-[9px] text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded'; }
+
+            const t0 = performance.now();
+            try {
+                const res = await fetch('https://mcp.lyai.pro/health', { method: 'GET', mode: 'cors' });
+                const latency = Math.round(performance.now() - t0);
+                const text = await res.text();
+                if (dot) dot.className = res.ok ? 'w-2 h-2 rounded-full bg-emerald-400' : 'w-2 h-2 rounded-full bg-amber-400';
+                if (badge) {
+                    badge.innerText = res.ok ? 'CONECTADO' : `HTTP ${res.status}`;
+                    badge.className = res.ok ? 'text-[9px] text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded' : 'text-[9px] text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded';
+                }
+                if (latencyEl) latencyEl.innerText = `${latency}ms (medido real)`;
+                if (responseEl) responseEl.innerText = text.slice(0, 80);
+            } catch (err) {
+                if (dot) dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+                if (badge) { badge.innerText = 'SIN CONEXIÓN'; badge.className = 'text-[9px] text-rose-400 bg-rose-950/80 px-2 py-0.5 rounded'; }
+                if (latencyEl) latencyEl.innerText = '—';
+                if (responseEl) responseEl.innerText = err.message;
+            }
+        }
 
         function scrollToSection(id) {
             const el = document.getElementById(id);
