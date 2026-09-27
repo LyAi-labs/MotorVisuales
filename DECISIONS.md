@@ -742,4 +742,40 @@
   - ✅ Impacto sensorial instantáneo en cada Drop con shockwaves, destellos fotográficos y saltos de cámara.
   - ✅ Operación autónoma manos libres de nivel festival/concierto con el modo Auto-VJ.
 
+---
+
+### D-031 — Motor de Universos Escénicos Vivos `ScenicWorldEngine`: Océano de Mercurio, Megalitos y Dron FPV (Anti-MilkDrop V6)
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. El paradigma clásico de visualizadores (MilkDrop / Winamp 2001) se basa en la deformación per-pixel de planos 2D o figuras geométricas aisladas flotando en un vacío negro sin horizonte ni física de fluidos ni geología.
+  2. El usuario requirió salir explícitamente de esa concepción anticuada de hace 20 años y aspirar a algo único: **mundos escénicos completos y vivos** con arquitectura monumental, oceanografía procedural y cinematografía inteligente de cine.
+  3. Al mismo tiempo, en el servidor Hetzner de producción (`LyAi-labs/MotorVisuales`) el equipo implementó la rama `server-real-implementations-2026-09-27` con correcciones de eco en capturas de pestaña (`connectSpeakers = false`), enlace de navegación al landing del hub y motores de cómputo RF/WebGPU en tiempo real.
+- **Decisión:**
+  1. **Fusión Limpia con Hetzner (`server-real-implementations-2026-09-27`):**
+     - Preservar `connectSpeakers = false` en `startTabCapture()` para eliminar la duplicación de audio del sistema.
+     - Integrar botón de cabecera `‹` de retorno a `milkdropagent.motorvisuales.site`.
+     - Integrar funciones reales del panel RF: `resetRfComputeBuffer()`, `stepRfDiffusionCPU()`, Blinn-Phong dinámico por gradientes térmicos, Magic Eye 3D anáglifo estereoscópico, `snapshotIqConstellation()` y `checkMcpBridgeStatus()`.
+  2. **Arquitectura del `ScenicWorldEngine` (Universo 12: Océano de Mercurio & Megalitos):**
+     - **Superficie de Mercurio Líquido (Ondas Trocoidales de Gerstner en GPU):**
+       - Malla planar densa de $160\times 160$ quads deformada analíticamente en vertex shader con 4 trenes de ondas cruzadas con amortiguación y amplificación por sub-graves y bombo.
+       - Cálculo analítico exacto de vectores tangentes y binormales para normales continuas de alta precisión.
+       - Fresnel Schlick de mercurio puro ($F_0 = 0.82$), dispersión cromática especular en micro-crestas y ondas de choque hiperbólicas en drops.
+     - **26 Megalitos de Basalto Hexagonal Brutalista:**
+       - Columnas colosales prismáticas de 6 caras dispuestas en espiral áurea ($r = 90\dots 700$).
+       - Vetas verticales de cuarzo cuántico lumínico calculadas procedimentalmente en fragment shader que laten con frecuencias medias y agudas (`uHighmid`, `uTreble`).
+       - Oscilación geológica de pistones titánicos: las columnas emergen y se sumergen rítmicamente en el mercurio con ritmos armónicos sincronizados con `flowTime`.
+     - **Bóveda Celeste & Tormenta de Relámpagos:**
+       - Bóveda invertida esférica con gradiente crepuscular cósmico y estrellas procedurales en el cenit.
+       - Relámpagos reactivos: ante onsets y drops, una descarga volumétrica destella en el horizonte durante 3 frames e inyecta luz especular azul-plateada cegadora sobre el océano.
+     - **Cinematografía FPV Inteligente (Dron de Cine):**
+       - Trayectorias continuas 3D rasantes sobre el mercurio ($Y = 9\dots 38$) con alabeo aerodinámico (Bank Roll) en curvas.
+       - Micro-vibración reactiva al bombo y saltos de cámara cinemáticos (Jump Cuts) ante drops.
+  3. **Activación:** Escena 12 en selector Three.js (`12. 🌊 Universo Escénico: Océano de Mercurio & Megalitos`) y seleccionada por defecto al iniciar el motor.
+- **Consecuencias:**
+  - ✅ Salto cualitativo revolucionario: MotorVisuales crea mundos escénicos cinematográficos con atmósfera viva, dejando atrás el paradigma MilkDrop.
+  - ✅ Renderizado fluido a 60 FPS estables gracias a la computación 100% en vertex/fragment shaders.
+  - ✅ Perfecta convivencia entre el código del servidor de producción y los avances de la V6 local.
+
+
 

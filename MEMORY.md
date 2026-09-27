@@ -182,7 +182,22 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Túnel Serpentino & Monolito Giroscópico:** Ondulación 3D en serpentina con velocidad warp en drops para el Túnel, y doble anillo giroscópico ortogonal reactivo para el Monolito.
   - **Modo Auto-VJ Autónomo:** Transiciones inteligentes de escena y preset cada 16-28 segundos o en picos/drops con botón `[⚡ AUTO-VJ: ON / OFF]` en Viewport y chip `FLOW:` en el Cockpit Bar.
 
+- ✅ **Sincronización Hetzner / Claude (`server-real-implementations-2026-09-27`):**
+  - **Prevención de Eco/Duplicación en Captura de Pestaña:** `connectSpeakers = false` en `startTabCapture()` para evitar que el audio del sistema se reproduzca dos veces (salida nativa + audioCtx).
+  - **Navegación al Hub:** Botón `‹` integrado en cabecera hacia `milkdropagent.motorvisuales.site`.
+  - **Funciones Reales de RF y WebGPU:** `resetRfComputeBuffer()`, `stepRfDiffusionCPU()`, mapas de normales analíticos, modo Magic Eye 3D anáglifo, `snapshotIqConstellation()`, comprobador de latencia de red `checkMcpBridgeStatus()`.
+  - **Docker Compose Unificado:** Red externa `traefik_traefik` y montura de volúmenes persistentes.
+
+- ✅ **Motor de Universos Escénicos Vivos `ScenicWorldEngine` (Anti-MilkDrop V6 / D-031):**
+  - **Salto Paradigmático Radical:** Salida del concepto clásico de figuras geométricas flotando en fondo negro (MilkDrop 2001) hacia **Mundos Escénicos Completos** con geología viva, horizonte, fluidos físicos PBR y atmósfera meteorológica reactiva.
+  - **Mar de Mercurio Líquido (Ondas Trocoidales de Gerstner en GPU):** Malla planar de $160\times 160$ quads deformada analíticamente en vertex shader con 4 trenes de ondas cruzadas, normales de derivadas continuas exactas, Fresnel metálico de mercurio puro ($F_0 = 0.82$), dispersión cromática especular en crestas y ondas de choque hiperbólicas concéntricas en los drops.
+  - **26 Megalitos de Basalto Hexagonal Brutalista:** Columnas colosales dispuestas en espiral áurea con texturizado de roca volcánica, vetas verticales de cuarzo cuántico luminiscente moduladas por medios/agudos y oscilación geológica vertical en pistones titánicos sincronizados con el ritmo musical.
+  - **Bóveda Celeste & Meteorología de Plasma:** Cúpula cósmica con horizonte crepuscular y relámpagos volumétricos estroboscópicos reactivos que iluminan el mar de mercurio en cada impacto percusivo (onset/drop).
+  - **Cinematografía FPV Inteligente:** Dron de cine con trayectorias 3D rasantes, alabeo dinámico aerodinámico (Bank Roll), micro-vibración por sub-graves y saltos cinemáticos de cámara (Jump Cuts) ante drops acústicos.
+  - **Activación:** Escena 12 en selector Three.js (`12. 🌊 Universo Escénico: Océano de Mercurio & Megalitos`) y seleccionada por defecto al iniciar el motor.
+
 ## Próximas Ideas / Pendientes
+- [ ] Segundo Mundo Escénico: *Valle de Cristales Flotantes y Nebulosa de Hidrógeno*.
 - [ ] Soporte para audio multicanal Surround 7.1 y Dolby Atmos espacial con 8-12 canales discretos en navegadores compatibles.
 - [ ] Exportador de mapas de calor espectrales en formato TIFF/OpenEXR de 32-bit float para renderers VFX (Houdini, Blender).
 - [ ] Integración WebRTC P2P para transmisión de audio reactivo y control VJ en vivo entre múltiples dispositivos sin servidor central.

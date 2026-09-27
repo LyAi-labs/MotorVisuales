@@ -364,5 +364,25 @@
   4. **Morfogénesis Analítica en GPU:** Evaluar en vertex shader múltiples morfologías paramétricas analíticas (Esfera, Galaxia espiral, Toroide de Clifford, Resonador cimático, Doble hélice) interpolando con `smoothstep` sin sobrecarga en la CPU.
 - **Trigger:** Al diseñar motores visuales de audio-reactividad que deban ofrecer una experiencia artística generativa, cambiante y de calidad cinematográfica autónoma.
 
+---
+
+### L-028
+- **Tags:** #threejs #shaders #gerstner-waves #pbr #mercury #monoliths #scenic-worlds #anti-milkdrop #git-merge
+- **Síntoma:**
+  1. Las visuales generadas para música electrónica/rock sufren del "síndrome MilkDrop 2001": formas geométricas o fractales abstractos flotando en un fondo negro vacío, sin línea de horizonte, sin física de fluidos ni geología monumental viva.
+  2. Al resolver fusiones complejas de Git entre desarrollo local y un servidor remoto con implementaciones concurrentes (archivos HTML monolíticos de >18.000 líneas), marcadores de conflicto no resueltos o llaves `{}` huérfanas pueden quebrar silenciosamente el parseo de JavaScript.
+- **Causa raíz:**
+  1. El paradigma de MilkDrop se limitaba a un bucle de retroalimentación 2D per-pixel sin noción de mundo, iluminación PBR, niebla volumétrica ni cámaras cinemáticas con alabeo aerodinámico (Bank Roll).
+  2. Resolver bloques de conflicto con herramientas de reemplazo de texto sin un validador sintáctico estricto en JS (`node --check` / parser AST) puede dejar bloques con llaves de cierre omitidas que impiden el arranque del script principal.
+- **Solución:**
+  1. **Motor de Universos Escénicos (`ScenicWorldEngine`):**
+     - **Superficie de Fluido Físico (Ondas Trocoidales de Gerstner en GPU):** Implementar $N$ trenes de ondas cruzadas directamente en el vertex shader sobre una malla planar de $160\times 160$ quads, calculando las derivadas parciales continuas $\nabla P$ analíticamente para obtener normales hiper-precisas sin aproximaciones por diferencias finitas.
+     - **Óptica de Metal Líquido (Mercurio PBR):** Aplicar aproximación de Fresnel Schlick con reflectancia base de metal noble ($F_0 = 0.82$), dispersión cromática angular en micro-crestas y sun glint anisotrópico.
+     - **Geología Monumental & Vetas Lumínicas:** Disponer prismas hexagonales colosales de basalto volcánico en espiral áurea, con canales emisivos de cuarzo cuántico en las aristas modulados por frecuencias medias/altas y oscilación geológica en pistones armónicos.
+     - **Atmósfera Reactiva & Dron FPV:** Integrar cúpula con relámpagos estroboscópicos reactivos a los onsets y cámara con trayectorias 3D suaves, alabeo en curvas y saltos cinemáticos (Jump Cuts) en los drops.
+  2. **Técnica de Validación Sintáctica Post-Merge:**
+     - Al mergear scripts monolíticos en HTML, aislar el bloque principal en un archivo temporal y verificar la paridad atómica de llaves `{}` con un script tokenizador que ignore cadenas (`"`, `'`, `` ` ``) y comentarios (`//`, `/* */`), seguido de `node --check <file>.js` para garantizar cero errores sintácticos antes de confirmar el commit.
+- **Trigger:** Al construir mundos escénicos cinematográficos de vanguardia o al fusionar ramas complejas con código concurrente en un frontend monolítico.
+
 
 
