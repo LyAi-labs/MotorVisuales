@@ -763,6 +763,7 @@
                         <!-- 3D Scene Selector & Orbit Camera -->
                         <div class="flex items-center gap-1.5 text-xs">
                             <select id="three-scene-mode" onchange="switchThreeScene(this.value)" class="flex-grow sm:flex-grow-0 bg-zinc-900 border border-white/[0.08] text-zinc-100 rounded-lg px-2 py-1 text-[11px] sm:text-xs font-semibold focus:outline-none focus:border-cyan-500 cursor-pointer truncate">
+                                <option value="scenic_mercury_monoliths" selected>12. 🌊 Universo Escénico: Océano de Mercurio &amp; Megalitos</option>
                                 <option value="nebula">1. Nebulosa de 30.000 Partículas Volumétricas</option>
                                 <option value="tunnel">2. Túnel Cilíndrico Infinito Deformado por FFT</option>
                                 <option value="monolith">3. Monolito Icosaédrico Wireframe con Dispersión</option>
@@ -4809,8 +4810,9 @@
             buildGpuComputeScene();
             buildAutonomousGenesisScene();
             buildWaterfallScene();
+            initScenicWorldEngine();
 
-            switchThreeScene('nebula');
+            switchThreeScene('scenic_mercury_monoliths');
 
             // Setup EffectComposer if postprocessing libraries are loaded
             setupPostProcessing(width, height);
@@ -6417,6 +6419,13 @@
             }
 
             activeSceneType = type;
+
+            // 12. Universo Escénico: Océano de Mercurio & Megalitos
+            const isScenic = (type === 'scenic_mercury_monoliths');
+            if (scenicWorldEngine) {
+                scenicWorldEngine.setVisible(isScenic);
+            }
+
             if (particlesMesh) particlesMesh.visible = (type === 'nebula');
             if (tunnelMesh) tunnelMesh.visible = (type === 'tunnel');
             if (monolithMesh) monolithMesh.visible = (type === 'monolith');
@@ -6463,6 +6472,8 @@
                     hudMode.innerText = `Génesis IA (${autonomousGenesisManager?.currentConcept?.conceptTitle || 'Arte Autónomo'})`;
                 } else if (isWaterfall) {
                     hudMode.innerText = "🌊 Espectrograma 3D Waterfall (Cascada Temporal)";
+                } else if (isScenic) {
+                    hudMode.innerText = "🌊 Universo Escénico: Océano de Mercurio & Megalitos";
                 } else if (type === 'nebula') {
                     hudMode.innerText = "Nebulosa Volumétrica 30.000 Partículas";
                 } else if (type === 'tunnel') {
@@ -6767,6 +6778,11 @@
             // SCENE 11 — ESPECTROGRAMA 3D WATERFALL (CASCADA TEMPORAL)
             if (activeSceneType === 'waterfall' && waterfallManager) {
                 waterfallManager.update(time, liveAudioMetrics, stemsData);
+            }
+
+            // SCENE 12 — UNIVERSO ESCÉNICO: OCÉANO DE MERCURIO & MEGALITOS DE BASALTO
+            if (activeSceneType === 'scenic_mercury_monoliths' && scenicWorldEngine) {
+                scenicWorldEngine.update(0.016, audioTime, liveAudioMetrics, stemsData, audioNarrativeDirector);
             }
 
             // === ORQUESTADOR IA AUTÓNOMO DE POST-PROCESADO FX ===
@@ -12527,6 +12543,519 @@ Respond ONLY with valid JSON with:
         }
 
         // =========================================================================
+        
+        // =========================================================================
+        // 12. SCENIC WORLD ENGINE: UNIVERSOS PROCEDURALES VIVOS (ANTI-MILKDROP V6)
+        // =========================================================================
+
+        class ScenicWorldEngine {
+            constructor() {
+                this.group = new THREE.Group();
+                this.group.name = "scenicWorldGroup";
+                this.visible = false;
+                this.isInitialized = false;
+
+                this.oceanMesh = null;
+                this.oceanMaterial = null;
+                this.oceanUniforms = null;
+
+                this.monolithsGroup = new THREE.Group();
+                this.monolithMeshes = [];
+                this.monolithData = [];
+
+                this.skyDome = null;
+                this.skyUniforms = null;
+
+                this.lightningLight = null;
+                this.lightningIntensity = 0.0;
+                this.lightningDecay = 0.88;
+
+                this.droneProgress = 0.0;
+                this.droneSpeed = 0.055;
+                this.activeCameraPreset = 'fpv_cruise';
+            }
+
+            init(scene) {
+                if (this.isInitialized) return;
+
+                this.initSkyDome();
+                this.initMercuryOcean();
+                this.initBasaltMonoliths();
+
+                this.lightningLight = new THREE.PointLight(0xaaddee, 0.0, 1800);
+                this.lightningLight.position.set(0, 300, 0);
+                this.group.add(this.lightningLight);
+
+                this.group.visible = false;
+                scene.add(this.group);
+                this.isInitialized = true;
+            }
+
+            initSkyDome() {
+                const skyGeom = new THREE.SphereGeometry(1800, 32, 24);
+                this.skyUniforms = {
+                    uTime: { value: 0.0 },
+                    uLightning: { value: 0.0 },
+                    uSkyZenith: { value: new THREE.Color(0x020108) },
+                    uSkyHorizon: { value: new THREE.Color(0x061828) },
+                    uSunDir: { value: new THREE.Vector3(0.6, 0.15, -0.7).normalize() }
+                };
+
+                const skyMat = new THREE.ShaderMaterial({
+                    uniforms: this.skyUniforms,
+                    vertexShader: `
+                        varying vec3 vWorldPos;
+                        void main() {
+                            vec4 wp = modelMatrix * vec4(position, 1.0);
+                            vWorldPos = wp.xyz;
+                            gl_Position = projectionMatrix * viewMatrix * wp;
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float uTime;
+                        uniform float uLightning;
+                        uniform vec3 uSkyZenith;
+                        uniform vec3 uSkyHorizon;
+                        uniform vec3 uSunDir;
+                        varying vec3 vWorldPos;
+
+                        float hash(vec2 p) {
+                            return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+                        }
+
+                        void main() {
+                            vec3 dir = normalize(vWorldPos);
+                            float height = clamp(dir.y, 0.0, 1.0);
+                            
+                            vec3 sky = mix(uSkyHorizon, uSkyZenith, pow(height, 0.45));
+
+                            float sunDot = max(dot(dir, uSunDir), 0.0);
+                            vec3 sunGlow = vec3(0.0, 0.85, 1.0) * pow(sunDot, 128.0) * 2.5;
+                            sunGlow += vec3(0.8, 0.4, 0.9) * pow(sunDot, 16.0) * 0.8;
+                            sky += sunGlow;
+
+                            if (dir.y > 0.15) {
+                                vec2 starUv = dir.xz / (dir.y + 0.35) * 35.0;
+                                float n = hash(floor(starUv));
+                                if (n > 0.985) {
+                                    float twinkle = sin(uTime * 4.0 + n * 60.0) * 0.5 + 0.5;
+                                    sky += vec3(0.9, 0.95, 1.0) * twinkle * (n - 0.985) * 60.0;
+                                }
+                            }
+
+                            if (uLightning > 0.01) {
+                                sky += vec3(0.65, 0.82, 1.0) * uLightning * 1.5;
+                            }
+
+                            gl_FragColor = vec4(sky, 1.0);
+                        }
+                    `,
+                    side: THREE.BackSide,
+                    depthWrite: false
+                });
+
+                this.skyDome = new THREE.Mesh(skyGeom, skyMat);
+                this.group.add(this.skyDome);
+            }
+
+            initMercuryOcean() {
+                const oceanGeom = new THREE.PlaneGeometry(2800, 2800, 160, 160);
+                oceanGeom.rotateX(-Math.PI / 2);
+
+                this.oceanUniforms = {
+                    uTime: { value: 0.0 },
+                    uSub: { value: 0.0 },
+                    uBass: { value: 0.0 },
+                    uTreble: { value: 0.0 },
+                    uShockwave: { value: 0.0 },
+                    uLightning: { value: 0.0 },
+                    uCameraPos: { value: new THREE.Vector3() },
+                    uSunDir: { value: new THREE.Vector3(0.6, 0.15, -0.7).normalize() },
+                    uSkyHorizon: { value: new THREE.Color(0x061828) },
+                    uSkyZenith: { value: new THREE.Color(0x020108) }
+                };
+
+                this.oceanMaterial = new THREE.ShaderMaterial({
+                    uniforms: this.oceanUniforms,
+                    vertexShader: `
+                        uniform float uTime;
+                        uniform float uSub;
+                        uniform float uBass;
+                        uniform float uTreble;
+                        uniform float uShockwave;
+                        uniform vec3 uCameraPos;
+
+                        varying vec3 vWorldPos;
+                        varying vec3 vNormal;
+                        varying vec3 vViewDir;
+                        varying float vWaveHeight;
+
+                        vec3 gerstnerWave(vec2 d, float a, float l, float speed, vec2 p, inout vec3 tangent, inout vec3 binormal) {
+                            float k = 6.2831853 / l;
+                            float c = sqrt(9.8 / k) * speed;
+                            float f = k * (dot(d, p) - c * uTime);
+                            float q = 0.68;
+
+                            float cosF = cos(f);
+                            float sinF = sin(f);
+
+                            tangent += vec3(
+                                -d.x * d.x * (q * a * k * sinF),
+                                d.x * (a * k * cosF),
+                                -d.x * d.y * (q * a * k * sinF)
+                            );
+                            binormal += vec3(
+                                -d.x * d.y * (q * a * k * sinF),
+                                d.y * (a * k * cosF),
+                                -d.y * d.y * (q * a * k * sinF)
+                            );
+
+                            return vec3(
+                                q * a * d.x * cosF,
+                                a * sinF,
+                                q * a * d.y * cosF
+                            );
+                        }
+
+                        void main() {
+                            vec2 p = position.xz;
+                            vec3 tangent = vec3(1.0, 0.0, 0.0);
+                            vec3 binormal = vec3(0.0, 0.0, 1.0);
+                            vec3 disp = vec3(0.0);
+
+                            float bassScale = 1.0 + uSub * 3.2 + uBass * 1.8;
+
+                            disp += gerstnerWave(normalize(vec2(1.0, 0.35)), 12.0 * bassScale, 280.0, 1.1, p, tangent, binormal);
+                            disp += gerstnerWave(normalize(vec2(-0.8, 0.7)), 8.0 * bassScale, 150.0, 1.5, p, tangent, binormal);
+                            disp += gerstnerWave(normalize(vec2(0.3, -1.0)), 4.5 * (1.0 + uBass * 2.2), 70.0, 2.1, p, tangent, binormal);
+                            disp += gerstnerWave(normalize(vec2(-0.6, -0.6)), 2.4 * (1.0 + uTreble * 3.0), 30.0, 3.2, p, tangent, binormal);
+
+                            float r = length(p);
+                            float shockRad = mod(uTime * 380.0, 1400.0);
+                            float diff = abs(r - shockRad);
+                            float shockH = exp(-diff * 0.02) * uShockwave * 45.0;
+                            disp.y += shockH;
+
+                            vec3 newPos = vec3(position.x + disp.x, disp.y, position.z + disp.z);
+                            vec3 N = normalize(cross(binormal, tangent));
+
+                            vec4 worldPos = modelMatrix * vec4(newPos, 1.0);
+                            vWorldPos = worldPos.xyz;
+                            vNormal = normalize(normalMatrix * N);
+                            vViewDir = normalize(uCameraPos - worldPos.xyz);
+                            vWaveHeight = disp.y;
+
+                            gl_Position = projectionMatrix * viewMatrix * worldPos;
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform vec3 uCameraPos;
+                        uniform vec3 uSunDir;
+                        uniform vec3 uSkyHorizon;
+                        uniform vec3 uSkyZenith;
+                        uniform float uLightning;
+                        uniform float uTime;
+                        uniform float uBass;
+                        uniform float uTreble;
+
+                        varying vec3 vWorldPos;
+                        varying vec3 vNormal;
+                        varying vec3 vViewDir;
+                        varying float vWaveHeight;
+
+                        void main() {
+                            vec3 N = normalize(vNormal);
+                            vec3 V = normalize(vViewDir);
+                            vec3 L = normalize(uSunDir);
+                            vec3 R = reflect(-V, N);
+
+                            float F0 = 0.82;
+                            float NdotV = max(dot(N, V), 0.0);
+                            float fresnel = F0 + (1.0 - F0) * pow(1.0 - NdotV, 5.0);
+
+                            float skyBlend = clamp(R.y * 0.5 + 0.5, 0.0, 1.0);
+                            vec3 skyRefl = mix(uSkyHorizon, uSkyZenith, pow(skyBlend, 0.5));
+
+                            vec3 H = normalize(L + V);
+                            float NdotH = max(dot(N, H), 0.0);
+                            float specPower = 90.0 + (1.0 - uTreble * 0.4) * 220.0;
+                            float glint = pow(NdotH, specPower) * 4.0;
+
+                            vec3 sunColor = vec3(0.0, 0.9, 1.0);
+                            vec3 chromaticGlint = vec3(
+                                pow(max(dot(N, normalize(L + vec3(0.03, 0.0, 0.0))), 0.0), specPower) * 1.2,
+                                glint,
+                                pow(max(dot(N, normalize(L - vec3(0.03, 0.0, 0.0))), 0.0), specPower) * 1.4
+                            );
+
+                            vec3 baseMercury = vec3(0.08, 0.12, 0.18);
+                            vec3 mercuryCol = mix(baseMercury, skyRefl * 1.5, fresnel);
+                            mercuryCol += chromaticGlint * sunColor * 1.6;
+
+                            if (uLightning > 0.01) {
+                                mercuryCol += vec3(0.7, 0.88, 1.0) * uLightning * 3.5 * fresnel;
+                            }
+
+                            float crestGlow = smoothstep(10.0, 32.0, vWaveHeight) * (uBass * 1.4);
+                            mercuryCol += vec3(0.0, 0.9, 0.8) * crestGlow * 0.5;
+
+                            float dist = length(vWorldPos - uCameraPos);
+                            float fog = 1.0 - exp(-pow(dist * 0.00062, 1.8));
+                            vec3 fogCol = mix(uSkyHorizon, uSkyZenith, 0.2);
+                            if (uLightning > 0.01) fogCol += vec3(0.35, 0.5, 0.7) * uLightning;
+
+                            vec3 finalColor = mix(mercuryCol, fogCol, clamp(fog, 0.0, 1.0));
+                            gl_FragColor = vec4(finalColor, 1.0);
+                        }
+                    `
+                });
+
+                this.oceanMesh = new THREE.Mesh(oceanGeom, this.oceanMaterial);
+                this.group.add(this.oceanMesh);
+            }
+
+            initBasaltMonoliths() {
+                const count = 26;
+                this.monolithMeshes = [];
+                this.monolithData = [];
+
+                this.monolithMaterial = new THREE.ShaderMaterial({
+                    uniforms: {
+                        uTime: { value: 0.0 },
+                        uHighmid: { value: 0.0 },
+                        uTreble: { value: 0.0 },
+                        uLightning: { value: 0.0 },
+                        uShockwave: { value: 0.0 },
+                        uSunDir: { value: new THREE.Vector3(0.6, 0.15, -0.7).normalize() }
+                    },
+                    vertexShader: `
+                        attribute float aVeinHue;
+                        varying vec3 vWorldPos;
+                        varying vec3 vNormal;
+                        varying vec2 vUv;
+                        varying float vVeinHue;
+
+                        void main() {
+                            vVeinHue = aVeinHue;
+                            vUv = uv;
+                            vec4 wp = modelMatrix * vec4(position, 1.0);
+                            vWorldPos = wp.xyz;
+                            vNormal = normalize(normalMatrix * normal);
+                            gl_Position = projectionMatrix * viewMatrix * wp;
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float uTime;
+                        uniform float uHighmid;
+                        uniform float uTreble;
+                        uniform float uLightning;
+                        uniform float uShockwave;
+                        uniform vec3 uSunDir;
+
+                        varying vec3 vWorldPos;
+                        varying vec3 vNormal;
+                        varying vec2 vUv;
+                        varying float vVeinHue;
+
+                        void main() {
+                            vec3 N = normalize(vNormal);
+                            vec3 L = normalize(uSunDir);
+                            float NdotL = max(dot(N, L), 0.0);
+
+                            vec3 basalt = vec3(0.04, 0.045, 0.055) + vec3(0.02, 0.025, 0.03) * NdotL;
+
+                            float veinU = abs(fract(vUv.x * 6.0) - 0.5) * 2.0;
+                            float isEdge = smoothstep(0.72, 0.96, veinU);
+
+                            float pulse = sin(vWorldPos.y * 0.08 - uTime * 4.5) * 0.5 + 0.5;
+                            float energy = (pulse * 0.7 + 0.3) * (0.6 + uHighmid * 2.5 + uTreble * 1.5 + uShockwave * 3.0);
+
+                            vec3 veinColor = mix(vec3(0.0, 0.95, 1.0), vec3(0.9, 0.1, 0.95), vVeinHue);
+                            vec3 emissiveVein = veinColor * isEdge * energy * 2.8;
+
+                            if (uLightning > 0.01) {
+                                basalt += vec3(0.5, 0.65, 0.8) * uLightning * 1.5;
+                                emissiveVein *= (1.0 + uLightning * 2.0);
+                            }
+
+                            vec3 color = basalt + emissiveVein;
+
+                            float dist = length(vWorldPos);
+                            float fog = 1.0 - exp(-pow(dist * 0.00062, 1.8));
+                            vec3 fogCol = vec3(0.04, 0.08, 0.14);
+                            if (uLightning > 0.01) fogCol += vec3(0.3, 0.45, 0.6) * uLightning;
+
+                            gl_FragColor = vec4(mix(color, fogCol, clamp(fog, 0.0, 1.0)), 1.0);
+                        }
+                    `
+                });
+
+                for (let i = 0; i < count; i++) {
+                    const angle = i * 2.39996;
+                    const radius = 90.0 + Math.sqrt(i) * 95.0;
+                    const x = Math.cos(angle) * radius;
+                    const z = Math.sin(angle) * radius;
+
+                    const height = 160.0 + (i % 5) * 60.0 + Math.random() * 40.0;
+                    const colRadius = 14.0 + (i % 3) * 6.0;
+
+                    const geom = new THREE.CylinderGeometry(colRadius, colRadius * 1.05, height, 6);
+                    
+                    const hueVal = (i % 2 === 0) ? 0.0 : 1.0;
+                    const hues = new Float32Array(geom.attributes.position.count).fill(hueVal);
+                    geom.setAttribute('aVeinHue', new THREE.BufferAttribute(hues, 1));
+
+                    const mesh = new THREE.Mesh(geom, this.monolithMaterial);
+                    const baseY = height * 0.35 - 30.0;
+                    mesh.position.set(x, baseY, z);
+                    mesh.rotation.y = (i * 0.45) % Math.PI;
+
+                    this.group.add(mesh);
+                    this.monolithMeshes.push(mesh);
+                    this.monolithData.push({
+                        x, z, baseY,
+                        height,
+                        phase: angle + i * 0.8,
+                        liftSpeed: 0.8 + (i % 4) * 0.3
+                    });
+                }
+            }
+
+            setVisible(vis) {
+                this.visible = vis;
+                this.group.visible = vis;
+            }
+
+            triggerDropCinematics() {
+                this.lightningIntensity = 1.0;
+                this.droneProgress += 0.35;
+                const presets = ['fpv_cruise', 'low_skimmer', 'tower_reveal'];
+                this.activeCameraPreset = presets[Math.floor(Math.random() * presets.length)];
+            }
+
+            update(dt, audioTime, liveAudioMetrics, stemsData, narrativeDirector) {
+                if (!this.visible || !this.isInitialized) return;
+
+                const sSub = stemsData['sub']?.value || 0;
+                const sBass = stemsData['bass']?.value || 0;
+                const sMid = stemsData['mid']?.value || 0;
+                const sHighmid = stemsData['highmid']?.value || 0;
+                const sTreble = stemsData['treble']?.value || 0;
+
+                const isDrop = narrativeDirector ? narrativeDirector.isDrop() : false;
+                const shockwave = narrativeDirector ? narrativeDirector.shockwavePower : 0.0;
+                const tension = narrativeDirector ? narrativeDirector.tensionLevel : 0.0;
+
+                if (isDrop) {
+                    this.triggerDropCinematics();
+                } else if (liveAudioMetrics && (liveAudioMetrics.isOnset || liveAudioMetrics.transientIntensity > 0.65)) {
+                    this.lightningIntensity = Math.max(this.lightningIntensity, 0.85);
+                }
+
+                this.lightningIntensity *= this.lightningDecay;
+                if (this.lightningLight) {
+                    this.lightningLight.intensity = this.lightningIntensity * 6.0;
+                }
+
+                if (this.oceanUniforms) {
+                    this.oceanUniforms.uTime.value = audioTime;
+                    this.oceanUniforms.uSub.value = sSub;
+                    this.oceanUniforms.uBass.value = sBass;
+                    this.oceanUniforms.uTreble.value = sTreble;
+                    this.oceanUniforms.uShockwave.value = shockwave;
+                    this.oceanUniforms.uLightning.value = this.lightningIntensity;
+                    if (threeCamera) this.oceanUniforms.uCameraPos.value.copy(threeCamera.position);
+                }
+
+                if (this.skyUniforms) {
+                    this.skyUniforms.uTime.value = audioTime;
+                    this.skyUniforms.uLightning.value = this.lightningIntensity;
+                }
+
+                if (this.monolithMaterial) {
+                    this.monolithMaterial.uniforms.uTime.value = audioTime;
+                    this.monolithMaterial.uniforms.uHighmid.value = sHighmid;
+                    this.monolithMaterial.uniforms.uTreble.value = sTreble;
+                    this.monolithMaterial.uniforms.uLightning.value = this.lightningIntensity;
+                    this.monolithMaterial.uniforms.uShockwave.value = shockwave;
+                }
+
+                for (let i = 0; i < this.monolithMeshes.length; i++) {
+                    const m = this.monolithMeshes[i];
+                    const d = this.monolithData[i];
+                    const osc = Math.sin(audioTime * d.liftSpeed + d.phase);
+                    const lift = osc * (20.0 + sSub * 40.0) + (shockwave * 55.0);
+                    m.position.y = d.baseY + lift;
+                }
+
+                if (cameraOrbitEnabled && threeCamera) {
+                    this.updateDroneCinematics(dt, audioTime, sSub, sBass, tension, shockwave);
+                }
+            }
+
+            updateDroneCinematics(dt, audioTime, sSub, sBass, tension, shockwave) {
+                const speedMult = 1.0 + (shockwave * 2.2) + (tension * 0.8);
+                this.droneProgress += dt * this.droneSpeed * speedMult;
+
+                const t = this.droneProgress * 2.0;
+
+                let camX = 0, camY = 0, camZ = 0;
+                let lookX = 0, lookY = 0, lookZ = 0;
+
+                if (this.activeCameraPreset === 'fpv_cruise') {
+                    camX = Math.cos(t * 0.35) * 290.0 + Math.sin(t * 0.7) * 70.0;
+                    camZ = Math.sin(t * 0.35) * 290.0 + Math.cos(t * 0.5) * 80.0;
+                    camY = 18.0 + Math.sin(t * 0.9) * 12.0 + sSub * 14.0;
+
+                    const tLook = t + 0.18;
+                    lookX = Math.cos(tLook * 0.35) * 290.0 + Math.sin(tLook * 0.7) * 70.0;
+                    lookZ = Math.sin(tLook * 0.35) * 290.0 + Math.cos(tLook * 0.5) * 80.0;
+                    lookY = 14.0 + Math.sin(tLook * 0.9) * 8.0;
+
+                } else if (this.activeCameraPreset === 'low_skimmer') {
+                    camX = Math.cos(t * 0.45) * 220.0;
+                    camZ = Math.sin(t * 0.45) * 220.0;
+                    camY = 9.0 + Math.sin(t * 1.4) * 4.0 + (sSub * 8.0);
+
+                    const tLook = t + 0.22;
+                    lookX = Math.cos(tLook * 0.45) * 220.0;
+                    lookZ = Math.sin(tLook * 0.45) * 220.0;
+                    lookY = 25.0;
+
+                } else {
+                    const focalMonolith = this.monolithData[2];
+                    camX = focalMonolith.x + Math.cos(t * 0.4) * 65.0;
+                    camZ = focalMonolith.z + Math.sin(t * 0.4) * 65.0;
+                    camY = 30.0 + Math.sin(t * 0.6) * 120.0 + 80.0;
+
+                    lookX = focalMonolith.x;
+                    lookZ = focalMonolith.z;
+                    lookY = focalMonolith.baseY + 120.0;
+                }
+
+                const shakeX = (Math.random() - 0.5) * sSub * 4.0;
+                const shakeY = (Math.random() - 0.5) * sSub * 4.0;
+
+                threeCamera.position.set(camX + shakeX, camY + shakeY, camZ);
+                threeCamera.lookAt(lookX, lookY, lookZ);
+
+                const bankRoll = -Math.sin(t * 0.35) * 0.16 * (1.0 + sBass * 0.6);
+                threeCamera.rotation.z += bankRoll;
+            }
+        }
+
+        let scenicWorldEngine = null;
+
+        function initScenicWorldEngine() {
+            if (!threeScene) return;
+            try {
+                scenicWorldEngine = new ScenicWorldEngine();
+                scenicWorldEngine.init(threeScene);
+            } catch(e) {
+                console.error("Error al inicializar ScenicWorldEngine:", e);
+            }
+        }
+
         // 12. MOTOR DE AUDIO ESPACIAL 3D & SURROUND MULTICANAL 5.1/7.1
         // =========================================================================
         class SpatialAudioEngine {
