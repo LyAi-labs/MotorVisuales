@@ -400,5 +400,21 @@
   3. **Centrado Dinámico de la Bóveda Celeste:** Copiar en cada frame la posición de la cámara a la esfera del cielo (`skyDome.position.copy(threeCamera.position)`) para garantizar que nunca sea recortada por el frustum de la GPU.
 - **Trigger:** Al desarrollar escenas de entorno 3D completas, mundos abiertos o simulaciones escénicas que deben ser inmediatamente visibles y luminosas sin importar si hay audio reproduciéndose.
 
+---
+
+### L-030
+- **Tags:** #webaudio #spatial-audio #surround-sound #openexr #tiff #vfx-pipeline #webrtc #datachannel
+- **Síntoma:** Al codificar formatos científicos y de VFX en el cliente (como OpenEXR o TIFF Float32) y al negociar canales de audio discretos superiores a 6 canales (Surround 7.1 y Atmos), los navegadores arrojan excepciones de hardware o las aplicaciones 3D como Houdini/Blender fallan al leer los archivos generados.
+- **Causa raíz:**
+  1. **Especificación Estricta de Canales en OpenEXR:** La especificación de Industrial Light & Magic exige que los canales dentro de un `chlist` de OpenEXR estén rigurosamente ordenados alfabéticamente por su nombre ASCII ('A', 'B', 'G', 'R'). Si se escriben en orden RGBA o desordenados, Houdini y Nuke rechazan el archivo por corrupción de cabecera.
+  2. **Etiquetas Numéricas de TIFF:** En el estándar TIFF, las entradas del IFD (Image File Directory) deben estar estrictamente ordenadas por su Tag ID numérico creciente. Si el tag 256 (ImageWidth) o 258 (BitsPerSample) no siguen el orden, los decodificadores fallan.
+  3. **Límites de Canales de Hardware en Web Audio API:** Si se solicita `AudioDestinationNode.channelCount = 8` o `12` en un dispositivo con salida estéreo o auriculares, el navegador lanza una excepción `IndexSizeError` o no produce sonido.
+- **Solución:**
+  1. **Orden Alfabético y Numérico Estricto en Encoders:** Ordenar los nombres de canales en OpenEXR como `['A', 'B', 'G', 'R']` y escribir las etiquetas TIFF en secuencia ascendente estricta ($256 \dots 339$), configurando `SampleFormat = 3` (IEEE Float).
+  2. **Fallback Inteligente de Salida Multicanal:** Comprobar siempre `audioCtx.destination.maxChannelCount`. Si es inferior al canal objetivo (6, 8 o 12), mantener la matriz interna completa y los vúmetros visuales para monitoreo del usuario, pero enrutar la salida acústica a través del PannerNode Binaural HRTF.
+  3. **DataChannel WebRTC de Ultra-Baja Latencia:** Configurar `ordered: false` y `maxRetransmits: 0` para telemetría continua de audio-reactividad a 60 FPS, previniendo saturación de colas y bloqueos TCP en enlaces P2P.
+- **Trigger:** Al generar archivos de intercambio para suites de postproducción 3D o al implementar protocolos de audio multicanal y telemetría inter-dispositivo en navegadores web.
+
+
 
 

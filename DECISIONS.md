@@ -795,5 +795,71 @@
   - ✅ Ofrece feedback visual inmediato al programador de shaders sobre los valores numéricos exactos que alimentan las variables en tiempo de ejecución.
   - ✅ Acelera el desarrollo en caliente con funciones matemáticas reutilizables de 1 clic.
 
+---
+
+### D-033 — Segundo Universo Escénico: Valle de Cristales & Nebulosa H-Alfa
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - Tras el éxito de *Océano de Mercurio & Megalitos*, se requería un segundo bioma escénico que contrastara radicalmente con el metal líquido y las columnas monolíticas oscuras, explorando óptica de refracción cromática y astrofísica nebular interestelar.
+- **Decisión:**
+  - **Morfología Cristalina Procedural:** 36 poliedros flotantes (icosaedros, octaedros, dodecaedros) a altitudes entre 40m y 240m con oscilación vertical armónica.
+  - **Shader de Dispersión Cromática Fresnel:** Cálculo de dispersión angular con índice de refracción variable por canal RGB ($\eta_R, \eta_G, \eta_B$), facetas reflectantes y núcleo cuántico que emite en longitudes de onda H-Alfa ($656.3\text{ nm}$) y O-III ($500.7\text{ nm}$) modulado por medios y agudos.
+  - **Vórtice Turbulento de 12.000 Partículas:** Sistema de partículas en espiral acelerado en tiempo real por la energía del bombo y sub-graves.
+  - **Cinemática Crystal Drone:** Trayectorias en slalom entre cristales y ascensos por el núcleo con alabeo aerodinámico y respuesta ante drops.
+- **Consecuencias:**
+  - ✅ Ofrece una atmósfera visual espacial deslumbrante a 60 FPS sin saturar la memoria GPU.
+  - ✅ Conmutación instantánea entre universos sin recargar recursos ni interrumpir el flujo de audio.
+
+---
+
+### D-034 — Audio Espacial Multicanal Discreto Surround 7.1 y Dolby Atmos 7.1.4
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - El sistema solo contaba con Estéreo, Binaural 3D y Surround 5.1 (6 canales). Se requería extender el motor a 8 canales (Surround 7.1) y 12 canales (Dolby Atmos 7.1.4 con 4 canales de techo), manteniendo compatibilidad universal.
+- **Decisión:**
+  - Extender la matriz interna de `SpatialAudioEngine` a 12 canales: L, R, C, LFE, SL, SR, BL, BR, TFL, TFR, TRL, TRR.
+  - Asignar los registros cuánticos $Q_{25}$ (Surround BL), $Q_{26}$ (Surround BR), $Q_{27}$ (Promedio de Altura Frontal) y $Q_{28}$ (Promedio de Altura Trasera) en `window.qVars`.
+  - Conmutar `audioCtx.destination.channelCount` según las capacidades del dispositivo (`maxChannelCount`). Si el hardware tiene menos canales, activar automáticamente simulación en vúmetros con render Binaural HRTF y aviso toast informativo.
+  - Actualizar el Radar Espacial 2D con la posición de los altavoces físicos 7.1 y los 4 indicadores cenitales Atmos, modulando su brillo según la energía de cada canal.
+- **Consecuencias:**
+  - ✅ Compatibilidad con interfaces de audio de estudio profesionales de 8 a 12 salidas.
+  - ✅ Experiencia visual y auditiva idéntica en cualquier dispositivo gracias al fallback inteligente a HRTF.
+
+---
+
+### D-035 — Exportador VFX OpenEXR / TIFF 32-Bit Float Nativo
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - Artistas de efectos visuales (VFX) en Houdini, Blender, Maya, Unreal Engine y Nuke requieren utilizar los datos espectrales y de relieve 3D como mapas de desplazamiento (*heightmaps*) y mapas de calor en punto flotante puro de 32 bits (IEEE 754 float32).
+- **Decisión:**
+  - Implementar codificadores binarios nativos sin librerías externas utilizando `ArrayBuffer` y `DataView`:
+    - **OpenEXR 2.0:** Formato scanline single-part uncompressed con canales ordenados alfabéticamente ('A', 'B', 'G', 'R') en IEEE Float32 y tabla de offsets de líneas.
+    - **TIFF RGBA 32-bit Float:** Formato Little Endian "II" con `SampleFormat = 3` (IEEE Float), 4 muestras por píxel y etiquetas ordenadas numéricamente.
+  - Asignación de canales: R = Amplitud FFT, G = Derivada temporal $dF/dt$, B = Coherencia transitoria / Onsets, A/Z = Mapa de desplazamiento / relieve.
+- **Consecuencias:**
+  - ✅ Archivos de ultra-alta precisión de rango dinámico exportables en milisegundos directamente en el navegador.
+  - ✅ Cero dependencias de librerías externas pesadas (WASM/C++).
+
+---
+
+### D-036 — Enlace WebRTC P2P y Consola VJ Remota Serverless
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - En festivales y sesiones en vivo, el VJ suele operar desde una tablet o segundo dispositivo mientras la máquina host procesa el audio y proyecta en el escenario. Se necesitaba un enlace de control y telemetría de ultra-baja latencia sin requerir servidores intermedios en la nube.
+- **Decisión:**
+  - Arquitectura Peer-to-Peer mediante WebRTC `RTCDataChannel` sin retransmisiones (`ordered: false, maxRetransmits: 0`) para latencias inferiores a 15ms.
+  - Sistema de señalización dual:
+    1. **Air-Gapped Serverless:** Generación de tokens SDP en base64 para emparejamiento manual entre dispositivos sin internet ni red compartida.
+    2. **Auto-Pair LAN:** Auto-descubrimiento en red local vía WebSocket local (`ws://<host>:8089`) para conexión en 1 clic.
+  - Protocolo de comandos bidireccional: el Host transmite telemetría completa a 30-60 FPS; la consola VJ remota envía disparos de drops, cambios de mundos escénicos y presets aleatorios.
+- **Consecuencias:**
+  - ✅ Independencia absoluta de infraestructuras externas o conexiones a internet en clubs/estadios.
+  - ✅ Control VJ fluido inter-dispositivo con telemetría en tiempo real.
+
+
 
 

@@ -202,8 +202,32 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Telemetría en Vivo de Uniforms:** Medidores gráficos en tiempo real (60 FPS) de `uSub`, `uBass`, `uMid`, `uTreble` con barras de nivel reactivas, monitor de `uTime`, RMS y LED estroboscópico de `uIsOnset`.
   - **Botonera de Snippets Matemáticos (1 Clic):** Inserción instantánea de funciones complejas al cursor (`rot2D`, `snoise(vec3)`, `fresnel(N,V)` y `cosPalette(t)`).
 
+- ✅ **Segundo Universo Escénico: Valle de Cristales & Nebulosa H-Alfa (D-033):**
+  - **36 Cristales Polimórficos Flotantes:** Icosaedros, octaedros y dodecaedros dispersos a diferentes altitudes ($Y = 40\dots 240$), dotados de shader custom con dispersión cromática angular Fresnel en RGB ($\eta_R, \eta_G, \eta_B$), aristas reflectantes y pulso interior audio-reactivo sintonizado a frecuencias medias y agudas (`uMid`, `uTreble`).
+  - **Vórtice Espiral de 12.000 Partículas H-Alfa:** Nebulosa turbulenta con filamentos de Hidrógeno H-Alfa ($656.3\text{ nm}$) y Oxígeno III ($500.7\text{ nm}$), con rotación espiral y turbulencia vertical acelerada por sub-graves y bombo (`uSub`, `uBass`).
+  - **Cinemática FPV Crystal Drone:** Vuelo acrobático entre las formaciones de cristal con slalom envolvente, ascenso vertiginoso por el vórtice, alabeo dinámico y saltos cinemáticos ante drops.
+  - **Bóveda Celeste Multiespectral:** Transición de cielo en GPU gobernada por `uWorldMode` entre el crepúsculo de Mercurio y el espacio profundo interestelar.
+  - **Selección:** Accesible en `#three-scene-mode` como opción `13. 💎 Universo Escénico: Valle de Cristales & Nebulosa H-Alfa`.
+
+- ✅ **Audio Multicanal Surround 7.1 y Dolby Atmos 7.1.4 (D-034):**
+  - **Expansión a 12 Canales Discretos:** Matriz ampliada que soporta Estéreo, Binaural HRTF 360°, Surround 5.1 (6 canales), Surround 7.1 (8 canales con Back Surrounds dedicados BL y BR) y Dolby Atmos 7.1.4 (12 canales con 4 altavoces cenitales de techo: TFL, TFR, TRL, TRR).
+  - **Gestión Inteligente de Hardware:** Consulta `AudioDestinationNode.maxChannelCount` y conmuta limpiamente a canales discretos si el hardware lo soporta, manteniendo simulación continua en los vúmetros visuales con render Binaural HRTF si se detectan limitaciones de salida.
+  - **Registros Cuánticos $Q_{25} \dots Q_{28}$:** Asignados $Q_{25}$ (Surround BL), $Q_{26}$ (Surround BR), $Q_{27}$ (Promedio de Altura Frontal TFL + TFR) y $Q_{28}$ (Promedio de Altura Trasera TRL + TRR).
+  - **Radar Polar 2D/3D Actualizado:** Visualización de altavoces físicos 7.1 perimetrales y los 4 altavoces de techo Atmos en el anillo medio, con brillo y halos lumínicos modulados dinámicamente por la energía de cada canal.
+
+- ✅ **Exportador VFX OpenEXR / TIFF 32-Bit Float para Pipelines de Render (D-035):**
+  - **Generadores Binarios Nativos sin Dependencias:** Codificación en `ArrayBuffer` y `DataView` de especificación OpenEXR 2.0 scanline uncompressed e imagen TIFF con `SampleFormat = 3` (IEEE 754 Float32).
+  - **Empaquetado de Datos para VFX:** Canal R = Densidad espectral FFT; Canal G = Derivada temporal de frecuencia $dF/dt$; Canal B = Detección de transitorios y onsets; Canal A/Z = Mapa de desplazamiento / relieve para Houdini, Blender, Unreal Engine, Maya y Nuke.
+  - **Integración en UI:** Botones dedicados `[🏔️ Exportar EXR (.exr)]` y `[🖼️ Exportar TIFF (.tiff)]` en el rack de Waterfall.
+
+- ✅ **Enlace WebRTC P2P & Consola VJ Remota Serverless (D-036):**
+  - **DataChannel Peer-to-Peer:** Canal de datos UDP-like (`ordered: false, maxRetransmits: 0`) para transmisión de telemetría audio-reactiva a 60 FPS y control remoto inter-dispositivo con latencia inferior a 15ms en red local.
+  - **Señalización Serverless / Air-Gapped:** Intercambio de ofertas y respuestas mediante tokens base64 autocontenidos sin requerir servidores de señalización en internet.
+  - **Emparejamiento Rápido LAN (`Auto-Pair LAN`):** Auto-descubrimiento en red local a través del puerto WebSocket local (8089).
+  - **Control Remoto VJ:** Roles conmutables (Host / Emisor vs Consola VJ Remota / Controlador), gatillos remotos para forzar drops, alternar mundos escénicos y cambiar presets aleatorios, con monitorización de paquetes TX/RX y latencia RTT.
+
 ## Próximas Ideas / Pendientes
-- [ ] Segundo Mundo Escénico: *Valle de Cristales Flotantes y Nebulosa de Hidrógeno*.
-- [ ] Soporte para audio multicanal Surround 7.1 y Dolby Atmos espacial con 8-12 canales discretos en navegadores compatibles.
-- [ ] Exportador de mapas de calor espectrales en formato TIFF/OpenEXR de 32-bit float para renderers VFX (Houdini, Blender).
-- [ ] Integración WebRTC P2P para transmisión de audio reactivo y control VJ en vivo entre múltiples dispositivos sin servidor central.
+- [ ] Grabación y reproducción de sesiones VJ (Timeline de automatización para registros Q).
+- [ ] Exportador de mallas 3D OBJ/glTF congeladas de la topografía Waterfall para impresión 3D y escultura digital.
+- [ ] Soporte para cámaras NDI / WebRTC entrantes para mezclar video real con los mundos escénicos 3D.
+

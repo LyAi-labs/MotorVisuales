@@ -408,6 +408,8 @@
                 <span>|</span>
                 <span class="text-pink-300 font-bold">OSC: <span id="mini-osc-state" class="text-zinc-500">OFF</span></span>
                 <span>|</span>
+                <span class="text-teal-300 font-bold">P2P: <span id="mini-p2p-state" class="text-zinc-500">OFF</span></span>
+                <span>|</span>
                 <span class="text-purple-300 font-bold">FLOW: <span id="mini-narrative-state">INTRO</span></span>
             </div>
 
@@ -416,6 +418,7 @@
                 <span class="text-cyan-400 font-bold">q1:<span id="mini-q1-m">0.00</span></span>
                 <span id="mini-burst-state-m" class="text-emerald-400 font-bold text-[8px] px-1 py-0.2 rounded bg-emerald-950/80">OK</span>
                 <span id="mini-narrative-state-m" class="text-purple-300 font-bold text-[8px] px-1 py-0.2 rounded bg-purple-950/80 border border-purple-500/30">INTRO</span>
+                <span id="mini-p2p-state-m" class="text-zinc-500 font-bold text-[8px] px-1 py-0.2 rounded bg-zinc-900 border border-white/5">P2P:OFF</span>
                 <span id="mini-osc-state-m" class="text-zinc-500 font-bold text-[8px] px-1 py-0.2 rounded bg-zinc-900 border border-white/5">OSC:OFF</span>
             </div>
         </div>
@@ -764,6 +767,7 @@
                         <div class="flex items-center gap-1.5 text-xs">
                             <select id="three-scene-mode" onchange="switchThreeScene(this.value)" class="flex-grow sm:flex-grow-0 bg-zinc-900 border border-white/[0.08] text-zinc-100 rounded-lg px-2 py-1 text-[11px] sm:text-xs font-semibold focus:outline-none focus:border-cyan-500 cursor-pointer truncate">
                                 <option value="scenic_mercury_monoliths" selected>12. 🌊 Universo Escénico: Océano de Mercurio &amp; Megalitos</option>
+                                <option value="scenic_crystal_valley">13. 💎 Universo Escénico: Valle de Cristales &amp; Nebulosa H-Alfa</option>
                                 <option value="nebula">1. Nebulosa de 30.000 Partículas Volumétricas</option>
                                 <option value="tunnel">2. Túnel Cilíndrico Infinito Deformado por FFT</option>
                                 <option value="monolith">3. Monolito Icosaédrico Wireframe con Dispersión</option>
@@ -1529,6 +1533,25 @@
                             <input type="range" min="0.2" max="3.0" step="0.1" value="1.0" oninput="updateWaterfallSpeed(this.value)" class="w-full accent-cyan-400 cursor-pointer h-1">
                         </div>
                     </div>
+
+                    <!-- Barra de Exportación VFX (32-bit Float EXR & TIFF para Houdini / Blender / Nuke) -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/[0.06] font-mono text-[10px]">
+                        <div class="flex items-center gap-2 text-zinc-400">
+                            <span class="text-xs">💾</span>
+                            <span class="text-zinc-300 font-bold uppercase">EXPORTADOR DE MAPAS ESPECTRALES VFX (32-BIT FLOAT):</span>
+                            <span class="hidden sm:inline text-zinc-500">Displacement Maps IEEE 754 para Houdini / Blender / Nuke</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="exportSpectralMapVFX('waterfall', 'exr')" class="px-2.5 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-lg border border-cyan-400/40 shadow-sm transition flex items-center gap-1.5" title="Exportar Mapa de Relieve Espectral en Formato OpenEXR 32-bit Float sin pérdida">
+                                <span>🏔️</span>
+                                <span>Exportar EXR (.exr)</span>
+                            </button>
+                            <button onclick="exportSpectralMapVFX('waterfall', 'tiff')" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-teal-300 hover:text-white font-bold rounded-lg border border-teal-500/30 transition flex items-center gap-1.5" title="Exportar Mapa de Relieve Espectral en Formato TIFF 32-bit Float">
+                                <span>🖼️</span>
+                                <span>Exportar TIFF (.tiff)</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Code Editor Workspace (Split-View IDE: Editor GLSL + Inspector de Uniforms en Vivo & Snippets) -->
@@ -2001,32 +2024,50 @@
                 <!-- 1. Selector de Modo de Espacialización Principal -->
                 <div class="space-y-1.5 font-mono">
                     <span class="text-[10px] uppercase tracking-wider text-zinc-400">MODO DE ESCUCHA &amp; TOPOLOGÍA DE SALIDA:</span>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
                         <!-- Estéreo Master -->
-                        <button id="btn-spatial-mode-stereo" onclick="setSpatialMode('stereo')" class="px-3 py-2 rounded-xl border text-left transition font-bold text-xs bg-cyan-500/20 border-cyan-400 text-cyan-200 shadow-sm flex flex-col justify-between">
+                        <button id="btn-spatial-mode-stereo" onclick="setSpatialMode('stereo')" class="px-2.5 py-2 rounded-xl border text-left transition font-bold text-xs bg-cyan-500/20 border-cyan-400 text-cyan-200 shadow-sm flex flex-col justify-between">
                             <div class="flex items-center justify-between">
-                                <span class="flex items-center gap-1.5"><span>🎵</span>ESTÉREO MASTER</span>
+                                <span class="flex items-center gap-1"><span>🎵</span>ESTÉREO</span>
                                 <span class="text-[9px] px-1.5 py-0.2 rounded bg-black/60 text-zinc-400">2 CH</span>
                             </div>
-                            <span class="text-[10px] text-zinc-400 font-normal mt-1">Mezcla tradicional L/R sin procesamiento de fase adicional.</span>
+                            <span class="text-[9px] text-zinc-400 font-normal mt-1 leading-tight">Mezcla tradicional L/R sin alteración de fase.</span>
                         </button>
 
                         <!-- Binaural 3D HRTF -->
-                        <button id="btn-spatial-mode-binaural" onclick="setSpatialMode('binaural')" class="px-3 py-2 rounded-xl border text-left transition font-medium text-xs bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between">
+                        <button id="btn-spatial-mode-binaural" onclick="setSpatialMode('binaural')" class="px-2.5 py-2 rounded-xl border text-left transition font-medium text-xs bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between">
                             <div class="flex items-center justify-between">
-                                <span class="flex items-center gap-1.5"><span>🎧</span>BINAURAL 3D (HRTF)</span>
-                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-400">AURICULARES</span>
+                                <span class="flex items-center gap-1"><span>🎧</span>BINAURAL 3D</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-400">HRTF</span>
                             </div>
-                            <span class="text-[10px] text-zinc-400 font-normal mt-1">Función de transferencia de cabeza para inmersión orbital 360°.</span>
+                            <span class="text-[9px] text-zinc-400 font-normal mt-1 leading-tight">Inmersión esférica 360° para auriculares.</span>
                         </button>
 
-                        <!-- Surround 5.1 / 7.1 -->
-                        <button id="btn-spatial-mode-surround51" onclick="setSpatialMode('surround51')" class="px-3 py-2 rounded-xl border text-left transition font-medium text-xs bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between">
+                        <!-- Surround 5.1 -->
+                        <button id="btn-spatial-mode-surround51" onclick="setSpatialMode('surround51')" class="px-2.5 py-2 rounded-xl border text-left transition font-medium text-xs bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between">
                             <div class="flex items-center justify-between">
-                                <span class="flex items-center gap-1.5"><span>🔊</span>SURROUND 5.1 DISCRETO</span>
-                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-pink-950 text-pink-400">6 ALTAVOCES</span>
+                                <span class="flex items-center gap-1"><span>🔊</span>SURROUND 5.1</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-pink-950 text-pink-400">6 CH</span>
                             </div>
-                            <span class="text-[10px] text-zinc-400 font-normal mt-1">Matriz para tarjetas multicanal (Front L/R, Center, Sub LFE, Surr L/R).</span>
+                            <span class="text-[9px] text-zinc-400 font-normal mt-1 leading-tight">Frontales, Central, Subwoofer y Laterales.</span>
+                        </button>
+
+                        <!-- Surround 7.1 -->
+                        <button id="btn-spatial-mode-surround71" onclick="setSpatialMode('surround71')" class="px-2.5 py-2 rounded-xl border text-left transition font-medium text-xs bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="flex items-center gap-1"><span>🎛️</span>SURROUND 7.1</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-950 text-indigo-400">8 CH</span>
+                            </div>
+                            <span class="text-[9px] text-zinc-400 font-normal mt-1 leading-tight">Añade Back Surrounds traseros dedicados.</span>
+                        </button>
+
+                        <!-- Dolby Atmos 7.1.4 -->
+                        <button id="btn-spatial-mode-atmos" onclick="setSpatialMode('atmos')" class="px-2.5 py-2 rounded-xl border text-left transition font-medium text-xs bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between">
+                            <div class="flex items-center justify-between">
+                                <span class="flex items-center gap-1"><span>🌌</span>ATMOS 7.1.4</span>
+                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-950 text-amber-400">12 CH</span>
+                            </div>
+                            <span class="text-[9px] text-zinc-400 font-normal mt-1 leading-tight">Cúpula 3D con 4 altavoces cenitales de techo.</span>
                         </button>
                     </div>
                 </div>
@@ -2038,9 +2079,9 @@
                         <div class="w-full flex items-center justify-between font-mono text-[10px]">
                             <span class="text-cyan-400 font-bold flex items-center gap-1.5">
                                 <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-                                RADAR POLAR DE ESPACIALIZACIÓN 3D
+                                RADAR POLAR DE ESPACIALIZACIÓN 3D &amp; MULTICANAL
                             </span>
-                            <span class="text-zinc-500">Arrastra el cursor para posicionar</span>
+                            <span class="text-zinc-500">Arrastra para posicionar fuente</span>
                         </div>
                         <div class="relative w-full flex items-center justify-center p-2">
                             <canvas id="spatialRadarCanvas" width="280" height="280" class="max-w-[280px] aspect-square rounded-full border border-white/10 cursor-crosshair shadow-lg bg-[#070a14]"></canvas>
@@ -2052,7 +2093,7 @@
                         </div>
                     </div>
 
-                    <!-- Controles de Trayectoria y Vúmetro 5.1 -->
+                    <!-- Controles de Trayectoria y Vúmetro Multicanal 5.1/7.1/Atmos -->
                     <div class="lg:col-span-6 space-y-3 flex flex-col justify-between">
                         <!-- Selector de Trayectoria -->
                         <div class="p-3 bg-zinc-950 rounded-xl border border-white/[0.06] space-y-2 font-mono">
@@ -2088,60 +2129,120 @@
                             </div>
                         </div>
 
-                        <!-- Vúmetro de 6 Canales Surround 5.1 (L, R, C, LFE, SL, SR) -->
+                        <!-- Vúmetro Multicanal Expandido 5.1 / 7.1 / Atmos 12-Canales -->
                         <div class="p-3 bg-zinc-950 rounded-xl border border-white/[0.06] space-y-2 font-mono">
                             <div class="flex items-center justify-between text-[10px]">
-                                <span class="text-pink-400 font-bold">MONITOR DISCRETO 5.1 (POTENCIA POR ALTAVOZ)</span>
-                                <span class="text-zinc-500">Crossover LFE: 80 Hz</span>
+                                <span class="text-pink-400 font-bold">MATRIZ DISCRETA (NIVEL DE POTENCIA POR ALTAVOZ)</span>
+                                <span class="text-zinc-500 text-[9px]">LFE: &lt;80Hz • 7.1 Bed + 4 Atmos Tops</span>
                             </div>
-                            <div class="grid grid-cols-6 gap-2 pt-1">
+                            
+                            <!-- Canales Base (Horizontal Bed: L, R, C, LFE, SL, SR, BL, BR) -->
+                            <div class="grid grid-cols-8 gap-1.5 pt-1">
                                 <!-- Ch 0: Front Left -->
-                                <div class="bg-black/70 p-1.5 rounded-lg border border-white/5 flex flex-col items-center space-y-1">
-                                    <span class="text-[9px] text-zinc-400 font-bold">L</span>
-                                    <div class="w-full bg-zinc-900 h-16 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                <div class="bg-black/70 p-1 rounded-lg border border-white/5 flex flex-col items-center space-y-0.5">
+                                    <span class="text-[8px] text-cyan-300 font-bold">L</span>
+                                    <div class="w-full bg-zinc-900 h-14 rounded overflow-hidden flex flex-col justify-end p-0.5">
                                         <div id="meter-surround-l" class="w-full bg-cyan-400 rounded-sm transition-all duration-75" style="height: 40%;"></div>
                                     </div>
-                                    <span id="val-surround-l" class="text-[8px] text-cyan-300">40%</span>
+                                    <span id="val-surround-l" class="text-[7px] text-cyan-300">40%</span>
                                 </div>
                                 <!-- Ch 1: Front Right -->
-                                <div class="bg-black/70 p-1.5 rounded-lg border border-white/5 flex flex-col items-center space-y-1">
-                                    <span class="text-[9px] text-zinc-400 font-bold">R</span>
-                                    <div class="w-full bg-zinc-900 h-16 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                <div class="bg-black/70 p-1 rounded-lg border border-white/5 flex flex-col items-center space-y-0.5">
+                                    <span class="text-[8px] text-cyan-300 font-bold">R</span>
+                                    <div class="w-full bg-zinc-900 h-14 rounded overflow-hidden flex flex-col justify-end p-0.5">
                                         <div id="meter-surround-r" class="w-full bg-cyan-400 rounded-sm transition-all duration-75" style="height: 40%;"></div>
                                     </div>
-                                    <span id="val-surround-r" class="text-[8px] text-cyan-300">40%</span>
+                                    <span id="val-surround-r" class="text-[7px] text-cyan-300">40%</span>
                                 </div>
                                 <!-- Ch 2: Center -->
-                                <div class="bg-black/70 p-1.5 rounded-lg border border-white/5 flex flex-col items-center space-y-1">
-                                    <span class="text-[9px] text-zinc-400 font-bold">C</span>
-                                    <div class="w-full bg-zinc-900 h-16 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                <div class="bg-black/70 p-1 rounded-lg border border-white/5 flex flex-col items-center space-y-0.5">
+                                    <span class="text-[8px] text-emerald-300 font-bold">C</span>
+                                    <div class="w-full bg-zinc-900 h-14 rounded overflow-hidden flex flex-col justify-end p-0.5">
                                         <div id="meter-surround-c" class="w-full bg-emerald-400 rounded-sm transition-all duration-75" style="height: 50%;"></div>
                                     </div>
-                                    <span id="val-surround-c" class="text-[8px] text-emerald-300">50%</span>
+                                    <span id="val-surround-c" class="text-[7px] text-emerald-300">50%</span>
                                 </div>
                                 <!-- Ch 3: LFE Subwoofer -->
-                                <div class="bg-black/70 p-1.5 rounded-lg border border-white/5 flex flex-col items-center space-y-1">
-                                    <span class="text-[9px] text-amber-400 font-bold">LFE</span>
-                                    <div class="w-full bg-zinc-900 h-16 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                <div class="bg-black/70 p-1 rounded-lg border border-white/5 flex flex-col items-center space-y-0.5">
+                                    <span class="text-[8px] text-amber-300 font-bold">LFE</span>
+                                    <div class="w-full bg-zinc-900 h-14 rounded overflow-hidden flex flex-col justify-end p-0.5">
                                         <div id="meter-surround-lfe" class="w-full bg-amber-400 rounded-sm transition-all duration-75" style="height: 65%;"></div>
                                     </div>
-                                    <span id="val-surround-lfe" class="text-[8px] text-amber-300">65%</span>
+                                    <span id="val-surround-lfe" class="text-[7px] text-amber-300">65%</span>
                                 </div>
                                 <!-- Ch 4: Surround Left -->
-                                <div class="bg-black/70 p-1.5 rounded-lg border border-white/5 flex flex-col items-center space-y-1">
-                                    <span class="text-[9px] text-pink-400 font-bold">SL</span>
-                                    <div class="w-full bg-zinc-900 h-16 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                <div class="bg-black/70 p-1 rounded-lg border border-white/5 flex flex-col items-center space-y-0.5">
+                                    <span class="text-[8px] text-pink-300 font-bold">SL</span>
+                                    <div class="w-full bg-zinc-900 h-14 rounded overflow-hidden flex flex-col justify-end p-0.5">
                                         <div id="meter-surround-sl" class="w-full bg-pink-400 rounded-sm transition-all duration-75" style="height: 30%;"></div>
                                     </div>
-                                    <span id="val-surround-sl" class="text-[8px] text-pink-300">30%</span>
+                                    <span id="val-surround-sl" class="text-[7px] text-pink-300">30%</span>
                                 </div>
                                 <!-- Ch 5: Surround Right -->
-                                <div class="bg-black/70 p-1.5 rounded-lg border border-white/5 flex flex-col items-center space-y-1">
-                                    <span class="text-[9px] text-pink-400 font-bold">SR</span>
-                                    <div class="w-full bg-zinc-900 h-16 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                <div class="bg-black/70 p-1 rounded-lg border border-white/5 flex flex-col items-center space-y-0.5">
+                                    <span class="text-[8px] text-pink-300 font-bold">SR</span>
+                                    <div class="w-full bg-zinc-900 h-14 rounded overflow-hidden flex flex-col justify-end p-0.5">
                                         <div id="meter-surround-sr" class="w-full bg-pink-400 rounded-sm transition-all duration-75" style="height: 30%;"></div>
                                     </div>
-                                    <span id="val-surround-sr" class="text-[8px] text-pink-300">30%</span>
+                                    <span id="val-surround-sr" class="text-[7px] text-pink-300">30%</span>
+                                </div>
+                                <!-- Ch 6: Back Left (7.1) -->
+                                <div class="bg-black/70 p-1 rounded-lg border border-white/5 flex flex-col items-center space-y-0.5">
+                                    <span class="text-[8px] text-indigo-300 font-bold">BL</span>
+                                    <div class="w-full bg-zinc-900 h-14 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                        <div id="meter-surround-bl" class="w-full bg-indigo-400 rounded-sm transition-all duration-75" style="height: 25%;"></div>
+                                    </div>
+                                    <span id="val-surround-bl" class="text-[7px] text-indigo-300">25%</span>
+                                </div>
+                                <!-- Ch 7: Back Right (7.1) -->
+                                <div class="bg-black/70 p-1 rounded-lg border border-white/5 flex flex-col items-center space-y-0.5">
+                                    <span class="text-[8px] text-indigo-300 font-bold">BR</span>
+                                    <div class="w-full bg-zinc-900 h-14 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                        <div id="meter-surround-br" class="w-full bg-indigo-400 rounded-sm transition-all duration-75" style="height: 25%;"></div>
+                                    </div>
+                                    <span id="val-surround-br" class="text-[7px] text-indigo-300">25%</span>
+                                </div>
+                            </div>
+
+                            <!-- Canales de Altura Cenital (Atmos 7.1.4 Tops: TFL, TFR, TRL, TRR) -->
+                            <div class="border-t border-white/5 pt-1.5 space-y-1">
+                                <div class="flex items-center justify-between text-[9px] text-amber-400">
+                                    <span class="font-bold flex items-center gap-1"><span>☁️</span>CANALES DE ALTURA CENITAL (DOLBY ATMOS 7.1.4 HEIGHTS)</span>
+                                    <span class="text-[8px] text-zinc-500">Activados con elevación positiva</span>
+                                </div>
+                                <div class="grid grid-cols-4 gap-1.5">
+                                    <!-- Ch 8: Top Front Left -->
+                                    <div class="bg-black/70 p-1 rounded-lg border border-amber-500/20 flex flex-col items-center space-y-0.5">
+                                        <span class="text-[8px] text-amber-300 font-bold">TFL (Top Front L)</span>
+                                        <div class="w-full bg-zinc-900 h-8 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                            <div id="meter-surround-tfl" class="w-full bg-amber-400 rounded-sm transition-all duration-75" style="height: 15%;"></div>
+                                        </div>
+                                        <span id="val-surround-tfl" class="text-[7px] text-amber-300">15%</span>
+                                    </div>
+                                    <!-- Ch 9: Top Front Right -->
+                                    <div class="bg-black/70 p-1 rounded-lg border border-amber-500/20 flex flex-col items-center space-y-0.5">
+                                        <span class="text-[8px] text-amber-300 font-bold">TFR (Top Front R)</span>
+                                        <div class="w-full bg-zinc-900 h-8 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                            <div id="meter-surround-tfr" class="w-full bg-amber-400 rounded-sm transition-all duration-75" style="height: 15%;"></div>
+                                        </div>
+                                        <span id="val-surround-tfr" class="text-[7px] text-amber-300">15%</span>
+                                    </div>
+                                    <!-- Ch 10: Top Rear Left -->
+                                    <div class="bg-black/70 p-1 rounded-lg border border-amber-500/20 flex flex-col items-center space-y-0.5">
+                                        <span class="text-[8px] text-amber-300 font-bold">TRL (Top Rear L)</span>
+                                        <div class="w-full bg-zinc-900 h-8 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                            <div id="meter-surround-trl" class="w-full bg-amber-400 rounded-sm transition-all duration-75" style="height: 10%;"></div>
+                                        </div>
+                                        <span id="val-surround-trl" class="text-[7px] text-amber-300">10%</span>
+                                    </div>
+                                    <!-- Ch 11: Top Rear Right -->
+                                    <div class="bg-black/70 p-1 rounded-lg border border-amber-500/20 flex flex-col items-center space-y-0.5">
+                                        <span class="text-[8px] text-amber-300 font-bold">TRR (Top Rear R)</span>
+                                        <div class="w-full bg-zinc-900 h-8 rounded overflow-hidden flex flex-col justify-end p-0.5">
+                                            <div id="meter-surround-trr" class="w-full bg-amber-400 rounded-sm transition-all duration-75" style="height: 10%;"></div>
+                                        </div>
+                                        <span id="val-surround-trr" class="text-[7px] text-amber-300">10%</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -2894,6 +2995,104 @@
                                 <div><code class="text-amber-300">/motor/master/volume [0..1]</code> • Nivel de escucha</div>
                                 <div><code class="text-emerald-300">/motor/vector_xy [x] [y]</code> • Pad caótico</div>
                                 <div><code class="text-indigo-300">/motor/spatial/mode [mode]</code> • Estéreo / 3D</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enlace WebRTC P2P • Consola VJ Remota Inter-Dispositivo -->
+                    <div class="md:col-span-2 p-4 rounded-xl bg-zinc-950 border border-teal-500/30 space-y-3 font-mono">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-2.5">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-teal-400 shadow-[0_0_8px_#14b8a6]"></span>
+                                <span class="text-xs font-bold text-teal-300 uppercase tracking-wider">ENLACE WEBRTC P2P • CONSOLA VJ REMOTA SIN SERVIDOR (PEER DATA CHANNEL)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="p2p-status-badge" class="text-[9px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-white/5">DESCONECTADO</span>
+                                <button id="btn-p2p-auto-pair" onclick="p2pAutoPairLAN()" class="px-2.5 py-1 rounded-lg bg-teal-500/20 hover:bg-teal-500/40 text-teal-300 border border-teal-500/40 font-bold text-xs transition flex items-center gap-1">
+                                    <span>⚡</span><span>Auto-Pair LAN</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Selector de Rol (Host vs VJ Remote) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[10px]">
+                            <button id="btn-p2p-role-host" onclick="setP2pRole('host')" class="p-2.5 rounded-lg border text-left transition font-bold bg-teal-500/20 border-teal-400 text-teal-200 shadow-sm flex flex-col justify-between">
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-1.5"><span>🎙️</span>ROL: HOST / MASTER AUDIO</span>
+                                    <span class="text-[8px] px-1.5 py-0.2 rounded bg-teal-950 text-teal-400">EMISOR 60 FPS</span>
+                                </div>
+                                <span class="text-[9px] text-zinc-400 font-normal mt-1 leading-tight">Envía telemetría acústica, 8 stems Biquad, Bus Q y estado visual hacia controladores remotos.</span>
+                            </button>
+
+                            <button id="btn-p2p-role-remote" onclick="setP2pRole('vj_remote')" class="p-2.5 rounded-lg border text-left transition font-medium bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between">
+                                <div class="flex items-center justify-between">
+                                    <span class="flex items-center gap-1.5"><span>🎛️</span>ROL: CONSOLA VJ REMOTA</span>
+                                    <span class="text-[8px] px-1.5 py-0.2 rounded bg-zinc-950 text-zinc-400">CONTROLADOR</span>
+                                </div>
+                                <span class="text-[9px] text-zinc-400 font-normal mt-1 leading-tight">Controla escenas, presets GLSL, pads caóticos, faders y transitorios desde un segundo dispositivo.</span>
+                            </button>
+                        </div>
+
+                        <!-- Panel de Señalización Serverless (Tokens Air-Gapped) -->
+                        <div class="p-3 bg-black/60 rounded-lg border border-white/5 space-y-2 text-[10px]">
+                            <div class="flex flex-wrap items-center justify-between gap-2">
+                                <span class="text-zinc-300 font-bold uppercase tracking-wider text-[9px]">INTERCAMBIO DE SEÑALIZACIÓN SDP (SIN SERVIDOR / AIR-GAPPED):</span>
+                                <div class="flex items-center gap-1.5">
+                                    <button onclick="p2pGenerateOffer()" id="btn-p2p-gen-offer" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-teal-300 border border-teal-500/30 rounded text-[9px] transition">
+                                        1. Generar Oferta (Host)
+                                    </button>
+                                    <button onclick="p2pAcceptOfferAndAnswer()" id="btn-p2p-answer" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-cyan-300 border border-cyan-500/30 rounded text-[9px] transition">
+                                        2. Responder (VJ)
+                                    </button>
+                                    <button onclick="p2pCompleteHandshake()" id="btn-p2p-complete" class="px-2 py-0.5 bg-zinc-900 hover:bg-zinc-800 text-emerald-300 border border-emerald-500/30 rounded text-[9px] transition">
+                                        3. Conectar (Host)
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="text" id="p2p-token-input" placeholder="Pega el token SDP aquí o haz clic en los botones superiores..." class="w-full bg-zinc-900 border border-white/10 rounded px-2.5 py-1 text-zinc-200 text-[9px] font-mono focus:outline-none focus:border-teal-400">
+                                <button onclick="copyP2pToken()" class="px-2.5 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-white/10 rounded text-[9px] shrink-0 transition" title="Copiar Token">
+                                    📋 Copiar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Monitor de Tráfico P2P y Acciones Rápidas VJ -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[10px]">
+                            <!-- Tráfico P2P -->
+                            <div class="p-2.5 bg-black/60 rounded-lg border border-white/5 space-y-1">
+                                <div class="text-zinc-400 font-bold text-[9px] uppercase">TELEMETRÍA DE ENLACE DIRECTO (DATACHANNEL):</div>
+                                <div class="flex justify-between">
+                                    <span class="text-zinc-500">PAQUETES TX (TELEMETRÍA):</span>
+                                    <span id="p2p-tx-counter" class="text-teal-400 font-bold">0 (0.0 KB)</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-zinc-500">PAQUETES RX (COMANDOS):</span>
+                                    <span id="p2p-rx-counter" class="text-cyan-400 font-bold">0 (0.0 KB)</span>
+                                </div>
+                                <div class="flex justify-between border-t border-white/5 pt-1">
+                                    <span class="text-zinc-500">ESTADO RTC / LATENCIA:</span>
+                                    <span id="p2p-latency-display" class="text-emerald-400 font-bold">DISCONNECTED</span>
+                                </div>
+                            </div>
+
+                            <!-- Botonera VJ Remote Rápida -->
+                            <div class="p-2.5 bg-black/60 rounded-lg border border-white/5 space-y-1.5">
+                                <div class="text-zinc-400 font-bold text-[9px] uppercase">COMANDOS RÁPIDOS VJ (OVER P2P):</div>
+                                <div class="grid grid-cols-2 gap-1.5 pt-0.5">
+                                    <button onclick="p2pSendTriggerDrop()" class="px-2 py-1 bg-red-950/60 hover:bg-red-900/80 text-red-300 border border-red-500/40 rounded text-[9px] font-bold transition">
+                                        💥 Disparar Drop VJ
+                                    </button>
+                                    <button onclick="p2pSendRandomPreset()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-cyan-300 border border-cyan-500/30 rounded text-[9px] transition">
+                                        ⚡ Preset Aleatorio
+                                    </button>
+                                    <button onclick="p2pSendWorldSwitch('scenic_crystal_valley')" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-fuchsia-300 border border-fuchsia-500/30 rounded text-[9px] transition">
+                                        💎 Mundo: Cristales
+                                    </button>
+                                    <button onclick="p2pSendWorldSwitch('scenic_mercury_monoliths')" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-teal-300 border border-teal-500/30 rounded text-[9px] transition">
+                                        🌊 Mundo: Mercurio
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -6513,9 +6712,14 @@
 
             activeSceneType = type;
 
-            // 12. Universo Escénico: Océano de Mercurio & Megalitos
-            const isScenic = (type === 'scenic_mercury_monoliths');
+            // 12. Universo Escénico: Océano de Mercurio & Megalitos / 13. Valle de Cristales & Nebulosa H-Alfa
+            const isScenic = (type === 'scenic_mercury_monoliths' || type === 'scenic_crystal_valley');
             if (scenicWorldEngine) {
+                if (type === 'scenic_crystal_valley') {
+                    scenicWorldEngine.setWorld('crystal_valley');
+                } else if (type === 'scenic_mercury_monoliths') {
+                    scenicWorldEngine.setWorld('mercury_monoliths');
+                }
                 scenicWorldEngine.setVisible(isScenic);
             }
 
@@ -6565,6 +6769,8 @@
                     hudMode.innerText = `Génesis IA (${autonomousGenesisManager?.currentConcept?.conceptTitle || 'Arte Autónomo'})`;
                 } else if (isWaterfall) {
                     hudMode.innerText = "🌊 Espectrograma 3D Waterfall (Cascada Temporal)";
+                } else if (type === 'scenic_crystal_valley') {
+                    hudMode.innerText = "💎 Valle de Cristales & Nebulosa H-Alfa (FPV 60 FPS)";
                 } else if (isScenic) {
                     hudMode.innerText = "🌊 Universo Escénico: Océano de Mercurio & Megalitos";
                 } else if (type === 'nebula') {
@@ -6606,8 +6812,8 @@
             const sAir      = stemsData['air']?.value      || 0; // >10kHz → opacidad nebulosa
 
             // === CÁMARA: CINEMÁTICA ORBITAL REACTIVA VS CONTROL MANUAL ===
-            if (activeSceneType === 'scenic_mercury_monoliths') {
-                // El control de cámara para el Universo Escénico es gobernado por ScenicWorldEngine
+            if (activeSceneType === 'scenic_mercury_monoliths' || activeSceneType === 'scenic_crystal_valley') {
+                // El control de cámara para los Universos Escénicos es gobernado por ScenicWorldEngine
             } else if (cameraOrbitEnabled) {
                 // Modulación por audio y tiempo fluido musical
                 const orbitSpeed = 0.4 * cameraOrbitSpeedMult * (1.0 + shockwave * 1.5);
@@ -6878,8 +7084,8 @@
                 waterfallManager.update(time, liveAudioMetrics, stemsData);
             }
 
-            // SCENE 12 — UNIVERSO ESCÉNICO: OCÉANO DE MERCURIO & MEGALITOS DE BASALTO
-            if (activeSceneType === 'scenic_mercury_monoliths' && scenicWorldEngine) {
+            // SCENE 12/13 — UNIVERSOS ESCÉNICOS VIVOS (MERCURIO O CRISTALES)
+            if ((activeSceneType === 'scenic_mercury_monoliths' || activeSceneType === 'scenic_crystal_valley') && scenicWorldEngine) {
                 scenicWorldEngine.update(0.016, audioTime, liveAudioMetrics, stemsData, audioNarrativeDirector);
             }
 
@@ -12711,7 +12917,312 @@ Respond ONLY with valid JSON with:
         }
 
         // =========================================================================
-        
+        // 11.B EXPORTADOR VFX OPENEXR / TIFF 32-BIT FLOAT (HOUDINI / BLENDER / NUKE)
+        // =========================================================================
+
+        function encodeOpenEXRFloat32(width, height, floatData) {
+            // Generador binario nativo OpenEXR 2.0/3.0 Scanline Uncompressed 32-bit Float
+            // Canales en orden alfabético estricto ILM: 'A', 'B', 'G', 'R'
+            const encoder = new TextEncoder();
+            
+            function createAttribute(name, type, valBytes) {
+                const nameBytes = encoder.encode(name + "\0");
+                const typeBytes = encoder.encode(type + "\0");
+                const sizeBuf = new ArrayBuffer(4);
+                new DataView(sizeBuf).setUint32(0, valBytes.length, true);
+                const total = nameBytes.length + typeBytes.length + 4 + valBytes.length;
+                const out = new Uint8Array(total);
+                let off = 0;
+                out.set(nameBytes, off); off += nameBytes.length;
+                out.set(typeBytes, off); off += typeBytes.length;
+                out.set(new Uint8Array(sizeBuf), off); off += 4;
+                out.set(valBytes, off);
+                return out;
+            }
+
+            const headerParts = [];
+            // Magic 0x76, 0x2f, 0x31, 0x01
+            headerParts.push(new Uint8Array([0x76, 0x2f, 0x31, 0x01]));
+            // Version 2 (single-part scanline, no flags)
+            headerParts.push(new Uint8Array([0x02, 0x00, 0x00, 0x00]));
+
+            // Canales 'A', 'B', 'G', 'R' (pixelType=2 (FLOAT), pLinear=0, reserved=0,0,0, xSampling=1, ySampling=1)
+            const chlistBuf = new Uint8Array(18 * 4 + 1);
+            const chNames = ['A', 'B', 'G', 'R'];
+            let cOff = 0;
+            for (let i = 0; i < 4; i++) {
+                chlistBuf[cOff++] = chNames[i].charCodeAt(0);
+                chlistBuf[cOff++] = 0; // null-terminated
+                const dv = new DataView(chlistBuf.buffer, chlistBuf.byteOffset + cOff, 16);
+                dv.setInt32(0, 2, true);  // pixelType: 2 = FLOAT32
+                dv.setUint8(4, 0);        // pLinear: 0
+                dv.setUint8(5, 0);        // reserved
+                dv.setUint8(6, 0);
+                dv.setUint8(7, 0);
+                dv.setInt32(8, 1, true);  // xSampling: 1
+                dv.setInt32(12, 1, true); // ySampling: 1
+                cOff += 16;
+            }
+            chlistBuf[cOff++] = 0; // chlist terminator
+            headerParts.push(createAttribute("channels", "chlist", chlistBuf));
+
+            // Compression: 0 (NO_COMPRESSION)
+            headerParts.push(createAttribute("compression", "compression", new Uint8Array([0])));
+
+            // DataWindow & DisplayWindow: [0, 0, width-1, height-1]
+            const winBuf = new Uint8Array(16);
+            const winDv = new DataView(winBuf.buffer);
+            winDv.setInt32(0, 0, true);
+            winDv.setInt32(4, 0, true);
+            winDv.setInt32(8, width - 1, true);
+            winDv.setInt32(12, height - 1, true);
+            headerParts.push(createAttribute("dataWindow", "box2i", winBuf));
+            headerParts.push(createAttribute("displayWindow", "box2i", winBuf));
+
+            // LineOrder: 0 (INCREASING_Y)
+            headerParts.push(createAttribute("lineOrder", "lineOrder", new Uint8Array([0])));
+
+            // PixelAspectRatio: 1.0 (float32)
+            const parBuf = new Uint8Array(4);
+            new DataView(parBuf.buffer).setFloat32(0, 1.0, true);
+            headerParts.push(createAttribute("pixelAspectRatio", "float", parBuf));
+
+            // ScreenWindowCenter: [0.0, 0.0]
+            const swcBuf = new Uint8Array(8);
+            new DataView(swcBuf.buffer).setFloat32(0, 0.0, true);
+            new DataView(swcBuf.buffer).setFloat32(4, 0.0, true);
+            headerParts.push(createAttribute("screenWindowCenter", "v2f", swcBuf));
+
+            // ScreenWindowWidth: 1.0
+            const swwBuf = new Uint8Array(4);
+            new DataView(swwBuf.buffer).setFloat32(0, 1.0, true);
+            headerParts.push(createAttribute("screenWindowWidth", "float", swwBuf));
+
+            // Header terminator byte (0x00)
+            headerParts.push(new Uint8Array([0x00]));
+
+            // Calcular tamaño del encabezado
+            let headerSize = 0;
+            headerParts.forEach(p => headerSize += p.length);
+
+            // Tamaño por scanline block: y (4 bytes) + dataSize (4 bytes) + width * 4 channels * 4 bytes
+            const scanlineDataSize = width * 4 * 4; // 16 * width
+            const scanlineBlockSize = 8 + scanlineDataSize;
+
+            // Offset table: height * 8 bytes
+            const offsetTableSize = height * 8;
+            const firstScanlineOffset = headerSize + offsetTableSize;
+            const totalFileSize = firstScanlineOffset + height * scanlineBlockSize;
+
+            const finalBuffer = new ArrayBuffer(totalFileSize);
+            const finalU8 = new Uint8Array(finalBuffer);
+            const finalDv = new DataView(finalBuffer);
+
+            // Escribir cabecera
+            let writePos = 0;
+            for (let i = 0; i < headerParts.length; i++) {
+                finalU8.set(headerParts[i], writePos);
+                writePos += headerParts[i].length;
+            }
+
+            // Escribir tabla de offsets de scanlines
+            for (let y = 0; y < height; y++) {
+                const scOffset = firstScanlineOffset + y * scanlineBlockSize;
+                finalDv.setUint32(writePos, scOffset, true);
+                finalDv.setUint32(writePos + 4, 0, true); // 64-bit upper word
+                writePos += 8;
+            }
+
+            // Escribir bloques de scanlines con canales separados en orden A, B, G, R
+            for (let y = 0; y < height; y++) {
+                finalDv.setInt32(writePos, y, true);
+                finalDv.setInt32(writePos + 4, scanlineDataSize, true);
+                writePos += 8;
+
+                // 1. Canal A (índice 3 en floatData)
+                for (let x = 0; x < width; x++) {
+                    const val = floatData[(y * width + x) * 4 + 3];
+                    finalDv.setFloat32(writePos, val, true);
+                    writePos += 4;
+                }
+                // 2. Canal B (índice 2 en floatData)
+                for (let x = 0; x < width; x++) {
+                    const val = floatData[(y * width + x) * 4 + 2];
+                    finalDv.setFloat32(writePos, val, true);
+                    writePos += 4;
+                }
+                // 3. Canal G (índice 1 en floatData)
+                for (let x = 0; x < width; x++) {
+                    const val = floatData[(y * width + x) * 4 + 1];
+                    finalDv.setFloat32(writePos, val, true);
+                    writePos += 4;
+                }
+                // 4. Canal R (índice 0 en floatData)
+                for (let x = 0; x < width; x++) {
+                    const val = floatData[(y * width + x) * 4 + 0];
+                    finalDv.setFloat32(writePos, val, true);
+                    writePos += 4;
+                }
+            }
+
+            return finalBuffer;
+        }
+
+        function encodeTIFFFloat32(width, height, floatData) {
+            // Generador binario nativo TIFF RGBA 32-bit Floating Point (SampleFormat=3)
+            const numTags = 15;
+            const ifdOffset = 8;
+            const ifdSize = 2 + numTags * 12 + 4; // 186 bytes
+            const extraDataOffset = ifdOffset + ifdSize; // 194
+            const extraDataSize = 32; // 8 bytes por tag extra (BitsPerSample, SampleFormat, XRes, YRes)
+            const pixelDataOffset = 256; // Alineado a múltiplo limpio
+            const pixelDataSize = width * height * 4 * 4;
+            const totalFileSize = pixelDataOffset + pixelDataSize;
+
+            const buffer = new ArrayBuffer(totalFileSize);
+            const dv = new DataView(buffer);
+
+            // Header (Little Endian "II", 42, IFD offset)
+            dv.setUint8(0, 0x49); // 'I'
+            dv.setUint8(1, 0x49); // 'I'
+            dv.setUint16(2, 42, true);
+            dv.setUint32(4, ifdOffset, true);
+
+            // IFD Tag Helper
+            let tagPos = ifdOffset;
+            dv.setUint16(tagPos, numTags, true);
+            tagPos += 2;
+
+            function writeTag(tagId, type, count, valOrOffset) {
+                dv.setUint16(tagPos, tagId, true);
+                dv.setUint16(tagPos + 2, type, true);
+                dv.setUint32(tagPos + 4, count, true);
+                dv.setUint32(tagPos + 8, valOrOffset, true);
+                tagPos += 12;
+            }
+
+            const offBitsPerSample = extraDataOffset;
+            const offSampleFormat = extraDataOffset + 8;
+            const offXRes = extraDataOffset + 16;
+            const offYRes = extraDataOffset + 24;
+
+            // Escribir datos extra
+            // BitsPerSample: [32, 32, 32, 32]
+            for (let i = 0; i < 4; i++) dv.setUint16(offBitsPerSample + i * 2, 32, true);
+            // SampleFormat: [3, 3, 3, 3] (3 = IEEE Float)
+            for (let i = 0; i < 4; i++) dv.setUint16(offSampleFormat + i * 2, 3, true);
+            // XResolution & YResolution: 72/1
+            dv.setUint32(offXRes, 72, true);
+            dv.setUint32(offXRes + 4, 1, true);
+            dv.setUint32(offYRes, 72, true);
+            dv.setUint32(offYRes + 4, 1, true);
+
+            // Tags ordenados numéricamente
+            writeTag(256, 4, 1, width);                          // ImageWidth
+            writeTag(257, 4, 1, height);                         // ImageLength
+            writeTag(258, 3, 4, offBitsPerSample);               // BitsPerSample
+            writeTag(259, 3, 1, 1);                              // Compression (None)
+            writeTag(262, 3, 1, 2);                              // PhotometricInterpretation (RGB)
+            writeTag(273, 4, 1, pixelDataOffset);                // StripOffsets
+            writeTag(277, 3, 1, 4);                              // SamplesPerPixel (RGBA)
+            writeTag(278, 4, 1, height);                         // RowsPerStrip
+            writeTag(279, 4, 1, pixelDataSize);                  // StripByteCounts
+            writeTag(282, 5, 1, offXRes);                        // XResolution
+            writeTag(283, 5, 1, offYRes);                        // YResolution
+            writeTag(284, 3, 1, 1);                              // PlanarConfiguration (Chunky RGBA)
+            writeTag(296, 3, 1, 2);                              // ResolutionUnit (Inch)
+            writeTag(338, 3, 1, 1);                              // ExtraSamples (Associated Alpha / Displacement)
+            writeTag(339, 3, 4, offSampleFormat);                // SampleFormat (3 = IEEE Float)
+
+            dv.setUint32(tagPos, 0, true); // Next IFD offset: 0
+
+            // Escribir datos de píxeles RGBA en Float32 chunky
+            let pPos = pixelDataOffset;
+            const totalFloats = width * height * 4;
+            for (let i = 0; i < totalFloats; i++) {
+                dv.setFloat32(pPos, floatData[i], true);
+                pPos += 4;
+            }
+
+            return buffer;
+        }
+
+        function downloadBinaryBlob(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 120);
+        }
+
+        function exportSpectralMapVFX(sourceType, format) {
+            try {
+                if (!waterfallManager || !waterfallManager.textureData) {
+                    if (typeof showToast === 'function') {
+                        showToast("VFX Export Error", "No hay buffer de espectrograma activo para exportar.", "error", 3500);
+                    }
+                    return;
+                }
+
+                const W = waterfallManager.binsX || 128;
+                const H = waterfallManager.historyZ || 128;
+                const relief = waterfallManager.reliefScale || 1.2;
+
+                const floatData = new Float32Array(W * H * 4);
+                const tex = waterfallManager.textureData;
+
+                for (let y = 0; y < H; y++) {
+                    for (let x = 0; x < W; x++) {
+                        const idx = (y * W + x) * 4;
+                        const rVal = (tex[idx + 0] || 0) / 255.0;
+                        const prevY = Math.max(0, y - 1);
+                        const prevIdx = (prevY * W + x) * 4;
+                        const prevR = (tex[prevIdx + 0] || 0) / 255.0;
+                        
+                        // G: Derivada temporal dF/dt (gradiente de frecuencia dinámico)
+                        const dFdt = (rVal - prevR) * 2.0 + (x / W) * 0.5;
+                        // B: Coherencia de transitorios / Onset detectado
+                        const bVal = (tex[idx + 2] || 0) / 255.0;
+                        // A: Desplazamiento puro en z / relieve
+                        const zVal = rVal * relief;
+
+                        floatData[idx + 0] = rVal;
+                        floatData[idx + 1] = dFdt;
+                        floatData[idx + 2] = bVal;
+                        floatData[idx + 3] = zVal;
+                    }
+                }
+
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+
+                if (format.toLowerCase() === 'exr') {
+                    const exrBuffer = encodeOpenEXRFloat32(W, H, floatData);
+                    const blob = new Blob([exrBuffer], { type: 'image/x-exr' });
+                    downloadBinaryBlob(blob, `MotorVisuales_SpectralRelief_32f_${timestamp}.exr`);
+                    if (typeof showToast === 'function') {
+                        showToast("OpenEXR 32-bit Exportado", `Archivo EXR (${W}x${H} Float32 scanline) generado para VFX Houdini/Blender/Nuke.`, "success", 4000);
+                    }
+                } else {
+                    const tiffBuffer = encodeTIFFFloat32(W, H, floatData);
+                    const blob = new Blob([tiffBuffer], { type: 'image/tiff' });
+                    downloadBinaryBlob(blob, `MotorVisuales_SpectralRelief_32f_${timestamp}.tiff`);
+                    if (typeof showToast === 'function') {
+                        showToast("TIFF 32-bit Float Exportado", `Archivo TIFF RGBA Float32 (${W}x${H}) generado con éxito.`, "success", 4000);
+                    }
+                }
+            } catch(err) {
+                console.error("[VFX Export] Error:", err);
+                if (typeof showToast === 'function') {
+                    showToast("Fallo en Exportación VFX", err.message, "error", 4500);
+                }
+            }
+        }
+
         // =========================================================================
         // 12. SCENIC WORLD ENGINE: UNIVERSOS PROCEDURALES VIVOS (ANTI-MILKDROP V6)
         // =========================================================================
@@ -12722,6 +13233,12 @@ Respond ONLY with valid JSON with:
                 this.group.name = "scenicWorldGroup";
                 this.visible = false;
                 this.isInitialized = false;
+                this.activeWorld = 'mercury_monoliths'; // 'mercury_monoliths' | 'crystal_valley'
+
+                // Grupo 1: Océano de Mercurio y Megalitos
+                this.mercuryGroup = new THREE.Group();
+                this.mercuryGroup.name = "mercuryMonolithsGroup";
+                this.group.add(this.mercuryGroup);
 
                 this.oceanMesh = null;
                 this.oceanMaterial = null;
@@ -12730,6 +13247,17 @@ Respond ONLY with valid JSON with:
                 this.monolithsGroup = new THREE.Group();
                 this.monolithMeshes = [];
                 this.monolithData = [];
+
+                // Grupo 2: Valle de Cristales Flotantes y Nebulosa de Hidrógeno
+                this.crystalGroup = new THREE.Group();
+                this.crystalGroup.name = "crystalValleyGroup";
+                this.crystalMeshes = [];
+                this.crystalData = [];
+                this.crystalMaterial = null;
+                this.crystalUniforms = null;
+                this.hydrogenNebula = null;
+                this.hydrogenUniforms = null;
+                this.group.add(this.crystalGroup);
 
                 this.skyDome = null;
                 this.skyUniforms = null;
@@ -12749,7 +13277,7 @@ Respond ONLY with valid JSON with:
             init(scene) {
                 if (this.isInitialized) return;
 
-                // --- 1. BÓVEDA CELESTE AURORA & SOL BINARIO ---
+                // --- 1. BÓVEDA CELESTE MULTIESPECTRAL ---
                 this.initSkyDome();
 
                 // --- 2. OCÉANO DE MERCURIO LÍQUIDO LUMINOSO (GERSTNER EN GPU) ---
@@ -12757,6 +13285,9 @@ Respond ONLY with valid JSON with:
 
                 // --- 3. 26 MEGALITOS DE BASALTO & VETAS DE CUARZO CUÁNTICO VIVAS ---
                 this.initBasaltMonoliths();
+
+                // --- 4. VALLE DE CRISTALES FLOTANTES & NEBULOSA H-ALFA ---
+                this.initCrystalValley();
 
                 // Luz direccional solar y luz de relámpago
                 const sunLight = new THREE.DirectionalLight(0x00e5ff, 1.2);
@@ -12775,12 +13306,31 @@ Respond ONLY with valid JSON with:
                 this.isInitialized = true;
             }
 
+            setWorld(worldName) {
+                this.activeWorld = worldName;
+                if (this.mercuryGroup) this.mercuryGroup.visible = (worldName === 'mercury_monoliths');
+                if (this.crystalGroup) this.crystalGroup.visible = (worldName === 'crystal_valley');
+                if (this.skyUniforms) {
+                    this.skyUniforms.uWorldMode.value = (worldName === 'crystal_valley' ? 1.0 : 0.0);
+                }
+                if (this.visible && threeCamera) {
+                    if (worldName === 'crystal_valley') {
+                        threeCamera.position.set(0, 110, 280);
+                        threeCamera.lookAt(0, 90, 0);
+                    } else {
+                        threeCamera.position.set(0, 32, 260);
+                        threeCamera.lookAt(0, 45, 0);
+                    }
+                }
+            }
+
             initSkyDome() {
                 // Esfera de cielo centrada dinámicamente en la cámara (radio 1200)
                 const skyGeom = new THREE.SphereGeometry(1200, 32, 24);
                 this.skyUniforms = {
                     uTime: { value: 0.0 },
                     uLightning: { value: 0.0 },
+                    uWorldMode: { value: 0.0 }, // 0.0 = Mercurio, 1.0 = Valle de Cristales & Nebulosa
                     uSkyZenith: { value: new THREE.Color(0x0d122b) },    // Violeta noche cósmica
                     uSkyHorizon: { value: new THREE.Color(0x085472) },   // Cian esmeralda crepuscular
                     uSkyGlow: { value: new THREE.Color(0xb02685) },      // Resplandor fucsia atardecer
@@ -12800,6 +13350,7 @@ Respond ONLY with valid JSON with:
                     fragmentShader: `
                         uniform float uTime;
                         uniform float uLightning;
+                        uniform float uWorldMode;
                         uniform vec3 uSkyZenith;
                         uniform vec3 uSkyHorizon;
                         uniform vec3 uSkyGlow;
@@ -12814,23 +13365,34 @@ Respond ONLY with valid JSON with:
                             vec3 dir = normalize(vWorldPos);
                             float height = clamp(dir.y, 0.0, 1.0);
 
-                            // Degradado crepuscular cósmico vivo y luminoso
-                            vec3 sky = mix(uSkyHorizon, uSkyZenith, pow(height, 0.45));
-                            sky = mix(sky, uSkyGlow, exp(-height * 4.0) * 0.45);
+                            // Modo 0: Degradado crepuscular cósmico de Mercurio
+                            vec3 skyMercury = mix(uSkyHorizon, uSkyZenith, pow(height, 0.45));
+                            skyMercury = mix(skyMercury, uSkyGlow, exp(-height * 4.0) * 0.45);
+
+                            // Modo 1: Espacio Profundo y Nebulosa H-Alfa (656.3nm) / O-III (500.7nm)
+                            vec3 nebulaAlpha = vec3(0.85, 0.06, 0.32);
+                            vec3 nebulaO3 = vec3(0.01, 0.88, 0.78);
+                            vec3 spaceDeep = vec3(0.02, 0.01, 0.05);
+                            float nebWave = sin(dir.x * 3.5 + dir.y * 4.2 + uTime * 0.15) * 0.5 + 0.5;
+                            vec3 skyNebula = mix(spaceDeep, nebulaAlpha * 0.75, pow(height, 0.6));
+                            skyNebula = mix(skyNebula, nebulaO3 * 0.65, nebWave * 0.55);
+
+                            vec3 sky = mix(skyMercury, skyNebula, uWorldMode);
 
                             // Sol Binario Titánico en el horizonte
                             float sunDot = max(dot(dir, uSunDir), 0.0);
                             vec3 sunGlow = vec3(0.2, 0.95, 1.0) * pow(sunDot, 80.0) * 4.5;
                             sunGlow += vec3(1.0, 0.75, 0.3) * pow(sunDot, 12.0) * 1.8;
-                            sky += sunGlow;
+                            sky += sunGlow * (1.0 - uWorldMode * 0.4);
 
                             // Campo de estrellas nítidas en el cielo nocturno
-                            if (dir.y > 0.12) {
-                                vec2 starUv = dir.xz / (dir.y + 0.3) * 45.0;
+                            if (dir.y > 0.08 || uWorldMode > 0.5) {
+                                vec2 starUv = dir.xz / (abs(dir.y) + 0.3) * (uWorldMode > 0.5 ? 65.0 : 45.0);
                                 float n = hash(floor(starUv));
-                                if (n > 0.982) {
+                                float starThreshold = (uWorldMode > 0.5) ? 0.975 : 0.982;
+                                if (n > starThreshold) {
                                     float twinkle = sin(uTime * 3.5 + n * 80.0) * 0.5 + 0.5;
-                                    sky += vec3(0.9, 0.96, 1.0) * twinkle * (n - 0.982) * 55.0;
+                                    sky += vec3(0.92, 0.96, 1.0) * twinkle * (n - starThreshold) * 65.0;
                                 }
                             }
 
@@ -13018,7 +13580,7 @@ Respond ONLY with valid JSON with:
                 });
 
                 this.oceanMesh = new THREE.Mesh(oceanGeom, this.oceanMaterial);
-                this.group.add(this.oceanMesh);
+                this.mercuryGroup.add(this.oceanMesh);
             }
 
             initBasaltMonoliths() {
@@ -13127,7 +13689,7 @@ Respond ONLY with valid JSON with:
                     mesh.position.set(x, baseY, z);
                     mesh.rotation.y = (i * 0.45) % Math.PI;
 
-                    this.group.add(mesh);
+                    this.mercuryGroup.add(mesh);
                     this.monolithMeshes.push(mesh);
                     this.monolithData.push({
                         x, z, baseY,
@@ -13138,13 +13700,257 @@ Respond ONLY with valid JSON with:
                 }
             }
 
+            initCrystalValley() {
+                const count = 36;
+                this.crystalMeshes = [];
+                this.crystalData = [];
+
+                this.crystalUniforms = {
+                    uTime: { value: 0.0 },
+                    uMid: { value: 0.0 },
+                    uHighmid: { value: 0.0 },
+                    uTreble: { value: 0.0 },
+                    uSunDir: { value: this.sunDir },
+                    uShockwave: { value: 0.0 }
+                };
+
+                this.crystalMaterial = new THREE.ShaderMaterial({
+                    uniforms: this.crystalUniforms,
+                    vertexShader: `
+                        varying vec3 vWorldPos;
+                        varying vec3 vNormal;
+                        varying vec3 vViewDir;
+                        varying vec2 vUv;
+                        void main() {
+                            vUv = uv;
+                            vec4 wp = modelMatrix * vec4(position, 1.0);
+                            vWorldPos = wp.xyz;
+                            vNormal = normalize(normalMatrix * normal);
+                            vViewDir = normalize(cameraPosition - wp.xyz);
+                            gl_Position = projectionMatrix * viewMatrix * wp;
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float uTime;
+                        uniform float uMid;
+                        uniform float uHighmid;
+                        uniform float uTreble;
+                        uniform float uShockwave;
+                        uniform vec3 uSunDir;
+
+                        varying vec3 vWorldPos;
+                        varying vec3 vNormal;
+                        varying vec3 vViewDir;
+                        varying vec2 vUv;
+
+                        void main() {
+                            vec3 N = normalize(vNormal);
+                            vec3 V = normalize(vViewDir);
+                            vec3 L = normalize(uSunDir);
+
+                            float NdotV = max(dot(N, V), 0.0);
+                            float NdotL = max(dot(N, L), 0.0);
+
+                            // Refracción y Dispersión Cromática Fresnel (IOR variable para R, G, B)
+                            float fresnelR = pow(1.0 - NdotV, 3.2);
+                            float fresnelG = pow(1.0 - NdotV, 3.7);
+                            float fresnelB = pow(1.0 - NdotV, 4.4);
+                            vec3 fresnelDispersion = vec3(fresnelR, fresnelG, fresnelB);
+
+                            // Brillo especular facetado
+                            vec3 H = normalize(L + V);
+                            float spec = pow(max(dot(N, H), 0.0), 90.0) * 3.5;
+
+                            // Núcleo cuántico interior pulsante audio-reactivo (H-alfa + O-III)
+                            float innerPulse = sin(uTime * 3.0 + vWorldPos.y * 0.08) * 0.5 + 0.5;
+                            vec3 hAlphaCore = vec3(0.95, 0.08, 0.35) * (0.4 + uMid * 1.8);
+                            vec3 o3Vein = vec3(0.0, 0.95, 0.85) * (0.3 + uTreble * 2.2);
+                            vec3 coreGlow = mix(hAlphaCore, o3Vein, sin(uTime + vWorldPos.x * 0.02) * 0.5 + 0.5);
+
+                            // Facetas cristalinas semitransparentes con aristas luminiscentes
+                            vec3 crystalBody = vec3(0.04, 0.08, 0.14) + coreGlow * (innerPulse * 0.6 + 0.4);
+                            vec3 edgeHighlight = fresnelDispersion * vec3(0.2, 0.9, 1.0) * 2.2;
+                            vec3 specCol = vec3(0.9, 0.96, 1.0) * spec;
+
+                            if (uShockwave > 0.05) {
+                                crystalBody += vec3(1.0, 0.2, 0.7) * uShockwave * 2.0;
+                            }
+
+                            vec3 finalColor = crystalBody + edgeHighlight + specCol;
+
+                            // Niebla cósmica de hidrógeno
+                            float dist = length(vWorldPos - cameraPosition);
+                            float fog = 1.0 - exp(-pow(dist * 0.00045, 1.6));
+                            vec3 fogCol = vec3(0.08, 0.02, 0.09);
+
+                            gl_FragColor = vec4(mix(finalColor, fogCol, clamp(fog, 0.0, 0.88)), 0.92);
+                        }
+                    `,
+                    transparent: true,
+                    side: THREE.DoubleSide
+                });
+
+                // Geometrías poliédricas variadas
+                const geometries = [
+                    new THREE.IcosahedronGeometry(1.0, 0),
+                    new THREE.OctahedronGeometry(1.0, 0),
+                    new THREE.DodecahedronGeometry(1.0, 0)
+                ];
+
+                for (let i = 0; i < count; i++) {
+                    const geomIndex = i % geometries.length;
+                    const geom = geometries[geomIndex];
+                    const mesh = new THREE.Mesh(geom, this.crystalMaterial);
+
+                    const angle = i * 2.15;
+                    const radius = 60.0 + Math.sqrt(i) * 65.0;
+                    const x = Math.cos(angle) * radius;
+                    const z = Math.sin(angle) * radius;
+                    const y = 45.0 + (i % 7) * 26.0 + Math.sin(i * 1.3) * 15.0;
+
+                    const scale = 10.0 + (i % 5) * 6.5 + (i * 0.4);
+                    mesh.scale.set(scale, scale * (1.2 + (i % 3) * 0.3), scale);
+
+                    mesh.position.set(x, y, z);
+                    mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+
+                    this.crystalGroup.add(mesh);
+                    this.crystalMeshes.push(mesh);
+                    this.crystalData.push({
+                        baseX: x,
+                        baseY: y,
+                        baseZ: z,
+                        scale: scale,
+                        rotSpeedX: 0.15 + (i % 4) * 0.1,
+                        rotSpeedY: 0.25 + (i % 3) * 0.12,
+                        rotSpeedZ: 0.1 + (i % 5) * 0.08,
+                        floatSpeed: 0.8 + (i % 4) * 0.35,
+                        floatAmp: 12.0 + (i % 5) * 4.0,
+                        phase: i * 0.85
+                    });
+                }
+
+                // --- VÓRTICE DE 12,000 PARTÍCULAS DE NEBULOSA DE HIDRÓGENO H-ALFA ---
+                const pCount = 12000;
+                const pGeom = new THREE.BufferGeometry();
+                const pPositions = new Float32Array(pCount * 3);
+                const pColors = new Float32Array(pCount * 3);
+                const pSeeds = new Float32Array(pCount);
+                const pSizes = new Float32Array(pCount);
+
+                const cAlpha = new THREE.Color(0xe61c5d); // H-alfa carmesí intenso
+                const cO3 = new THREE.Color(0x00f2d4);    // Oxígeno III turquesa
+                const cDeep = new THREE.Color(0x3a0842);  // Violeta interestelar profundo
+
+                for (let i = 0; i < pCount; i++) {
+                    const spiralAngle = i * 0.024;
+                    const spiralRad = 40.0 + Math.sqrt(i) * 7.8 + (Math.random() - 0.5) * 55.0;
+                    const px = Math.cos(spiralAngle) * spiralRad;
+                    const pz = Math.sin(spiralAngle) * spiralRad;
+                    const py = 15.0 + (Math.random() - 0.5) * 180.0 + Math.sin(spiralAngle * 2.0) * 35.0;
+
+                    pPositions[i * 3] = px;
+                    pPositions[i * 3 + 1] = py;
+                    pPositions[i * 3 + 2] = pz;
+
+                    pSeeds[i] = Math.random();
+                    pSizes[i] = 18.0 + Math.random() * 26.0;
+
+                    const tCol = Math.random();
+                    let col;
+                    if (tCol < 0.6) {
+                        col = cAlpha.clone().lerp(cDeep, Math.random() * 0.4);
+                    } else {
+                        col = cO3.clone().lerp(cDeep, Math.random() * 0.3);
+                    }
+                    pColors[i * 3] = col.r;
+                    pColors[i * 3 + 1] = col.g;
+                    pColors[i * 3 + 2] = col.b;
+                }
+
+                pGeom.setAttribute('position', new THREE.BufferAttribute(pPositions, 3));
+                pGeom.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
+                pGeom.setAttribute('aSeed', new THREE.BufferAttribute(pSeeds, 1));
+                pGeom.setAttribute('aSize', new THREE.BufferAttribute(pSizes, 1));
+
+                this.hydrogenUniforms = {
+                    uTime: { value: 0.0 },
+                    uSub: { value: 0.0 },
+                    uBass: { value: 0.0 },
+                    uTreble: { value: 0.0 },
+                    uShockwave: { value: 0.0 }
+                };
+
+                const pMat = new THREE.ShaderMaterial({
+                    uniforms: this.hydrogenUniforms,
+                    vertexShader: `
+                        uniform float uTime;
+                        uniform float uSub;
+                        uniform float uBass;
+                        uniform float uTreble;
+                        uniform float uShockwave;
+
+                        attribute vec3 color;
+                        attribute float aSeed;
+                        attribute float aSize;
+
+                        varying vec3 vColor;
+                        varying float vAlpha;
+
+                        void main() {
+                            vColor = color;
+                            vec3 pos = position;
+
+                            float angle = uTime * (0.08 + aSeed * 0.06) * (1.0 + uBass * 1.8);
+                            float cosA = cos(angle);
+                            float sinA = sin(angle);
+                            vec2 rotP = vec2(pos.x * cosA - pos.z * sinA, pos.x * sinA + pos.z * cosA);
+                            pos.x = rotP.x;
+                            pos.z = rotP.y;
+
+                            pos.y += sin(uTime * 1.5 + aSeed * 12.0) * (8.0 + uSub * 24.0) + (uShockwave * 40.0 * (aSeed - 0.5));
+
+                            vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                            float pointDist = length(mvPosition.xyz);
+                            gl_PointSize = aSize * (1.0 + uTreble * 1.4 + uShockwave * 2.0) * (360.0 / max(pointDist, 10.0));
+                            gl_Position = projectionMatrix * mvPosition;
+
+                            vAlpha = clamp(0.25 + uBass * 0.5 + (1.0 - pointDist / 1200.0) * 0.45, 0.1, 0.95);
+                        }
+                    `,
+                    fragmentShader: `
+                        varying vec3 vColor;
+                        varying float vAlpha;
+                        void main() {
+                            vec2 uv = gl_PointCoord - vec2(0.5);
+                            float dist = length(uv);
+                            if (dist > 0.5) discard;
+                            float radial = exp(-dist * 5.2);
+                            gl_FragColor = vec4(vColor * 1.6, radial * vAlpha);
+                        }
+                    `,
+                    blending: THREE.AdditiveBlending,
+                    depthWrite: false,
+                    transparent: true
+                });
+
+                this.hydrogenNebula = new THREE.Points(pGeom, pMat);
+                this.crystalGroup.add(this.hydrogenNebula);
+
+                this.crystalGroup.visible = (this.activeWorld === 'crystal_valley');
+            }
+
             setVisible(vis) {
                 this.visible = vis;
                 this.group.visible = vis;
                 if (vis && threeCamera) {
-                    // Colocar cámara a altura y posición épica de entrada
-                    threeCamera.position.set(0, 32, 260);
-                    threeCamera.lookAt(0, 45, 0);
+                    if (this.activeWorld === 'crystal_valley') {
+                        threeCamera.position.set(0, 110, 280);
+                        threeCamera.lookAt(0, 90, 0);
+                    } else {
+                        threeCamera.position.set(0, 32, 260);
+                        threeCamera.lookAt(0, 45, 0);
+                    }
                 }
             }
 
@@ -13184,41 +13990,76 @@ Respond ONLY with valid JSON with:
                     this.skyDome.position.copy(threeCamera.position);
                 }
 
-                if (this.oceanUniforms) {
-                    this.oceanUniforms.uTime.value = audioTime;
-                    this.oceanUniforms.uSub.value = sSub;
-                    this.oceanUniforms.uBass.value = sBass;
-                    this.oceanUniforms.uTreble.value = sTreble;
-                    this.oceanUniforms.uShockwave.value = shockwave;
-                    this.oceanUniforms.uLightning.value = this.lightningIntensity;
-                    if (threeCamera) this.oceanUniforms.uCameraPos.value.copy(threeCamera.position);
-                }
-
                 if (this.skyUniforms) {
                     this.skyUniforms.uTime.value = audioTime;
                     this.skyUniforms.uLightning.value = this.lightningIntensity;
+                    this.skyUniforms.uWorldMode.value = (this.activeWorld === 'crystal_valley' ? 1.0 : 0.0);
                 }
 
-                if (this.monolithMaterial) {
-                    this.monolithMaterial.uniforms.uTime.value = audioTime;
-                    this.monolithMaterial.uniforms.uHighmid.value = sHighmid;
-                    this.monolithMaterial.uniforms.uTreble.value = sTreble;
-                    this.monolithMaterial.uniforms.uLightning.value = this.lightningIntensity;
-                    this.monolithMaterial.uniforms.uShockwave.value = shockwave;
-                }
+                if (this.activeWorld === 'mercury_monoliths') {
+                    if (this.oceanUniforms) {
+                        this.oceanUniforms.uTime.value = audioTime;
+                        this.oceanUniforms.uSub.value = sSub;
+                        this.oceanUniforms.uBass.value = sBass;
+                        this.oceanUniforms.uTreble.value = sTreble;
+                        this.oceanUniforms.uShockwave.value = shockwave;
+                        this.oceanUniforms.uLightning.value = this.lightningIntensity;
+                        if (threeCamera) this.oceanUniforms.uCameraPos.value.copy(threeCamera.position);
+                    }
 
-                // Dinámica armónica de pistones en los megalitos
-                for (let i = 0; i < this.monolithMeshes.length; i++) {
-                    const m = this.monolithMeshes[i];
-                    const d = this.monolithData[i];
-                    const osc = Math.sin(audioTime * d.liftSpeed + d.phase);
-                    const lift = osc * (18.0 + sSub * 38.0) + (shockwave * 50.0);
-                    m.position.y = d.baseY + lift;
-                }
+                    if (this.monolithMaterial) {
+                        this.monolithMaterial.uniforms.uTime.value = audioTime;
+                        this.monolithMaterial.uniforms.uHighmid.value = sHighmid;
+                        this.monolithMaterial.uniforms.uTreble.value = sTreble;
+                        this.monolithMaterial.uniforms.uLightning.value = this.lightningIntensity;
+                        this.monolithMaterial.uniforms.uShockwave.value = shockwave;
+                    }
 
-                // Cinemática de vuelo FPV sobre el mar
-                if (cameraOrbitEnabled && threeCamera && !isMouseDown) {
-                    this.updateDroneCinematics(dt, audioTime, sSub, sBass, tension, shockwave);
+                    // Dinámica armónica de pistones en los megalitos
+                    for (let i = 0; i < this.monolithMeshes.length; i++) {
+                        const m = this.monolithMeshes[i];
+                        const d = this.monolithData[i];
+                        const osc = Math.sin(audioTime * d.liftSpeed + d.phase);
+                        const lift = osc * (18.0 + sSub * 38.0) + (shockwave * 50.0);
+                        m.position.y = d.baseY + lift;
+                    }
+
+                    // Cinemática de vuelo FPV sobre el mar
+                    if (cameraOrbitEnabled && threeCamera && !isMouseDown) {
+                        this.updateDroneCinematics(dt, audioTime, sSub, sBass, tension, shockwave);
+                    }
+                } else if (this.activeWorld === 'crystal_valley') {
+                    if (this.crystalUniforms) {
+                        this.crystalUniforms.uTime.value = audioTime;
+                        this.crystalUniforms.uMid.value = sMid;
+                        this.crystalUniforms.uHighmid.value = sHighmid;
+                        this.crystalUniforms.uTreble.value = sTreble;
+                        this.crystalUniforms.uShockwave.value = shockwave;
+                    }
+
+                    if (this.hydrogenUniforms) {
+                        this.hydrogenUniforms.uTime.value = audioTime;
+                        this.hydrogenUniforms.uSub.value = sSub;
+                        this.hydrogenUniforms.uBass.value = sBass;
+                        this.hydrogenUniforms.uTreble.value = sTreble;
+                        this.hydrogenUniforms.uShockwave.value = shockwave;
+                    }
+
+                    // Dinámica armónica y rotación de cristales flotantes
+                    for (let i = 0; i < this.crystalMeshes.length; i++) {
+                        const m = this.crystalMeshes[i];
+                        const d = this.crystalData[i];
+                        m.rotation.x += dt * d.rotSpeedX * (1.0 + sTreble * 1.5);
+                        m.rotation.y += dt * d.rotSpeedY * (1.0 + sMid * 1.2);
+                        m.rotation.z += dt * d.rotSpeedZ;
+                        const floatOsc = Math.sin(audioTime * d.floatSpeed + d.phase);
+                        m.position.y = d.baseY + floatOsc * (d.floatAmp + sSub * 22.0) + (shockwave * 35.0);
+                    }
+
+                    // Cinemática de vuelo FPV entre cristales y nebulosa
+                    if (cameraOrbitEnabled && threeCamera && !isMouseDown) {
+                        this.updateCrystalDroneCinematics(dt, audioTime, sSub, sBass, tension, shockwave);
+                    }
                 }
             }
 
@@ -13282,6 +14123,60 @@ Respond ONLY with valid JSON with:
                     zoomHud.innerText = Math.round(threeCamera.position.length());
                 }
             }
+
+            updateCrystalDroneCinematics(dt, audioTime, sSub, sBass, tension, shockwave) {
+                const speedMult = 1.0 + (shockwave * 2.5) + (tension * 0.8);
+                this.droneProgress += dt * this.droneSpeed * speedMult;
+                const t = this.droneProgress * 2.2;
+
+                let camX = 0, camY = 0, camZ = 0;
+                let lookX = 0, lookY = 0, lookZ = 0;
+
+                if (this.activeCameraPreset === 'fpv_cruise') {
+                    // Slalom hiper-espacial envolvente entre los cristales gigantes
+                    camX = Math.cos(t * 0.28) * 240.0 + Math.sin(t * 0.56) * 50.0;
+                    camZ = Math.sin(t * 0.28) * 240.0 + Math.cos(t * 0.42) * 60.0;
+                    camY = 90.0 + Math.sin(t * 0.7) * 35.0 + (sSub * 20.0);
+
+                    const tLook = t + 0.15;
+                    lookX = Math.cos(tLook * 0.28) * 240.0;
+                    lookZ = Math.sin(tLook * 0.28) * 240.0;
+                    lookY = 85.0 + Math.sin(tLook * 0.7) * 25.0;
+                } else if (this.activeCameraPreset === 'low_skimmer') {
+                    // Ascenso vertiginoso por el núcleo de la nebulosa
+                    camX = Math.sin(t * 0.35) * 110.0;
+                    camZ = Math.cos(t * 0.35) * 110.0;
+                    camY = 50.0 + ((t * 28.0) % 180.0) + (sSub * 15.0);
+
+                    lookX = 0;
+                    lookZ = 0;
+                    lookY = camY + 40.0;
+                } else {
+                    // Vuelo orbital en torno a un cristal central con vista a la nebulosa H-alfa
+                    camX = Math.cos(t * 0.45) * 160.0;
+                    camZ = Math.sin(t * 0.45) * 160.0;
+                    camY = 110.0 + Math.sin(t * 0.9) * 25.0;
+
+                    lookX = 0;
+                    lookZ = 0;
+                    lookY = 90.0;
+                }
+
+                const shakeX = (Math.random() - 0.5) * sSub * 3.5;
+                const shakeY = (Math.random() - 0.5) * sSub * 3.5;
+
+                threeCamera.position.set(camX + shakeX, camY + shakeY, camZ);
+                threeCamera.lookAt(lookX, lookY, lookZ);
+
+                // Alabeo acentuado en curvas
+                const bankRoll = -Math.sin(t * 0.28) * 0.22 * (1.0 + sBass * 0.8);
+                threeCamera.rotation.z += bankRoll;
+
+                const zoomHud = document.getElementById('hud-camera-zoom');
+                if (zoomHud && Math.random() < 0.15) {
+                    zoomHud.innerText = Math.round(threeCamera.position.length());
+                }
+            }
         }
         let scenicWorldEngine = null;
 
@@ -13299,7 +14194,7 @@ Respond ONLY with valid JSON with:
         // =========================================================================
         class SpatialAudioEngine {
             constructor() {
-                this.mode = 'stereo'; // 'stereo', 'binaural', 'surround51'
+                this.mode = 'stereo'; // 'stereo', 'binaural', 'surround51', 'surround71', 'atmos'
                 this.trajectoryMode = 'orbit_auto'; // 'orbit_auto', 'anchored_scene', 'manual_pad'
                 this.soundAzimuth = 0.0;    // Radians (-PI a +PI)
                 this.soundElevation = 0.2;  // Radians (-PI/2 a +PI/2)
@@ -13312,7 +14207,8 @@ Respond ONLY with valid JSON with:
                 this.surroundMerger = null;
                 this.lfeFilter = null;
                 this.channelGains = [];
-                this.channelLevels = new Float32Array(6); // L, R, C, LFE, SL, SR
+                // 12 Canales: L, R, C, LFE, SL, SR, BL, BR, TFL, TFR, TRL, TRR
+                this.channelLevels = new Float32Array(12);
                 
                 this.radarCanvas = null;
                 this.radarCtx = null;
@@ -13344,9 +14240,9 @@ Respond ONLY with valid JSON with:
                     this.lfeFilter.frequency.value = 80;
                     this.lfeFilter.Q.value = 1.0;
 
-                    // Nodos de ganancia para los 6 canales 5.1
+                    // Nodos de ganancia para los 12 canales (7.1 Bed + 4 Atmos Tops)
                     this.channelGains = [];
-                    for (let i = 0; i < 6; i++) {
+                    for (let i = 0; i < 12; i++) {
                         const g = audioCtx.createGain();
                         g.gain.value = 1.0;
                         this.channelGains.push(g);
@@ -13419,13 +14315,13 @@ Respond ONLY with valid JSON with:
                 this.mode = mode;
                 if (!audioCtx) return;
 
-                ['stereo', 'binaural', 'surround51'].forEach(m => {
+                ['stereo', 'binaural', 'surround51', 'surround71', 'atmos'].forEach(m => {
                     const btn = document.getElementById(`btn-spatial-mode-${m}`);
                     if (btn) {
                         if (m === mode) {
-                            btn.className = "px-3 py-2 rounded-xl border text-left transition font-bold text-xs bg-cyan-500/20 border-cyan-400 text-cyan-200 shadow-sm flex flex-col justify-between";
+                            btn.className = "px-2.5 py-2 rounded-xl border text-left transition font-bold text-xs bg-cyan-500/20 border-cyan-400 text-cyan-200 shadow-sm flex flex-col justify-between";
                         } else {
-                            btn.className = "px-3 py-2 rounded-xl border text-left transition font-medium text-xs bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between";
+                            btn.className = "px-2.5 py-2 rounded-xl border text-left transition font-medium text-xs bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between";
                         }
                     }
                 });
@@ -13435,33 +14331,33 @@ Respond ONLY with valid JSON with:
                     const labels = {
                         stereo: "ESTÉREO MASTER (TRADICIONAL L/R)",
                         binaural: "BINAURAL 3D HRTF (INMERSIÓN 360°)",
-                        surround51: "SURROUND 5.1 (MATRIZ 6 CANALES)"
+                        surround51: "SURROUND 5.1 (MATRIZ 6 CANALES)",
+                        surround71: "SURROUND 7.1 (MATRIZ 8 CANALES DISCRETOS)",
+                        atmos: "DOLBY ATMOS 7.1.4 (MATRIZ 12 CANALES DISCRETOS + CÚPULA CENITAL)"
                     };
-                    statusBadge.innerText = labels[mode] || mode;
+                    statusBadge.innerText = labels[mode] || mode.toUpperCase();
                 }
 
                 const miniSpatial = document.getElementById('mini-spatial-mode');
                 if (miniSpatial) miniSpatial.innerText = mode.toUpperCase();
 
-                if (mode === 'surround51') {
-                    const maxChannels = audioCtx.destination.maxChannelCount;
-                    if (maxChannels < 6) {
+                const targetChannels = (mode === 'atmos') ? 12 : (mode === 'surround71') ? 8 : (mode === 'surround51') ? 6 : 2;
+                if (targetChannels > 2) {
+                    const maxChannels = audioCtx.destination.maxChannelCount || 2;
+                    if (maxChannels < targetChannels) {
                         if (typeof showToast === 'function') {
-                            showToast("Hardware 5.1 No Detectado", `Tu dispositivo soporta máx ${maxChannels} canales. Conmutando a Binaural 3D HRTF.`, "warning", 4000);
+                            showToast(`Hardware ${mode.toUpperCase()} No Detectado`, `Dispositivo soporta máx ${maxChannels} ch. Monitoreo visual activo con render Binaural HRTF.`, "warning", 4500);
                         }
-                        this.mode = 'binaural';
-                        this.setMode('binaural');
-                        return;
                     } else {
                         try {
-                            audioCtx.destination.channelCount = 6;
+                            audioCtx.destination.channelCount = targetChannels;
                             audioCtx.destination.channelCountMode = 'explicit';
                             audioCtx.destination.channelInterpretation = 'discrete';
                             if (typeof showToast === 'function') {
-                                showToast("Surround 5.1 Activo", "Matriz discreta de 6 altavoces configurada con éxito.", "success", 3000);
+                                showToast(`${mode.toUpperCase()} Activo`, `Matriz física de ${targetChannels} canales configurada con éxito.`, "success", 3000);
                             }
                         } catch(e) {
-                            console.warn("[SpatialAudio] Surround error:", e);
+                            console.warn("[SpatialAudio] Routing hardware error:", e);
                         }
                     }
                 } else {
@@ -13582,27 +14478,43 @@ Respond ONLY with valid JSON with:
                     this.pannerNode.setPosition(sX, sY, sZ);
                 }
 
-                // 3. Simular niveles de los 6 canales 5.1
+                // 3. Simular niveles de los 12 canales (7.1 Bed + 4 Atmos Tops)
                 const rms = liveAudioMetrics.rms || 0;
-                const panNorm = Math.sin(this.soundAzimuth);
-                const frontBack = Math.cos(this.soundAzimuth);
+                const panNorm = Math.sin(this.soundAzimuth); // -1 = Left, +1 = Right
+                const frontBack = Math.cos(this.soundAzimuth); // +1 = Front, -1 = Back
+                const heightSin = Math.sin(this.soundElevation); // Elevación (-1 a +1)
+                const hNorm = Math.max(0.0, heightSin); // Altura positiva cenital (0 a 1)
 
-                this.channelLevels[0] = Math.max(0, rms * (0.7 - panNorm * 0.5) * (0.6 + frontBack * 0.4)); // L
-                this.channelLevels[1] = Math.max(0, rms * (0.7 + panNorm * 0.5) * (0.6 + frontBack * 0.4)); // R
-                this.channelLevels[2] = Math.max(0, rms * (1.0 - Math.abs(panNorm) * 0.7) * (0.5 + Math.max(0, frontBack) * 0.5)); // C
-                this.channelLevels[3] = Math.max(0, (stemsData['sub']?.value || 0) * 1.2 + (stemsData['bass']?.value || 0) * 0.8); // LFE
-                this.channelLevels[4] = Math.max(0, rms * (0.7 - panNorm * 0.5) * (0.6 - frontBack * 0.4)); // SL
-                this.channelLevels[5] = Math.max(0, rms * (0.7 + panNorm * 0.5) * (0.6 - frontBack * 0.4)); // SR
+                // Energía base horizontal y energía cenital de altura
+                const horizEnergy = rms * Math.max(0.18, 1.0 - hNorm * 0.72);
+                const topEnergy = rms * (0.15 + hNorm * 1.35) + (sTreble * 0.4);
+
+                // 7.1 Bed: Canales Horizontales
+                this.channelLevels[0] = Math.max(0, horizEnergy * (0.7 - panNorm * 0.5) * (0.6 + frontBack * 0.4)); // L
+                this.channelLevels[1] = Math.max(0, horizEnergy * (0.7 + panNorm * 0.5) * (0.6 + frontBack * 0.4)); // R
+                this.channelLevels[2] = Math.max(0, horizEnergy * (1.0 - Math.abs(panNorm) * 0.75) * (0.5 + Math.max(0, frontBack) * 0.5)); // C
+                this.channelLevels[3] = Math.max(0, (stemsData['sub']?.value || 0) * 1.25 + (stemsData['bass']?.value || 0) * 0.75); // LFE
+                this.channelLevels[4] = Math.max(0, horizEnergy * (0.8 - panNorm * 0.4) * (0.65 - frontBack * 0.25)); // SL
+                this.channelLevels[5] = Math.max(0, horizEnergy * (0.8 + panNorm * 0.4) * (0.65 - frontBack * 0.25)); // SR
+                this.channelLevels[6] = Math.max(0, horizEnergy * (0.75 - panNorm * 0.45) * Math.max(0, -frontBack) * 1.3); // BL (Back Left)
+                this.channelLevels[7] = Math.max(0, horizEnergy * (0.75 + panNorm * 0.45) * Math.max(0, -frontBack) * 1.3); // BR (Back Right)
+
+                // Dolby Atmos: 4 Canales Cenitales de Techo
+                this.channelLevels[8] = Math.max(0, topEnergy * (0.7 - panNorm * 0.5) * (0.5 + frontBack * 0.5)); // TFL
+                this.channelLevels[9] = Math.max(0, topEnergy * (0.7 + panNorm * 0.5) * (0.5 + frontBack * 0.5)); // TFR
+                this.channelLevels[10] = Math.max(0, topEnergy * (0.7 - panNorm * 0.5) * (0.5 - frontBack * 0.5)); // TRL
+                this.channelLevels[11] = Math.max(0, topEnergy * (0.7 + panNorm * 0.5) * (0.5 - frontBack * 0.5)); // TRR
 
                 if (currentV4View === 'spatial-audio') {
-                    const chIds = ['l', 'r', 'c', 'lfe', 'sl', 'sr'];
-                    chIds.forEach((id, i) => {
+                    const chIds = ['l', 'r', 'c', 'lfe', 'sl', 'sr', 'bl', 'br', 'tfl', 'tfr', 'trl', 'trr'];
+                    for (let i = 0; i < chIds.length; i++) {
+                        const id = chIds[i];
                         const bar = document.getElementById(`meter-surround-${id}`);
                         const val = document.getElementById(`val-surround-${id}`);
-                        const pct = Math.min(100, Math.round(this.channelLevels[i] * 100));
+                        const pct = Math.min(100, Math.round((this.channelLevels[i] || 0) * 100));
                         if (bar) bar.style.height = `${pct}%`;
                         if (val) val.innerText = `${pct}%`;
-                    });
+                    }
                 }
             }
 
@@ -13690,6 +14602,74 @@ Respond ONLY with valid JSON with:
                 ctx.arc(pX, pY, 5, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
+
+                // Indicador de elevación junto a la fuente
+                ctx.font = '8px monospace';
+                ctx.fillStyle = '#ec4899';
+                const elDeg = (this.soundElevation * 180 / Math.PI).toFixed(0);
+                ctx.fillText(`${elDeg > 0 ? '+' : ''}${elDeg}°`, pX + 8, pY - 4);
+
+                // Render Altavoces Físicos Surround 7.1 Bed & Dolby Atmos Tops
+                const speakers = [
+                    // 7.1 Bed:
+                    { id: 'C',   angle: 0.0,            r: maxR * 0.90, ch: 2, col: '#10b981' },
+                    { id: 'L',   angle: -Math.PI / 6,   r: maxR * 0.90, ch: 0, col: '#06b6d4' },
+                    { id: 'R',   angle: Math.PI / 6,    r: maxR * 0.90, ch: 1, col: '#06b6d4' },
+                    { id: 'SL',  angle: -Math.PI / 2,   r: maxR * 0.90, ch: 4, col: '#ec4899' },
+                    { id: 'SR',  angle: Math.PI / 2,    r: maxR * 0.90, ch: 5, col: '#ec4899' },
+                    { id: 'BL',  angle: -Math.PI * 0.82,r: maxR * 0.90, ch: 6, col: '#818cf8' },
+                    { id: 'BR',  angle: Math.PI * 0.82, r: maxR * 0.90, ch: 7, col: '#818cf8' },
+                    // Atmos Tops (Cúpula Cenital Elevada):
+                    { id: 'TFL', angle: -Math.PI / 4,   r: maxR * 0.52, ch: 8, col: '#f59e0b' },
+                    { id: 'TFR', angle: Math.PI / 4,    r: maxR * 0.52, ch: 9, col: '#f59e0b' },
+                    { id: 'TRL', angle: -Math.PI * 0.75,r: maxR * 0.52, ch: 10,col: '#f59e0b' },
+                    { id: 'TRR', angle: Math.PI * 0.75, r: maxR * 0.52, ch: 11,col: '#f59e0b' }
+                ];
+
+                ctx.font = '7px monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                for (let i = 0; i < speakers.length; i++) {
+                    const spk = speakers[i];
+                    const spkX = cx + Math.sin(spk.angle) * spk.r;
+                    const spkY = cy - Math.cos(spk.angle) * spk.r;
+                    const lvl = Math.min(1.0, this.channelLevels[spk.ch] || 0.0);
+
+                    ctx.beginPath();
+                    ctx.arc(spkX, spkY, 3.2 + lvl * 3.0, 0, Math.PI * 2);
+                    if (lvl > 0.08) {
+                        ctx.fillStyle = spk.col;
+                        ctx.shadowColor = spk.col;
+                        ctx.shadowBlur = 6 + lvl * 10;
+                    } else {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+                        ctx.shadowBlur = 0;
+                    }
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    ctx.fillStyle = (lvl > 0.15) ? '#ffffff' : '#71717a';
+                    const labelOffset = (spk.r > maxR * 0.7) ? 8 : 7;
+                    const lblY = (spkY > cy) ? spkY + labelOffset : spkY - labelOffset;
+                    ctx.fillText(spk.id, spkX, lblY);
+                }
+
+                // Subwoofer LFE cerca del centro
+                const lfeLvl = Math.min(1.0, this.channelLevels[3] || 0.0);
+                const lfeX = cx - 20;
+                const lfeY = cy + 20;
+                ctx.beginPath();
+                ctx.arc(lfeX, lfeY, 3.5 + lfeLvl * 3.5, 0, Math.PI * 2);
+                ctx.fillStyle = (lfeLvl > 0.1) ? '#fbbf24' : 'rgba(255, 255, 255, 0.22)';
+                if (lfeLvl > 0.1) {
+                    ctx.shadowColor = '#fbbf24';
+                    ctx.shadowBlur = 8;
+                }
+                ctx.fill();
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = (lfeLvl > 0.1) ? '#ffffff' : '#71717a';
+                ctx.fillText('LFE', lfeX, lfeY + 8);
 
                 ctx.font = '8px monospace';
                 ctx.fillStyle = '#71717a';
@@ -14120,6 +15100,469 @@ Respond ONLY with valid JSON with:
         function toggleOscFilter(filterName, isChecked) {
             if (oscBridgeEngine && oscBridgeEngine.filters) {
                 oscBridgeEngine.filters[filterName] = isChecked;
+            }
+        }
+
+        // =========================================================================
+        // 13.B ENLACE WEBRTC P2P • CONSOLA VJ REMOTA SIN SERVIDOR (PEER DATACHANNEL)
+        // =========================================================================
+        class WebRtcP2pEngine {
+            constructor() {
+                this.role = 'host'; // 'host' | 'vj_remote'
+                this.pc = null;
+                this.dataChannel = null;
+                this.isConnected = false;
+                this.txPackets = 0;
+                this.rxPackets = 0;
+                this.txBytes = 0;
+                this.rxBytes = 0;
+                this.lastOutboundTime = 0;
+                this.latencyMs = 0;
+                this.pingTimer = null;
+                this.autoPairWs = null;
+            }
+
+            init() {
+                this.updateUIStatus();
+            }
+
+            setRole(newRole) {
+                this.role = newRole;
+                const btnHost = document.getElementById('btn-p2p-role-host');
+                const btnRemote = document.getElementById('btn-p2p-role-remote');
+                if (newRole === 'host') {
+                    if (btnHost) btnHost.className = "p-2.5 rounded-lg border text-left transition font-bold bg-teal-500/20 border-teal-400 text-teal-200 shadow-sm flex flex-col justify-between";
+                    if (btnRemote) btnRemote.className = "p-2.5 rounded-lg border text-left transition font-medium bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between";
+                    if (typeof showToast === 'function') showToast("Rol P2P: Host", "Este dispositivo transmitirá telemetría 60 FPS hacia los controladores remotos.", "info", 3000);
+                } else {
+                    if (btnHost) btnHost.className = "p-2.5 rounded-lg border text-left transition font-medium bg-zinc-900 border-white/[0.08] text-zinc-400 hover:text-white flex flex-col justify-between";
+                    if (btnRemote) btnRemote.className = "p-2.5 rounded-lg border text-left transition font-bold bg-teal-500/20 border-teal-400 text-teal-200 shadow-sm flex flex-col justify-between";
+                    if (typeof showToast === 'function') showToast("Rol P2P: Consola VJ", "Este dispositivo actuará como controlador remoto inter-dispositivo.", "info", 3000);
+                }
+            }
+
+            createPeerConnection() {
+                if (this.pc) {
+                    try { this.pc.close(); } catch(e){}
+                    this.pc = null;
+                }
+
+                const config = {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:global.stun.twilio.com:3478' }
+                    ]
+                };
+
+                this.pc = new RTCPeerConnection(config);
+
+                this.pc.oniceconnectionstatechange = () => {
+                    const state = this.pc.iceConnectionState;
+                    if (state === 'connected' || state === 'completed') {
+                        this.isConnected = true;
+                    } else if (state === 'disconnected' || state === 'failed' || state === 'closed') {
+                        this.isConnected = false;
+                    }
+                    this.updateUIStatus();
+                };
+
+                return this.pc;
+            }
+
+            setupDataChannel(channel) {
+                this.dataChannel = channel;
+                this.dataChannel.binaryType = 'arraybuffer';
+
+                this.dataChannel.onopen = () => {
+                    this.isConnected = true;
+                    this.updateUIStatus();
+                    if (typeof showToast === 'function') {
+                        showToast("Enlace WebRTC P2P Conectado", "Canal de datos de ultra-baja latencia establecido.", "success", 4000);
+                    }
+                    if (this.pingTimer) clearInterval(this.pingTimer);
+                    this.pingTimer = setInterval(() => {
+                        if (this.isConnected && this.dataChannel && this.dataChannel.readyState === 'open') {
+                            this.sendPing();
+                        }
+                    }, 1500);
+                };
+
+                this.dataChannel.onclose = () => {
+                    this.isConnected = false;
+                    this.updateUIStatus();
+                    if (this.pingTimer) clearInterval(this.pingTimer);
+                };
+
+                this.dataChannel.onerror = (err) => {
+                    console.warn("[WebRTC P2P] Error en canal de datos:", err);
+                };
+
+                this.dataChannel.onmessage = (event) => {
+                    this.handleIncoming(event.data);
+                };
+            }
+
+            async generateOffer() {
+                try {
+                    const pc = this.createPeerConnection();
+                    const dc = pc.createDataChannel('motor_vj_link', {
+                        ordered: false,
+                        maxRetransmits: 0
+                    });
+                    this.setupDataChannel(dc);
+
+                    const offer = await pc.createOffer();
+                    await pc.setLocalDescription(offer);
+
+                    await new Promise(resolve => {
+                        if (pc.iceGatheringState === 'complete') {
+                            resolve();
+                        } else {
+                            const checkState = () => {
+                                if (pc.iceGatheringState === 'complete') {
+                                    pc.removeEventListener('icegatheringstatechange', checkState);
+                                    resolve();
+                                }
+                            };
+                            pc.addEventListener('icegatheringstatechange', checkState);
+                            setTimeout(resolve, 1200);
+                        }
+                    });
+
+                    const token = btoa(JSON.stringify(pc.localDescription));
+                    const inputEl = document.getElementById('p2p-token-input');
+                    if (inputEl) inputEl.value = token;
+
+                    if (typeof showToast === 'function') {
+                        showToast("Oferta P2P Creada (Host)", "Token generado en el campo inferior. Cópialo y pégalo en el dispositivo VJ.", "success", 5000);
+                    }
+                    return token;
+                } catch(err) {
+                    console.error("[WebRTC P2P] Error al generar oferta:", err);
+                    if (typeof showToast === 'function') showToast("Error P2P", err.message, "error", 4000);
+                }
+            }
+
+            async acceptOfferAndAnswer(offerToken) {
+                try {
+                    if (!offerToken) {
+                        const inputEl = document.getElementById('p2p-token-input');
+                        offerToken = inputEl ? inputEl.value.trim() : '';
+                    }
+                    if (!offerToken) {
+                        if (typeof showToast === 'function') showToast("Token P2P Requerido", "Pega el token de Oferta generado por el Host.", "warning", 3500);
+                        return;
+                    }
+
+                    const offerDesc = JSON.parse(atob(offerToken));
+                    const pc = this.createPeerConnection();
+
+                    pc.ondatachannel = (e) => {
+                        this.setupDataChannel(e.channel);
+                    };
+
+                    await pc.setRemoteDescription(offerDesc);
+                    const answer = await pc.createAnswer();
+                    await pc.setLocalDescription(answer);
+
+                    await new Promise(resolve => {
+                        if (pc.iceGatheringState === 'complete') {
+                            resolve();
+                        } else {
+                            const checkState = () => {
+                                if (pc.iceGatheringState === 'complete') {
+                                    pc.removeEventListener('icegatheringstatechange', checkState);
+                                    resolve();
+                                }
+                            };
+                            pc.addEventListener('icegatheringstatechange', checkState);
+                            setTimeout(resolve, 1200);
+                        }
+                    });
+
+                    const answerToken = btoa(JSON.stringify(pc.localDescription));
+                    const inputEl = document.getElementById('p2p-token-input');
+                    if (inputEl) inputEl.value = answerToken;
+
+                    if (typeof showToast === 'function') {
+                        showToast("Respuesta P2P Creada (VJ)", "Copia este nuevo token y pégalo de vuelta en el Host (Paso 3).", "success", 5000);
+                    }
+                    return answerToken;
+                } catch(err) {
+                    console.error("[WebRTC P2P] Error al responder oferta:", err);
+                    if (typeof showToast === 'function') showToast("Error P2P", "Token inválido o error SDP: " + err.message, "error", 4000);
+                }
+            }
+
+            async completeHandshake(answerToken) {
+                try {
+                    if (!this.pc) {
+                        if (typeof showToast === 'function') showToast("Error P2P", "Debes generar primero la oferta en este dispositivo (Paso 1).", "error", 3500);
+                        return;
+                    }
+                    if (!answerToken) {
+                        const inputEl = document.getElementById('p2p-token-input');
+                        answerToken = inputEl ? inputEl.value.trim() : '';
+                    }
+                    if (!answerToken) {
+                        if (typeof showToast === 'function') showToast("Token P2P Requerido", "Pega el token de Respuesta generado por el VJ.", "warning", 3500);
+                        return;
+                    }
+
+                    const answerDesc = JSON.parse(atob(answerToken));
+                    await this.pc.setRemoteDescription(answerDesc);
+
+                    if (typeof showToast === 'function') {
+                        showToast("Handshake P2P Completado", "Conectando canales con el dispositivo VJ...", "info", 3000);
+                    }
+                } catch(err) {
+                    console.error("[WebRTC P2P] Error en handshake:", err);
+                    if (typeof showToast === 'function') showToast("Error P2P", "Fallo al aplicar respuesta: " + err.message, "error", 4000);
+                }
+            }
+
+            autoPairLAN() {
+                const wsHost = location.hostname || 'localhost';
+                const pairUrl = `ws://${wsHost}:8089`;
+                if (typeof showToast === 'function') {
+                    showToast("Auto-Pair LAN Iniciado", `Buscando pares en ${pairUrl}...`, "info", 3000);
+                }
+
+                try {
+                    if (this.autoPairWs) { try { this.autoPairWs.close(); } catch(e){} }
+                    this.autoPairWs = new WebSocket(pairUrl);
+
+                    this.autoPairWs.onopen = async () => {
+                        if (this.role === 'host') {
+                            const offerToken = await this.generateOffer();
+                            if (offerToken && this.autoPairWs.readyState === WebSocket.OPEN) {
+                                this.autoPairWs.send(JSON.stringify({ type: 'p2p_lan_offer', token: offerToken }));
+                                if (typeof showToast === 'function') showToast("Auto-Pair: Oferta Emitida", "Esperando respuesta de consola VJ...", "info", 3000);
+                            }
+                        } else {
+                            this.autoPairWs.send(JSON.stringify({ type: 'p2p_lan_ready_vj' }));
+                        }
+                    };
+
+                    this.autoPairWs.onmessage = async (e) => {
+                        try {
+                            const msg = JSON.parse(e.data);
+                            if (msg.type === 'p2p_lan_offer' && this.role === 'vj_remote') {
+                                const answerToken = await this.acceptOfferAndAnswer(msg.token);
+                                if (answerToken && this.autoPairWs.readyState === WebSocket.OPEN) {
+                                    this.autoPairWs.send(JSON.stringify({ type: 'p2p_lan_answer', token: answerToken }));
+                                }
+                            } else if (msg.type === 'p2p_lan_answer' && this.role === 'host') {
+                                await this.completeHandshake(msg.token);
+                            }
+                        } catch(err) {}
+                    };
+
+                    this.autoPairWs.onerror = () => {
+                        if (typeof showToast === 'function') {
+                            showToast("Auto-Pair Local No Disponible", "Utiliza el intercambio manual con los botones 1, 2 y 3.", "warning", 4000);
+                        }
+                    };
+                } catch(e) {
+                    console.warn("[WebRTC P2P] Auto-Pair:", e);
+                }
+            }
+
+            handleIncoming(data) {
+                this.rxPackets++;
+                this.rxBytes += (typeof data === 'string') ? data.length : data.byteLength;
+                let msg;
+                try {
+                    msg = (typeof data === 'string') ? JSON.parse(data) : JSON.parse(new TextDecoder().decode(data));
+                } catch(e) { return; }
+
+                if (msg.type === 'ping') {
+                    this.sendPacket({ type: 'pong', t: msg.t });
+                } else if (msg.type === 'pong') {
+                    this.latencyMs = Math.round(performance.now() - msg.t);
+                    const latEl = document.getElementById('p2p-latency-display');
+                    if (latEl) latEl.innerText = `${this.latencyMs} ms (RTT)`;
+                } else if (msg.type === 'telemetry') {
+                    window.p2pLastTelemetry = msg;
+                } else if (msg.type === 'cmd') {
+                    this.executeRemoteCommand(msg);
+                }
+            }
+
+            executeRemoteCommand(msg) {
+                if (msg.action === 'trigger_drop') {
+                    if (scenicWorldEngine) scenicWorldEngine.triggerDropCinematics();
+                    if (typeof triggerAudioBurst === 'function') triggerAudioBurst();
+                    if (typeof showToast === 'function') showToast("Comando P2P Recibido", "¡Drop audiovisual disparado por VJ remoto!", "info", 2500);
+                } else if (msg.action === 'switch_world' && msg.world) {
+                    switchThreeScene(msg.world);
+                    const sel = document.getElementById('three-scene-mode');
+                    if (sel) sel.value = msg.world;
+                    if (typeof showToast === 'function') showToast("Comando P2P Recibido", `Cambio de mundo a '${msg.world}'`, "info", 2500);
+                } else if (msg.action === 'random_preset') {
+                    const presets = ['custom_shader', 'scenic_crystal_valley', 'scenic_mercury_monoliths', 'tunnel', 'monolith', 'waterfall'];
+                    const chosen = presets[Math.floor(Math.random() * presets.length)];
+                    switchThreeScene(chosen);
+                    const sel = document.getElementById('three-scene-mode');
+                    if (sel) sel.value = chosen;
+                    if (typeof showToast === 'function') showToast("Comando P2P Recibido", `Escena aleatoria: ${chosen}`, "info", 2000);
+                }
+            }
+
+            sendPing() {
+                this.sendPacket({ type: 'ping', t: performance.now() });
+            }
+
+            sendPacket(obj) {
+                if (!this.isConnected || !this.dataChannel || this.dataChannel.readyState !== 'open') return;
+                try {
+                    const str = JSON.stringify(obj);
+                    this.dataChannel.send(str);
+                    this.txPackets++;
+                    this.txBytes += str.length;
+                } catch(e) {}
+            }
+
+            update(time, dt) {
+                if (!this.isConnected || !this.dataChannel || this.dataChannel.readyState !== 'open') return;
+
+                if (this.role === 'host' && (time - this.lastOutboundTime >= 0.033)) {
+                    this.lastOutboundTime = time;
+
+                    const telemetryPacket = {
+                        type: 'telemetry',
+                        time: time,
+                        rms: (liveAudioMetrics ? liveAudioMetrics.rms : 0),
+                        onset: (liveAudioMetrics ? liveAudioMetrics.isOnset : false),
+                        centroid: (liveAudioMetrics ? liveAudioMetrics.spectralCentroid : 0),
+                        flux: (liveAudioMetrics ? liveAudioMetrics.spectralFlux : 0),
+                        scene: activeSceneType,
+                        world: (scenicWorldEngine ? scenicWorldEngine.activeWorld : null),
+                        q: (window.qVars ? Array.from(window.qVars.slice(0, 29)) : [])
+                    };
+
+                    this.sendPacket(telemetryPacket);
+                }
+
+                const txEl = document.getElementById('p2p-tx-counter');
+                const rxEl = document.getElementById('p2p-rx-counter');
+                if (txEl) txEl.innerText = `${this.txPackets} (${(this.txBytes / 1024).toFixed(1)} KB)`;
+                if (rxEl) rxEl.innerText = `${this.rxPackets} (${(this.rxBytes / 1024).toFixed(1)} KB)`;
+            }
+
+            updateUIStatus() {
+                const badge = document.getElementById('p2p-status-badge');
+                const mini = document.getElementById('mini-p2p-state');
+                const miniM = document.getElementById('mini-p2p-state-m');
+                const latEl = document.getElementById('p2p-latency-display');
+
+                if (badge) {
+                    if (this.isConnected) {
+                        badge.innerText = `CONECTADO (${this.role.toUpperCase()})`;
+                        badge.className = "text-[9px] font-mono px-2 py-0.5 rounded bg-teal-950/80 text-teal-300 border border-teal-500/40 font-bold";
+                    } else {
+                        badge.innerText = "DESCONECTADO";
+                        badge.className = "text-[9px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-white/5";
+                    }
+                }
+
+                if (mini) {
+                    mini.innerText = this.isConnected ? "LINK OK" : "OFF";
+                    mini.className = this.isConnected ? "text-teal-400 font-bold" : "text-zinc-500";
+                }
+
+                if (miniM) {
+                    miniM.innerText = this.isConnected ? "P2P:OK" : "P2P:OFF";
+                    miniM.className = this.isConnected ? "text-teal-400 font-bold text-[8px] px-1 py-0.2 rounded bg-teal-950/80 border border-teal-500/30" : "text-zinc-500 font-bold text-[8px] px-1 py-0.2 rounded bg-zinc-900 border border-white/5";
+                }
+
+                if (latEl && !this.isConnected) {
+                    latEl.innerText = "DISCONNECTED";
+                }
+            }
+        }
+
+        let webRtcP2pEngine = null;
+
+        function initWebRtcP2pEngine() {
+            if (!webRtcP2pEngine) {
+                webRtcP2pEngine = new WebRtcP2pEngine();
+                webRtcP2pEngine.init();
+            }
+        }
+
+        function setP2pRole(role) {
+            if (!webRtcP2pEngine) initWebRtcP2pEngine();
+            webRtcP2pEngine.setRole(role);
+        }
+
+        function p2pGenerateOffer() {
+            if (!webRtcP2pEngine) initWebRtcP2pEngine();
+            webRtcP2pEngine.generateOffer();
+        }
+
+        function p2pAcceptOfferAndAnswer() {
+            if (!webRtcP2pEngine) initWebRtcP2pEngine();
+            webRtcP2pEngine.acceptOfferAndAnswer();
+        }
+
+        function p2pCompleteHandshake() {
+            if (!webRtcP2pEngine) initWebRtcP2pEngine();
+            webRtcP2pEngine.completeHandshake();
+        }
+
+        function p2pAutoPairLAN() {
+            if (!webRtcP2pEngine) initWebRtcP2pEngine();
+            webRtcP2pEngine.autoPairLAN();
+        }
+
+        function copyP2pToken() {
+            const inputEl = document.getElementById('p2p-token-input');
+            if (inputEl && inputEl.value) {
+                navigator.clipboard.writeText(inputEl.value).then(() => {
+                    if (typeof showToast === 'function') showToast("Token Copiado", "Pégalo en el otro dispositivo.", "success", 2000);
+                }).catch(() => {
+                    inputEl.select();
+                    document.execCommand('copy');
+                    if (typeof showToast === 'function') showToast("Token Copiado", "Pégalo en el otro dispositivo.", "success", 2000);
+                });
+            } else {
+                if (typeof showToast === 'function') showToast("Sin Token", "Genera una oferta o respuesta primero.", "warning", 2000);
+            }
+        }
+
+        function p2pSendTriggerDrop() {
+            if (webRtcP2pEngine && webRtcP2pEngine.isConnected) {
+                webRtcP2pEngine.sendPacket({ type: 'cmd', action: 'trigger_drop' });
+                if (typeof showToast === 'function') showToast("Comando Enviado", "Drop disparado hacia el Host.", "success", 2000);
+            } else {
+                if (scenicWorldEngine) scenicWorldEngine.triggerDropCinematics();
+                if (typeof triggerAudioBurst === 'function') triggerAudioBurst();
+                if (typeof showToast === 'function') showToast("Drop Local", "Disparado localmente (P2P no conectado).", "info", 2000);
+            }
+        }
+
+        function p2pSendRandomPreset() {
+            if (webRtcP2pEngine && webRtcP2pEngine.isConnected) {
+                webRtcP2pEngine.sendPacket({ type: 'cmd', action: 'random_preset' });
+                if (typeof showToast === 'function') showToast("Comando Enviado", "Preset aleatorio enviado al Host.", "success", 2000);
+            } else {
+                const presets = ['custom_shader', 'scenic_crystal_valley', 'scenic_mercury_monoliths', 'tunnel', 'monolith', 'waterfall'];
+                const chosen = presets[Math.floor(Math.random() * presets.length)];
+                switchThreeScene(chosen);
+                const sel = document.getElementById('three-scene-mode');
+                if (sel) sel.value = chosen;
+            }
+        }
+
+        function p2pSendWorldSwitch(world) {
+            if (webRtcP2pEngine && webRtcP2pEngine.isConnected) {
+                webRtcP2pEngine.sendPacket({ type: 'cmd', action: 'switch_world', world });
+                if (typeof showToast === 'function') showToast("Comando Enviado", `Conmutación a '${world}' enviada al Host.`, "success", 2000);
+            } else {
+                switchThreeScene(world);
+                const sel = document.getElementById('three-scene-mode');
+                if (sel) sel.value = world;
             }
         }
 
@@ -16021,6 +17464,19 @@ void main() {
             window.qVars[22] = waterfallManager ? waterfallManager.reliefScale : 1.2;             // q23: Waterfall relief
             window.qVars[23] = (oscBridgeEngine && oscBridgeEngine.isConnected) ? 1.0 : 0.0;     // q24: OSC Online (0 o 1)
 
+            // Q25..Q28: Surround 7.1 y Dolby Atmos Canales Discretos
+            if (spatialAudioEngine && spatialAudioEngine.channelLevels) {
+                window.qVars[24] = spatialAudioEngine.channelLevels[6] || 0.0; // Q25: Surround Back Left (BL)
+                window.qVars[25] = spatialAudioEngine.channelLevels[7] || 0.0; // Q26: Surround Back Right (BR)
+                window.qVars[26] = ((spatialAudioEngine.channelLevels[8] || 0.0) + (spatialAudioEngine.channelLevels[9] || 0.0)) * 0.5; // Q27: Promedio Canales Altura Frontal (TFL + TFR)
+                window.qVars[27] = ((spatialAudioEngine.channelLevels[10] || 0.0) + (spatialAudioEngine.channelLevels[11] || 0.0)) * 0.5; // Q28: Promedio Canales Altura Trasera (TRL + TRR)
+            } else {
+                window.qVars[24] = 0.0;
+                window.qVars[25] = 0.0;
+                window.qVars[26] = 0.0;
+                window.qVars[27] = 0.0;
+            }
+
             // Update mini telemetry header (Desktop & Mobile)
             const miniQ1 = document.getElementById('mini-q1');
             if (miniQ1) miniQ1.innerText = window.qVars[0].toFixed(2);
@@ -17531,6 +18987,11 @@ void main() {
                 oscBridgeEngine.update(time, dt);
             }
 
+            // 4.3 Enlace WebRTC P2P DataChannel (Telemetría Directa & Consola VJ Remota @ 30 FPS)
+            if (webRtcP2pEngine) {
+                webRtcP2pEngine.update(time, dt);
+            }
+
             // 5. Renderizado de Canvases v4.2 activos según vista
             if (currentV4View === 'chaos-lab') {
                 renderChaosCanvas();
@@ -17570,6 +19031,7 @@ void main() {
             initWebMIDI();
             initSpatialAudioEngine();
             initOscBridge();
+            initWebRtcP2pEngine();
             startAiDirectorLoop();
             masterRenderLoop();
             syncResponsiveLayout();
