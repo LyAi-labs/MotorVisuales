@@ -3436,9 +3436,19 @@
             updateOutputVolumeNodes();
 
             const stateEl = document.getElementById('txt-monitor-state');
+            const btnMonitor = document.getElementById('btn-toggle-monitor');
             if (stateEl) {
                 stateEl.innerText = isAudioMonitoringEnabled ? 'ACTIVO' : 'MUTE';
                 stateEl.className = isAudioMonitoringEnabled ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
+            }
+            if (btnMonitor) {
+                if (isAudioMonitoringEnabled) {
+                    btnMonitor.classList.remove('border-rose-500/50', 'bg-rose-950/40');
+                    btnMonitor.classList.add('border-emerald-500/40', 'bg-emerald-950/30');
+                } else {
+                    btnMonitor.classList.remove('border-emerald-500/40', 'bg-emerald-950/30');
+                    btnMonitor.classList.add('border-rose-500/50', 'bg-rose-950/40');
+                }
             }
         }
 
@@ -3497,14 +3507,36 @@
 
         function toggleAudioMonitoring() {
             isAudioMonitoringEnabled = !isAudioMonitoringEnabled;
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
             updateOutputVolumeNodes();
             const stateEl = document.getElementById('txt-monitor-state');
+            const btnMonitor = document.getElementById('btn-toggle-monitor');
             if (stateEl) {
                 stateEl.innerText = isAudioMonitoringEnabled ? 'ACTIVO' : 'MUTE';
                 stateEl.className = isAudioMonitoringEnabled ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
             }
+            if (btnMonitor) {
+                if (isAudioMonitoringEnabled) {
+                    btnMonitor.classList.remove('border-rose-500/50', 'bg-rose-950/40');
+                    btnMonitor.classList.add('border-emerald-500/40', 'bg-emerald-950/30');
+                } else {
+                    btnMonitor.classList.remove('border-emerald-500/40', 'bg-emerald-950/30');
+                    btnMonitor.classList.add('border-rose-500/50', 'bg-rose-950/40');
+                }
+            }
+            if (currentSourceType === 'tab') {
+                const audioTracks = micStream ? micStream.getAudioTracks() : [];
+                let isSuppressed = false;
+                if (audioTracks.length > 0) {
+                    const settings = audioTracks[0].getSettings ? audioTracks[0].getSettings() : {};
+                    isSuppressed = settings.suppressLocalAudioPlayback === true;
+                }
+                updateTabAudioHint(isSuppressed);
+            }
             if (typeof showToast === 'function') {
-                showToast("Monitoreo Estéreo", isAudioMonitoringEnabled ? "Salida a auriculares y balance L/R ACTIVADO" : "Salida a auriculares SILENCIADA", "info");
+                showToast("Monitoreo Estéreo", isAudioMonitoringEnabled ? "Salida a altavoces/auriculares ACTIVADA" : "Salida a altavoces/auriculares MUTEADA", isAudioMonitoringEnabled ? "info" : "warning");
             }
         }
 
@@ -4325,11 +4357,35 @@
             if (currentSourceType === 'tab') {
                 hintEl.classList.remove('hidden');
                 if (isLocalSuppressed) {
-                    hintEl.className = "mt-1.5 text-[9px] font-mono p-1.5 rounded bg-emerald-950/40 border border-emerald-500/30 text-emerald-200/90 leading-tight";
-                    hintEl.innerHTML = `<span class="font-bold text-emerald-300">🔊 Pestaña silenciada en origen:</span> El volumen de salida de YouTube está gobernado al 100% por este fader Master y balance L/R.`;
+                    hintEl.className = "mt-1.5 text-[9px] font-mono p-2 rounded bg-emerald-950/50 border border-emerald-500/40 text-emerald-200/90 leading-tight space-y-1.5";
+                    hintEl.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-emerald-300 flex items-center gap-1">
+                                <span>🔊 Pestaña silenciada en origen (Suno / YouTube)</span>
+                            </span>
+                            <button onclick="toggleAudioMonitoring()" class="px-2 py-0.5 rounded text-[8px] font-bold uppercase transition ${isAudioMonitoringEnabled ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-rose-700 text-white hover:bg-rose-600 animate-pulse'}">
+                                ${isAudioMonitoringEnabled ? '🎧 Salida Activa' : '🔇 Salida Muteada'}
+                            </button>
+                        </div>
+                        <div class="text-zinc-300">
+                            El audio suena a través de MotorVisuales gobernado por el <b>Volumen General (Master)</b> y balance L/R.
+                        </div>
+                    `;
                 } else {
-                    hintEl.className = "mt-1.5 text-[9px] font-mono p-1.5 rounded bg-cyan-950/40 border border-cyan-500/30 text-cyan-200/90 leading-tight";
-                    hintEl.innerHTML = `<span class="font-bold text-cyan-300">ℹ️ Audio en vivo:</span> Este fader modula la salida de MotorVisuales. Si compartes pantalla completa y escuchas duplicación, pulsa <b class="underline cursor-pointer" onclick="toggleAudioMonitoring()">Monitoreo MUTE</b>.`;
+                    hintEl.className = "mt-1.5 text-[9px] font-mono p-2 rounded bg-cyan-950/50 border border-cyan-500/40 text-cyan-200/90 leading-tight space-y-1.5";
+                    hintEl.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-cyan-300 flex items-center gap-1">
+                                <span>ℹ️ Pestaña reproduciendo en origen</span>
+                            </span>
+                            <button onclick="toggleAudioMonitoring()" class="px-2 py-0.5 rounded text-[8px] font-bold uppercase transition ${isAudioMonitoringEnabled ? 'bg-emerald-600 text-white hover:bg-emerald-500' : 'bg-amber-600 text-white hover:bg-amber-500'}">
+                                ${isAudioMonitoringEnabled ? '🔊 Monitoreo ON' : '🔈 Activar Salida'}
+                            </button>
+                        </div>
+                        <div class="text-zinc-300">
+                            La fuente ya emite sonido por el sistema. Si no la oyes o deseas enrutarla por MotorVisuales, activa la salida.
+                        </div>
+                    `;
                 }
             } else {
                 hintEl.classList.add('hidden');
@@ -4349,9 +4405,10 @@
                 }
 
                 // Configuración de captura con supresión de audio en la pestaña de origen:
-                // 'suppressLocalAudioPlayback: true' silencia el audio nativo de la pestaña compartida (YouTube)
+                // 'suppressLocalAudioPlayback: true' silencia el audio nativo de la pestaña compartida (Suno, YouTube, Spotify)
                 // para que TODO el audio pase exclusivamente por el motor y responda a los faders de volumen y balance L/R.
                 let stream = null;
+                let requestedSuppression = false;
                 try {
                     stream = await navigator.mediaDevices.getDisplayMedia({ 
                         video: true, 
@@ -4360,13 +4417,21 @@
                         },
                         systemAudio: 'include'
                     });
+                    requestedSuppression = true;
                 } catch (optErr) {
                     console.warn("Fallo con suppressLocalAudioPlayback, reintentando captura estándar:", optErr);
                     stream = await navigator.mediaDevices.getDisplayMedia({ 
                         video: true, 
                         audio: true 
                     });
+                    requestedSuppression = false;
                 }
+
+                // Asegurar que AudioContext esté activo tras la interacción con el diálogo de compartir
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    await audioCtx.resume();
+                }
+
                 micStream = stream;
                 
                 const audioTracks = micStream.getAudioTracks();
@@ -4382,24 +4447,41 @@
                     const settings = audioTrack.getSettings ? audioTrack.getSettings() : {};
                     if (settings && settings.suppressLocalAudioPlayback === true) {
                         isLocalSuppressed = true;
+                    } else if (settings && settings.suppressLocalAudioPlayback === undefined && requestedSuppression) {
+                        // Fallback en Chromium si la restricción fue aceptada pero no expuesta en getSettings()
+                        isLocalSuppressed = true;
                     }
                 } catch(e) {}
 
+                // Al detener la compartición desde la barra del navegador, detener limpiamente
+                audioTrack.onended = () => {
+                    if (currentSourceType === 'tab') {
+                        stopAudio();
+                    }
+                };
+                if (micStream.getVideoTracks().length > 0) {
+                    micStream.getVideoTracks()[0].onended = () => {
+                        if (currentSourceType === 'tab') {
+                            stopAudio();
+                        }
+                    };
+                }
+
                 const audioStream = new MediaStream([audioTrack]);
                 const source = audioCtx.createMediaStreamSource(audioStream);
-                // connectSpeakers=false: la pestaña/pantalla capturada YA reproduce su propio
-                // audio (getDisplayMedia no la silencia). Conectarla también a audioCtx.destination
-                // duplicaba el sonido (pestaña de YouTube + pestaña de MotorVisuales a la vez).
-                // El análisis/visualización sigue intacto: mainAnalyser cuelga de masterGainNode
-                // de forma permanente (initAudioContext), no de esta rama de salida a altavoces.
-                // Si el usuario quiere monitorizar por auriculares, el botón de Monitoreo Estéreo
-                // (toggleAudioMonitoring) lo activa manualmente.
-                connectSourceToPipeline(source, false);
+
+                // Si el navegador silenció la pestaña de origen (Suno/YouTube silenciado por suppressLocalAudioPlayback),
+                // MotorVisuales DEBE conectar los altavoces (connectSpeakers = true) para que el audio se escuche
+                // gobernado por el volumen Master y balance L/R.
+                // Si la fuente no fue silenciada (ej. pantalla completa), se evita duplicación (L-004), pero
+                // el usuario puede activarlo en cualquier momento desde el botón de Monitoreo.
+                const shouldConnectSpeakers = isLocalSuppressed;
+                connectSourceToPipeline(source, shouldConnectSpeakers);
                 
                 currentSourceType = 'tab';
                 isAudioRunning = true;
-                updatePlaybackBar('tab', 'Audio Sistema / YouTube');
-                updateBadge('Audio Sistema / YouTube Activo', 'bg-cyan-600 text-white border-cyan-400');
+                updatePlaybackBar('tab', 'Audio Pestaña (Suno / YouTube)');
+                updateBadge('Pestaña Audio En Vivo', 'bg-cyan-600 text-white border-cyan-400');
                 const btnTab = document.getElementById('btn-tab');
                 if (btnTab) btnTab.classList.add('ring-2', 'ring-cyan-500');
 
@@ -4407,9 +4489,9 @@
 
                 if (typeof showToast === 'function') {
                     if (isLocalSuppressed) {
-                        showToast("YouTube / Pestaña Conectada", "Pestaña silenciada en origen. MotorVisuales gobierna el volumen Master al 100%.", "success");
+                        showToast("Pestaña Conectada & Sonando", "Pestaña silenciada en origen. MotorVisuales reproduce el audio y gobierna el volumen Master al 100%.", "success");
                     } else {
-                        showToast("Audio Sistema / YouTube Activo", "Captura digital directa. Regula balance L / R y volumen general.", "success");
+                        showToast("Pestaña Conectada", "Captura digital activa. Monitorea o regula balance L / R y volumen general.", "info");
                     }
                 }
             } catch (err) {
@@ -4569,6 +4651,8 @@
             // Reset playback bar and VU meter
             updatePlaybackBar('none', 'En espera (Selecciona fuente)');
             updateCompactAudioDeckStatus();
+            const tabHint = document.getElementById('tab-audio-hint');
+            if (tabHint) tabHint.classList.add('hidden');
             const fillEl = document.getElementById('live-meter-fill');
             if (fillEl) fillEl.style.width = '0%';
             const dbEl = document.getElementById('live-meter-db');

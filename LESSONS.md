@@ -447,6 +447,22 @@
   3. **Scrubbing Bidireccional No Destructivo:** Al arrastrar el cursor sobre el canvas del timeline multipista, pausar automáticamente la grabación y evaluar la interpolación espacial en el frame exacto con búsqueda binaria o acceso $O(1)$ por índice indexado en tiempo real.
 - **Trigger:** Al diseñar sistemas de grabación, automatización y reproducción de señales reactivas (VJ timelines, DAW automation lanes, Show Control).
 
+---
+
+### L-033
+- **Tags:** #webaudio #tab-capture #getdisplaymedia #suppresslocalaudioplayback #monitoring #echo
+- **Síntoma:** Al compartir una pestaña con audio (Suno, YouTube, Spotify Web), el analizador FFT y el vúmetro reciben señal continua (-22 dB, reactividad 3D activa), pero los altavoces o auriculares permanecen en silencio absoluto.
+- **Causa raíz:**
+  1. Para gobernar el volumen y balance L/R de una pestaña desde el visualizador, se solicita `suppressLocalAudioPlayback: true` en `getDisplayMedia`. Chrome silencia la pestaña en origen.
+  2. Debido a la regla histórica contra el eco (L-004), `connectSourceToPipeline` se invocaba con `connectSpeakers = false` (`isAudioMonitoringEnabled = false`), poniendo `outputMasterGain.gain.value = 0.0`.
+  3. Al estar la pestaña silenciada por el navegador y la salida de MotorVisuales silenciada por software, el usuario quedaba en silencio total a pesar de ver el vúmetro a 100% de volumen.
+- **Solución:**
+  1. Evaluar si la pestaña fue silenciada en origen: `const isLocalSuppressed = audioTrack.getSettings()?.suppressLocalAudioPlayback === true`.
+  2. Si `isLocalSuppressed === true`, invocar `connectSourceToPipeline(source, true)` para que MotorVisuales reproduzca el audio en `audioCtx.destination`.
+  3. Si `isLocalSuppressed === false` (ej. captura de pantalla completa o ventana donde el SO ya reproduce audio), mantener `connectSpeakers = false` por defecto para evitar el eco duplicado de L-004.
+  4. Proveer un botón de monitoreo interactivo con estados claros (`🔊 Salida Activa` vs `🔇 Salida Muteada` / `ACTIVO` vs `MUTE`) y reanudar `audioCtx.resume()` tras la interacción con el modal de `getDisplayMedia`.
+- **Trigger:** Al implementar captura de pestañas y enrutamiento de Web Audio API con `getDisplayMedia`.
+
 
 
 
