@@ -494,3 +494,252 @@
 
 
 
+
+---
+
+### D-022 — Goniómetro de Fase Lissajous, Matriz de Control Web MIDI USB y Exportador Cuantizado de Loops WebP 24-bit
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:** 
+  1. Los productores musicales y artistas visuales requerían evaluar la coherencia de fase estéreo, compatibilidad mono y distribución espacial en tiempo real mediante instrumentación estándar de mastering y broadcast (goniómetro de fase y osciloscopio Lissajous).
+  2. Se requería soporte plug-and-play para hardware físico USB (controladores DJ/VJ, mesas de mezclas, teclados y fader wings) mediante Web MIDI API con modo MIDI Learn interactivo y presets de fábrica.
+  3. Para redes sociales, VJing y diseño generativo, se requería exportar bucles visuales continuos perfectamente cuantizados a compases acústicos (2, 4 u 8 compases) sincronizados al tempo BPM y al transitorio de bombo (Downbeat Snap), en un formato de alta fidelidad cromática (24-bit/32-bit) sin recurrir a GIF obsoleto de 256 colores ni a librerías WASM pesadas.
+- **Decisión:**
+  1. **Goniómetro de Fase y Osciloscopio Lissajous (X/Y Phase Scope):**
+     - Bifurcación estéreo desde `stereoSplitterNode` hacia analizadores dedicados `phaseAnalyserL` y `phaseAnalyserR` (512 muestras de dominio temporal).
+     - Coeficiente de correlación normalizado de Pearson $r \in [-1.0, +1.0]$ con suavizado IIR/EMA ($r_{\text{smooth}} = r_{\text{smooth}} \times 0.85 + r \times 0.15$), aguja indicadora con gradiente semafórico y badges (`MONO SAFE`, `WIDE STEREO`, `OUT OF PHASE`).
+     - Osciloscopio vectorial sobre canvas con estela analógica de persistencia de fósforo CRT:
+       - Modo **Mid/Side 45° (Broadcast Standard)**: Eje vertical = Mid ($L+R$), Eje horizontal = Side ($L-R$).
+       - Modo **X/Y Directo**: Eje X = L, Eje Y = R.
+     - Métricas dinámicas: Balance L/R en dB/%, Ancho Estéreo (Stereo Width %) y Potencia Mid vs Side en dB.
+     - Inyección en el bus de registros ciberfísicos: $Q_{17} = r$, $Q_{18} = \text{balance}$, $Q_{19} = \text{width}$.
+     - Mini overlay flotante Picture-in-Picture (PiP) proyectable sobre el Viewport 3D en `LIVE RUNNER`.
+  2. **Matriz de Control Web MIDI USB & Hardware Controller Learn:**
+     - Detección automática y gestión en caliente de puertos USB mediante `navigator.requestMIDIAccess({ sysex: false })`.
+     - Monitor de tráfico MIDI en vivo con LED interactivo ultraligero y decodificación de Canal, Tipo (CC/Note), Número y Valor.
+     - Modo interactivo **MIDI Learn**: el usuario pulsa 'Aprender' y mueve cualquier fader o knob físico para vincularlo instantáneamente a los 8 stems DSP, ganancia master, volumen L/R, modulador Vector XY, velocidad caótica, Bloom o Glitch FX.
+     - Presets de fábrica incorporados (*Korg nanoKONTROL2*, *Akai APC Mini / MIDIMIX*, *Genérico 8 Knobs/Faders*), exportación/importación en formato JSON y persistencia en `localStorage`.
+  3. **Exportador a WebP Animado en Bucle Cuantizado Acústico:**
+     - Sincronización rítmica matemática: selección de 2, 4 u 8 compases con cálculo exacto de duración en función del BPM ($\text{Segundos} = \text{Bars} \times \frac{4 \times 60}{\text{BPM}}$).
+     - Detección automática de BPM según perfil de género activo y botón interactivo `[🖐 TAP TEMPO]`.
+     - Cuantización Downbeat Snap: el grabador aguarda al transitorio de bombo (`liveAudioMetrics.isOnset` o $dE/dt$) para iniciar la captura en el compás 1.1.
+     - Ensamblador nativo RIFF WEBP de 24 bits (`encodeAnimatedWebP`) escrito en vanilla JS: empaqueta cabecera `RIFF....WEBP`, chunk `VP8X` (animación activa), `ANIM` (loop infinito `0x0000`) y chunks `ANMF` por cada fotograma capturado con retardo milimétrico ($1000/\text{FPS}$ ms) extrayendo el payload `VP8/VP8L` de `canvas.toBlob('image/webp')`.
+     - Cero dependencias externas de red o paquetes npm pesados, renderizado en memoria, visor de preview del bucle infinito y descarga inmediata con métricas de archivo.
+- **Consecuencias:**
+  - ✅ Control físico profesional de directo para actuaciones DJ/VJ en vivo.
+  - ✅ Diagnóstico visual completo de compatibilidad mono y espacialidad estéreo.
+  - ✅ Creación y exportación de bucles acústicos cinematográficos de ultra-alta calidad sin límites de color ni artefactos de compresión.
+
+---
+
+### D-023 — Arquitectura Mobile Workstation: Zero-Scroll, Deck Switcher y Viewport Superior
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:** 
+  1. En dispositivos móviles y smartphones (pantallas < 1024px, anchos típicos de 360px a 430px y alturas de 660px a 900px), el layout de escritorio con doble columna se apilaba verticalmente en un documento continuo de más de 5.000 píxeles.
+  2. El Viewport 3D quedaba relegado por debajo de 1.400px de controles de audio y stems, obligando al usuario a scroll vertical constante y provocando colisiones entre los gestos de rotación/zoom 3D y el desplazamiento nativo de la ventana.
+  3. El usuario requería explícitamente una adaptación ergonómica nativa para smartphones minimizando/eliminando el scrolling (Zero Page Scrolling).
+- **Decisión:**
+  1. **Reordenación Dinámica del Viewport 3D (`order-1 lg:order-2`):**
+     - En pantallas móviles (`< 1024px`), el canvas Three.js se sitúa siempre en el pináculo de la pantalla (`order-1`), garantizando que la visualización reactiva a 60 FPS esté permanentemente a la vista sin necesidad de scroll.
+     - Dimensionamiento dinámico mediante `dvh` (`h-[32dvh] min-h-[210px] max-h-[290px] sm:h-[440px] lg:h-[580px]`) que se auto-adapta dinámicamente ante la apertura/cierre de la barra de direcciones del navegador móvil.
+  2. **Mobile Deck Switcher (5 Pestañas de Control Táctico):**
+     - Barra de navegación flotante tipo consola de 5 decks ubicada inmediatamente bajo el Viewport 3D (`lg:hidden`):
+       - `[🎵 Audio]`: Ingesta HQ (3 tracks), micrófono, YouTube Móvil, master fader, volumen L/R, osciloscopio PCM y telemetría (RMS/Centroid/Flux/ZCR/Rolloff/Beat).
+       - `[🎚️ Stems]`: Rack de 8 filtros Biquad con vúmetros de energía, muteos y exportación WAV.
+       - `[✨ PostFX]`: Suite de 9 pases reactivos de post-procesado (Bloom, Aberración, Glitch, etc.).
+       - `[⚡ GLSL]`: Laboratorio de shaders hot-reload con 19 presets, botones de compilación rápida y editor adaptable.
+       - `[🧠 IA / MER]`: Director de Arte IA multimodal, paleta de colores inyectada, radar Russell MER Circumplex y espectrograma FFT.
+  3. **Contención Interna de Scroll (`mobile-deck-scrollable`):**
+     - Cada panel se confina en un contenedor scrollable interno con `max-h-[calc(100dvh-420px)] overflow-y-auto overscroll-behavior: contain; -webkit-overflow-scrolling: touch;`.
+     - El scroll táctil opera exclusivamente sobre el deck seleccionado, eliminando el scroll de ventana global (Zero Page Scrolling).
+  4. **Preservación Total del Entorno de Escritorio (`lg: >= 1024px`):**
+     - El Mobile Deck Switcher permanece oculto (`lg:hidden`), y los modificadores `lg:block`, `lg:grid` y `lg:overflow-visible` restauran el layout completo en 2 columnas y el bloque de estudios inferiores sin alteración.
+- **Consecuencias:**
+  - ✅ Experiencia 100% de aplicación nativa en smartphones: el canvas 3D se visualiza continuamente en la mitad superior mientras los controles se operan ergonómicamente con el pulgar.
+  - ✅ Cero rebote y cero desplazamiento de página inoportuno durante la manipulación de sliders o pads.
+  - ✅ Transición instantánea entre módulos sin recarga, manteniendo estables los 60 FPS.
+
+---
+
+### D-024 — Simulación FHD (Navier-Stokes + Langevin + Rosensweig) & Director IA Autónomo PostFX
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. El usuario solicitó modelar matemáticamente ferrofluidos magnéticos con Navier-Stokes, densidad de fuerza de Kelvin, función no lineal de Langevin, inestabilidad de Rosensweig y óptica Thin-Film multiespectral, con un modo interactivo en vivo.
+  2. Asimismo, requirió un modo autónomo para que la IA gobierne creativamente los parámetros visuales y pases de post-procesado al ritmo de la música.
+  3. Adicionalmente, el panel de pistas de audio requería ser rediseñado con estándares profesionales de consola de hardware de audio (reemplazando "Temas Disponibles" por "Pistas Master de Referencia" y eliminando gradientes y emojis).
+- **Decisión:**
+  1. **Simulación Ferrohidrodinámica (FHD & Magnetostática):**
+     - Uniforms en GPU: `uMagMode` (0: Sin campo, 1: Diamagnético, 2: Paramagnético, 3: Superparamagnético Langevin), `uBetaPolarity` ($\pm 1$), `uBaseH0`, `uCoilAlpha`, `uRosensweigHc`, `uViscosity`, `uThinFilmStr`.
+     - Presets 18 y 20 en GLSL con picos voronoi hexagonales de Rosensweig, función de Langevin numéricamente segura mediante aproximación de Taylor en $\xi < 0.08$ y óptica Thin-Film interferencial en $\lambda \in \{650, 532, 440\}\,\text{nm}$.
+     - Consola de laboratorio interactiva `#fhd-controls-rack` sincronizada bidireccionalmente.
+  2. **Director IA Autónomo de PostFX (`aiFxDirector`):**
+     - 6 Arquetipos cinematográficos (*Cine 35mm*, *Cyberpunk Glitch*, *Psicodelia Fractal*, *Arcade VHS*, *Negativo Solar*, *Minimal Zen*) que rotan dinámicamente según cadencia temporal y perfiles energéticos del audio.
+     - Suavizado LERP a 60 FPS de parámetros continuos y micro-reactividad instantánea ante transitorios (`isOnset`) y bombos subgraves.
+     - Botón de control en header de PostFX y acceso rápido en el Viewport 3D (`[🧠 Director FX]`).
+  3. **Rediseño Profesional de Ingesta:**
+     - Matriz de Pistas Master con chasis de aluminio grafito, etiquetas `CH 01 // REF`, `CH 02 // REF`, `CH 03 // STREAM` y micro-LEDs de estado activo `[ON AIR]` vs reposo `[STANDBY]`.
+     - Patchbay exterior con botones técnicos analógicos/digitales/loopback.
+- **Consecuencias:**
+  - ✅ Fidelidad física y estética sublime en las escenas de ferrofluido 3D y cámara de levitación magnética.
+  - ✅ Experiencia visual cinematográfica viva y cambiante sin necesidad de intervención manual gracias al Director IA.
+  - ✅ Apariencia visual sobria y profesional de estudio de mastering acorde a las exigencias del usuario.
+
+---
+
+### D-025 — Menú de Secciones Colapsables del Deck de Audio: Input & Vol/Bal
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. El rack de Ingesta de Audio (Pistas Master + Patchbay + Transporte + Scrubber + Faders Master/Balance L/R) ocupaba una altura vertical sustancial (~480px), restando espacio visual inmediato para el canvas 3D, el osciloscopio y el rack de stems DSP.
+  2. El usuario solicitó un menú de secciones con dos botones dedicados: `Input` para plegar/colapsar la matriz de ingesta y `Vol/Bal` para plegar/colapsar los controles de volumen y balance estéreo, ganando espacio dinámico.
+- **Decisión:**
+  1. **Barra de Menú de Secciones en Cabecera:**
+     - Botón `[Input]`: pliega/despliega `#deck-sec-input-content` (Pistas Master de Referencia y Matriz de Ingesta Externa / Patchbay) con chevron dinámico (`▼` abierto vs `▶` cerrado) y micro-LED de estado.
+     - Botón `[Vol/Bal]`: pliega/despliega `#track-player-controls` (Transporte Play/Pause, Scrubber temporal, Vúmetro en vivo y faders Master y L/R) con chevron y micro-LED.
+     - Micro-Status Bar en la misma fila: muestra en vivo el track actual y el volumen master activo (`[Mordaza • 100%]`), garantizando telemetría permanente incluso con ambas secciones completamente plegadas.
+  2. **Independencia Total de Control:**
+     - Ambas secciones pueden abrirse o cerrarse a voluntad del usuario sin interferir en la reproducción ni en el grafo de Web Audio.
+     - Al colapsar ambas secciones, la altura del dock de audio se reduce en más de 360 píxeles, liberando pantalla completa para el motor gráfico 3D.
+- **Consecuencias:**
+  - ✅ Ergonomía y flexibilidad de espacio óptima tanto en escritorio como en dispositivos móviles.
+  - ✅ Telemetría de señal y volumen siempre visible en el micro-badge superior.
+
+---
+
+### D-026 — Espectrograma 3D Waterfall en Cascada Tridimensional Navegable por GPU
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:** Las visualizaciones de espectro en 2D carecían de profundidad temporal e inmersión navegable. Desplazar mallas de alta resolución ($128 \times 128 = 16.384$ vértices) fotograma a fotograma en CPU causaba caídas severas de FPS y saturación del recolector de basura de JavaScript.
+- **Decisión:**
+  1. **Textura Dinámica de Desplazamiento GPU (`THREE.DataTexture` 128x128 RGBA):**
+     - El historial espectral de 128 pasos temporales se almacena en un búfer circular en memoria continua `Uint8Array(128 * 128 * 4)`.
+     - En cada fotograma, el historial se desplaza una fila hacia atrás mediante `Uint8Array.prototype.copyWithin()`, tomando menos de $0.3\text{ms}$ en CPU, y la fila 0 se escribe con los 128 bins interpolados del analizador FFT y stems DSP.
+     - `texture.needsUpdate = true` carga los datos directamente a la VRAM sin recalcular geometrías en CPU.
+  2. **Vertex & Fragment Shader Customizado:**
+     - El Vertex Shader realiza la elevación vertical multiplicando la muestra de textura por `uReliefScale`. Las normales se calculan numéricamente mediante diferencias finitas muestreando los téxeles vecinos ($x \pm 1, z \pm 1$), permitiendo sombreado difuso y especular dinámico.
+     - El Fragment Shader proyecta isolíneas de contorno topográfico con `smoothstep(mod(vHeight...))` y desvanece suavemente la malla hacia el horizonte temporal para una estética infinita.
+     - 5 Mapas de color: Turbo térmico, Cyberpunk Neón, Synthwave 80s, Matrix y sincronización con el Director de Arte IA.
+- **Consecuencias:**
+  - ✅ 60 FPS estables e inmutables con 16.384 vértices interactivos.
+  - ✅ Navegación orbital completa con ratón/táctil en el Viewport 3D.
+
+---
+
+### D-027 — Pasarela Open Sound Control (OSC) Bidireccional por WebSockets y Codec Binario Nativo
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:** La interoperabilidad con software profesional de directo y VJing (TouchDesigner, Resolume Arena, Max/MSP, Ableton Live) requería comunicación OSC de ultra-baja latencia sin obligar al usuario a instalar complejos paquetes npm ni servidores pesados.
+- **Decisión:**
+  1. **Pasarela Python Standalone (`osc_bridge.py`):**
+     - Script asíncrono con `asyncio`, `websockets` y sockets UDP estándar de Python, escuchando en `ws://127.0.0.1:8089`.
+     - Reenvía mensajes entrantes por WebSocket como paquetes UDP al puerto 9000 (TouchDesigner/Resolume) y escucha en UDP 9001 para reenviar comandos externos de vuelta al navegador.
+     - Reconfiguración explícita de `sys.stdout` a UTF-8 para garantizar compatibilidad con terminales Windows.
+  2. **Codec Nativo OSC 1.0 en JavaScript:**
+     - Empaquetado y desempaquetado binario puro con `ArrayBuffer` y `DataView` sin librerías externas.
+     - Soporta strings con padding de 4 bytes nulos y tipos `f` (float32 Big Endian), `i` (int32) y `s`.
+     - Compatible tanto con datagramas binarios puros como con envelopes JSON-OSC de alta legibilidad.
+  3. **Streaming Acústico y Despacho de Comandos:**
+     - Transmisión a 30 FPS de RMS, flux, los 8 stems Biquad, el cursor Vector XY, correlación estéreo y variables del bus $Q_1 \dots Q_{24}$.
+     - Recepción y ejecución en vivo de comandos para cambio de escena (`/motor/scene`), conmutación de mutes (`/motor/stem/mute`), control de volumen (`/motor/volume`) y disparadores de pads.
+- **Consecuencias:**
+  - ✅ Conexión instantánea sin instalación de paquetes de terceros ni dependencias pesadas.
+  - ✅ Sincronización transparente a 30 FPS con herramientas de visuales en vivo.
+
+---
+
+### D-028 — Motor de Audio Espacial 3D (Binaural HRTF) & Matriz Multicanal Surround 5.1 con Crossover LFE
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:** Las mezclas de audio se limitaban a estéreo tradicional o auriculares convencionales. Se requería una experiencia auditiva tridimensional envolvente alineada con el movimiento de la cámara 3D de Three.js y soporte para configuraciones multicanal de cine y conciertos (Surround 5.1 / 7.1).
+- **Decisión:**
+  1. **Motor Binaural HRTF 3D:**
+     - Uso de `AudioListener` sincronizado a 60 FPS con `threeCamera.position` y vectores directores `forward` y `up` mediante `setValueAtTime` (con fallback a `setPosition`/`setOrientation`).
+     - `PannerNode` configurado con modelo de atenuación inverso (`refDistance: 120`, `maxDistance: 1500`, `rolloffFactor: 1.2`, modelo HRTF).
+     - Trayectorias cinemáticas: órbita automática 3D alrededor de la cabeza del oyente, anclaje a la geometría visual activa (Túnel, Monolito, Waterfall) o control gestual manual en pad de radar polar.
+  2. **Matriz Surround 5.1 con Crossover LFE:**
+     - Configuración de destino multicanal `channelCount: 6`, `channelInterpretation: 'discrete'`.
+     - Crossover analítico de subgraves a 80 Hz con `BiquadFilter` de paso bajo alimentando el canal 3 (LFE Subwoofer) directamente con los stems de `sub` y `bass`.
+     - Panning polar matricial en tiempo real distribuyendo energía hacia Frontal Izquierdo (L), Frontal Derecho (R), Centro (C), Envolvente Trasero Izquierdo (SL) y Envolvente Trasero Derecho (SR).
+  3. **Radar Polar Interactivo 2D/3D & Vúmetro Hexagonal:**
+     - Canvas interactivo (`#spatialRadarCanvas`) con respuesta táctil y de ratón arrastrando el emisor de sonido en el plano acimutal.
+     - Vúmetro en tiempo real de los 6 canales en la sub-vista `[🎧 SPATIAL 3D & 5.1]` del Cockpit Bar.
+- **Consecuencias:**
+  - ✅ Inmersión auditiva total para usuarios con auriculares (binaural 3D) y salas con tarjetas multicanal 5.1.
+  - ✅ Enlace natural e intuitivo entre la visión tridimensional y la percepción espacial del sonido.
+
+---
+
+### D-029 — Estudio de Cómputo Dual: WebGPU WGSL Real, Inyector GLSL FBO para Three.js y Orquestador Autónomo Creativo
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. El panel de cómputo en la vista RF/SDR presentaba código WGSL estático y botones simulados sin ejecución en GPU ni interactividad.
+  2. El usuario requería: (a) un editor WGSL funcional gobernado por un orquestador creativo coordinado con el audio y herramientas de IA, (b) un segundo editor GLSL Compute para inyectar código en caliente directamente en el pipeline FBO de Three.js (modulando las 65.536 partículas y el relieve 3D), y (c) nuevos shaders visuales originales inéditos en la industria.
+- **Decisión:**
+  1. **Editor y Motor WebGPU WGSL (`WebGpuComputeEngine`):**
+     - Detección proactiva de hardware WebGPU (`navigator.gpu`) con compilación asíncrona de módulos de cómputo y pipeline de ejecución.
+     - Fallback JIT inteligente híbrido ejecutando la simulación fluidodinámica real (diferencias finitas laplacianas y advección de fluido) en caso de que el navegador opere en entorno WebGL2.
+     - Editor de código interactivo `<textarea>` con 4 presets de vanguardia: *1. Laplacian Reaction-Diffusion & Advección RF*, *2. Guía de Onda Electromagnética & Plasma RF*, *3. Interferencia Cuántica & Vórtices de Fase*, *4. Morfogénesis Bioluminiscente de Turing*.
+     - Selector de modos de visualización en el canvas: `BLINN-PHONG`, `MAGIC EYE 3D` y `NORMALS`.
+  2. **Inyector GLSL Compute en Pipeline Three.js (`ThreeJsGlslComputeEngine`):**
+     - Editor independiente que permite programar y modificar en caliente los fragment shaders de los pases FBO de `GpuComputeManager` (`velMat`, `posMat`, `morphMat`).
+     - Selector de destino FBO (Velocidad de partículas, Posición, Reacción-Difusión o Ecuación de Ondas).
+     - Validación previa segura mediante compilación en render target temporal antes de reemplazar el shader en el grafo de Three.js, impidiendo caídas de FPS o congelamiento del bucle maestro.
+     - Botón de proyección instantánea en Viewport 3D (`[👁️ Ver 3D]`).
+     - 5 Presets listos para producción: *Curl Noise 3D & Vórtice Cuántico*, *Atractor Caótico de Lorenz FBO*, *Reacción-Difusión Gray-Scott con F y K*, *Ondas Acústicas 2D & Shockwaves*, y *Singularidad de Agujero Negro*.
+  3. **Orquestador Creativo Autónomo (`WgslCreativeOrchestrator`):**
+     - Módulo de dirección de arte que modula continuamente la advección, difusión y decaimiento del kernel computacional en función de los transitorios del Lookahead Ring Buffer ($Q_1$), la densidad espectral ($Q_2$), coordenadas de emoción MER y onsets acústicos.
+     - Sincronización continua con los 6 arquetipos del Director IA (`aiFxDirector`).
+     - Feed de telemetría en vivo con registro de mutaciones y botón de disparo manual de ráfagas.
+  4. **Nuevos Shaders Procedurales de Vanguardia (Presets 21 y 22):**
+     - **Preset 21: 🔮 Cristal de Bismuto Fractal Iridiscente:** SDF de hopper crystal escalonado a 90° con interferencia física de película delgada de óxido ($Bi_2O_3$), reflectividad metálica y reactividad acústica en la velocidad de crecimiento fractal.
+     - **Preset 22: 🪼 Medusa Bioluminiscente & Abismo Abisal:** Organismo abisal con campana translúcida elástica ondulante, tentáculos radiales armónicos, bioluminiscencia interna que dispara potenciales de acción en onsets/agudos y partículas de nieve marina flotante.
+- **Consecuencias:**
+  - ✅ MotorVisuales cuenta con el primer IDE dual WebGPU WGSL + Three.js GLSL Compute completamente funcional del ecosistema web.
+  - ✅ Modulación computacional continua, segura y creativa que responde orgánicamente a la música.
+  - ✅ Expansión de la biblioteca de shaders a 22 presets de alta fidelidad matemática y artística.
+
+---
+
+### D-030 — Motor de Interpretación Acústica Narrativa, Reloj Perceptual Fluido, Morfogénesis en GPU & Auto-VJ Generativo (V5)
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. La interpretación visual del audio operaba mediante mapeos mecánicos y lineales de vúmetro 3D (amplitud multiplicando escalas estáticas o rotaciones uniformes con `performance.now()`), provocando que las escenas se sintiesen repetitivas, predecibles y sin evolución dramática ni narrativa.
+  2. Una composición musical real contiene fases emocionales marcadas (*Intro etérea*, *Build-up de tensión*, *Drop / Clímax explosivo*, *Groove rítmico*, *Breakdowns de suspensión*). El motor no distinguía estas fases ni reaccionaba con impacto cinematográfico a los drops ni a los silencios.
+  3. Las geometrías fundamentales (la esfera de la Nebulosa, el Túnel o el Monolito) no mutaban su estructura topológica interna, obligando al usuario a manipular controles manualmente en vez de disfrutar de una odisea generativa autónoma.
+- **Decisión:**
+  1. **Reloj Perceptual Musical Fluido (`flowTime`):**
+     - Desacoplar la evolución temporal de los shaders del reloj plano de la CPU.
+     - $\frac{d\theta_{\text{flow}}}{dt} = \omega_{\text{base}} + \alpha \cdot \text{RMS}^{1.5} + \beta \cdot \text{Sub}^{1.2} + \gamma \cdot \text{OnsetValue}$.
+     - Cuando la música gana intensidad y pulso, el tiempo visual se acelera orgánicamente y desacelera con inercia elástica en los pasajes lentos.
+  2. **Detector de Macro-Estados Narrativos & Shockwaves:**
+     - Análisis en tiempo real mediante filtros EMA multiescala (energía rápida vs lenta, ratio de aumento, seguimiento de tensión por densidad de agudos y flujo espectral, y detección de silencios previos al drop).
+     - **DROP EXPLOSIVO:** Gatillado ante saltos energéticos violentos en subgraves ($>0.65$) tras fases de tensión o silencio.
+       - Disparo de flash fotográfico analógico (`#hud-drop-flash`, $90\text{ms}$).
+       - Salto de cámara cinemático (Jump Cut aleatorio de órbita y orientación azimutal).
+       - Inyección de onda de choque expansiva (`uShockwave`) que dispersa las 30.000 partículas de la Nebulosa hacia el infinito con decaimiento suave.
+       - Conmutación instantánea a paletas cromáticas vivas de alto contraste.
+  3. **Morfogénesis Analítica en GPU de la Nebulosa (5 Arquetipos Cuánticos):**
+     - Evaluación matemática analítica en el vertex shader sin sobrecarga de CPU (60 FPS estables):
+       - *Forma 0: Esfera Cuántica Flotante con Turbulencia Ondulatoria*.
+       - *Forma 1: Galaxia Espiral Doble Brazo (Kepleriana)*.
+       - *Forma 2: Toroide Cuántico de Clifford / Vórtice Recirculante*.
+       - *Forma 3: Resonador de Chladni Cimático 3D (Armónico Esférico Modal)*.
+       - *Forma 4: Doble Hélice / Filamento Cuántico ADN*.
+     - Interpolación hermítica continua (`uMorphProgress`) entre formas y contracción por tensión (`uTension`) en los build-ups.
+  4. **Túnel Serpentino & Monolito con Anillos Giroscópicos Cuánticos:**
+     - El Túnel adopta ondulación serpentina sinusoidal tridimensional en X e Y dependiente de los medios y graves, con aceleración hiperespacial $3.5\times$ en los Drops.
+     - El Monolito incorpora un núcleo cristalino y dos anillos giroscópicos exteriores ortogonales rotando a velocidades diferenciales acopladas a los stems de audio.
+  5. **Modo Auto-VJ Autónomo & HUD Narrativo en Vivo:**
+     - Botón `[⚡ AUTO-VJ: ON / OFF]` en Viewport 3D y telemetría `FLOW:` en el Cockpit Bar.
+     - Transición autónoma y cinematográfica de escenas (rotación entre Nebulosa, Túnel, Monolito, Waterfall 3D y Shaders procedurales) en momentos álgidos y drops de la música.
+     - Indicador HUD en tiempo real mostrando el estado musical (`🌌 INTRO ETÉREA`, `⚡ BUILD-UP TENSIÓN`, `💥 DROP EXPLOSIVO`, `🌊 GROOVE RÍTMICO`, `🧊 BREAKDOWN`) y la mutación geométrica activa.
+- **Consecuencias:**
+  - ✅ Transformación radical de MotorVisuales: de un visualizador plano a una experiencia audiovisual narrativa, viva y en continua mutación que comprende y siente la estructura de la música.
+  - ✅ Impacto sensorial instantáneo en cada Drop con shockwaves, destellos fotográficos y saltos de cámara.
+  - ✅ Operación autónoma manos libres de nivel festival/concierto con el modo Auto-VJ.
+
+

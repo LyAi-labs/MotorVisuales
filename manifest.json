@@ -90,6 +90,18 @@
           "sizes": "192x192"
         }
       ]
+    },
+    {
+      "name": "Audio DSP & Goniómetro",
+      "short_name": "DSP & Fase",
+      "description": "Consola de 64 bandas y goniómetro de fase estéreo Lissajous",
+      "url": "./index.html?view=dsp",
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

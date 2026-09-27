@@ -245,3 +245,124 @@
   4. Proveer un botón de opciones avanzadas (`⚙️`) junto a `YouTube Móvil` con un asistente transparente que expone las 4 alternativas (reproducción HQ 1-tap, escucha por micrófono acústico con AGC 4.5x, captura digital de pantalla compartida y carga de archivos locales).
 - **Trigger:** Al integrar audio de YouTube o aplicaciones de terceros en navegadores móviles con auriculares conectados.
 
+
+---
+
+### L-020
+- **Tags:** #webaudio #phase-correlation #goniometer #web-midi #animated-webp #riff-muxer
+- **Síntoma:**
+  1. Al representar la correlación de fase estéreo con señales ricas en transitorios, el coeficiente sufre fluctuaciones erráticas si se evalúa fotograma a fotograma sin suavizado.
+  2. La exportación de bucles visuales continuos a GIF tradicional genera artefactos de cuantización de color severos (límite de 256 colores) y los navegadores carecen de API nativa canvas.toBlob('image/webp-animated') directa.
+  3. En controladores MIDI físicos, el giro rápido de encoders rotatorios o faders emite decenas de eventos CC por segundo que pueden saturar la interfaz si se manipula el DOM de forma síncrona.
+- **Causa raíz:**
+  1. La correlación instantánea entre bloques FFT pequeños (512 muestras) varía velozmente en música percusiva.
+  2. El estándar WebP Container soporta animación mediante chunks ANMF y ANIM en el formato RIFF, pero HTMLCanvasElement solo genera imágenes WebP estáticas individuales (VP8 o VP8L).
+  3. Desencadenar document.getElementById o re-renderizados pesados por cada byte MIDI bloquea el hilo principal a 60 FPS.
+- **Solución:**
+  1. Aplicar filtro IIR/EMA (r_smooth = r_smooth * 0.85 + r * 0.15) sobre el coeficiente normalizado de Pearson r = sum(L*R) / sqrt(sum(L^2)*sum(R^2)), estabilizando la aguja analógica del vúmetro y la retícula Mid/Side 45° con persistencia de fósforo vectorial.
+  2. Construir un ensamblador RIFF WEBP de 24-bit nativo en vanilla JS (encodeAnimatedWebP): compone la cabecera RIFF....WEBP, inyecta el chunk de cabecera extendida VP8X (con bit de animación 0x02), el chunk de control ANIM (loop infinito 0x0000) y empaqueta cada frame WebP generado por canvas.toBlob('image/webp') dentro de chunks ANMF con retardo en milisegundos (1000/FPS) y flag de sobreescritura 0x02. Cero librerías externas, alta compresión y calidad fotográfica total.
+  3. En el controlador MIDI, aplicar las mutaciones directamente a los objetos de audio en memoria (AudioParam.value, v4XyMod, uniforms WebGL) y actualizar la telemetría del monitor mediante un temporizador debounce con LED CSS de baja sobrecarga.
+- **Trigger:** Al implementar medidores de fase broadcast, codificación de bucles WebP en el cliente o mapeo de hardware MIDI USB.
+
+---
+
+### L-021
+- **Tags:** #mobile-ui #responsive #viewport #zero-scroll #dvh #overscroll-contain #deck-switcher
+- **Síntoma:** En smartphones y pantallas reducidas (< 1024px), el diseño de doble columna de escritorio apilaba verticalmente el rack de audio (1400px), el viewport 3D y la suite de estudios creativos (> 3000px), obligando al usuario a realizar desplazamientos kilométricos para ver la escena 3D y provocando que los gestos táctiles sobre el canvas interceptaran el scroll de la página de forma errática.
+- **Causa raíz:** El orden natural del DOM renderizaba la columna izquierda (`#left-dock-column`) antes del canvas Three.js (`#three-viewport-section`), y todos los módulos se mostraban simultáneamente sin discriminación de viewport móvil ni contención de desbordamiento.
+- **Solución:**
+  1. **Reordenación Flex/Grid:** Asignar `order-1 lg:order-2` al viewport 3D para posicionarlo en la cabecera superior inmediata del teléfono, y `order-2 lg:order-1` al panel de audio/stems.
+  2. **Dimensionamiento Dinámico (`dvh`):** Configurar `#three-canvas-container` con altura fluida adaptada a navegadores móviles `h-[32dvh] min-h-[210px] max-h-[290px] sm:h-[440px] lg:h-[580px]`, garantizando visibilidad del canvas 3D y espacio ergonómico inferior.
+  3. **Mobile Deck Switcher:** Barra de navegación táctica de 5 pestañas (`[🎵 Audio] [🎚️ Stems] [✨ PostFX] [⚡ GLSL] [🧠 IA / MER]`) visible exclusivamente en móviles (`lg:hidden`), que alterna visibilidad con cero recarga ni caída de FPS.
+  4. **Contención de Scroll Aislada (`mobile-deck-scrollable`):** Limitar la altura de los controles en móvil con `max-h-[calc(100dvh-420px)] overflow-y-auto overscroll-behavior: contain; -webkit-overflow-scrolling: touch;`, impidiendo que el scroll de los controles arrastre la ventana completa (Zero Window Scrolling).
+  5. **Integridad de Escritorio:** En pantallas `>= 1024px`, los modificadores `lg:block`, `lg:grid` y `lg:overflow-visible` restauran el 100% de la consola sin alterar un solo píxel de la experiencia desktop.
+- **Trigger:** Al adaptar consolas densas de audio/video y visualizadores 3D a interfaces de smartphone sin degradar la experiencia de escritorio.
+
+---
+
+### L-022
+- **Tags:** #ui-design #pro-audio #hardware-rack #patchbay #led-status #master-tracks #anti-slop
+- **Síntoma:** El panel de pistas de audio presentaba el título "Temas Disponibles", botones con gradientes multicolores saturados (fucsia, violeta, rojo), comillas en los nombres y emojis lúdicos (`🔥`, `⚡`), proyectando una imagen infantil y poco seria inadecuada para un entorno de masterización y DSP profesional.
+- **Causa raíz:** Enfoque de diseño previo orientado a demostración rápida de biblioteca de música en lugar de estándar de consola de estudio de hardware (tipo Elektron, SSL, Teenage Engineering o Ableton).
+- **Solución:**
+  1. **Nomenclatura Técnica Rigurosa:** Reemplazar "Temas Disponibles" por **"PISTAS MASTER DE REFERENCIA"** dentro de la **"MATRIZ DE ENTRADA & SEÑAL MASTER"**, con metadatos de canal (`PCM 48kHz Master`, `Dynamic Mix 320k`, `YouTube Direct Feed`).
+  2. **Estética Chasis Hardware Rack:** Sustituir gradientes y emojis por botones de aluminio grafito oscuro (`bg-zinc-900/90 border border-zinc-800 hover:border-cyan-500/50`), tipografía monospace técnica para serigrafía de canal (`CH 01 // REF`, `CH 02 // REF`, `CH 03 // STREAM`) y micro-indicadores LED de estado (`STANDBY` en gris/apagado vs `ON AIR` con micro-LED verde brillante `bg-emerald-400 shadow-[0_0_8px_#34d399]`).
+  3. **Matriz de Ingesta Externa (Patchbay):** Convertir los botones de fuentes secundarias en pulsadores de patchbay de estudio con tags técnicos claros: `[MIC] ANALOG`, `[YT] DIRECT`, `[SYS] LOOP`, `[FILE] LOCAL`, `[SYN] PROC` y `[MUTE] STOP`.
+- **Trigger:** Al diseñar interfaces de audio, DSP o consolas de mastering que deban transmitir rigor técnico y máxima ergonomía profesional.
+
+---
+
+### L-023
+- **Tags:** #ferrofluids #fhd #magnetostatics #langevin #rosensweig #postfx #ai-director #autonomous-art
+- **Síntoma:** 
+  1. Para simular ferrofluidos con rigor físico no bastaban ondas trigonométricas simples; se requería modelar Navier-Stokes con densidad de fuerza de Kelvin, saturación de Langevin e inestabilidad hexagonal de Rosensweig con óptica nacarada.
+  2. La suite de post-procesado de 9 passes requería una orquestación autónoma coordinada donde la IA pudiera intervenir creativamente en vivo sin saltos bruscos ni desorden visual.
+- **Causa raíz:**
+  1. En GLSL ES 1.0, la función $\coth(\xi) - 1/\xi$ diverge numéricamente en el origen y requiere aproximación de Taylor para $\xi < 0.08$ y acotación exponencial.
+  2. La aleatorización no estructurada de parámetros de post-procesado destruye la estética de la imagen; se requiere un sistema dramatúrgico basado en arquetipos estéticos con interpolación suave LERP a 60 FPS y micro-reactividad a transitorios de audio.
+- **Solución:**
+  1. Implementación de los 4 modos magnéticos (Sin campo, Diamagnético repulsivo, Paramagnético lineal, Superparamagnético no lineal), control de polaridad $\beta \in \{-1, +1\}$ ("Tirar" constructivo vs "Empujar" destructivo), picos hexagonales de Rosensweig y óptica Thin-Film Newtoniana ($\lambda \in \{650, 532, 440\}\,\text{nm}$) en los presets 18 y 20 de GLSL, gobernados por el panel interactivo `#fhd-controls-rack`.
+  2. Implementación de `aiFxDirector` con 6 arquetipos cinematográficos (*Cine 35mm*, *Cyberpunk Glitch*, *Psicodelia Astral*, *Arcade VHS*, *Negativo Solar*, *Minimal Zen*) que interpola armónicamente a 60 FPS hacia los valores objetivo mientras preserva micro-spikes de reacción instantánea en onsets y drops musicales.
+- **Trigger:** Al simular fluidos magnetostáticos no lineales o implementar orquestadores de post-procesado visual autónomos guiados por IA.
+
+---
+
+### L-024
+- **Tags:** #python #windows #encoding #osc #websockets #utf8 #charmap
+- **Síntoma:** El script en segundo plano falla inmediatamente al arrancar o se detiene con `UnicodeEncodeError: 'charmap' codec can't encode character ...` al imprimir mensajes de registro en PowerShell o CMD de Windows.
+- **Causa raíz:** En Windows, la consola estándar por defecto utiliza codificaciones heredadas (como CP-1252 o CP-850) para `sys.stdout` y `sys.stderr`. Cualquier carácter fuera del mapa ASCII de 8 bits (incluyendo emojis, flechas o caracteres técnicos tipográficos) provoca una excepción fatal en Python.
+- **Solución:** En cualquier script o pasarela Python destinada a correr en terminales Windows, forzar la reconfiguración de los flujos de salida estándar a UTF-8 con reemplazo seguro de errores en el encabezado del archivo:
+  ```python
+  import sys
+  if sys.platform == 'win32':
+      try:
+          sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+          sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+      except Exception:
+          pass
+  ```
+- **Trigger:** Al escribir scripts de soporte, daemons, pasarelas OSC o herramientas CLI en Python que impriman logs en Windows.
+
+---
+
+### L-025
+- **Tags:** #webaudio #spatial-audio #panner #hrtf #surround #routing #bypass #threejs
+- **Síntoma:** Al activar el audio espacial 3D o Binaural HRTF en paralelo a una cadena de mezcla existente, el volumen de salida se duplica o se producen artefactos molestos de filtro peine (comb filtering) y cancelaciones de fase acústicas.
+- **Causa raíz:** Si `masterGainNode` alimenta al mismo tiempo a la cadena estéreo tradicional (`stereoMergerNode -> outputMasterGain`) y a la cadena espacializada (`pannerInputGain -> pannerNode -> outputMasterGain`), el oyente recibe la señal original y la señal espacializada con micro-retardo HRTF de forma simultánea, duplicando la amplitud y provocando interferencia destructiva de fase.
+- **Solución:** Implementar conmutación de enrutamiento mutuamente excluyente en el grafo (`updateGraphRouting()`):
+  - **Modo Binaural 3D HRTF:** Desconectar temporalmente `stereoMergerNode` de `outputMasterGain` y abrir la ganancia del panner (`pannerOutputGain.gain.setValueAtTime(1.0, audioCtx.currentTime)`), enlazando `pannerOutputGain` a `outputMasterGain`.
+  - **Modo Estéreo Tradicional (Bypass):** Atenuar la ganancia del panner a cero (`pannerOutputGain.gain.setValueAtTime(0.0, audioCtx.currentTime)`) y reconectar limpiamente `stereoMergerNode` a `outputMasterGain`.
+  - **Modo Surround 5.1:** Reconfigurar el destino con `destination.channelCount = 6` y `channelInterpretation = 'discrete'`, derivando las bajas frecuencias mediante un crossover analítico a 80 Hz hacia el canal 3 (LFE Subwoofer).
+- **Trigger:** Al integrar procesadores de audio espacial 3D, panners binaurales o matrices multicanal sobre infraestructuras Web Audio existentes.
+
+---
+
+### L-026
+- **Tags:** #webgpu #wgsl #gpgpu #threejs #fbo #hot-reload #shader-injection #safe-compile
+- **Síntoma:** Intentar ejecutar WebGPU directamente sobre lienzos existentes puede colisionar con contextos 2D/WebGL si ya fueron inicializados, o inyectar código de simulación FBO dinámicamente en Three.js puede congelar la aplicación si la compilación en GPU arroja un error de sintaxis.
+- **Causa raíz:**
+  1. La especificación del estándar HTML Canvas prohíbe invocar `getContext('webgpu')` sobre un elemento `<canvas>` que ya haya obtenido previamente un contexto `'2d'` o `'webgl'` (arrojando `InvalidStateError` o devolviendo `null`).
+  2. Sustituir directamente `material.fragmentShader` en bucles de simulación continua Ping-Pong FBO sin validar la compilación en GPU destruye el pipeline de Three.js ante cualquier error sintáctico, deteniendo el `requestAnimationFrame` de la aplicación.
+- **Solución:**
+  1. Diseñar el motor WebGPU con arquitectura híbrida JIT resiliente: si el hardware no expone WebGPU nativo, ejecutar la simulación numérica exacta (diferencias finitas laplacianas y advección) en el contexto de dibujo activo, permitiendo que el usuario programe en WGSL y experimente sin romper el canvas.
+  2. Para la inyección en caliente de shaders FBO en Three.js (`injectGlslComputePipeline`), instanciar previamente un `THREE.ShaderMaterial` temporal aislado con idénticos uniforms y compilarlo con `threeRenderer.compile(testScene, threeCamera)`. Si la compilación GPU es exitosa, se actualiza el material del FBO en caliente; si falla, se captura el error, se emite feedback claro en la consola de la UI y la simulación previa continúa corriendo a 60 FPS sin parpadeos ni cuelgues.
+- **Trigger:** Al diseñar IDEs, editores de shaders o motores de cómputo GPU interactivos con compilación en caliente en tiempo de ejecución.
+
+---
+
+### L-027
+- **Tags:** #webaudio #generative-art #auto-vj #musical-narrative #flow-clock #morphogenesis #drops
+- **Síntoma:** Las visualizaciones reactivas al audio se sienten estáticas, predecibles y mecánicas (estilo vúmetro 3D) a pesar de utilizar shaders complejos o geometrías densas. El usuario percibe que el motor "no interpreta la música" ni cambia con la evolución dramática de la canción.
+- **Causa raíz:**
+  1. Utilizar el reloj plano del sistema (`time = performance.now() * 0.001`) para avanzar los uniforms temporales en los shaders, provocando que la velocidad de animación sea indiferente al tempo, a los silencios o a los clímax.
+  2. Ausencia de análisis estructural de la música: tratar cada fotograma de forma aislada sin memoria de corto/medio plazo que distinga una introducción etérea de un build-up de tensión o de un drop atronador.
+  3. Geometrías fijas que solo se escalan o rotan en bloque en vez de mutar sus ecuaciones topológicas analíticas.
+- **Solución:**
+  1. **Reloj Perceptual Musical Fluido (`flowTime`):** Integrar un reloj perceptual $\frac{d\theta}{dt} = \omega_{\text{base}} + \alpha \cdot \text{RMS}^{1.5} + \beta \cdot \text{Sub}^{1.2} + \gamma \cdot \text{OnsetValue}$. Cuando la música acelera o gana densidad rítmica, el tiempo visual se acelera orgánicamente y frena con inercia elástica en los pasajes tranquilos.
+  2. **Detección de Macro-Estados Narrativos:** Implementar filtros EMA multiescala (energía rápida vs lenta) para detectar *Intro Etérea*, *Build-up de Tensión*, *Drop Explosivo*, *Groove Rítmico* y *Breakdown*.
+  3. **Eventos No Lineales de Impacto:** En los Drops musicales, disparar destellos analógicos fotográficos (`#hud-drop-flash`), saltos de cámara aleatorios (Jump Cuts), ondas de choque expansivas de partículas (`uShockwave`) y conmutaciones a paletas de alto contraste.
+  4. **Morfogénesis Analítica en GPU:** Evaluar en vertex shader múltiples morfologías paramétricas analíticas (Esfera, Galaxia espiral, Toroide de Clifford, Resonador cimático, Doble hélice) interpolando con `smoothstep` sin sobrecarga en la CPU.
+- **Trigger:** Al diseñar motores visuales de audio-reactividad que deban ofrecer una experiencia artística generativa, cambiante y de calidad cinematográfica autónoma.
+
+
+
