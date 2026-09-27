@@ -243,14 +243,14 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Monolito Holográfico Flotante:** Pantalla curva gigante integrada en `ScenicWorldEngine` sobre el Océano de Mercurio con scanlines CRT, halo lumínico y glitch reactivo a los transitorios de audio.
   - **Textura Universal:** Exposición de uniforms `uVideoTexture` y `uVideoActive` en todos los 22 shaders GLSL del Live Shader Studio.
 
-- ✅ **Estudio de Creación Narrativa & Clips IA Multicapa (AiClipStudioEngine / D-040):**
-  - **Motor de Animación & Creación Procedural 60 FPS:** 6 arquetipos estilísticos vivos (Anime Sakuga & Cel-Shading con líneas de velocidad y destellos en drops, Cómic Noir & Halftone con tramas Ben-Day y onomatopeyas POP/POW/BOOM, Cinematografía Realista 35mm con cantante en foco cenital y flares anamórficos, Aventura & Fantasía Épica con islas flotantes y dragón cósmico, Cyberpunk 2099 con androide neural y lluvia Matrix, Acuarela & Óleo Onírico con pigmentos reactivos a RMS).
-  - **Director Narrativo & Storyboard Autónomo:** Generación inteligente de guiones visuales en 6 escenas sincronizadas con la música utilizando la API de Gemini 2.5 Flash (`application/json`) y fallback heurístico local instantáneo (100% offline).
-  - **Transmutación Estética en Vivo:** Filtros de post-procesado GLSL (Cómic Ink, Anime Cel, Holograma Cuántico, Cyber Glitch) y módulo de audio-reactividad con Speed Ramping, Beat Jump Cuts, Sub-Bass Zoom Pulse y Chroma Key.
-  - **Proyección Universal 3D:** Inyección de textura en `customShaderUniforms.uVideoTexture` para los 22 shaders GLSL, pantallas holográficas en el Océano de Mercurio y Valle de Cristales, y ventana flotante PiP HUD en el Viewport 3D.
+- ✅ **Composición Multicapa, Síntesis de Arquetipos IA, Exportador 1080p y Universo 14 (D-041):**
+  - **Composición Multicapa (Layer Blending):** Desacoplamiento de generación en 3 capas simultáneas (Fondo, Sujeto/Personaje y FX/Overlays) con opacidades y modos de fusión (`source-over`, `screen`, `lighter`, `multiply`), permitiendo combinaciones ilimitadas.
+  - **Sintetizador de Arquetipos con Gemini IA:** Generador dinámico en el modal a partir de prompts de texto ("Prompt-to-Visual") integrado con la API de Gemini 2.5 Flash y fallback local heurístico.
+  - **Exportador de Videoclip Completo 1080p Master:** Renderizado a 60 FPS con `MediaRecorder` mezclando video de alta resolución y audio master en un contenedor `.webm` con HUD de progreso y descarga directa.
+  - **Tercer Universo Escénico: Abismo Oceánico & 4.096 Boids Bioluminiscentes (Escena 14):** Fondo marino abisal PBR, monolito sumergido para videoclips, 4.096 criaturas simuladas con boids a 60 FPS en `THREE.InstancedMesh` con dispersión reactiva a bombos y emisión bioluminiscente cian/azul modulada por frecuencias medias y agudas, con cinemática FPV submarina.
 
 ## Próximas Ideas / Pendientes
-- [ ] Universo Escénico 14: "Abismo Oceánico & Enjambre de Boids 3D (4.096 Peces Bioluminiscentes en GPGPU)".
 - [ ] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).
 - [ ] Control de iluminación DMX / ArtNet vía WebSockets para sincronizar luces de escenario con MotorVisuales.
+- [ ] Soporte para modelos 3D GLTF/GLB importables por el usuario dentro de los Universos Escénicos.
 

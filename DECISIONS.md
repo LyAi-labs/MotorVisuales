@@ -950,6 +950,38 @@
   - ✅ Capacidad de generar y proyectar videoclips musicales narrativos completos sin salir de la herramienta.
   - ✅ Coexistencia fluida entre video en vivo (cámara/NDI) y clips generativos IA en el pipeline de Three.js y WebGL.
 
+---
+
+### D-041 — Composición Multicapa, Síntesis de Arquetipos con Gemini IA, Exportador 1080p Master y Universo 14 (Abismo Boids 3D)
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - Consolidar la visión de creación artística visual infinita solicitada por el usuario: superponer múltiples creaciones simultáneas (capas de fondo, personajes y efectos reactivos), sintetizar nuevos arquetipos estéticos ilimitados mediante prompts en lenguaje natural con Gemini IA, grabar y descargar el videoclip musical completo terminado en 1080p con audio master, e incorporar el Universo Escénico 14 (Abismo Oceánico & 4.096 Boids Bioluminiscentes).
+- **Decisión:**
+  - **1. Composición Multicapa (Layer Blending):**
+    - Desacoplamiento de la generación en 3 capas combinables:
+      - *Capa 1 (Fondo):* Atardecer anime, cómic halftone, escenario 35mm, cielo de aventura con lunas gemelas, megaciudad cyberpunk, abismo marino y pergamino acuarela.
+      - *Capa 2 (Sujeto/Personaje):* Guerrero anime con katana, detective noir en gárgola, cantante 35mm ante micrófono vintage, dragón cósmico, androide neural y video del usuario.
+      - *Capa 3 (Efectos & Overlays):* Speedlines sakuga, onomatopeyas cómic en drops, destellos anamórficos 35mm, lluvia matrix con osciloscopio y polvo de oro.
+    - Controles de opacidad independiente por capa y modos de fusión `source-over`, `screen`, `lighter`.
+  - **2. Sintetizador de Arquetipos Infinitos con Gemini IA (Prompt-to-Visual):**
+    - Input de texto interactivo en el modal para describir cualquier concepto artístico.
+    - Síntesis estructurada con Gemini 2.5 Flash (`application/json`) y fallback heurístico local inmediato.
+    - Inyección dinámica en la galería de arquetipos y selección instantánea.
+  - **3. Exportador de Videoclip Completo en 1080p Master con Audio:**
+    - Grabación a 60 FPS mediante `MediaRecorder` mezclando `canvas.captureStream(60)` con `audioCtx.createMediaStreamDestination()` (VP9/Opus @ 8 Mbps).
+    - Recorrido automatizado por el storyboard, HUD de progreso en tiempo real y descarga automática del archivo `.webm` masterizado.
+  - **4. Universo Escénico 14: Abismo Oceánico & Enjambre de 4.096 Boids Bioluminiscentes:**
+    - Escena 14 en Three.js con lecho marino abisal PBR, niebla marina profunda y 2.000 partículas de nieve marina (plancton).
+    - Monolito sumergido central proyectando la textura del videoclip IA.
+    - 4.096 boids implementados con `THREE.InstancedMesh` a 60 FPS con simulación de bandadas (separación, alineamiento, cohesión), dispersión reactiva en transitorios de bombo y emisión bioluminiscente modulada por `uMid` y `uTreble`.
+    - Dron cinemático submarino FPV con alabeo fluido en curvas.
+- **Consecuencias:**
+  - ✅ Posibilidades creativas multiplicadas exponencialmente: cualquier fondo puede combinarse con cualquier sujeto y efecto.
+  - ✅ Generación de videoclips musicales terminados y listos para compartir sin software externo.
+  - ✅ Nuevo universo 3D inmersivo de referencia para música ambiental, electrónica y espectáculos en vivo.
+
+
 
 
 
