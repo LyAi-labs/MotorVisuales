@@ -384,5 +384,21 @@
      - Al mergear scripts monolíticos en HTML, aislar el bloque principal en un archivo temporal y verificar la paridad atómica de llaves `{}` con un script tokenizador que ignore cadenas (`"`, `'`, `` ` ``) y comentarios (`//`, `/* */`), seguido de `node --check <file>.js` para garantizar cero errores sintácticos antes de confirmar el commit.
 - **Trigger:** Al construir mundos escénicos cinematográficos de vanguardia o al fusionar ramas complejas con código concurrente en un frontend monolítico.
 
+---
+
+### L-029
+- **Tags:** #threejs #shaders #lighting #pbr #camera-orbit #frustum-clipping #scenic-worlds #ambient-light
+- **Síntoma:** Al seleccionar una escena 3D procedural compleja (como el Universo Escénico de Mercurio & Megalitos), el Viewport aparece completamente negro a pesar de tener 60 FPS estables y HUD activo, o la cámara se aleja a distancias gigantescas impidiendo la experiencia FPV.
+- **Causa raíz:**
+  1. **Oscuridad en estado de reposo:** Los shaders de cielo, océano y basalto dependían al 100% de la actividad musical (`uHighmid`, `uTreble`, `uLightning`). Con la música pausada o en pasajes tenues, los colores resultantes tenían amplitudes RGB de $0.01 \dots 0.04$.
+  2. **Ausencia de iluminación ambiental y solar permanente:** La escena dependía de un `PointLight` de relámpago con intensidad $0.0$ en reposo.
+  3. **Conflicto de cinemática de cámara:** El bucle general `renderThreeFrame` aplicaba automáticamente su cámara orbital estándar (`DIST: 657` mirando al origen) sobreescribiendo el vuelo rasante FPV de `ScenicWorldEngine.updateDroneCinematics()`.
+  4. **Frustum Clipping de la cúpula celeste:** La esfera del cielo tenía radio $1800$ mientras que `camera.far = 2000`; al orbitar la cámara a distancia $657$, la geometría del cielo superaba el plano de recorte lejano de WebGL.
+- **Solución:**
+  1. **Iluminación Base Radiante:** Integrar `THREE.DirectionalLight` (sol binario) y `THREE.AmbientLight` constantes en el grupo escénico. En los shaders, asegurar un brillo base mínimo del $85\%$ en las vetas de neón y una paleta crepuscular esmeralda/fucsia en el cielo visible aún en silencio absoluto.
+  2. **Desacoplamiento de Cámara:** En `renderThreeFrame`, añadir una excepción condicional explícita para `activeSceneType === 'scenic_mercury_monoliths'`, delegando el gobierno de la cámara al sistema de vuelo cinemático de la escena.
+  3. **Centrado Dinámico de la Bóveda Celeste:** Copiar en cada frame la posición de la cámara a la esfera del cielo (`skyDome.position.copy(threeCamera.position)`) para garantizar que nunca sea recortada por el frustum de la GPU.
+- **Trigger:** Al desarrollar escenas de entorno 3D completas, mundos abiertos o simulaciones escénicas que deben ser inmediatamente visibles y luminosas sin importar si hay audio reproduciéndose.
+
 
 

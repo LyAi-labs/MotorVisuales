@@ -777,5 +777,23 @@
   - ✅ Renderizado fluido a 60 FPS estables gracias a la computación 100% en vertex/fragment shaders.
   - ✅ Perfecta convivencia entre el código del servidor de producción y los avances de la V6 local.
 
+---
+
+### D-032 — Split-View IDE en Laboratorio GLSL (Inspector de Uniforms en Vivo & Snippets Rápidos)
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - El bloque `sec-shader-editor` ("Laboratorio GLSL • Hot-Reload WebGL") ocupaba el 100% del ancho de la pantalla (hasta 1720px), pero el `<textarea>` del código solo utilizaba 35-50 caracteres por línea a la izquierda (~35% del ancho), dejando más del 65% de la ventana derecha como un desierto negro vacío desperdiciado.
+- **Decisión:**
+  - Rediseñar el workspace del editor en una cuadrícula Split-View responsive de 12 columnas:
+    1. **Columna Izquierda (`lg:col-span-8` / ~66%):** Editor de código GLSL limpio para Fragment y Vertex Shaders, con altura responsive expandida y feedback sintáctico.
+    2. **Columna Derecha (`lg:col-span-4` / ~33%):** Panel interactivo **"Uniforms en Vivo & Snippets GLSL"**:
+       - **Telemetría de Uniforms DSP en Tiempo Real (60 FPS):** Medidores con barras reactivas de `uSub`, `uBass`, `uMid`, `uTreble`, visualizador de `uTime`, RMS y LED estroboscópico de `uIsOnset`.
+       - **Botonera de Snippets Matemáticos (1 Clic al cursor):** Inyección instantánea de funciones GLSL de alto rendimiento (`rot2D`, `snoise(vec3)`, `fresnel(N,V)` y `cosPalette(t)`).
+- **Consecuencias:**
+  - ✅ Elimina el 100% del espacio negro muerto en el bloque de shaders.
+  - ✅ Ofrece feedback visual inmediato al programador de shaders sobre los valores numéricos exactos que alimentan las variables en tiempo de ejecución.
+  - ✅ Acelera el desarrollo en caliente con funciones matemáticas reutilizables de 1 clic.
+
 
 

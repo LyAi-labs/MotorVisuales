@@ -194,7 +194,13 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **26 Megalitos de Basalto Hexagonal Brutalista:** Columnas colosales dispuestas en espiral áurea con texturizado de roca volcánica, vetas verticales de cuarzo cuántico luminiscente moduladas por medios/agudos y oscilación geológica vertical en pistones titánicos sincronizados con el ritmo musical.
   - **Bóveda Celeste & Meteorología de Plasma:** Cúpula cósmica con horizonte crepuscular y relámpagos volumétricos estroboscópicos reactivos que iluminan el mar de mercurio en cada impacto percusivo (onset/drop).
   - **Cinematografía FPV Inteligente:** Dron de cine con trayectorias 3D rasantes, alabeo dinámico aerodinámico (Bank Roll), micro-vibración por sub-graves y saltos cinemáticos de cámara (Jump Cuts) ante drops acústicos.
+  - **Iluminación Base Radiante & Centrado Dinámico:** Integración de luz solar direccional y ambiental base con vetas de neón activas al 85% en reposo, desacoplamiento orbital exclusivo en `renderThreeFrame` y seguimiento dinámico de la cúpula celeste en la posición de cámara (L-029).
   - **Activación:** Escena 12 en selector Three.js (`12. 🌊 Universo Escénico: Océano de Mercurio & Megalitos`) y seleccionada por defecto al iniciar el motor.
+
+- ✅ **Laboratorio GLSL Split-View IDE (D-032):**
+  - **Eliminación del Espacio Muerto:** Rediseño del bloque de shaders a doble columna responsive (`lg:grid-cols-12`). La columna izquierda (66%) alberga el editor de código con altura expandida y la columna derecha (33%) un **Inspector de Uniforms en Vivo & Inyector de Snippets**.
+  - **Telemetría en Vivo de Uniforms:** Medidores gráficos en tiempo real (60 FPS) de `uSub`, `uBass`, `uMid`, `uTreble` con barras de nivel reactivas, monitor de `uTime`, RMS y LED estroboscópico de `uIsOnset`.
+  - **Botonera de Snippets Matemáticos (1 Clic):** Inserción instantánea de funciones complejas al cursor (`rot2D`, `snoise(vec3)`, `fresnel(N,V)` y `cosPalette(t)`).
 
 ## Próximas Ideas / Pendientes
 - [ ] Segundo Mundo Escénico: *Valle de Cristales Flotantes y Nebulosa de Hidrógeno*.

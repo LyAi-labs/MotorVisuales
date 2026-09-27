@@ -1531,22 +1531,115 @@
                     </div>
                 </div>
 
-                <!-- Code Editor Workspace -->
+                <!-- Code Editor Workspace (Split-View IDE: Editor GLSL + Inspector de Uniforms en Vivo & Snippets) -->
                 <div class="space-y-2">
-                    <div class="relative bg-black rounded-xl border border-white/[0.08] overflow-hidden shadow-inner">
-                        <!-- Fragment Shader Textarea -->
-                        <textarea id="shader-code-frag" spellcheck="false" class="w-full h-44 sm:h-72 bg-transparent text-pink-200 font-mono text-xs p-3 sm:p-3.5 focus:outline-none resize-y leading-relaxed" placeholder="// Escribe tu Fragment Shader GLSL aquí..."></textarea>
-                        
-                        <!-- Vertex Shader Textarea (Oculto inicialmente) -->
-                        <textarea id="shader-code-vert" spellcheck="false" class="hidden w-full h-44 sm:h-72 bg-transparent text-emerald-200 font-mono text-xs p-3 sm:p-3.5 focus:outline-none resize-y leading-relaxed" placeholder="// Escribe tu Vertex Shader GLSL aquí..."></textarea>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
+                        <!-- Columna Izquierda: Editor de Código GLSL (lg:col-span-8) -->
+                        <div class="lg:col-span-8 relative bg-black/95 rounded-xl border border-white/[0.08] overflow-hidden shadow-inner flex flex-col min-h-[300px] sm:min-h-[340px]">
+                            <!-- Fragment Shader Textarea -->
+                            <textarea id="shader-code-frag" spellcheck="false" class="w-full h-56 sm:h-80 bg-transparent text-pink-200 font-mono text-xs p-3 sm:p-3.5 focus:outline-none resize-y leading-relaxed flex-grow" placeholder="// Escribe tu Fragment Shader GLSL aquí..."></textarea>
+                            
+                            <!-- Vertex Shader Textarea (Oculto inicialmente) -->
+                            <textarea id="shader-code-vert" spellcheck="false" class="hidden w-full h-56 sm:h-80 bg-transparent text-emerald-200 font-mono text-xs p-3 sm:p-3.5 focus:outline-none resize-y leading-relaxed flex-grow" placeholder="// Escribe tu Vertex Shader GLSL aquí..."></textarea>
 
-                        <!-- Line indicator badge -->
-                        <div class="absolute bottom-2 right-3 pointer-events-none text-[9px] font-mono text-zinc-500 bg-zinc-900/90 px-2 py-0.5 rounded border border-white/[0.06]">
-                            GLSL ES 1.00 • WebGL
+                            <!-- Line indicator badge -->
+                            <div class="absolute bottom-2 right-3 pointer-events-none text-[9px] font-mono text-zinc-500 bg-zinc-900/90 px-2 py-0.5 rounded border border-white/[0.06]">
+                                GLSL ES 1.00 • WebGL
+                            </div>
+                        </div>
+
+                        <!-- Columna Derecha: Inspector de Uniforms en Vivo & Inyector de Snippets (lg:col-span-4) -->
+                        <div class="lg:col-span-4 bg-zinc-950/90 rounded-xl border border-white/[0.08] p-3 flex flex-col justify-between space-y-2.5 shadow-inner">
+                            <div>
+                                <div class="flex items-center justify-between border-b border-white/[0.08] pb-1.5 mb-2">
+                                    <div class="flex items-center gap-1.5 font-bold text-xs text-zinc-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                                        <span class="font-mono text-[11px] text-cyan-300 uppercase tracking-wider">Uniforms en Vivo</span>
+                                    </div>
+                                    <span class="text-[9px] font-mono text-zinc-500 bg-zinc-900 px-1.5 py-0.5 rounded border border-white/[0.05]">DSP 60 FPS</span>
+                                </div>
+
+                                <!-- Grid de Uniforms en Tiempo Real -->
+                                <div class="grid grid-cols-2 gap-1.5 text-[10px] font-mono mb-2">
+                                    <!-- uSub -->
+                                    <div class="bg-zinc-900/80 p-1.5 rounded border border-white/[0.04]">
+                                        <div class="flex justify-between text-zinc-400 mb-0.5">
+                                            <span>uSub:</span>
+                                            <span id="insp-uSub-val" class="text-cyan-400 font-bold">0.00</span>
+                                        </div>
+                                        <div class="w-full bg-zinc-950 h-1.5 rounded overflow-hidden">
+                                            <div id="insp-uSub-bar" class="h-full bg-cyan-400 transition-all duration-75" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                    <!-- uBass -->
+                                    <div class="bg-zinc-900/80 p-1.5 rounded border border-white/[0.04]">
+                                        <div class="flex justify-between text-zinc-400 mb-0.5">
+                                            <span>uBass:</span>
+                                            <span id="insp-uBass-val" class="text-emerald-400 font-bold">0.00</span>
+                                        </div>
+                                        <div class="w-full bg-zinc-950 h-1.5 rounded overflow-hidden">
+                                            <div id="insp-uBass-bar" class="h-full bg-emerald-400 transition-all duration-75" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                    <!-- uMid -->
+                                    <div class="bg-zinc-900/80 p-1.5 rounded border border-white/[0.04]">
+                                        <div class="flex justify-between text-zinc-400 mb-0.5">
+                                            <span>uMid:</span>
+                                            <span id="insp-uMid-val" class="text-amber-400 font-bold">0.00</span>
+                                        </div>
+                                        <div class="w-full bg-zinc-950 h-1.5 rounded overflow-hidden">
+                                            <div id="insp-uMid-bar" class="h-full bg-amber-400 transition-all duration-75" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                    <!-- uTreble -->
+                                    <div class="bg-zinc-900/80 p-1.5 rounded border border-white/[0.04]">
+                                        <div class="flex justify-between text-zinc-400 mb-0.5">
+                                            <span>uTreble:</span>
+                                            <span id="insp-uTreble-val" class="text-pink-400 font-bold">0.00</span>
+                                        </div>
+                                        <div class="w-full bg-zinc-950 h-1.5 rounded overflow-hidden">
+                                            <div id="insp-uTreble-bar" class="h-full bg-pink-400 transition-all duration-75" style="width: 0%;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Variables de Entorno -->
+                                <div class="flex items-center justify-between bg-zinc-900/80 px-2 py-1 rounded border border-white/[0.04] text-[10px] font-mono text-zinc-400 mb-2">
+                                    <div>uTime: <span id="insp-uTime-val" class="text-zinc-200 font-bold">0.0s</span></div>
+                                    <div class="flex items-center gap-1">
+                                        <span>uIsOnset:</span>
+                                        <span id="insp-uOnset-led" class="w-2 h-2 rounded-full bg-zinc-700"></span>
+                                    </div>
+                                    <div>RMS: <span id="insp-uRms-val" class="text-cyan-300 font-bold">0.00</span></div>
+                                </div>
+                            </div>
+
+                            <!-- Snippets Rápidos de GLSL (1 Clic) -->
+                            <div class="border-t border-white/[0.06] pt-2">
+                                <div class="text-[10px] font-mono uppercase text-zinc-400 font-bold mb-1.5 flex items-center justify-between">
+                                    <span>⚡ Snippets GLSL (1 Clic):</span>
+                                    <span class="text-[8px] text-zinc-500 font-normal">Inserta al cursor</span>
+                                </div>
+                                <div class="grid grid-cols-2 gap-1 text-[9px] font-mono">
+                                    <button type="button" onclick="insertShaderSnippet('rot2D')" class="p-1 rounded bg-zinc-900 hover:bg-pink-950 hover:border-pink-500/40 border border-white/[0.06] text-zinc-300 hover:text-pink-300 text-left transition flex items-center gap-1" title="Matriz de rotación 2D mat2(c,-s,s,c)">
+                                        <span class="text-pink-400">+</span><span>rot2D(angle)</span>
+                                    </button>
+                                    <button type="button" onclick="insertShaderSnippet('snoise')" class="p-1 rounded bg-zinc-900 hover:bg-emerald-950 hover:border-emerald-500/40 border border-white/[0.06] text-zinc-300 hover:text-emerald-300 text-left transition flex items-center gap-1" title="Ruido Simplex 3D snoise(vec3)">
+                                        <span class="text-emerald-400">+</span><span>snoise(vec3)</span>
+                                    </button>
+                                    <button type="button" onclick="insertShaderSnippet('fresnel')" class="p-1 rounded bg-zinc-900 hover:bg-cyan-950 hover:border-cyan-500/40 border border-white/[0.06] text-zinc-300 hover:text-cyan-300 text-left transition flex items-center gap-1" title="Aproximación de Fresnel Schlick pow(1.0 - dot(N,V), 3.0)">
+                                        <span class="text-cyan-400">+</span><span>fresnel(N,V)</span>
+                                    </button>
+                                    <button type="button" onclick="insertShaderSnippet('palette')" class="p-1 rounded bg-zinc-900 hover:bg-purple-950 hover:border-purple-500/40 border border-white/[0.06] text-zinc-300 hover:text-purple-300 text-left transition flex items-center gap-1" title="Gradiente espectral coseno cos(6.28318*(c*t+d))">
+                                        <span class="text-purple-400">+</span><span>palette(t)</span>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Compiler Log Output Console -->
+                <!-- Compiler Log Output Console -->
                     <div id="shader-console-panel" class="bg-black/90 rounded-xl border border-white/[0.08] p-2.5 font-mono text-xs space-y-1">
                         <div class="flex items-center justify-between text-[10px] pb-1 border-b border-white/[0.05]">
                             <span class="text-zinc-400 flex items-center gap-1.5">
@@ -6499,6 +6592,9 @@
             const shockwave = audioNarrativeDirector ? audioNarrativeDirector.shockwavePower : 0.0;
             const tension = audioNarrativeDirector ? audioNarrativeDirector.tensionLevel : 0.0;
 
+            // Actualizar telemetría de uniforms en el Inspector del Laboratorio GLSL
+            updateShaderInspectorLive();
+
             // === MAPPING GRANULAR: 8 stems → parámetros individuales ===
             const sSub      = stemsData['sub']?.value      || 0; // <60Hz → expansión núcleo nebulosa
             const sBass     = stemsData['bass']?.value     || 0; // 60-250Hz → escala Monolito + rotación Y
@@ -6510,7 +6606,9 @@
             const sAir      = stemsData['air']?.value      || 0; // >10kHz → opacidad nebulosa
 
             // === CÁMARA: CINEMÁTICA ORBITAL REACTIVA VS CONTROL MANUAL ===
-            if (cameraOrbitEnabled) {
+            if (activeSceneType === 'scenic_mercury_monoliths') {
+                // El control de cámara para el Universo Escénico es gobernado por ScenicWorldEngine
+            } else if (cameraOrbitEnabled) {
                 // Modulación por audio y tiempo fluido musical
                 const orbitSpeed = 0.4 * cameraOrbitSpeedMult * (1.0 + shockwave * 1.5);
                 const baseAngle = audioTime * orbitSpeed + cameraManualAzimuth;
@@ -9800,6 +9898,76 @@ void main() {
             loadShaderPreset(key);
         }
 
+        function insertShaderSnippet(type) {
+            const activeTab = (typeof currentShaderTab !== 'undefined') ? currentShaderTab : 'frag';
+            const textarea = document.getElementById(activeTab === 'frag' ? 'shader-code-frag' : 'shader-code-vert');
+            if (!textarea) return;
+
+            let snippet = '';
+            if (type === 'rot2D') {
+                snippet = `\nmat2 rot2D(float a) {\n    float s = sin(a), c = cos(a);\n    return mat2(c, -s, s, c);\n}\n`;
+            } else if (type === 'snoise') {
+                snippet = `\nfloat snoise(vec3 v) {\n    const vec2 C = vec2(1.0/6.0, 1.0/3.0);\n    const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);\n    vec3 i  = floor(v + dot(v, C.yyy));\n    vec3 x0 = v - i + dot(i, C.xxx);\n    vec3 g = step(x0.yzx, x0.xyz);\n    vec3 l = 1.0 - g;\n    vec3 i1 = min(g.xyz, l.zxy);\n    vec3 i2 = max(g.xyz, l.zxy);\n    vec3 x1 = x0 - i1 + C.xxx;\n    vec3 x2 = x0 - i2 + C.yyy;\n    vec3 x3 = x0 - D.yyy;\n    i = mod(i, 289.0);\n    return fract(sin(dot(x0, vec3(12.9898, 78.233, 45.164))) * 43758.5453);\n}\n`;
+            } else if (type === 'fresnel') {
+                snippet = `\nfloat fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 3.0);\n`;
+            } else if (type === 'palette') {
+                snippet = `\nvec3 cosPalette(float t, vec3 a, vec3 b, vec3 c, vec3 d) {\n    return a + b * cos(6.28318 * (c * t + d));\n}\n`;
+            }
+
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const val = textarea.value;
+            textarea.value = val.substring(0, start) + snippet + val.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + snippet.length;
+            textarea.focus();
+            if (typeof showToast === 'function') {
+                showToast("Snippet Inyectado", `Fragmento "${type}" añadido al shader`, "info", 1800);
+            }
+        }
+
+        function updateShaderInspectorLive() {
+            if (typeof stemsData === 'undefined') return;
+            const sub = stemsData['sub'] ? stemsData['sub'].value : 0;
+            const bass = stemsData['bass'] ? stemsData['bass'].value : 0;
+            const mid = stemsData['mid'] ? stemsData['mid'].value : 0;
+            const treble = stemsData['treble'] ? stemsData['treble'].value : 0;
+
+            const elSubVal = document.getElementById('insp-uSub-val');
+            if (elSubVal) {
+                elSubVal.innerText = sub.toFixed(2);
+                const bSub = document.getElementById('insp-uSub-bar');
+                if (bSub) bSub.style.width = Math.min(100, Math.round(sub * 100)) + '%';
+
+                const elBassVal = document.getElementById('insp-uBass-val');
+                if (elBassVal) elBassVal.innerText = bass.toFixed(2);
+                const bBass = document.getElementById('insp-uBass-bar');
+                if (bBass) bBass.style.width = Math.min(100, Math.round(bass * 100)) + '%';
+
+                const elMidVal = document.getElementById('insp-uMid-val');
+                if (elMidVal) elMidVal.innerText = mid.toFixed(2);
+                const bMid = document.getElementById('insp-uMid-bar');
+                if (bMid) bMid.style.width = Math.min(100, Math.round(mid * 100)) + '%';
+
+                const elTrebVal = document.getElementById('insp-uTreble-val');
+                if (elTrebVal) elTrebVal.innerText = treble.toFixed(2);
+                const bTreb = document.getElementById('insp-uTreble-bar');
+                if (bTreb) bTreb.style.width = Math.min(100, Math.round(treble * 100)) + '%';
+
+                const elTime = document.getElementById('insp-uTime-val');
+                if (elTime && typeof audioTime !== 'undefined') elTime.innerText = audioTime.toFixed(1) + 's';
+
+                const elRms = document.getElementById('insp-uRms-val');
+                if (elRms && typeof liveAudioMetrics !== 'undefined') elRms.innerText = (liveAudioMetrics.rms || 0).toFixed(2);
+
+                const led = document.getElementById('insp-uOnset-led');
+                if (led && typeof liveAudioMetrics !== 'undefined') {
+                    led.className = liveAudioMetrics.isOnset 
+                        ? 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]' 
+                        : 'w-2 h-2 rounded-full bg-zinc-700';
+                }
+            }
+        }
+
         function compileUserShaderFromUI() {
             const fragArea = document.getElementById('shader-code-frag');
             const vertArea = document.getElementById('shader-code-vert');
@@ -12566,24 +12734,40 @@ Respond ONLY with valid JSON with:
                 this.skyDome = null;
                 this.skyUniforms = null;
 
+                this.sunDir = new THREE.Vector3(0.55, 0.18, -0.8).normalize();
+                this.sunColor = new THREE.Color(0x00f5ff);
+
                 this.lightningLight = null;
                 this.lightningIntensity = 0.0;
-                this.lightningDecay = 0.88;
+                this.lightningDecay = 0.86;
 
                 this.droneProgress = 0.0;
-                this.droneSpeed = 0.055;
+                this.droneSpeed = 0.045;
                 this.activeCameraPreset = 'fpv_cruise';
             }
 
             init(scene) {
                 if (this.isInitialized) return;
 
+                // --- 1. BÓVEDA CELESTE AURORA & SOL BINARIO ---
                 this.initSkyDome();
+
+                // --- 2. OCÉANO DE MERCURIO LÍQUIDO LUMINOSO (GERSTNER EN GPU) ---
                 this.initMercuryOcean();
+
+                // --- 3. 26 MEGALITOS DE BASALTO & VETAS DE CUARZO CUÁNTICO VIVAS ---
                 this.initBasaltMonoliths();
 
-                this.lightningLight = new THREE.PointLight(0xaaddee, 0.0, 1800);
-                this.lightningLight.position.set(0, 300, 0);
+                // Luz direccional solar y luz de relámpago
+                const sunLight = new THREE.DirectionalLight(0x00e5ff, 1.2);
+                sunLight.position.copy(this.sunDir).multiplyScalar(500);
+                this.group.add(sunLight);
+
+                const ambient = new THREE.AmbientLight(0x182844, 0.8);
+                this.group.add(ambient);
+
+                this.lightningLight = new THREE.PointLight(0xd0f0ff, 0.0, 2200);
+                this.lightningLight.position.set(0, 250, 0);
                 this.group.add(this.lightningLight);
 
                 this.group.visible = false;
@@ -12592,13 +12776,15 @@ Respond ONLY with valid JSON with:
             }
 
             initSkyDome() {
-                const skyGeom = new THREE.SphereGeometry(1800, 32, 24);
+                // Esfera de cielo centrada dinámicamente en la cámara (radio 1200)
+                const skyGeom = new THREE.SphereGeometry(1200, 32, 24);
                 this.skyUniforms = {
                     uTime: { value: 0.0 },
                     uLightning: { value: 0.0 },
-                    uSkyZenith: { value: new THREE.Color(0x020108) },
-                    uSkyHorizon: { value: new THREE.Color(0x061828) },
-                    uSunDir: { value: new THREE.Vector3(0.6, 0.15, -0.7).normalize() }
+                    uSkyZenith: { value: new THREE.Color(0x0d122b) },    // Violeta noche cósmica
+                    uSkyHorizon: { value: new THREE.Color(0x085472) },   // Cian esmeralda crepuscular
+                    uSkyGlow: { value: new THREE.Color(0xb02685) },      // Resplandor fucsia atardecer
+                    uSunDir: { value: this.sunDir }
                 };
 
                 const skyMat = new THREE.ShaderMaterial({
@@ -12616,6 +12802,7 @@ Respond ONLY with valid JSON with:
                         uniform float uLightning;
                         uniform vec3 uSkyZenith;
                         uniform vec3 uSkyHorizon;
+                        uniform vec3 uSkyGlow;
                         uniform vec3 uSunDir;
                         varying vec3 vWorldPos;
 
@@ -12626,25 +12813,30 @@ Respond ONLY with valid JSON with:
                         void main() {
                             vec3 dir = normalize(vWorldPos);
                             float height = clamp(dir.y, 0.0, 1.0);
-                            
-                            vec3 sky = mix(uSkyHorizon, uSkyZenith, pow(height, 0.45));
 
+                            // Degradado crepuscular cósmico vivo y luminoso
+                            vec3 sky = mix(uSkyHorizon, uSkyZenith, pow(height, 0.45));
+                            sky = mix(sky, uSkyGlow, exp(-height * 4.0) * 0.45);
+
+                            // Sol Binario Titánico en el horizonte
                             float sunDot = max(dot(dir, uSunDir), 0.0);
-                            vec3 sunGlow = vec3(0.0, 0.85, 1.0) * pow(sunDot, 128.0) * 2.5;
-                            sunGlow += vec3(0.8, 0.4, 0.9) * pow(sunDot, 16.0) * 0.8;
+                            vec3 sunGlow = vec3(0.2, 0.95, 1.0) * pow(sunDot, 80.0) * 4.5;
+                            sunGlow += vec3(1.0, 0.75, 0.3) * pow(sunDot, 12.0) * 1.8;
                             sky += sunGlow;
 
-                            if (dir.y > 0.15) {
-                                vec2 starUv = dir.xz / (dir.y + 0.35) * 35.0;
+                            // Campo de estrellas nítidas en el cielo nocturno
+                            if (dir.y > 0.12) {
+                                vec2 starUv = dir.xz / (dir.y + 0.3) * 45.0;
                                 float n = hash(floor(starUv));
-                                if (n > 0.985) {
-                                    float twinkle = sin(uTime * 4.0 + n * 60.0) * 0.5 + 0.5;
-                                    sky += vec3(0.9, 0.95, 1.0) * twinkle * (n - 0.985) * 60.0;
+                                if (n > 0.982) {
+                                    float twinkle = sin(uTime * 3.5 + n * 80.0) * 0.5 + 0.5;
+                                    sky += vec3(0.9, 0.96, 1.0) * twinkle * (n - 0.982) * 55.0;
                                 }
                             }
 
+                            // Flash volumétrico de relámpago
                             if (uLightning > 0.01) {
-                                sky += vec3(0.65, 0.82, 1.0) * uLightning * 1.5;
+                                sky += vec3(0.65, 0.85, 1.0) * uLightning * 2.2;
                             }
 
                             gl_FragColor = vec4(sky, 1.0);
@@ -12659,7 +12851,8 @@ Respond ONLY with valid JSON with:
             }
 
             initMercuryOcean() {
-                const oceanGeom = new THREE.PlaneGeometry(2800, 2800, 160, 160);
+                // Malla densa de 140x140 subdivisiones rotada en plano horizontal XZ
+                const oceanGeom = new THREE.PlaneGeometry(2400, 2400, 140, 140);
                 oceanGeom.rotateX(-Math.PI / 2);
 
                 this.oceanUniforms = {
@@ -12669,10 +12862,11 @@ Respond ONLY with valid JSON with:
                     uTreble: { value: 0.0 },
                     uShockwave: { value: 0.0 },
                     uLightning: { value: 0.0 },
-                    uCameraPos: { value: new THREE.Vector3() },
-                    uSunDir: { value: new THREE.Vector3(0.6, 0.15, -0.7).normalize() },
-                    uSkyHorizon: { value: new THREE.Color(0x061828) },
-                    uSkyZenith: { value: new THREE.Color(0x020108) }
+                    uCameraPos: { value: new THREE.Vector3(0, 30, 200) },
+                    uSunDir: { value: this.sunDir },
+                    uSkyHorizon: { value: new THREE.Color(0x085472) },
+                    uSkyZenith: { value: new THREE.Color(0x0d122b) },
+                    uSkyGlow: { value: new THREE.Color(0xb02685) }
                 };
 
                 this.oceanMaterial = new THREE.ShaderMaterial({
@@ -12694,7 +12888,7 @@ Respond ONLY with valid JSON with:
                             float k = 6.2831853 / l;
                             float c = sqrt(9.8 / k) * speed;
                             float f = k * (dot(d, p) - c * uTime);
-                            float q = 0.68;
+                            float q = 0.65;
 
                             float cosF = cos(f);
                             float sinF = sin(f);
@@ -12723,17 +12917,19 @@ Respond ONLY with valid JSON with:
                             vec3 binormal = vec3(0.0, 0.0, 1.0);
                             vec3 disp = vec3(0.0);
 
-                            float bassScale = 1.0 + uSub * 3.2 + uBass * 1.8;
+                            // Siempre activo con suave fluidez base + amplificación musical por graves
+                            float waveAmp = 1.0 + uSub * 2.8 + uBass * 1.5;
 
-                            disp += gerstnerWave(normalize(vec2(1.0, 0.35)), 12.0 * bassScale, 280.0, 1.1, p, tangent, binormal);
-                            disp += gerstnerWave(normalize(vec2(-0.8, 0.7)), 8.0 * bassScale, 150.0, 1.5, p, tangent, binormal);
-                            disp += gerstnerWave(normalize(vec2(0.3, -1.0)), 4.5 * (1.0 + uBass * 2.2), 70.0, 2.1, p, tangent, binormal);
-                            disp += gerstnerWave(normalize(vec2(-0.6, -0.6)), 2.4 * (1.0 + uTreble * 3.0), 30.0, 3.2, p, tangent, binormal);
+                            disp += gerstnerWave(normalize(vec2(1.0, 0.35)), 10.0 * waveAmp, 260.0, 1.1, p, tangent, binormal);
+                            disp += gerstnerWave(normalize(vec2(-0.75, 0.7)), 7.0 * waveAmp, 140.0, 1.45, p, tangent, binormal);
+                            disp += gerstnerWave(normalize(vec2(0.25, -1.0)), 4.0 * (1.0 + uBass * 2.0), 65.0, 2.0, p, tangent, binormal);
+                            disp += gerstnerWave(normalize(vec2(-0.55, -0.6)), 2.2 * (1.0 + uTreble * 2.5), 28.0, 3.0, p, tangent, binormal);
 
+                            // Shockwave radial física en Drop
                             float r = length(p);
-                            float shockRad = mod(uTime * 380.0, 1400.0);
+                            float shockRad = mod(uTime * 350.0, 1400.0);
                             float diff = abs(r - shockRad);
-                            float shockH = exp(-diff * 0.02) * uShockwave * 45.0;
+                            float shockH = exp(-diff * 0.025) * uShockwave * 42.0;
                             disp.y += shockH;
 
                             vec3 newPos = vec3(position.x + disp.x, disp.y, position.z + disp.z);
@@ -12753,6 +12949,7 @@ Respond ONLY with valid JSON with:
                         uniform vec3 uSunDir;
                         uniform vec3 uSkyHorizon;
                         uniform vec3 uSkyZenith;
+                        uniform vec3 uSkyGlow;
                         uniform float uLightning;
                         uniform float uTime;
                         uniform float uBass;
@@ -12769,45 +12966,55 @@ Respond ONLY with valid JSON with:
                             vec3 L = normalize(uSunDir);
                             vec3 R = reflect(-V, N);
 
+                            // Fresnel Schlick de mercurio líquido pulido (F0 = 0.82)
                             float F0 = 0.82;
                             float NdotV = max(dot(N, V), 0.0);
-                            float fresnel = F0 + (1.0 - F0) * pow(1.0 - NdotV, 5.0);
+                            float fresnel = F0 + (1.0 - F0) * pow(1.0 - NdotV, 4.0);
 
+                            // Reflejo analítico de la cúpula celeste
                             float skyBlend = clamp(R.y * 0.5 + 0.5, 0.0, 1.0);
-                            vec3 skyRefl = mix(uSkyHorizon, uSkyZenith, pow(skyBlend, 0.5));
+                            vec3 skyRefl = mix(uSkyHorizon * 1.8, uSkyZenith * 2.2, pow(skyBlend, 0.5));
+                            skyRefl += uSkyGlow * exp(-skyBlend * 3.0) * 0.6;
 
+                            // Sun Glint / Reflejo especular solar radiante
                             vec3 H = normalize(L + V);
                             float NdotH = max(dot(N, H), 0.0);
-                            float specPower = 90.0 + (1.0 - uTreble * 0.4) * 220.0;
-                            float glint = pow(NdotH, specPower) * 4.0;
+                            float specPower = 55.0 + (1.0 - uTreble * 0.4) * 160.0;
+                            float sunSpecular = pow(NdotH, specPower) * 4.8;
 
-                            vec3 sunColor = vec3(0.0, 0.9, 1.0);
-                            vec3 chromaticGlint = vec3(
-                                pow(max(dot(N, normalize(L + vec3(0.03, 0.0, 0.0))), 0.0), specPower) * 1.2,
-                                glint,
-                                pow(max(dot(N, normalize(L - vec3(0.03, 0.0, 0.0))), 0.0), specPower) * 1.4
+                            // Dispersión cromática en las crestas (mercurio holográfico)
+                            vec3 sunCol = vec3(0.1, 0.95, 1.0);
+                            vec3 specChromatic = vec3(
+                                pow(max(dot(N, normalize(L + vec3(0.035, 0.0, 0.0))), 0.0), specPower) * 1.3,
+                                sunSpecular,
+                                pow(max(dot(N, normalize(L - vec3(0.035, 0.0, 0.0))), 0.0), specPower) * 1.5
                             );
 
-                            vec3 baseMercury = vec3(0.08, 0.12, 0.18);
-                            vec3 mercuryCol = mix(baseMercury, skyRefl * 1.5, fresnel);
-                            mercuryCol += chromaticGlint * sunColor * 1.6;
+                            // Metal líquido cromado plateado con reflejo radiante
+                            vec3 baseChrome = vec3(0.38, 0.46, 0.58);
+                            vec3 oceanColor = mix(baseChrome, skyRefl, fresnel);
+                            oceanColor += specChromatic * sunCol * 2.0;
 
+                            // Luminiscencia cuántica cian en las crestas elevadas
+                            float crestGlow = smoothstep(5.0, 24.0, vWaveHeight);
+                            oceanColor += vec3(0.0, 0.95, 0.85) * crestGlow * (0.35 + uBass * 0.9);
+
+                            // Destello de relámpago
                             if (uLightning > 0.01) {
-                                mercuryCol += vec3(0.7, 0.88, 1.0) * uLightning * 3.5 * fresnel;
+                                oceanColor += vec3(0.7, 0.88, 1.0) * uLightning * 3.8 * fresnel;
                             }
 
-                            float crestGlow = smoothstep(10.0, 32.0, vWaveHeight) * (uBass * 1.4);
-                            mercuryCol += vec3(0.0, 0.9, 0.8) * crestGlow * 0.5;
-
+                            // Niebla atmosférica suave hacia el horizonte
                             float dist = length(vWorldPos - uCameraPos);
-                            float fog = 1.0 - exp(-pow(dist * 0.00062, 1.8));
-                            vec3 fogCol = mix(uSkyHorizon, uSkyZenith, 0.2);
-                            if (uLightning > 0.01) fogCol += vec3(0.35, 0.5, 0.7) * uLightning;
+                            float fog = 1.0 - exp(-pow(dist * 0.00048, 1.8));
+                            vec3 fogCol = mix(uSkyHorizon * 1.4, uSkyZenith, 0.3);
+                            if (uLightning > 0.01) fogCol += vec3(0.4, 0.6, 0.85) * uLightning;
 
-                            vec3 finalColor = mix(mercuryCol, fogCol, clamp(fog, 0.0, 1.0));
+                            vec3 finalColor = mix(oceanColor, fogCol, clamp(fog, 0.0, 0.92));
                             gl_FragColor = vec4(finalColor, 1.0);
                         }
-                    `
+                    `,
+                    side: THREE.DoubleSide
                 });
 
                 this.oceanMesh = new THREE.Mesh(oceanGeom, this.oceanMaterial);
@@ -12826,7 +13033,7 @@ Respond ONLY with valid JSON with:
                         uTreble: { value: 0.0 },
                         uLightning: { value: 0.0 },
                         uShockwave: { value: 0.0 },
-                        uSunDir: { value: new THREE.Vector3(0.6, 0.15, -0.7).normalize() }
+                        uSunDir: { value: this.sunDir }
                     },
                     vertexShader: `
                         attribute float aVeinHue;
@@ -12862,51 +13069,61 @@ Respond ONLY with valid JSON with:
                             vec3 L = normalize(uSunDir);
                             float NdotL = max(dot(N, L), 0.0);
 
-                            vec3 basalt = vec3(0.04, 0.045, 0.055) + vec3(0.02, 0.025, 0.03) * NdotL;
+                            // Basalto volcánico visible con biseles facetados y luz ambiental
+                            vec3 basaltAmbient = vec3(0.12, 0.15, 0.20);
+                            vec3 basaltLit = vec3(0.32, 0.38, 0.48) * NdotL;
+                            vec3 basalt = basaltAmbient + basaltLit;
 
+                            // Vetas verticales de cuarzo cuántico en las 6 aristas
                             float veinU = abs(fract(vUv.x * 6.0) - 0.5) * 2.0;
-                            float isEdge = smoothstep(0.72, 0.96, veinU);
+                            float isEdge = smoothstep(0.68, 0.94, veinU);
 
-                            float pulse = sin(vWorldPos.y * 0.08 - uTime * 4.5) * 0.5 + 0.5;
-                            float energy = (pulse * 0.7 + 0.3) * (0.6 + uHighmid * 2.5 + uTreble * 1.5 + uShockwave * 3.0);
+                            // Pulso vertical activo con brillo base garantizado (incluso sin audio)
+                            float pulse = sin(vWorldPos.y * 0.06 - uTime * 3.5) * 0.5 + 0.5;
+                            float baseEnergy = 0.85; // ¡Siempre luminoso!
+                            float audioEnergy = uHighmid * 2.2 + uTreble * 1.5 + uShockwave * 3.0;
+                            float totalEnergy = (baseEnergy + audioEnergy) * (pulse * 0.4 + 0.6);
 
-                            vec3 veinColor = mix(vec3(0.0, 0.95, 1.0), vec3(0.9, 0.1, 0.95), vVeinHue);
-                            vec3 emissiveVein = veinColor * isEdge * energy * 2.8;
+                            // Vetas en cian eléctrico y magenta neón
+                            vec3 veinColor = mix(vec3(0.0, 0.95, 1.0), vec3(1.0, 0.1, 0.85), vVeinHue);
+                            vec3 emissiveVein = veinColor * isEdge * totalEnergy * 3.0;
 
+                            // Destello de relámpago
                             if (uLightning > 0.01) {
-                                basalt += vec3(0.5, 0.65, 0.8) * uLightning * 1.5;
-                                emissiveVein *= (1.0 + uLightning * 2.0);
+                                basalt += vec3(0.5, 0.7, 0.9) * uLightning * 1.8;
+                                emissiveVein *= (1.0 + uLightning * 2.2);
                             }
 
                             vec3 color = basalt + emissiveVein;
 
+                            // Niebla atmosférica sutil
                             float dist = length(vWorldPos);
-                            float fog = 1.0 - exp(-pow(dist * 0.00062, 1.8));
-                            vec3 fogCol = vec3(0.04, 0.08, 0.14);
-                            if (uLightning > 0.01) fogCol += vec3(0.3, 0.45, 0.6) * uLightning;
+                            float fog = 1.0 - exp(-pow(dist * 0.00045, 1.8));
+                            vec3 fogCol = vec3(0.08, 0.16, 0.26);
+                            if (uLightning > 0.01) fogCol += vec3(0.4, 0.55, 0.75) * uLightning;
 
-                            gl_FragColor = vec4(mix(color, fogCol, clamp(fog, 0.0, 1.0)), 1.0);
+                            gl_FragColor = vec4(mix(color, fogCol, clamp(fog, 0.0, 0.85)), 1.0);
                         }
                     `
                 });
 
                 for (let i = 0; i < count; i++) {
                     const angle = i * 2.39996;
-                    const radius = 90.0 + Math.sqrt(i) * 95.0;
+                    const radius = 80.0 + Math.sqrt(i) * 85.0;
                     const x = Math.cos(angle) * radius;
                     const z = Math.sin(angle) * radius;
 
-                    const height = 160.0 + (i % 5) * 60.0 + Math.random() * 40.0;
+                    const height = 180.0 + (i % 5) * 70.0 + (i * 5.0);
                     const colRadius = 14.0 + (i % 3) * 6.0;
 
-                    const geom = new THREE.CylinderGeometry(colRadius, colRadius * 1.05, height, 6);
+                    const geom = new THREE.CylinderGeometry(colRadius, colRadius * 1.08, height, 6);
                     
                     const hueVal = (i % 2 === 0) ? 0.0 : 1.0;
                     const hues = new Float32Array(geom.attributes.position.count).fill(hueVal);
                     geom.setAttribute('aVeinHue', new THREE.BufferAttribute(hues, 1));
 
                     const mesh = new THREE.Mesh(geom, this.monolithMaterial);
-                    const baseY = height * 0.35 - 30.0;
+                    const baseY = height * 0.38 - 25.0;
                     mesh.position.set(x, baseY, z);
                     mesh.rotation.y = (i * 0.45) % Math.PI;
 
@@ -12915,8 +13132,8 @@ Respond ONLY with valid JSON with:
                     this.monolithData.push({
                         x, z, baseY,
                         height,
-                        phase: angle + i * 0.8,
-                        liftSpeed: 0.8 + (i % 4) * 0.3
+                        phase: angle + i * 0.7,
+                        liftSpeed: 0.7 + (i % 4) * 0.25
                     });
                 }
             }
@@ -12924,6 +13141,11 @@ Respond ONLY with valid JSON with:
             setVisible(vis) {
                 this.visible = vis;
                 this.group.visible = vis;
+                if (vis && threeCamera) {
+                    // Colocar cámara a altura y posición épica de entrada
+                    threeCamera.position.set(0, 32, 260);
+                    threeCamera.lookAt(0, 45, 0);
+                }
             }
 
             triggerDropCinematics() {
@@ -12954,7 +13176,12 @@ Respond ONLY with valid JSON with:
 
                 this.lightningIntensity *= this.lightningDecay;
                 if (this.lightningLight) {
-                    this.lightningLight.intensity = this.lightningIntensity * 6.0;
+                    this.lightningLight.intensity = this.lightningIntensity * 6.5;
+                }
+
+                // Centrar la cúpula celeste dinámicamente en la cámara para evitar recorte
+                if (this.skyDome && threeCamera) {
+                    this.skyDome.position.copy(threeCamera.position);
                 }
 
                 if (this.oceanUniforms) {
@@ -12980,21 +13207,23 @@ Respond ONLY with valid JSON with:
                     this.monolithMaterial.uniforms.uShockwave.value = shockwave;
                 }
 
+                // Dinámica armónica de pistones en los megalitos
                 for (let i = 0; i < this.monolithMeshes.length; i++) {
                     const m = this.monolithMeshes[i];
                     const d = this.monolithData[i];
                     const osc = Math.sin(audioTime * d.liftSpeed + d.phase);
-                    const lift = osc * (20.0 + sSub * 40.0) + (shockwave * 55.0);
+                    const lift = osc * (18.0 + sSub * 38.0) + (shockwave * 50.0);
                     m.position.y = d.baseY + lift;
                 }
 
-                if (cameraOrbitEnabled && threeCamera) {
+                // Cinemática de vuelo FPV sobre el mar
+                if (cameraOrbitEnabled && threeCamera && !isMouseDown) {
                     this.updateDroneCinematics(dt, audioTime, sSub, sBass, tension, shockwave);
                 }
             }
 
             updateDroneCinematics(dt, audioTime, sSub, sBass, tension, shockwave) {
-                const speedMult = 1.0 + (shockwave * 2.2) + (tension * 0.8);
+                const speedMult = 1.0 + (shockwave * 2.2) + (tension * 0.7);
                 this.droneProgress += dt * this.droneSpeed * speedMult;
 
                 const t = this.droneProgress * 2.0;
@@ -13003,47 +13232,57 @@ Respond ONLY with valid JSON with:
                 let lookX = 0, lookY = 0, lookZ = 0;
 
                 if (this.activeCameraPreset === 'fpv_cruise') {
-                    camX = Math.cos(t * 0.35) * 290.0 + Math.sin(t * 0.7) * 70.0;
-                    camZ = Math.sin(t * 0.35) * 290.0 + Math.cos(t * 0.5) * 80.0;
-                    camY = 18.0 + Math.sin(t * 0.9) * 12.0 + sSub * 14.0;
+                    // Sobrevuelo rasante entre los monolitos con lemniscata elíptica
+                    camX = Math.cos(t * 0.32) * 260.0 + Math.sin(t * 0.64) * 60.0;
+                    camZ = Math.sin(t * 0.32) * 260.0 + Math.cos(t * 0.48) * 70.0;
+                    camY = 28.0 + Math.sin(t * 0.85) * 14.0 + (sSub * 15.0);
 
-                    const tLook = t + 0.18;
-                    lookX = Math.cos(tLook * 0.35) * 290.0 + Math.sin(tLook * 0.7) * 70.0;
-                    lookZ = Math.sin(tLook * 0.35) * 290.0 + Math.cos(tLook * 0.5) * 80.0;
-                    lookY = 14.0 + Math.sin(tLook * 0.9) * 8.0;
+                    const tLook = t + 0.16;
+                    lookX = Math.cos(tLook * 0.32) * 260.0 + Math.sin(tLook * 0.64) * 60.0;
+                    lookZ = Math.sin(tLook * 0.32) * 260.0 + Math.cos(tLook * 0.48) * 70.0;
+                    lookY = 35.0 + Math.sin(tLook * 0.85) * 10.0;
 
                 } else if (this.activeCameraPreset === 'low_skimmer') {
-                    camX = Math.cos(t * 0.45) * 220.0;
-                    camZ = Math.sin(t * 0.45) * 220.0;
-                    camY = 9.0 + Math.sin(t * 1.4) * 4.0 + (sSub * 8.0);
+                    // Vuelo ultra-rasante sobre el mercurio líquido
+                    camX = Math.cos(t * 0.42) * 210.0;
+                    camZ = Math.sin(t * 0.42) * 210.0;
+                    camY = 16.0 + Math.sin(t * 1.2) * 6.0 + (sSub * 10.0);
 
-                    const tLook = t + 0.22;
-                    lookX = Math.cos(tLook * 0.45) * 220.0;
-                    lookZ = Math.sin(tLook * 0.45) * 220.0;
-                    lookY = 25.0;
+                    const tLook = t + 0.2;
+                    lookX = Math.cos(tLook * 0.42) * 210.0;
+                    lookZ = Math.sin(tLook * 0.42) * 210.0;
+                    lookY = 32.0;
 
                 } else {
-                    const focalMonolith = this.monolithData[2];
-                    camX = focalMonolith.x + Math.cos(t * 0.4) * 65.0;
-                    camZ = focalMonolith.z + Math.sin(t * 0.4) * 65.0;
-                    camY = 30.0 + Math.sin(t * 0.6) * 120.0 + 80.0;
+                    // Tower Reveal: ascenso vertical frente a los monolitos
+                    const focalMonolith = this.monolithData[3] || { x: 100, z: 100, baseY: 40 };
+                    camX = focalMonolith.x + Math.cos(t * 0.38) * 75.0;
+                    camZ = focalMonolith.z + Math.sin(t * 0.38) * 75.0;
+                    camY = 40.0 + Math.sin(t * 0.5) * 130.0 + 90.0;
 
                     lookX = focalMonolith.x;
                     lookZ = focalMonolith.z;
-                    lookY = focalMonolith.baseY + 120.0;
+                    lookY = focalMonolith.baseY + 110.0;
                 }
 
-                const shakeX = (Math.random() - 0.5) * sSub * 4.0;
-                const shakeY = (Math.random() - 0.5) * sSub * 4.0;
+                // Shake sutil ante graves
+                const shakeX = (Math.random() - 0.5) * sSub * 3.0;
+                const shakeY = (Math.random() - 0.5) * sSub * 3.0;
 
                 threeCamera.position.set(camX + shakeX, camY + shakeY, camZ);
                 threeCamera.lookAt(lookX, lookY, lookZ);
 
-                const bankRoll = -Math.sin(t * 0.35) * 0.16 * (1.0 + sBass * 0.6);
+                // Alabeo aerodinámico en giros
+                const bankRoll = -Math.sin(t * 0.32) * 0.14 * (1.0 + sBass * 0.5);
                 threeCamera.rotation.z += bankRoll;
+
+                // Actualizar distancia en el HUD
+                const zoomHud = document.getElementById('hud-camera-zoom');
+                if (zoomHud && Math.random() < 0.15) {
+                    zoomHud.innerText = Math.round(threeCamera.position.length());
+                }
             }
         }
-
         let scenicWorldEngine = null;
 
         function initScenicWorldEngine() {
