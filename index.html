@@ -542,7 +542,7 @@
                         <div>
                             <div class="text-[9px] font-mono text-zinc-500 uppercase tracking-wider mb-1 px-0.5 flex items-center justify-between">
                                 <span>Matriz de Ingesta Externa // Patchbay</span>
-                                <span>6 FUENTES DSP</span>
+                                <span>7 FUENTES DSP & VIDEO</span>
                             </div>
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs font-mono">
                                 <button onclick="startMicrophone()" id="btn-mic" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group">
@@ -576,7 +576,17 @@
                                     <span id="txt-synth" class="text-[11px] font-sans font-medium">Synth Beat</span>
                                     <span class="text-[8px] text-amber-500/80">PROC</span>
                                 </button>
-                                <button onclick="stopAudio()" id="btn-stop" class="col-span-2 sm:col-span-1 py-1.5 px-2 bg-zinc-900/90 hover:bg-rose-950/60 text-zinc-400 hover:text-rose-300 rounded-lg border border-white/[0.08] hover:border-rose-500/40 flex items-center justify-between gap-1 transition">
+                                <div class="flex gap-1">
+                                    <button onclick="toggleLiveVideo()" id="btn-cam" class="flex-grow py-1.5 px-2 bg-zinc-900/90 hover:bg-cyan-950/40 text-cyan-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group" title="Activar/Desactivar Cámara en Vivo / NDI / Virtual Cam">
+                                        <span class="text-[10px] text-cyan-400 font-bold">[CAM]</span>
+                                        <span class="text-[11px] font-sans font-medium truncate">Webcam/NDI</span>
+                                        <span id="cam-badge" class="text-[8px] text-zinc-500 group-hover:text-cyan-400">STANDBY</span>
+                                    </button>
+                                    <button onclick="openVideoIngestModal()" class="px-2 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] text-xs transition" title="Ajustes de Cámara, Chroma Key y Proyección 3D">
+                                        <span>⚙️</span>
+                                    </button>
+                                </div>
+                                <button onclick="stopAudio()" id="btn-stop" class="col-span-2 sm:col-span-3 py-1.5 px-2 bg-zinc-900/90 hover:bg-rose-950/60 text-zinc-400 hover:text-rose-300 rounded-lg border border-white/[0.08] hover:border-rose-500/40 flex items-center justify-between gap-1 transition">
                                     <span class="text-[10px] text-rose-400 font-bold">[MUTE]</span>
                                     <span class="text-[11px] font-sans font-medium text-rose-300">Detener Audio</span>
                                     <span class="text-[8px] text-rose-500/80">STOP</span>
@@ -585,8 +595,9 @@
                         </div>
                     </div>
 
-                    <!-- HTML5 Audio Element persistente en DOM -->
+                    <!-- HTML5 Audio & Video Elements persistentes en DOM -->
                     <audio id="html5-audio-player" preload="auto" crossorigin="anonymous" class="hidden"></audio>
+                    <video id="live-video-stream" playsinline autoplay muted class="hidden"></video>
 
                     <!-- Dedicated Track Scrubber & Master Stereo Controls -->
                     <div id="track-player-controls" class="p-2.5 bg-black/70 rounded-lg border border-white/[0.08] space-y-2 text-xs">
@@ -805,6 +816,14 @@
                                     <span>🧠</span>
                                     <span class="hidden md:inline">Director FX</span>
                                 </button>
+                                <button onclick="focusVjTimeline()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-teal-400 hover:text-white rounded-lg border border-teal-500/30 text-[11px] transition flex items-center gap-1 font-medium" title="Abrir / Enfocar Timeline de Automatización VJ">
+                                    <span>⏱️</span>
+                                    <span class="hidden xl:inline">Timeline VJ</span>
+                                </button>
+                                <button onclick="openMeshFreezeModal()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-amber-400 hover:text-white rounded-lg border border-amber-500/30 text-[11px] transition flex items-center gap-1 font-medium" title="Congelar Malla 3D Topográfica y Exportar STL / OBJ / GLB">
+                                    <span>🧊</span>
+                                    <span class="hidden xl:inline">Freeze 3D</span>
+                                </button>
                                 <button onclick="resetThreeCamera()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-white/[0.08] text-zinc-400 hover:text-white text-[11px] transition">Reset</button>
                             </div>
                         </div>
@@ -935,9 +954,12 @@
                             <div class="h-3 w-px bg-white/20"></div>
                             <button onclick="playUserUploadedTrack()" class="text-zinc-200 hover:text-cyan-300 font-medium flex items-center gap-1">▶ Pista</button>
                             <button onclick="startMicrophone()" class="text-zinc-200 hover:text-cyan-300 font-medium flex items-center gap-1">🎙️ Mic</button>
+                            <button onclick="toggleLiveVideo()" class="text-zinc-200 hover:text-cyan-300 font-medium flex items-center gap-1" title="Cámara en Vivo">📹 Cam</button>
                             <button onclick="toggleSynthDemo()" class="text-zinc-200 hover:text-amber-300 font-medium flex items-center gap-1">⚡ Synth</button>
                             <div class="h-3 w-px bg-white/20"></div>
                             <button onclick="triggerAutonomousGenesis()" class="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1" title="Génesis Autónoma de Arte">🔮 Génesis</button>
+                            <button onclick="focusVjTimeline()" class="text-teal-300 hover:text-teal-200 font-bold flex items-center gap-1" title="Timeline VJ">⏱️ VJ</button>
+                            <button onclick="openMeshFreezeModal()" class="text-amber-300 hover:text-amber-200 font-bold flex items-center gap-1" title="Escultura 3D STL/OBJ">🧊 3D</button>
                             <button onclick="captureUltraScreenshot('4k', true)" class="text-zinc-200 hover:text-amber-300 font-medium flex items-center gap-1" title="Captura 4K instantánea [P]">📸 4K</button>
                             <button onclick="toggleCameraOrbit()" class="text-zinc-200 hover:text-indigo-300 font-medium flex items-center gap-1">🎥 Órbita</button>
                             <button onclick="toggleFullscreen()" class="text-zinc-200 hover:text-white font-medium flex items-center gap-1">⛶ Fullscreen</button>
@@ -949,6 +971,72 @@
 
                         <!-- Camera Shutter Flash Overlay for 4K / 8K Screenshots -->
                         <div id="screenshot-flash" class="absolute inset-0 bg-white pointer-events-none opacity-0 z-40"></div>
+                    </div>
+                </section>
+
+                <!-- 3.5 VJ AUTOMATION TIMELINE & SESSION RECORDER / PLAYER (Q-BUS DAW TIMELINE) -->
+                <section id="sec-vj-timeline" class="glass-panel rounded-xl p-3 sm:p-3.5 space-y-2.5 text-xs shadow-lg transition-all">
+                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-2">
+                        <div class="flex items-center gap-2 font-bold text-zinc-200">
+                            <span class="text-teal-400">⏱️ Timeline de Automatización VJ &amp; Sesión Q-Bus</span>
+                            <span id="vj-session-state-badge" class="text-[9px] font-mono text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-white/[0.08] flex items-center gap-1.5">
+                                <span id="vj-rec-led" class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span>
+                                <span id="vj-state-text">EN VIVO (STANDBY)</span>
+                            </span>
+                            <span id="vj-time-display" class="text-[10px] font-mono text-teal-300 font-bold bg-teal-950/60 px-2 py-0.5 rounded border border-teal-500/30">00:00.0 / 00:00.0</span>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-1.5 font-mono text-[10px]">
+                            <!-- Transport Controls -->
+                            <button onclick="toggleVjRecording()" id="btn-vj-rec" class="px-2.5 py-1 bg-red-600/30 hover:bg-red-600/60 text-red-300 border border-red-500/40 rounded-lg font-bold flex items-center gap-1 transition active:scale-95" title="Iniciar / Detener Grabación de Automatización VJ">
+                                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                                <span id="btn-vj-rec-text">REC</span>
+                            </button>
+                            <button onclick="toggleVjPlayback()" id="btn-vj-play" class="px-2.5 py-1 bg-teal-600/30 hover:bg-teal-600/60 text-teal-300 border border-teal-500/40 rounded-lg font-bold flex items-center gap-1 transition active:scale-95" title="Reproducir Sesión Grabada">
+                                <span>▶</span>
+                                <span id="btn-vj-play-text">PLAY</span>
+                            </button>
+                            <button onclick="stopVjSession()" id="btn-vj-stop" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] transition" title="Detener Playback y Volver a En Vivo">
+                                <span>⏹ STOP</span>
+                            </button>
+                            <button onclick="toggleVjLoop()" id="btn-vj-loop" class="px-2 py-1 bg-teal-950/60 text-teal-300 border border-teal-500/40 rounded-lg font-bold transition" title="Alternar Reproducción en Bucle Infinito">
+                                <span id="vj-loop-icon">↺ LOOP: ON</span>
+                            </button>
+                            <div class="hidden sm:block h-3 w-px bg-white/20 mx-0.5"></div>
+                            <!-- Curve Selector -->
+                            <select id="vj-curve-select" onchange="setVjTimelineCurve(this.value)" class="bg-zinc-900 border border-white/10 text-zinc-200 rounded px-2 py-1 text-[10px] focus:outline-none cursor-pointer">
+                                <option value="q1_rms" selected>Pista: Q1 (Burst) + RMS</option>
+                                <option value="q_bus">Pista: Q2 (Mids) + Q4 (SNR)</option>
+                                <option value="stems">Pista: Sub + Bass + Treble</option>
+                                <option value="events">Pista: Eventos &amp; Drops</option>
+                            </select>
+                            <button onclick="exportVjSessionFile()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-emerald-400 hover:text-white rounded-lg border border-emerald-500/30 transition flex items-center gap-1" title="Exportar Sesión en Archivo .mvj (JSON)">
+                                <span>⬇ .MVJ</span>
+                            </button>
+                            <label class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-cyan-400 hover:text-white rounded-lg border border-cyan-500/30 transition flex items-center gap-1 cursor-pointer" title="Cargar Archivo de Sesión .mvj">
+                                <span>⬆ CARGAR</span>
+                                <input type="file" id="vj-file-input" accept=".mvj,.json" class="hidden" onchange="loadVjSessionFile(event)">
+                            </label>
+                            <button onclick="toggleVjTimelineCollapse()" id="btn-vj-collapse" class="px-1.5 py-1 text-zinc-400 hover:text-white rounded bg-zinc-900 border border-white/5 transition" title="Plegar / Desplegar Timeline">
+                                <span id="vj-collapse-icon">▲</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Canvas Container (DAW Grid) -->
+                    <div id="vj-timeline-body" class="space-y-1.5 transition-all">
+                        <div class="relative w-full h-24 sm:h-28 bg-black/90 rounded-lg border border-white/10 overflow-hidden cursor-crosshair select-none" id="vj-canvas-wrapper">
+                            <canvas id="vjTimelineCanvas" class="w-full h-full block"></canvas>
+                            <!-- Interactive Scrubber Playhead -->
+                            <div id="vj-playhead-line" class="absolute top-0 bottom-0 w-0.5 bg-teal-400 shadow-[0_0_8px_#2dd4bf] pointer-events-none transition-none" style="left: 0%;"></div>
+                        </div>
+                        <div class="flex items-center justify-between text-[9px] font-mono text-zinc-500 px-1">
+                            <span class="flex items-center gap-2">
+                                <span class="flex items-center gap-1 text-cyan-400"><span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span> Q1 Lookahead</span>
+                                <span class="flex items-center gap-1 text-pink-400"><span class="w-1.5 h-1.5 rounded-full bg-pink-400"></span> RMS Energy</span>
+                                <span class="flex items-center gap-1 text-amber-400"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span> Drops / Transitorios</span>
+                            </span>
+                            <span>Haz clic o arrastra para Scrubbing temporal en tiempo real</span>
+                        </div>
                     </div>
                 </section>
 
@@ -1542,6 +1630,10 @@
                             <span class="hidden sm:inline text-zinc-500">Displacement Maps IEEE 754 para Houdini / Blender / Nuke</span>
                         </div>
                         <div class="flex items-center gap-2">
+                            <button onclick="openMeshFreezeModal()" class="px-2.5 py-1 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold rounded-lg border border-amber-400/40 shadow-sm transition flex items-center gap-1.5" title="Congelar Malla 3D Topográfica y Exportar STL (Impresión 3D) / OBJ / GLB">
+                                <span>🧊</span>
+                                <span>Congelar 3D &amp; STL/OBJ/GLB</span>
+                            </button>
                             <button onclick="exportSpectralMapVFX('waterfall', 'exr')" class="px-2.5 py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-lg border border-cyan-400/40 shadow-sm transition flex items-center gap-1.5" title="Exportar Mapa de Relieve Espectral en Formato OpenEXR 32-bit Float sin pérdida">
                                 <span>🏔️</span>
                                 <span>Exportar EXR (.exr)</span>
@@ -4732,6 +4824,9 @@
         let waterfallManager = null;
         let spatialAudioEngine = null;
         let oscBridgeEngine = null;
+        let vjSessionTimelineEngine = null;
+        let meshFreeze3DEngine = null;
+        let liveVideoIngestEngine = null;
         let gpuComputeManager = null;
         let audioDataTexture = null;
         let audioTextureBytes = null;
@@ -6635,7 +6730,10 @@
                 uCoilAlpha:   { value: 1.4 },
                 uRosensweigHc:{ value: 0.65 },
                 uViscosity:   { value: 0.7 },
-                uThinFilmStr: { value: 1.0 }
+                uThinFilmStr: { value: 1.0 },
+                // Live Video / Webcam / NDI Ingest
+                uVideoTexture:{ value: null },
+                uVideoActive: { value: 0.0 }
             };
 
             const defaultFrag = (typeof SHADER_PRESETS !== 'undefined' && SHADER_PRESETS.plasma) 
@@ -6998,6 +7096,12 @@
                 customShaderUniforms.uIsOnset.value    = liveAudioMetrics.isOnset ? 1.0 : 0.0;
                 if (audioDataTexture && customShaderUniforms.uAudioTexture) {
                     customShaderUniforms.uAudioTexture.value = audioDataTexture;
+                }
+                if (liveVideoIngestEngine && liveVideoIngestEngine.isActive && liveVideoIngestEngine.videoTexture) {
+                    if (customShaderUniforms.uVideoTexture) customShaderUniforms.uVideoTexture.value = liveVideoIngestEngine.videoTexture;
+                    if (customShaderUniforms.uVideoActive) customShaderUniforms.uVideoActive.value = 1.0;
+                } else if (customShaderUniforms.uVideoActive) {
+                    customShaderUniforms.uVideoActive.value = 0.0;
                 }
                 if (customShaderUniforms.uColor1) customShaderUniforms.uColor1.value.copy(aiColorsCurrent.prim);
                 if (customShaderUniforms.uColor2) customShaderUniforms.uColor2.value.copy(aiColorsCurrent.accent);
@@ -15567,6 +15671,1297 @@ Respond ONLY with valid JSON with:
         }
 
         // =========================================================================
+        // MOTORVISUALES v6: VJ AUTOMATION TIMELINE & SESSION RECORDER / PLAYER
+        // =========================================================================
+        class VjSessionTimelineEngine {
+            constructor() {
+                this.state = 'IDLE'; // 'IDLE', 'RECORDING', 'PLAYBACK', 'PAUSED'
+                this.isLooping = true;
+                this.frames = [];
+                this.events = [];
+                this.playbackTime = 0.0;
+                this.totalDuration = 0.0;
+                this.recordingStartTime = 0.0;
+                this.sampleInterval = 1000 / 30; // 30 FPS
+                this.lastSampleTime = 0;
+                this.selectedCurve = 'q1_rms'; // 'q1_rms', 'q_bus', 'stems', 'events'
+                this.canvas = null;
+                this.ctx = null;
+                this.playheadEl = null;
+                this.isDragging = false;
+                this.lastRecordedScene = '';
+                this.lastRecordedPreset = -1;
+            }
+
+            init() {
+                this.canvas = document.getElementById('vjTimelineCanvas');
+                if (this.canvas) {
+                    this.ctx = this.canvas.getContext('2d');
+                    this.setupEvents();
+                    this.resizeCanvas();
+                    window.addEventListener('resize', () => this.resizeCanvas());
+                    this.renderCanvas();
+                }
+                this.playheadEl = document.getElementById('vj-playhead-line');
+                this.updateUI();
+            }
+
+            resizeCanvas() {
+                if (!this.canvas) return;
+                const rect = this.canvas.parentElement.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = rect.width * dpr;
+                this.canvas.height = rect.height * dpr;
+                this.canvas.style.width = `${rect.width}px`;
+                this.canvas.style.height = `${rect.height}px`;
+                if (this.ctx) {
+                    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                }
+                this.renderCanvas();
+            }
+
+            setupEvents() {
+                if (!this.canvas) return;
+                const handleScrub = (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const x = clientX - rect.left;
+                    const ratio = Math.max(0, Math.min(1, x / rect.width));
+                    this.seekRatio(ratio);
+                };
+
+                this.canvas.addEventListener('mousedown', (e) => {
+                    this.isDragging = true;
+                    if (this.state === 'PLAYBACK') this.pausePlayback();
+                    handleScrub(e);
+                });
+
+                window.addEventListener('mousemove', (e) => {
+                    if (this.isDragging) handleScrub(e);
+                });
+
+                window.addEventListener('mouseup', () => {
+                    this.isDragging = false;
+                });
+
+                this.canvas.addEventListener('touchstart', (e) => {
+                    this.isDragging = true;
+                    if (this.state === 'PLAYBACK') this.pausePlayback();
+                    handleScrub(e);
+                }, { passive: true });
+
+                this.canvas.addEventListener('touchmove', (e) => {
+                    if (this.isDragging) handleScrub(e);
+                }, { passive: true });
+
+                window.addEventListener('touchend', () => {
+                    this.isDragging = false;
+                });
+            }
+
+            startRecording() {
+                this.frames = [];
+                this.events = [];
+                this.state = 'RECORDING';
+                this.playbackTime = 0.0;
+                this.totalDuration = 0.0;
+                this.recordingStartTime = performance.now();
+                this.lastSampleTime = 0;
+                this.lastRecordedScene = activeSceneType;
+                this.lastRecordedPreset = currentPresetIndex;
+                this.events.push({ time: 0, type: 'START', label: 'Inicio Sesión' });
+                this.updateUI();
+                if (typeof showToast === 'function') {
+                    showToast("Grabación VJ Iniciada", "Capturando telemetría Q-Bus y eventos a 30 FPS.", "info", 2000);
+                }
+            }
+
+            stopRecording() {
+                if (this.state !== 'RECORDING') return;
+                this.state = 'IDLE';
+                this.totalDuration = this.frames.length > 0 ? this.frames[this.frames.length - 1].time : 0.0;
+                this.events.push({ time: this.totalDuration, type: 'END', label: 'Fin Sesión' });
+                this.playbackTime = 0.0;
+                this.renderCanvas();
+                this.updateUI();
+                if (typeof showToast === 'function') {
+                    showToast("Sesión VJ Grabada", `${this.frames.length} frames (${this.totalDuration.toFixed(1)}s) listos para reproducir.`, "success", 3000);
+                }
+            }
+
+            toggleRecording() {
+                if (this.state === 'RECORDING') {
+                    this.stopRecording();
+                } else {
+                    this.startRecording();
+                }
+            }
+
+            startPlayback() {
+                if (this.frames.length === 0) {
+                    if (typeof showToast === 'function') showToast("Sin Sesión", "Graba una sesión o carga un archivo .mvj primero.", "warning", 2000);
+                    return;
+                }
+                this.state = 'PLAYBACK';
+                this.updateUI();
+                if (typeof showToast === 'function') {
+                    showToast("Reproduciendo Sesión VJ", `Sincronizada (${this.totalDuration.toFixed(1)}s).`, "info", 1500);
+                }
+            }
+
+            pausePlayback() {
+                if (this.state === 'PLAYBACK') {
+                    this.state = 'PAUSED';
+                    this.updateUI();
+                }
+            }
+
+            togglePlayback() {
+                if (this.state === 'PLAYBACK') {
+                    this.pausePlayback();
+                } else {
+                    this.startPlayback();
+                }
+            }
+
+            stopPlayback() {
+                this.state = 'IDLE';
+                this.playbackTime = 0.0;
+                this.updateUI();
+                this.updatePlayheadPosition();
+            }
+
+            toggleLoop() {
+                this.isLooping = !this.isLooping;
+                const btn = document.getElementById('btn-vj-loop');
+                if (btn) {
+                    btn.innerHTML = this.isLooping ? "↺ LOOP: ON" : "↺ LOOP: OFF";
+                    btn.className = this.isLooping
+                        ? "px-2 py-1 bg-teal-950/60 text-teal-300 border border-teal-500/40 rounded-lg font-bold transition"
+                        : "px-2 py-1 bg-zinc-900 text-zinc-400 border border-white/[0.08] rounded-lg transition";
+                }
+            }
+
+            seekRatio(ratio) {
+                if (this.frames.length === 0) return;
+                this.playbackTime = ratio * this.totalDuration;
+                this.applyFrameAt(this.playbackTime);
+                this.updatePlayheadPosition();
+                this.updateTimeDisplay();
+            }
+
+            applyFrameAt(timeSec) {
+                if (this.frames.length === 0) return;
+                const frameIdx = Math.max(0, Math.min(this.frames.length - 1, Math.round((timeSec / this.totalDuration) * (this.frames.length - 1))));
+                const frame = this.frames[frameIdx];
+                if (!frame) return;
+
+                if (window.qVars && frame.qVars) {
+                    for (let i = 0; i < Math.min(window.qVars.length, frame.qVars.length); i++) {
+                        window.qVars[i] = frame.qVars[i];
+                    }
+                }
+
+                if (typeof liveAudioMetrics !== 'undefined') {
+                    liveAudioMetrics.rms = frame.rms;
+                    liveAudioMetrics.spectralFlux = frame.flux;
+                    liveAudioMetrics.spectralCentroid = frame.centroid;
+                    liveAudioMetrics.isOnset = frame.isOnset;
+                }
+
+                if (frame.scene && frame.scene !== activeSceneType) {
+                    switchThreeScene(frame.scene);
+                    const sel = document.getElementById('three-scene-mode');
+                    if (sel) sel.value = frame.scene;
+                }
+
+                if (frame.shader !== undefined && frame.shader !== currentPresetIndex && typeof setShaderPreset === 'function') {
+                    setShaderPreset(frame.shader);
+                }
+            }
+
+            update(time, dt) {
+                const now = performance.now();
+
+                if (this.state === 'RECORDING') {
+                    if (now - this.lastSampleTime >= this.sampleInterval) {
+                        this.lastSampleTime = now;
+                        const tSec = (now - this.recordingStartTime) * 0.001;
+                        this.totalDuration = tSec;
+
+                        const qSlice = window.qVars ? Array.from(window.qVars.slice(0, 24)) : new Array(24).fill(0);
+                        const frame = {
+                            time: tSec,
+                            qVars: qSlice,
+                            rms: liveAudioMetrics ? (liveAudioMetrics.rms || 0) : 0,
+                            flux: liveAudioMetrics ? (liveAudioMetrics.spectralFlux || 0) : 0,
+                            centroid: liveAudioMetrics ? (liveAudioMetrics.spectralCentroid || 0) : 0,
+                            sub: stemsData && stemsData['sub'] ? stemsData['sub'].value : 0,
+                            bass: stemsData && stemsData['bass'] ? stemsData['bass'].value : 0,
+                            mid: stemsData && stemsData['mid'] ? stemsData['mid'].value : 0,
+                            treble: stemsData && stemsData['treble'] ? stemsData['treble'].value : 0,
+                            scene: activeSceneType,
+                            shader: currentPresetIndex,
+                            isOnset: liveAudioMetrics ? (liveAudioMetrics.isOnset ? 1 : 0) : 0
+                        };
+
+                        this.frames.push(frame);
+
+                        if (typeof narrativeDirector !== 'undefined' && narrativeDirector && narrativeDirector.isDrop()) {
+                            this.events.push({ time: tSec, type: 'DROP', label: 'Drop Explosivo' });
+                        }
+
+                        if (activeSceneType !== this.lastRecordedScene) {
+                            this.events.push({ time: tSec, type: 'SCENE', label: activeSceneType });
+                            this.lastRecordedScene = activeSceneType;
+                        }
+
+                        this.playbackTime = tSec;
+                        this.updatePlayheadPosition();
+                        this.updateTimeDisplay();
+
+                        if (this.frames.length % 15 === 0) {
+                            this.renderCanvas();
+                        }
+                    }
+                } else if (this.state === 'PLAYBACK') {
+                    this.playbackTime += dt;
+                    if (this.playbackTime >= this.totalDuration) {
+                        if (this.isLooping) {
+                            this.playbackTime = 0.0;
+                        } else {
+                            this.stopPlayback();
+                            return;
+                        }
+                    }
+                    this.applyFrameAt(this.playbackTime);
+                    this.updatePlayheadPosition();
+                    this.updateTimeDisplay();
+                }
+            }
+
+            updatePlayheadPosition() {
+                if (!this.playheadEl || this.totalDuration <= 0) return;
+                const pct = Math.max(0, Math.min(100, (this.playbackTime / this.totalDuration) * 100));
+                this.playheadEl.style.left = `${pct}%`;
+            }
+
+            updateTimeDisplay() {
+                const el = document.getElementById('vj-time-display');
+                if (!el) return;
+                const format = (sec) => {
+                    const m = Math.floor(sec / 60);
+                    const s = (sec % 60).toFixed(1);
+                    return `${m.toString().padStart(2, '0')}:${s.padStart(4, '0')}`;
+                };
+                el.innerText = `${format(this.playbackTime)} / ${format(this.totalDuration)}`;
+            }
+
+            updateUI() {
+                const recBtn = document.getElementById('btn-vj-rec');
+                const playBtn = document.getElementById('btn-vj-play');
+                const playText = document.getElementById('btn-vj-play-text');
+                const stateText = document.getElementById('vj-state-text');
+                const recLed = document.getElementById('vj-rec-led');
+
+                if (this.state === 'RECORDING') {
+                    if (recBtn) recBtn.className = "px-2.5 py-1 bg-red-600 text-white rounded-lg font-bold flex items-center gap-1 shadow-lg shadow-red-600/40 animate-pulse";
+                    if (playBtn) playBtn.className = "px-2.5 py-1 bg-zinc-900 text-zinc-500 rounded-lg";
+                    if (stateText) stateText.innerText = "GRABANDO TELEMETRÍA";
+                    if (recLed) recLed.className = "w-1.5 h-1.5 rounded-full bg-red-500 animate-ping";
+                } else if (this.state === 'PLAYBACK') {
+                    if (recBtn) recBtn.className = "px-2.5 py-1 bg-zinc-900 text-zinc-500 rounded-lg";
+                    if (playBtn) playBtn.className = "px-2.5 py-1 bg-teal-500 text-black font-black rounded-lg shadow-lg shadow-teal-500/40";
+                    if (playText) playText.innerText = "PAUSE";
+                    if (stateText) stateText.innerText = "REPRODUCIENDO AUTOMATIZACIÓN";
+                    if (recLed) recLed.className = "w-1.5 h-1.5 rounded-full bg-teal-400";
+                } else if (this.state === 'PAUSED') {
+                    if (playText) playText.innerText = "RESUME";
+                    if (stateText) stateText.innerText = "PAUSA (SCRUBBING ACTIVO)";
+                    if (recLed) recLed.className = "w-1.5 h-1.5 rounded-full bg-amber-400";
+                } else {
+                    if (recBtn) recBtn.className = "px-2.5 py-1 bg-red-600/30 hover:bg-red-600/60 text-red-300 border border-red-500/40 rounded-lg font-bold flex items-center gap-1 transition active:scale-95";
+                    if (playBtn) playBtn.className = "px-2.5 py-1 bg-teal-600/30 hover:bg-teal-600/60 text-teal-300 border border-teal-500/40 rounded-lg font-bold flex items-center gap-1 transition active:scale-95";
+                    if (playText) playText.innerText = "PLAY";
+                    if (stateText) stateText.innerText = "EN VIVO (STANDBY)";
+                    if (recLed) recLed.className = "w-1.5 h-1.5 rounded-full bg-zinc-600";
+                }
+                this.updateTimeDisplay();
+            }
+
+            renderCanvas() {
+                if (!this.canvas || !this.ctx) return;
+                const ctx = this.ctx;
+                const rect = this.canvas.getBoundingClientRect();
+                const w = rect.width;
+                const h = rect.height;
+
+                ctx.clearRect(0, 0, w, h);
+
+                // Fondo y rejilla de tiempo
+                ctx.fillStyle = '#06080f';
+                ctx.fillRect(0, 0, w, h);
+
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, h * 0.5); ctx.lineTo(w, h * 0.5);
+                ctx.moveTo(0, h * 0.25); ctx.lineTo(w, h * 0.25);
+                ctx.moveTo(0, h * 0.75); ctx.lineTo(w, h * 0.75);
+                ctx.stroke();
+
+                const numBars = 16;
+                for (let i = 1; i < numBars; i++) {
+                    const x = (i / numBars) * w;
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0); ctx.lineTo(x, h);
+                    ctx.stroke();
+                }
+
+                if (this.frames.length < 2) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.font = '10px monospace';
+                    ctx.textAlign = 'center';
+                    ctx.fillText("TIMELINE VACÍO // PULSA [REC] PARA GRABAR SESIÓN O CARGA .MVJ", w / 2, h / 2 + 4);
+                    return;
+                }
+
+                const n = this.frames.length;
+
+                // Curva 1: Área de RMS / Energía
+                const rmsGrad = ctx.createLinearGradient(0, 0, 0, h);
+                rmsGrad.addColorStop(0, 'rgba(236, 72, 153, 0.35)');
+                rmsGrad.addColorStop(1, 'rgba(236, 72, 153, 0.0)');
+                ctx.fillStyle = rmsGrad;
+                ctx.beginPath();
+                ctx.moveTo(0, h);
+                for (let i = 0; i < n; i++) {
+                    const x = (i / (n - 1)) * w;
+                    const val = Math.min(1.0, this.frames[i].rms * 2.2);
+                    const y = h - val * (h - 10);
+                    ctx.lineTo(x, y);
+                }
+                ctx.lineTo(w, h);
+                ctx.closePath();
+                ctx.fill();
+
+                // Curva 2: Línea Q1 (Burst Lookahead)
+                ctx.strokeStyle = '#22d3ee';
+                ctx.lineWidth = 1.8;
+                ctx.shadowColor = '#06b6d4';
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                for (let i = 0; i < n; i++) {
+                    const x = (i / (n - 1)) * w;
+                    const qVal = Math.min(1.0, (this.frames[i].qVars[0] || 0) * 0.85);
+                    const y = h - qVal * (h - 12);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+
+                // Curva 3: Línea de RMS
+                ctx.strokeStyle = '#f472b6';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                for (let i = 0; i < n; i++) {
+                    const x = (i / (n - 1)) * w;
+                    const val = Math.min(1.0, this.frames[i].rms * 2.2);
+                    const y = h - val * (h - 10);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                // Dibujar Marcadores de Eventos (Drops y Cambios de Escena)
+                if (this.totalDuration > 0) {
+                    for (let ev of this.events) {
+                        const ex = (ev.time / this.totalDuration) * w;
+                        if (ev.type === 'DROP') {
+                            ctx.strokeStyle = '#f59e0b';
+                            ctx.lineWidth = 1.5;
+                            ctx.setLineDash([3, 2]);
+                            ctx.beginPath();
+                            ctx.moveTo(ex, 0); ctx.lineTo(ex, h);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+                            ctx.fillStyle = '#f59e0b';
+                            ctx.beginPath();
+                            ctx.arc(ex, 10, 4, 0, Math.PI * 2);
+                            ctx.fill();
+                        } else if (ev.type === 'SCENE') {
+                            ctx.strokeStyle = '#c084fc';
+                            ctx.lineWidth = 1;
+                            ctx.setLineDash([2, 2]);
+                            ctx.beginPath();
+                            ctx.moveTo(ex, 0); ctx.lineTo(ex, h);
+                            ctx.stroke();
+                            ctx.setLineDash([]);
+                            ctx.fillStyle = '#c084fc';
+                            ctx.font = '8px monospace';
+                            ctx.fillText(ev.label.substring(0, 4), ex + 2, 20);
+                        }
+                    }
+                }
+            }
+
+            exportJson() {
+                if (this.frames.length === 0) {
+                    if (typeof showToast === 'function') showToast("Timeline Vacío", "No hay ninguna sesión grabada para exportar.", "warning", 2000);
+                    return;
+                }
+                const sessionData = {
+                    format: "MotorVisualesSession",
+                    version: "1.0",
+                    created: new Date().toISOString(),
+                    duration: this.totalDuration,
+                    framesCount: this.frames.length,
+                    eventsCount: this.events.length,
+                    frames: this.frames,
+                    events: this.events
+                };
+
+                const jsonStr = JSON.stringify(sessionData, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `sesion-vj-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.mvj`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                if (typeof showToast === 'function') {
+                    showToast("Sesión Exportada", `${(blob.size / 1024).toFixed(1)} KB guardados en archivo .mvj.`, "success", 3000);
+                }
+            }
+
+            importJson(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const parsed = JSON.parse(e.target.result);
+                        if (parsed.format !== 'MotorVisualesSession' && !parsed.frames) {
+                            throw new Error("Formato inválido: no es un archivo .mvj compatible");
+                        }
+                        this.frames = parsed.frames || [];
+                        this.events = parsed.events || [];
+                        this.totalDuration = parsed.duration || (this.frames.length > 0 ? this.frames[this.frames.length - 1].time : 0);
+                        this.playbackTime = 0.0;
+                        this.state = 'PAUSED';
+                        this.renderCanvas();
+                        this.updateUI();
+                        this.applyFrameAt(0.0);
+                        if (typeof showToast === 'function') {
+                            showToast("Sesión Cargada", `${this.frames.length} frames (${this.totalDuration.toFixed(1)}s) listos para reproducir.`, "success", 3000);
+                        }
+                    } catch (err) {
+                        console.error("[VJ Timeline] Error al cargar:", err);
+                        if (typeof showToast === 'function') showToast("Error al Cargar", err.message, "error", 4000);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // =========================================================================
+        // MOTORVISUALES v6: CONGELADOR DE TOPOGRAFÍA ACÚSTICA & EXPORTADOR STL/OBJ/GLB
+        // =========================================================================
+        class MeshFreeze3DEngine {
+            constructor() {
+                this.source = 'waterfall'; // 'waterfall' | 'gerstner_ocean'
+                this.baseThicknessMm = 8.0;
+                this.widthMm = 140.0;
+                this.depthMm = 100.0;
+                this.heightScaleMm = 25.0;
+                this.frozenGeometry = null;
+            }
+
+            freezeCurrentGeometry() {
+                const Nx = 128;
+                const Nz = 128;
+                const totalTopVerts = Nx * Nz;
+                const totalVerts = totalTopVerts * 2; // Top + Bottom
+                const positions = new Float32Array(totalVerts * 3);
+                const normals = new Float32Array(totalVerts * 3);
+                const uvs = new Float32Array(totalVerts * 2);
+
+                const heightData = new Float32Array(Nx * Nz);
+                if (this.source === 'waterfall' && waterfallManager && waterfallManager.textureData) {
+                    const tex = waterfallManager.textureData;
+                    for (let j = 0; j < Nz; j++) {
+                        for (let i = 0; i < Nx; i++) {
+                            const idx = (j * Nx + i) * 4;
+                            heightData[j * Nx + i] = tex[idx] / 255.0;
+                        }
+                    }
+                } else {
+                    for (let j = 0; j < Nz; j++) {
+                        for (let i = 0; i < Nx; i++) {
+                            const u = i / (Nx - 1), v = j / (Nz - 1);
+                            heightData[j * Nx + i] = (Math.sin(u * 12.0) * Math.cos(v * 10.0) + 1.0) * 0.5;
+                        }
+                    }
+                }
+
+                let minY = Infinity, maxY = -Infinity;
+                for (let k = 0; k < heightData.length; k++) {
+                    const y = heightData[k] * this.heightScaleMm;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+                }
+                const bottomY = minY - this.baseThicknessMm;
+
+                // 1. Vértices superiores
+                for (let j = 0; j < Nz; j++) {
+                    for (let i = 0; i < Nx; i++) {
+                        const vIdx = j * Nx + i;
+                        const x = (i / (Nx - 1) - 0.5) * this.widthMm;
+                        const z = (j / (Nz - 1) - 0.5) * this.depthMm;
+                        const y = heightData[vIdx] * this.heightScaleMm;
+
+                        positions[vIdx * 3] = x;
+                        positions[vIdx * 3 + 1] = y;
+                        positions[vIdx * 3 + 2] = z;
+
+                        uvs[vIdx * 2] = i / (Nx - 1);
+                        uvs[vIdx * 2 + 1] = j / (Nz - 1);
+                    }
+                }
+
+                // 2. Vértices inferiores (Base plana)
+                for (let j = 0; j < Nz; j++) {
+                    for (let i = 0; i < Nx; i++) {
+                        const topIdx = j * Nx + i;
+                        const botIdx = totalTopVerts + topIdx;
+                        const x = positions[topIdx * 3];
+                        const z = positions[topIdx * 3 + 2];
+
+                        positions[botIdx * 3] = x;
+                        positions[botIdx * 3 + 1] = bottomY;
+                        positions[botIdx * 3 + 2] = z;
+
+                        uvs[botIdx * 2] = uvs[topIdx * 2];
+                        uvs[botIdx * 2 + 1] = uvs[topIdx * 2 + 1];
+
+                        normals[botIdx * 3] = 0;
+                        normals[botIdx * 3 + 1] = -1;
+                        normals[botIdx * 3 + 2] = 0;
+                    }
+                }
+
+                // 3. Índices de triángulos (Watertight Manifold)
+                const indices = [];
+
+                // Tapa superior
+                for (let j = 0; j < Nz - 1; j++) {
+                    for (let i = 0; i < Nx - 1; i++) {
+                        const a = j * Nx + i;
+                        const b = j * Nx + (i + 1);
+                        const c = (j + 1) * Nx + (i + 1);
+                        const d = (j + 1) * Nx + i;
+                        indices.push(a, b, c);
+                        indices.push(a, c, d);
+                    }
+                }
+
+                // Tapa inferior
+                for (let j = 0; j < Nz - 1; j++) {
+                    for (let i = 0; i < Nx - 1; i++) {
+                        const a = totalTopVerts + (j * Nx + i);
+                        const b = totalTopVerts + (j * Nx + (i + 1));
+                        const c = totalTopVerts + ((j + 1) * Nx + (i + 1));
+                        const d = totalTopVerts + ((j + 1) * Nx + i);
+                        indices.push(a, c, b);
+                        indices.push(a, d, c);
+                    }
+                }
+
+                // Pared Norte (j = 0)
+                for (let i = 0; i < Nx - 1; i++) {
+                    const t1 = i, t2 = i + 1;
+                    const b1 = totalTopVerts + i, b2 = totalTopVerts + i + 1;
+                    indices.push(t1, b1, b2);
+                    indices.push(t1, b2, t2);
+                }
+
+                // Pared Sur (j = Nz - 1)
+                for (let i = 0; i < Nx - 1; i++) {
+                    const row = (Nz - 1) * Nx;
+                    const t1 = row + i, t2 = row + i + 1;
+                    const b1 = totalTopVerts + row + i, b2 = totalTopVerts + row + i + 1;
+                    indices.push(t1, t2, b2);
+                    indices.push(t1, b2, b1);
+                }
+
+                // Pared Oeste (i = 0)
+                for (let j = 0; j < Nz - 1; j++) {
+                    const t1 = j * Nx, t2 = (j + 1) * Nx;
+                    const b1 = totalTopVerts + j * Nx, b2 = totalTopVerts + (j + 1) * Nx;
+                    indices.push(t1, t2, b2);
+                    indices.push(t1, b2, b1);
+                }
+
+                // Pared Este (i = Nx - 1)
+                for (let j = 0; j < Nz - 1; j++) {
+                    const t1 = j * Nx + (Nx - 1), t2 = (j + 1) * Nx + (Nx - 1);
+                    const b1 = totalTopVerts + j * Nx + (Nx - 1), b2 = totalTopVerts + (j + 1) * Nx + (Nx - 1);
+                    indices.push(t1, b1, b2);
+                    indices.push(t1, b2, t2);
+                }
+
+                this.frozenGeometry = {
+                    positions,
+                    normals,
+                    uvs,
+                    indices: new Uint32Array(indices),
+                    vertexCount: totalVerts,
+                    triangleCount: indices.length / 3,
+                    width: this.widthMm,
+                    depth: this.depthMm,
+                    height: (maxY - bottomY)
+                };
+
+                return this.frozenGeometry;
+            }
+
+            exportSTL() {
+                if (!this.frozenGeometry) this.freezeCurrentGeometry();
+                const geom = this.frozenGeometry;
+                const numTriangles = geom.triangleCount;
+                const bufferSize = 84 + numTriangles * 50;
+                const buffer = new ArrayBuffer(bufferSize);
+                const view = new DataView(buffer);
+
+                const headerStr = "MotorVisuales v6 3D Sound Sculpture - Watertight Solid STL";
+                for (let i = 0; i < 80; i++) {
+                    view.setUint8(i, i < headerStr.length ? headerStr.charCodeAt(i) : 0x20);
+                }
+
+                view.setUint32(80, numTriangles, true);
+
+                const pos = geom.positions;
+                const idx = geom.indices;
+                let offset = 84;
+
+                for (let t = 0; t < numTriangles; t++) {
+                    const i0 = idx[t * 3] * 3;
+                    const i1 = idx[t * 3 + 1] * 3;
+                    const i2 = idx[t * 3 + 2] * 3;
+
+                    const ax = pos[i0], ay = pos[i0 + 1], az = pos[i0 + 2];
+                    const bx = pos[i1], by = pos[i1 + 1], bz = pos[i1 + 2];
+                    const cx = pos[i2], cy = pos[i2 + 1], cz = pos[i2 + 2];
+
+                    const abx = bx - ax, aby = by - ay, abz = bz - az;
+                    const acx = cx - ax, acy = cy - ay, acz = cz - az;
+                    let nx = aby * acz - abz * acy;
+                    let ny = abz * acx - abx * acz;
+                    let nz = abx * acy - aby * acx;
+                    const len = Math.sqrt(nx * nx + ny * ny + nz * nz) || 1.0;
+                    nx /= len; ny /= len; nz /= len;
+
+                    view.setFloat32(offset, nx, true);
+                    view.setFloat32(offset + 4, ny, true);
+                    view.setFloat32(offset + 8, nz, true);
+
+                    view.setFloat32(offset + 12, ax, true);
+                    view.setFloat32(offset + 16, ay, true);
+                    view.setFloat32(offset + 20, az, true);
+
+                    view.setFloat32(offset + 24, bx, true);
+                    view.setFloat32(offset + 28, by, true);
+                    view.setFloat32(offset + 32, bz, true);
+
+                    view.setFloat32(offset + 36, cx, true);
+                    view.setFloat32(offset + 40, cy, true);
+                    view.setFloat32(offset + 44, cz, true);
+
+                    view.setUint16(offset + 48, 0, true);
+                    offset += 50;
+                }
+
+                const blob = new Blob([buffer], { type: 'application/sla' });
+                this.downloadBlob(blob, `escultura-sonora-3d-${Date.now()}.stl`);
+                if (typeof showToast === 'function') {
+                    showToast("STL Exportado", `${(bufferSize / 1024 / 1024).toFixed(2)} MB • Listo para Slicers 3D.`, "success", 3000);
+                }
+            }
+
+            exportOBJ() {
+                if (!this.frozenGeometry) this.freezeCurrentGeometry();
+                const geom = this.frozenGeometry;
+                const pos = geom.positions;
+                const uvs = geom.uvs;
+                const idx = geom.indices;
+
+                let obj = `# MotorVisuales v6 - 3D Acoustic Sculpture\n# Vertices: ${geom.vertexCount}, Triangles: ${geom.triangleCount}\no SoundSculpture\n`;
+
+                for (let i = 0; i < geom.vertexCount; i++) {
+                    obj += `v ${pos[i * 3].toFixed(4)} ${pos[i * 3 + 1].toFixed(4)} ${pos[i * 3 + 2].toFixed(4)}\n`;
+                }
+
+                for (let i = 0; i < geom.vertexCount; i++) {
+                    obj += `vt ${uvs[i * 2].toFixed(4)} ${uvs[i * 2 + 1].toFixed(4)}\n`;
+                }
+
+                obj += `s 1\n`;
+                const numTriangles = geom.triangleCount;
+                for (let t = 0; t < numTriangles; t++) {
+                    const i0 = idx[t * 3] + 1;
+                    const i1 = idx[t * 3 + 1] + 1;
+                    const i2 = idx[t * 3 + 2] + 1;
+                    obj += `f ${i0}/${i0} ${i1}/${i1} ${i2}/${i2}\n`;
+                }
+
+                const blob = new Blob([obj], { type: 'text/plain' });
+                this.downloadBlob(blob, `escultura-sonora-3d-${Date.now()}.obj`);
+                if (typeof showToast === 'function') {
+                    showToast("OBJ Exportado", `${(blob.size / 1024 / 1024).toFixed(2)} MB • Compatible con Blender/ZBrush.`, "success", 3000);
+                }
+            }
+
+            exportGLB() {
+                if (!this.frozenGeometry) this.freezeCurrentGeometry();
+                const geom = this.frozenGeometry;
+
+                const posBytes = geom.positions.buffer;
+                const idxBytes = geom.indices.buffer;
+
+                const pad4 = (n) => (n % 4 === 0 ? 0 : 4 - (n % 4));
+                const posOffset = 0;
+                const posLength = posBytes.byteLength;
+                const idxOffset = posLength + pad4(posLength);
+                const idxLength = idxBytes.byteLength;
+                const totalBinLength = idxOffset + idxLength;
+
+                const binBuffer = new Uint8Array(totalBinLength);
+                binBuffer.set(new Uint8Array(posBytes), posOffset);
+                binBuffer.set(new Uint8Array(idxBytes), idxOffset);
+
+                const gltfJson = {
+                    asset: { version: "2.0", generator: "MotorVisuales v6 3D Sculpt Engine" },
+                    scene: 0,
+                    scenes: [{ nodes: [0] }],
+                    nodes: [{ mesh: 0, name: "AcousticSculptureSolid" }],
+                    materials: [{
+                        name: "AcousticSolidPBR",
+                        pbrMetallicRoughness: {
+                            baseColorFactor: [0.1, 0.85, 0.95, 1.0],
+                            metallicFactor: 0.8,
+                            roughnessFactor: 0.25
+                        }
+                    }],
+                    meshes: [{
+                        primitives: [{
+                            attributes: { POSITION: 0 },
+                            indices: 1,
+                            material: 0
+                        }]
+                    }],
+                    buffers: [{ byteLength: totalBinLength }],
+                    bufferViews: [
+                        { buffer: 0, byteOffset: posOffset, byteLength: posLength, target: 34962 },
+                        { buffer: 0, byteOffset: idxOffset, byteLength: idxLength, target: 34963 }
+                    ],
+                    accessors: [
+                        {
+                            bufferView: 0, byteOffset: 0,
+                            componentType: 5126,
+                            count: geom.vertexCount,
+                            type: "VEC3",
+                            max: [geom.width / 2, geom.height, geom.depth / 2],
+                            min: [-geom.width / 2, -100, -geom.depth / 2]
+                        },
+                        {
+                            bufferView: 1, byteOffset: 0,
+                            componentType: 5125,
+                            count: geom.indices.length,
+                            type: "SCALAR"
+                        }
+                    ]
+                };
+
+                const jsonStr = JSON.stringify(gltfJson);
+                const jsonLength = jsonStr.length;
+                const jsonPad = pad4(jsonLength);
+                const jsonTotal = jsonLength + jsonPad;
+
+                const glbSize = 12 + 8 + jsonTotal + 8 + totalBinLength;
+                const glbBuffer = new ArrayBuffer(glbSize);
+                const glbView = new DataView(glbBuffer);
+
+                glbView.setUint32(0, 0x46546C67, true); // "glTF"
+                glbView.setUint32(4, 2, true);
+                glbView.setUint32(8, glbSize, true);
+
+                glbView.setUint32(12, jsonTotal, true);
+                glbView.setUint32(16, 0x4E4F534A, true); // "JSON"
+                const glbBytes = new Uint8Array(glbBuffer);
+                for (let i = 0; i < jsonLength; i++) {
+                    glbBytes[20 + i] = jsonStr.charCodeAt(i);
+                }
+                for (let i = 0; i < jsonPad; i++) {
+                    glbBytes[20 + jsonLength + i] = 0x20;
+                }
+
+                const binChunkOffset = 20 + jsonTotal;
+                glbView.setUint32(binChunkOffset, totalBinLength, true);
+                glbView.setUint32(binChunkOffset + 4, 0x004E4942, true); // "BIN"
+                glbBytes.set(binBuffer, binChunkOffset + 8);
+
+                const blob = new Blob([glbBuffer], { type: 'model/gltf-binary' });
+                this.downloadBlob(blob, `escultura-sonora-3d-${Date.now()}.glb`);
+                if (typeof showToast === 'function') {
+                    showToast("GLB Exportado", `${(glbSize / 1024 / 1024).toFixed(2)} MB • Compatible con Web 3D / AR / Unreal.`, "success", 3000);
+                }
+            }
+
+            downloadBlob(blob, filename) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        // =========================================================================
+        // MOTORVISUALES v6: INGESTA DE VIDEO EN VIVO & WEBCAM / NDI / CHROMA KEY
+        // =========================================================================
+        class LiveVideoIngestEngine {
+            constructor() {
+                this.isActive = false;
+                this.stream = null;
+                this.videoElement = null;
+                this.previewElement = null;
+                this.videoTexture = null;
+                this.projectionMode = 'monolith'; // 'monolith', 'crystals', 'pip', 'shader_only'
+                this.chromaKey = {
+                    enabled: false,
+                    color: 'green',
+                    tolerance: 0.45,
+                    smoothness: 0.1
+                };
+                this.videoMonolithMesh = null;
+                this.videoHoloMaterial = null;
+            }
+
+            init() {
+                this.videoElement = document.getElementById('live-video-stream');
+                this.previewElement = document.getElementById('live-video-preview');
+                this.populateDevices();
+                this.initHoloMaterial();
+            }
+
+            async populateDevices() {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
+                try {
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    const sel = document.getElementById('video-device-select');
+                    if (!sel) return;
+                    sel.innerHTML = '<option value="">Cámara por Defecto</option>';
+                    devices.filter(d => d.kind === 'videoinput').forEach((dev, idx) => {
+                        const opt = document.createElement('option');
+                        opt.value = dev.deviceId;
+                        opt.innerText = dev.label || `Cámara ${idx + 1}`;
+                        sel.appendChild(opt);
+                    });
+                } catch (e) {
+                    console.warn("[Live Video] Error enumerando dispositivos:", e);
+                }
+            }
+
+            initHoloMaterial() {
+                this.videoHoloMaterial = new THREE.ShaderMaterial({
+                    uniforms: {
+                        uVideoTexture: { value: null },
+                        uChromaEnabled: { value: 0.0 },
+                        uChromaKeyColor: { value: new THREE.Color(0x00ff00) },
+                        uChromaTol: { value: 0.45 },
+                        uChromaSmooth: { value: 0.1 },
+                        uTime: { value: 0.0 },
+                        uAudioGlitch: { value: 0.0 },
+                        uBeatGlow: { value: 1.0 }
+                    },
+                    vertexShader: `
+                        uniform float uTime;
+                        uniform float uAudioGlitch;
+                        varying vec2 vUv;
+                        varying vec3 vNormal;
+
+                        void main() {
+                            vUv = uv;
+                            vNormal = normal;
+                            vec3 pos = position;
+                            pos.z -= pow(uv.x - 0.5, 2.0) * 12.0;
+                            if (uAudioGlitch > 0.05) {
+                                float slice = floor(uv.y * 30.0);
+                                float shift = sin(slice * 14.5 + uTime * 25.0) * uAudioGlitch * 4.0;
+                                pos.x += shift;
+                            }
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform sampler2D uVideoTexture;
+                        uniform float uChromaEnabled;
+                        uniform vec3 uChromaKeyColor;
+                        uniform float uChromaTol;
+                        uniform float uChromaSmooth;
+                        uniform float uTime;
+                        uniform float uBeatGlow;
+                        varying vec2 vUv;
+
+                        void main() {
+                            vec2 uv = vUv;
+                            vec4 tex = texture2D(uVideoTexture, uv);
+
+                            float scanline = sin(uv.y * 420.0 + uTime * 6.0) * 0.12 + 0.88;
+                            vec3 color = tex.rgb * scanline;
+
+                            float edge = pow(abs(uv.x - 0.5) * 2.0, 4.0) + pow(abs(uv.y - 0.5) * 2.0, 4.0);
+                            color += vec3(0.0, 0.85, 1.0) * edge * 0.45 * uBeatGlow;
+
+                            float alpha = 1.0;
+                            if (uChromaEnabled > 0.5) {
+                                float dist = distance(tex.rgb, uChromaKeyColor);
+                                alpha = smoothstep(uChromaTol, uChromaTol + uChromaSmooth, dist);
+                            }
+
+                            gl_FragColor = vec4(color, alpha * 0.95);
+                        }
+                    `,
+                    transparent: true,
+                    side: THREE.DoubleSide,
+                    depthWrite: false
+                });
+            }
+
+            async startCamera(deviceId = "") {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    if (typeof showToast === 'function') showToast("Incompatible", "Tu navegador no soporta captura de video getUserMedia.", "error", 3000);
+                    return;
+                }
+
+                try {
+                    const constraints = {
+                        video: {
+                            deviceId: deviceId ? { exact: deviceId } : undefined,
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 },
+                            frameRate: { ideal: 60 }
+                        },
+                        audio: false
+                    };
+
+                    this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                    if (this.videoElement) {
+                        this.videoElement.srcObject = this.stream;
+                        this.videoElement.play();
+                    }
+                    if (this.previewElement) {
+                        this.previewElement.srcObject = this.stream;
+                        this.previewElement.play();
+                    }
+
+                    const noSignal = document.getElementById('video-no-signal');
+                    if (noSignal) noSignal.classList.add('hidden');
+
+                    this.videoTexture = new THREE.VideoTexture(this.videoElement);
+                    this.videoTexture.minFilter = THREE.LinearFilter;
+                    this.videoTexture.magFilter = THREE.LinearFilter;
+                    this.videoTexture.format = THREE.RGBAFormat;
+
+                    if (this.videoHoloMaterial) {
+                        this.videoHoloMaterial.uniforms.uVideoTexture.value = this.videoTexture;
+                    }
+
+                    if (customShaderUniforms) {
+                        customShaderUniforms.uVideoTexture.value = this.videoTexture;
+                        customShaderUniforms.uVideoActive.value = 1.0;
+                    }
+
+                    this.attachHologramMonolith();
+                    this.isActive = true;
+                    this.updateUI();
+
+                    if (typeof showToast === 'function') {
+                        showToast("Cámara Activa (ON AIR)", "Video inyectado en Shaders GLSL y Océano Escénico.", "success", 3000);
+                    }
+                } catch (err) {
+                    console.error("[Live Video] Error iniciando cámara:", err);
+                    if (typeof showToast === 'function') {
+                        showToast("Error de Video", `No se pudo acceder a la cámara: ${err.message}`, "error", 4000);
+                    }
+                }
+            }
+
+            stopCamera() {
+                if (this.stream) {
+                    this.stream.getTracks().forEach(track => track.stop());
+                    this.stream = null;
+                }
+                if (this.videoElement) this.videoElement.srcObject = null;
+                if (this.previewElement) this.previewElement.srcObject = null;
+
+                const noSignal = document.getElementById('video-no-signal');
+                if (noSignal) noSignal.classList.remove('hidden');
+
+                if (customShaderUniforms) {
+                    customShaderUniforms.uVideoActive.value = 0.0;
+                }
+
+                if (this.videoMonolithMesh && scenicWorldEngine && scenicWorldEngine.mercuryGroup) {
+                    scenicWorldEngine.mercuryGroup.remove(this.videoMonolithMesh);
+                    this.videoMonolithMesh = null;
+                }
+
+                this.isActive = false;
+                this.updateUI();
+
+                if (typeof showToast === 'function') {
+                    showToast("Cámara Detenida", "Entrada de video desactivada.", "info", 2000);
+                }
+            }
+
+            toggle() {
+                if (this.isActive) this.stopCamera();
+                else this.startCamera();
+            }
+
+            attachHologramMonolith() {
+                if (!scenicWorldEngine || !scenicWorldEngine.mercuryGroup || this.videoMonolithMesh) return;
+                const geom = new THREE.PlaneGeometry(85, 120, 32, 32);
+                this.videoMonolithMesh = new THREE.Mesh(geom, this.videoHoloMaterial);
+                this.videoMonolithMesh.position.set(0, 85, -280);
+                scenicWorldEngine.mercuryGroup.add(this.videoMonolithMesh);
+            }
+
+            update(time, dt) {
+                if (!this.isActive || !this.videoTexture) return;
+                this.videoTexture.needsUpdate = true;
+
+                if (this.videoHoloMaterial) {
+                    this.videoHoloMaterial.uniforms.uTime.value = time;
+                    const glitch = (liveAudioMetrics && liveAudioMetrics.isOnset) ? 0.35 : 0.0;
+                    this.videoHoloMaterial.uniforms.uAudioGlitch.value = glitch;
+                    const beat = 1.0 + (stemsData && stemsData['bass'] ? stemsData['bass'].value * 1.5 : 0.0);
+                    this.videoHoloMaterial.uniforms.uBeatGlow.value = beat;
+                }
+
+                if (this.videoMonolithMesh) {
+                    this.videoMonolithMesh.position.y = 85 + Math.sin(time * 1.2) * 5.0;
+                    this.videoMonolithMesh.rotation.y = Math.sin(time * 0.4) * 0.08;
+                }
+            }
+
+            setChromaKey(enabled, color, tolerance) {
+                this.chromaKey.enabled = enabled;
+                if (color) this.chromaKey.color = color;
+                if (tolerance !== undefined) this.chromaKey.tolerance = parseFloat(tolerance);
+
+                if (this.videoHoloMaterial) {
+                    this.videoHoloMaterial.uniforms.uChromaEnabled.value = this.chromaKey.enabled ? 1.0 : 0.0;
+                    this.videoHoloMaterial.uniforms.uChromaTol.value = this.chromaKey.tolerance;
+                    let c = new THREE.Color(0x00ff00);
+                    if (this.chromaKey.color === 'blue') c.setHex(0x0000ff);
+                    else if (this.chromaKey.color === 'black') c.setHex(0x050505);
+                    this.videoHoloMaterial.uniforms.uChromaKeyColor.value = c;
+                }
+            }
+
+            updateUI() {
+                const btn = document.getElementById('btn-cam');
+                const badge = document.getElementById('cam-badge');
+                const modalBadge = document.getElementById('video-status-badge');
+                const btnToggle = document.getElementById('txt-toggle-live-video');
+
+                if (this.isActive) {
+                    if (btn) {
+                        btn.classList.add('bg-cyan-950/80', 'border-cyan-400');
+                        btn.classList.remove('bg-zinc-900/90');
+                    }
+                    if (badge) {
+                        badge.innerText = "ON AIR";
+                        badge.className = "text-[8px] text-emerald-400 font-bold animate-pulse";
+                    }
+                    if (modalBadge) {
+                        modalBadge.innerText = "ON AIR (60 FPS)";
+                        modalBadge.className = "text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-300 border border-emerald-500/40 font-bold";
+                    }
+                    if (btnToggle) btnToggle.innerText = "Detener Cámara en Vivo";
+                } else {
+                    if (btn) {
+                        btn.classList.remove('bg-cyan-950/80', 'border-cyan-400');
+                        btn.classList.add('bg-zinc-900/90');
+                    }
+                    if (badge) {
+                        badge.innerText = "STANDBY";
+                        badge.className = "text-[8px] text-zinc-500";
+                    }
+                    if (modalBadge) {
+                        modalBadge.innerText = "OFF AIR";
+                        modalBadge.className = "text-[9px] font-mono px-2 py-0.5 rounded bg-zinc-900 text-zinc-500 border border-white/5 font-bold";
+                    }
+                    if (btnToggle) btnToggle.innerText = "Activar Cámara en Vivo";
+                }
+            }
+        }
+
+        // Helper UI functions for VJ Timeline, Mesh Freeze, and Live Video
+        function toggleVjRecording() {
+            if (!vjSessionTimelineEngine) initVjEngines();
+            vjSessionTimelineEngine.toggleRecording();
+        }
+        function toggleVjPlayback() {
+            if (!vjSessionTimelineEngine) initVjEngines();
+            vjSessionTimelineEngine.togglePlayback();
+        }
+        function stopVjSession() {
+            if (vjSessionTimelineEngine) vjSessionTimelineEngine.stopPlayback();
+        }
+        function toggleVjLoop() {
+            if (vjSessionTimelineEngine) vjSessionTimelineEngine.toggleLoop();
+        }
+        function setVjTimelineCurve(curve) {
+            if (vjSessionTimelineEngine) {
+                vjSessionTimelineEngine.selectedCurve = curve;
+                vjSessionTimelineEngine.renderCanvas();
+            }
+        }
+        function exportVjSessionFile() {
+            if (vjSessionTimelineEngine) vjSessionTimelineEngine.exportJson();
+        }
+        function loadVjSessionFile(event) {
+            const file = event.target.files && event.target.files[0];
+            if (file && vjSessionTimelineEngine) {
+                vjSessionTimelineEngine.importJson(file);
+            }
+        }
+        function toggleVjTimelineCollapse() {
+            const body = document.getElementById('vj-timeline-body');
+            const icon = document.getElementById('vj-collapse-icon');
+            if (body) {
+                body.classList.toggle('hidden');
+                if (icon) icon.innerText = body.classList.contains('hidden') ? '▼' : '▲';
+            }
+        }
+        function focusVjTimeline() {
+            const sec = document.getElementById('sec-vj-timeline');
+            const body = document.getElementById('vj-timeline-body');
+            const icon = document.getElementById('vj-collapse-icon');
+            if (body && body.classList.contains('hidden')) {
+                body.classList.remove('hidden');
+                if (icon) icon.innerText = '▲';
+            }
+            if (sec) {
+                sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                sec.classList.add('ring-2', 'ring-teal-400');
+                setTimeout(() => sec.classList.remove('ring-2', 'ring-teal-400'), 1500);
+            }
+        }
+
+        // Mesh Freeze Helpers
+        function openMeshFreezeModal() {
+            if (!meshFreeze3DEngine) initVjEngines();
+            meshFreeze3DEngine.freezeCurrentGeometry();
+            updateFreezeMeshStats();
+            const modal = document.getElementById('mesh-freeze-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+        function closeMeshFreezeModal() {
+            const modal = document.getElementById('mesh-freeze-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+        function updateFreezeMeshStats() {
+            if (!meshFreeze3DEngine) initVjEngines();
+            const srcSel = document.getElementById('freeze-source-select');
+            const thkSel = document.getElementById('freeze-base-thickness');
+            if (srcSel) meshFreeze3DEngine.source = srcSel.value;
+            if (thkSel) meshFreeze3DEngine.baseThicknessMm = parseFloat(thkSel.value);
+            const geom = meshFreeze3DEngine.freezeCurrentGeometry();
+            if (geom) {
+                const vEl = document.getElementById('freeze-vertex-count');
+                const pEl = document.getElementById('freeze-poly-count');
+                const dEl = document.getElementById('freeze-dim-display');
+                if (vEl) vEl.innerText = geom.vertexCount.toLocaleString();
+                if (pEl) pEl.innerText = `${geom.triangleCount.toLocaleString()} caras`;
+                if (dEl) dEl.innerText = `${geom.width.toFixed(0)} x ${geom.depth.toFixed(0)} x ${geom.height.toFixed(1)} mm`;
+            }
+        }
+        function downloadFrozenMeshSTL() {
+            if (meshFreeze3DEngine) meshFreeze3DEngine.exportSTL();
+        }
+        function downloadFrozenMeshOBJ() {
+            if (meshFreeze3DEngine) meshFreeze3DEngine.exportOBJ();
+        }
+        function downloadFrozenMeshGLB() {
+            if (meshFreeze3DEngine) meshFreeze3DEngine.exportGLB();
+        }
+
+        // Live Video Helpers
+        function openVideoIngestModal() {
+            if (!liveVideoIngestEngine) initVjEngines();
+            const modal = document.getElementById('video-ingest-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+        function closeVideoIngestModal() {
+            const modal = document.getElementById('video-ingest-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+        function toggleLiveVideo() {
+            if (!liveVideoIngestEngine) initVjEngines();
+            liveVideoIngestEngine.toggle();
+        }
+        function changeVideoDevice(devId) {
+            if (liveVideoIngestEngine) liveVideoIngestEngine.startCamera(devId);
+        }
+        function setVideoProjectionMode(mode) {
+            if (liveVideoIngestEngine) liveVideoIngestEngine.projectionMode = mode;
+        }
+        function toggleVideoChroma(enabled) {
+            if (liveVideoIngestEngine) liveVideoIngestEngine.setChromaKey(enabled);
+        }
+        function setVideoChromaColor(color) {
+            if (liveVideoIngestEngine) liveVideoIngestEngine.setChromaKey(liveVideoIngestEngine.chromaKey.enabled, color);
+        }
+        function setVideoChromaTol(tol) {
+            if (liveVideoIngestEngine) liveVideoIngestEngine.setChromaKey(liveVideoIngestEngine.chromaKey.enabled, null, tol);
+        }
+
+        function initVjEngines() {
+            if (!vjSessionTimelineEngine) {
+                vjSessionTimelineEngine = new VjSessionTimelineEngine();
+                vjSessionTimelineEngine.init();
+            }
+            if (!meshFreeze3DEngine) {
+                meshFreeze3DEngine = new MeshFreeze3DEngine();
+            }
+            if (!liveVideoIngestEngine) {
+                liveVideoIngestEngine = new LiveVideoIngestEngine();
+                liveVideoIngestEngine.init();
+            }
+        }
+
+        // =========================================================================
         // MODO STUDIO CINEMA / ZEN FOCUS & DOCKING COLAPSABLE
         // =========================================================================
         function toggleStudioMode() {
@@ -18992,6 +20387,16 @@ void main() {
                 webRtcP2pEngine.update(time, dt);
             }
 
+            // 4.4 Timeline de Automatización VJ (Grabación & Playback)
+            if (vjSessionTimelineEngine) {
+                vjSessionTimelineEngine.update(time, dt);
+            }
+
+            // 4.5 Ingesta de Video en Vivo & Webcam / NDI
+            if (liveVideoIngestEngine) {
+                liveVideoIngestEngine.update(time, dt);
+            }
+
             // 5. Renderizado de Canvases v4.2 activos según vista
             if (currentV4View === 'chaos-lab') {
                 renderChaosCanvas();
@@ -19724,6 +21129,11 @@ void main() {
                 const btnInstall = document.getElementById('btn-pwa-install');
                 if (btnInstall) btnInstall.classList.add('hidden');
             }
+
+            // Inicializar motores de Sesión VJ, Escultura 3D y Video Ingest
+            setTimeout(() => {
+                initVjEngines();
+            }, 300);
         });
     </script>
 
@@ -20178,6 +21588,185 @@ void main() {
             <div class="border-t border-white/[0.08] pt-2 flex items-center justify-between text-[10px] font-mono text-zinc-500">
                 <span>RIFF WEBP 24-bit Container Muxer</span>
                 <button onclick="closeWebpLoopModal()" class="hover:text-zinc-300 transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 6: Congelador de Topografía Acústica 3D & Exportador STL / OBJ / GLB -->
+    <div id="mesh-freeze-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-amber-500/40 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden animate-fadeIn p-5 space-y-4">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-base">
+                        🧊
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-100 flex items-center gap-2">
+                            <span>Escultura Acústica 3D &amp; Geometría Estanca (Watertight)</span>
+                            <span class="text-[9px] font-mono text-amber-400 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-500/30 font-bold">SOLID MESH</span>
+                        </h3>
+                        <p class="text-[11px] text-zinc-400">Huella tridimensional del sonido congelada para Impresión 3D, CNC y Blender</p>
+                    </div>
+                </div>
+                <button onclick="closeMeshFreezeModal()" class="text-zinc-500 hover:text-zinc-300 transition text-lg">✕</button>
+            </div>
+
+            <!-- Mesh Stats & Source Selection -->
+            <div class="space-y-3 font-mono text-xs">
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="p-2.5 bg-zinc-900/80 rounded-xl border border-white/[0.06] space-y-1">
+                        <span class="text-[10px] text-zinc-400 uppercase tracking-wider block">ORIGEN TOPOGRÁFICO:</span>
+                        <select id="freeze-source-select" onchange="updateFreezeMeshStats()" class="w-full bg-black border border-white/10 text-amber-300 rounded p-1 text-xs focus:outline-none cursor-pointer">
+                            <option value="waterfall" selected>Cascada Waterfall 3D (128x128)</option>
+                            <option value="gerstner_ocean">Océano de Mercurio (Ondas Gerstner)</option>
+                        </select>
+                    </div>
+                    <div class="p-2.5 bg-zinc-900/80 rounded-xl border border-white/[0.06] space-y-1">
+                        <span class="text-[10px] text-zinc-400 uppercase tracking-wider block">ESPESOR DE BASE SÓLIDA:</span>
+                        <select id="freeze-base-thickness" onchange="updateFreezeMeshStats()" class="w-full bg-black border border-white/10 text-zinc-200 rounded p-1 text-xs focus:outline-none cursor-pointer">
+                            <option value="4">4 mm (Compacta / Ahorro Resina)</option>
+                            <option value="8" selected>8 mm (Estándar FDM / Sólida)</option>
+                            <option value="15">15 mm (Pedestal Monumental)</option>
+                            <option value="25">25 mm (Bloque Escultórico)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Mesh Geometry Metrics Card -->
+                <div class="p-3 bg-zinc-900/90 border border-amber-500/30 rounded-xl space-y-2 text-[11px]">
+                    <div class="flex items-center justify-between text-zinc-400">
+                        <span>Vértices Totales:</span>
+                        <span id="freeze-vertex-count" class="text-zinc-200 font-bold">32.768</span>
+                    </div>
+                    <div class="flex items-center justify-between text-zinc-400">
+                        <span>Triángulos Watertight (Cerrados):</span>
+                        <span id="freeze-poly-count" class="text-amber-300 font-bold">65.532 caras</span>
+                    </div>
+                    <div class="flex items-center justify-between text-zinc-400">
+                        <span>Dimensiones Físicas (Escala 3D):</span>
+                        <span id="freeze-dim-display" class="text-zinc-200 font-bold">140 x 100 x 28 mm</span>
+                    </div>
+                    <div class="flex items-center justify-between text-zinc-400">
+                        <span>Estado Geométrico:</span>
+                        <span class="text-emerald-400 font-bold flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            100% Manifold (Sin bordes abiertos / Lista para Slicers)
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Download Buttons Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                    <button onclick="downloadFrozenMeshSTL()" class="py-2.5 px-3 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-bold rounded-xl shadow-lg transition flex flex-col items-center justify-center gap-0.5 group active:scale-95">
+                        <span class="text-xs">🖨️ STL Binario</span>
+                        <span class="text-[9px] text-amber-200 font-normal">Cura / Prusa / Bambu</span>
+                    </button>
+                    <button onclick="downloadFrozenMeshOBJ()" class="py-2.5 px-3 bg-zinc-900 hover:bg-zinc-850 text-amber-300 hover:text-white border border-amber-500/30 rounded-xl transition flex flex-col items-center justify-center gap-0.5 group active:scale-95">
+                        <span class="text-xs">🗿 Wavefront OBJ</span>
+                        <span class="text-[9px] text-zinc-400 font-normal">Blender / ZBrush / Maya</span>
+                    </button>
+                    <button onclick="downloadFrozenMeshGLB()" class="py-2.5 px-3 bg-zinc-900 hover:bg-zinc-850 text-cyan-300 hover:text-white border border-cyan-500/30 rounded-xl transition flex flex-col items-center justify-center gap-0.5 group active:scale-95">
+                        <span class="text-xs">🌐 glTF 2.0 (.glb)</span>
+                        <span class="text-[9px] text-zinc-400 font-normal">Web 3D / AR / Unreal</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="border-t border-white/[0.08] pt-2 flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                <span>MotorVisuales v6 • 3D Sculpt Engine</span>
+                <button onclick="closeMeshFreezeModal()" class="hover:text-zinc-300 transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 7: Ingesta de Video en Vivo & Webcam / NDI / Chroma Key -->
+    <div id="video-ingest-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-cyan-500/40 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden animate-fadeIn p-5 space-y-4">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-base">
+                        📹
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-zinc-100 flex items-center gap-2">
+                            <span>Ingesta de Video en Vivo &amp; Webcam / NDI</span>
+                            <span id="video-status-badge" class="text-[9px] font-mono text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-white/[0.08] font-bold">OFF AIR</span>
+                        </h3>
+                        <p class="text-[11px] text-zinc-400">Proyección holográfica, textura uVideoTexture y Chroma Key en GPU</p>
+                    </div>
+                </div>
+                <button onclick="closeVideoIngestModal()" class="text-zinc-500 hover:text-zinc-300 transition text-lg">✕</button>
+            </div>
+
+            <!-- Video Preview & Device Selector -->
+            <div class="space-y-3 font-mono text-xs">
+                <!-- Mini Preview Area -->
+                <div class="relative w-full aspect-video rounded-xl overflow-hidden bg-black border border-white/10 flex items-center justify-center">
+                    <video id="live-video-preview" autoplay playsinline muted class="w-full h-full object-cover"></video>
+                    <div id="video-no-signal" class="absolute inset-0 flex flex-col items-center justify-center text-zinc-500 gap-1 bg-zinc-950/90">
+                        <span class="text-2xl">📹</span>
+                        <span class="text-[10px]">CÁMARA EN STANDBY</span>
+                    </div>
+                </div>
+
+                <!-- Controls Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div class="p-2.5 bg-zinc-900/80 rounded-xl border border-white/[0.06] space-y-1">
+                        <span class="text-[10px] text-zinc-400 uppercase tracking-wider block">DISPOSITIVO DE VIDEO:</span>
+                        <select id="video-device-select" onchange="changeVideoDevice(this.value)" class="w-full bg-black border border-white/10 text-cyan-300 rounded p-1 text-xs focus:outline-none cursor-pointer">
+                            <option value="">Cámara por Defecto</option>
+                        </select>
+                    </div>
+                    <div class="p-2.5 bg-zinc-900/80 rounded-xl border border-white/[0.06] space-y-1">
+                        <span class="text-[10px] text-zinc-400 uppercase tracking-wider block">MODO DE PROYECCIÓN 3D:</span>
+                        <select id="video-projection-mode" onchange="setVideoProjectionMode(this.value)" class="w-full bg-black border border-white/10 text-zinc-200 rounded p-1 text-xs focus:outline-none cursor-pointer">
+                            <option value="monolith" selected>Monolito Holográfico Gigante (Océano)</option>
+                            <option value="crystals">Mapeo en Cristales del Valle</option>
+                            <option value="pip">Pantalla PiP Flotante en Viewport</option>
+                            <option value="shader_only">Solo Textura GLSL (uVideoTexture)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Chroma Key Controls -->
+                <div class="p-3 bg-zinc-900/80 rounded-xl border border-white/[0.06] space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] text-zinc-300 font-bold uppercase tracking-wider">CHROMA KEY EN GPU:</span>
+                        <label class="flex items-center gap-1.5 cursor-pointer">
+                            <input type="checkbox" id="video-chroma-toggle" onchange="toggleVideoChroma(this.checked)" class="accent-cyan-400">
+                            <span class="text-[10px] text-zinc-400">Activar Eliminación de Fondo</span>
+                        </label>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <div>
+                            <span class="text-[9px] text-zinc-400 block mb-0.5">COLOR CLAVE:</span>
+                            <select id="video-chroma-color" onchange="setVideoChromaColor(this.value)" class="w-full bg-black border border-white/10 text-xs rounded p-1 text-zinc-300 focus:outline-none">
+                                <option value="green" selected>Verde Pantalla (#00ff00)</option>
+                                <option value="blue">Azul (#0000ff)</option>
+                                <option value="black">Negro Fondo (#000000)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <span class="text-[9px] text-zinc-400 block mb-0.5">TOLERANCIA:</span>
+                            <input type="range" id="video-chroma-tol" min="0.1" max="0.9" step="0.05" value="0.45" oninput="setVideoChromaTol(this.value)" class="w-full accent-cyan-400 h-1 mt-2">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <button onclick="toggleLiveVideo()" id="btn-toggle-live-video" class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition active:scale-95">
+                    <span>📹</span>
+                    <span id="txt-toggle-live-video">Activar Cámara en Vivo</span>
+                </button>
+            </div>
+
+            <!-- Footer -->
+            <div class="border-t border-white/[0.08] pt-2 flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                <span>Direct WebRTC / MediaDevices Stream</span>
+                <button onclick="closeVideoIngestModal()" class="hover:text-zinc-300 transition">Cerrar</button>
             </div>
         </div>
     </div>

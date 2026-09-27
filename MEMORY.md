@@ -226,8 +226,24 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Emparejamiento Rápido LAN (`Auto-Pair LAN`):** Auto-descubrimiento en red local a través del puerto WebSocket local (8089).
   - **Control Remoto VJ:** Roles conmutables (Host / Emisor vs Consola VJ Remota / Controlador), gatillos remotos para forzar drops, alternar mundos escénicos y cambiar presets aleatorios, con monitorización de paquetes TX/RX y latencia RTT.
 
+- ✅ **Timeline de Automatización VJ y Grabador de Sesión Q-Bus (.mvj) (D-037):**
+  - **Motor `VjSessionTimelineEngine`:** Muestreador continuo a 30 FPS en `masterRenderLoop` registrando fotogramas de telemetría ($Q_1 \dots Q_{24}$, RMS, Spectral Flux, 8 stems Biquad, onsets, drops y cambios de escena).
+  - **Timeline Gráfico Interactivo en Canvas 2D:** Visualización multipista con curvas de área (RMS en fucsia, Q1 en cian), marcadores de drops amarillos, scrubbing con arrastre táctil / ratón e interpolación fluida de keyframes.
+  - **Transporte y Exportación:** Controles `[REC]`, `[PLAY / PAUSE]`, `[STOP]`, `[LOOP]` y exportador / importador nativo de archivos `.mvj` (JSON estructurado).
+
+- ✅ **Congelador de Topografía Acústica 3D & Exportador Estanco STL / OBJ / GLB (D-038):**
+  - **Motor `MeshFreeze3DEngine`:** Congela instantáneamente la matriz de elevación ($128 \times 128$) de la cascada Waterfall o del Océano de Mercurio.
+  - **Geometría Sólida Estanca (Watertight Manifold):** Genera tapa superior deformada acústicamente, base plana inferior ($Y_{\text{bottom}} = Y_{\text{min}} - \text{baseThicknessMm}$) y 4 faldones perimetrales cerrados, produciendo un sólido 100% libre de bordes abiertos ($65.532$ triángulos con normales calculadas hacia afuera).
+  - **Exportadores Binarios Nativos:** Generación sin dependencias externas de archivos STL binario (para Cura, PrusaSlicer, Bambu Studio), Wavefront OBJ (para Blender, ZBrush) y glTF 2.0 binario `.glb` (con material PBR para visualización 3D y AR).
+
+- ✅ **Ingesta de Video en Vivo & Webcam / NDI con Chroma Key en GPU (D-039):**
+  - **Motor `LiveVideoIngestEngine`:** Entrada de video directo vía `getUserMedia` a 60 FPS con selector dinámico de cámaras y OBS Virtual Cam.
+  - **Procesador de Chroma Key en GPU:** Eliminación de fondo por color clave (verde, azul, negro) con tolerancia y suavizado `smoothstep`.
+  - **Monolito Holográfico Flotante:** Pantalla curva gigante integrada en `ScenicWorldEngine` sobre el Océano de Mercurio con scanlines CRT, halo lumínico y glitch reactivo a los transitorios de audio.
+  - **Textura Universal:** Exposición de uniforms `uVideoTexture` y `uVideoActive` en todos los 22 shaders GLSL del Live Shader Studio.
+
 ## Próximas Ideas / Pendientes
-- [ ] Grabación y reproducción de sesiones VJ (Timeline de automatización para registros Q).
-- [ ] Exportador de mallas 3D OBJ/glTF congeladas de la topografía Waterfall para impresión 3D y escultura digital.
-- [ ] Soporte para cámaras NDI / WebRTC entrantes para mezclar video real con los mundos escénicos 3D.
+- [ ] Universo Escénico 14: "Abismo Oceánico & Enjambre de Boids 3D (4.096 Peces Bioluminiscentes en GPGPU)".
+- [ ] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).
+- [ ] Control de iluminación DMX / ArtNet vía WebSockets para sincronizar luces de escenario con MotorVisuales.
 

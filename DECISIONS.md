@@ -860,6 +860,68 @@
   - ✅ Independencia absoluta de infraestructuras externas o conexiones a internet en clubs/estadios.
   - ✅ Control VJ fluido inter-dispositivo con telemetría en tiempo real.
 
+---
+
+### D-037 — Timeline de Automatización VJ y Grabador de Sesión Q-Bus (.mvj)
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - Los directos de VJing y las coreografías visuales requerían la capacidad de grabar toda la telemetría del bus de registros $Q_1 \dots Q_{64}$, cambios de escena 3D, mutaciones de shaders GLSL, macros musicales y eventos de drops en un timeline gráfico multipista tipo DAW interactivo, permitiendo su reproducción fiel cuadro a cuadro, bucle continuo y exportación/importación en formato JSON (`.mvj`).
+- **Decisión:**
+  - **Motor de Telemetría Temporal (`VjSessionTimelineEngine`):**
+    - Muestreador continuo a 30 FPS en `masterRenderLoop` registrando fotogramas de telemetría ($Q_1 \dots Q_{24}$, RMS, Spectral Flux, Centroid, 8 stems Biquad, escena activa, preset GLSL y onsets).
+    - Registro de eventos discretos (`DROP`, `SCENE_CHANGE`, etc.) sincronizados con marcas de tiempo en segundos.
+  - **Timeline Gráfico Interactivo en Canvas 2D:**
+    - Visualización con resolución de alta densidad (DPR) de curvas continuas de área (RMS en fucsia, Q1 en cian), rejilla métrica y marcadores de drops amarillos.
+    - Playhead interactivo con cursor deslizable y soporte para *scrubbing* en tiempo real (ratón y gestos táctiles), aplicando instantáneamente el estado completo de la máquina en el frame seleccionado.
+  - **Exportación / Importación `.mvj`:**
+    - Formato JSON estructurado con metadatos de sesión, compases, duración y matrices de fotogramas, descargable como archivo `.mvj` y cargable con `FileReader` nativo.
+- **Consecuencias:**
+  - ✅ Permite preparar, coreografiar y archivar shows visuales completos sin pérdidas de sincronía.
+  - ✅ Operación autónoma o guiada por el VJ con scrubbing y reproducción en bucle continuo.
+
+---
+
+### D-038 — Congelador de Topografía Acústica 3D y Exportador Estanco STL/OBJ/glTF (.glb)
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - Productores y artistas plásticos requerían transformar la energía sonora tridimensional (del espectrograma Waterfall 3D o del Océano de Mercurio) en esculturas tangibles para fabricación digital (impresión 3D FDM/resina, CNC) o escultura en Blender/ZBrush, exigiendo geometrías 100% estancas (*watertight manifolds*, $\partial M = \emptyset$) sin huecos ni caras invertidas.
+- **Decisión:**
+  - **Generador de Sólido Estanco (`MeshFreeze3DEngine`):**
+    - Extracción instantánea de la matriz de elevación ($128 \times 128$) de la GPU.
+    - Generación de doble tapa: superficie topográfica acústica superior y base plana inferior a $Y_{\text{bottom}} = Y_{\text{min}} - \text{baseThicknessMm}$.
+    - Construcción de 4 faldones perimetrales (Paredes Norte, Sur, Este y Oeste) conectando los vértices de borde superior con la base, formando un sólido cerrado con $65.532$ triángulos y normales calculadas hacia el exterior.
+  - **Exportadores Binarios Nativos sin Dependencias:**
+    - **STL Binario:** Cabecera de 80 bytes, uint32 de triángulos y bloques de 50 bytes por triángulo en Little Endian, directamente compatible con Cura, PrusaSlicer, Bambu Studio y Lychee.
+    - **Wavefront OBJ:** Formato texto estructurado con vértices `v`, normales `vn`, UVs `vt` y caras `f` para Blender, ZBrush y Maya.
+    - **glTF 2.0 Binario (.glb):** Contenedor binario estándar con cabecera `0x46546C67`, JSON chunk y BIN chunk con material PBR para visualización 3D en navegador, AR o Unreal Engine.
+- **Consecuencias:**
+  - ✅ Fabricación física directa de música e impresiones 3D sin requerir herramientas intermedias de reparación de mallas.
+  - ✅ Rendimiento instantáneo de generación en cliente en milisegundos gracias al ensamblado en `ArrayBuffer`.
+
+---
+
+### D-039 — Ingesta de Video en Vivo & Webcam / NDI con Chroma Key en GPU y Proyección Escénica
+- **Fecha:** 2026-09-27
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - Integrar video en directo (cámara web del performer, OBS Virtual Camera, stream NDI local) para mezclar al artista o al público directamente dentro de los universos escénicos 3D y en los shaders GLSL en tiempo real.
+- **Decisión:**
+  - **Motor de Captura WebRTC (`LiveVideoIngestEngine`):**
+    - Adquisición mediante `navigator.mediaDevices.getUserMedia` a 1080p/720p @ 60 FPS con selector dinámico de dispositivos de entrada.
+    - Creación de `THREE.VideoTexture` con filtrado lineal sin mipmaps para cero sobrecarga de VRAM.
+  - **Shaders Holográficos y Chroma Key en GPU:**
+    - Shader customizado para pantalla monolítica con curvatura cilíndrica, eliminación de fondo por color clave (Verde, Azul, Negro) con umbral de tolerancia y suavizado `smoothstep`.
+    - Micro-reactividad acústica: Desplazamiento por glitch horizontal en transitorios y bombos (`liveAudioMetrics.isOnset`), scanlines CRT y halo lumínico de borde.
+  - **Mapeo Universal:**
+    - Integración en `ScenicWorldEngine`: Monolito holográfico colosal flotante sobre el Océano de Mercurio frente al dron cinemático.
+    - Inyección universal en `customShaderUniforms` (`uVideoTexture` y `uVideoActive`) disponible para todos los presets GLSL.
+- **Consecuencias:**
+  - ✅ Convergencia total entre síntesis procedural, audio-reactividad y video real en tiempo real.
+  - ✅ Versatilidad para directos de música electrónica, festivales y transmisiones en streaming.
+
+
 
 
 

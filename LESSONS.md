@@ -415,6 +415,38 @@
   3. **DataChannel WebRTC de Ultra-Baja Latencia:** Configurar `ordered: false` y `maxRetransmits: 0` para telemetría continua de audio-reactividad a 60 FPS, previniendo saturación de colas y bloqueos TCP en enlaces P2P.
 - **Trigger:** Al generar archivos de intercambio para suites de postproducción 3D o al implementar protocolos de audio multicanal y telemetría inter-dispositivo en navegadores web.
 
+---
+
+### L-031
+- **Tags:** #threejs #3d-printing #stl #obj #gltf #manifold #watertight #heightmap #geometry
+- **Síntoma:** Al exportar mallas 3D generadas proceduralmente desde un heightmap (como Waterfall acústico o Gerstner waves) a formato STL u OBJ para slicers de impresión 3D (Cura, PrusaSlicer, Bambu Studio) o motores de modelado, el software arroja errores de geometría no múltiple ("non-manifold mesh", agujeros en la malla, bordes abiertos o volumen no estanco $\partial M \neq \emptyset$), impidiendo rebanar el modelo o calculando normales invertidas.
+- **Causa raíz:**
+  1. Un heightmap planar estándar solo genera la superficie superior ("open sheet"), dejando los cuatro costados perimetrales y el fondo abiertos.
+  2. Al triangular los faldones perimetrales, invertir el orden de los vértices (winding order clockwise vs counter-clockwise) genera normales que apuntan hacia el interior del sólido, desconcertando a los slicers de manufactura aditiva.
+  3. Para exportación binaria en Little Endian Float32 sin dependencias npm, una desalineación de bytes en el búfer STL o GLB corrompe la geometría.
+- **Solución:**
+  1. **Topología Cerrada Estanca (*Watertight Manifold*):** Extraer la matriz de elevación regular ($N \times M$), calcular un plano inferior $Y_{\text{bottom}} = Y_{\text{min}} - \text{baseThicknessMm}$ y construir 4 faldones perimetrales (Norte, Sur, Este, Oeste) más una tapa inferior cerrada con orden de devanado invertido.
+  2. **Cálculo de Normales Exteriores por Producto Cruz:** Para cada faceta triangular $(v_0, v_1, v_2)$, calcular analíticamente $\vec{N} = (v_1 - v_0) \times (v_2 - v_0)$ normalizado y verificar que apunte rígidamente hacia el exterior del sólido volumétrico.
+  3. **Encoders Binarios Nativos Puros:**
+     - **STL Binario:** Cabecera de 80 bytes, `UInt32LE` con conteo de facetas $F = 2 \cdot (N-1)(M-1) \cdot 2 + 2(N-1) \cdot 2 + 2(M-1) \cdot 2$, y bloques de 50 bytes por triángulo (3x Float32 normal + 9x Float32 vértices + 2 bytes attribute byte count).
+     - **glTF 2.0 Binario (.glb):** Ensamblado en un solo buffer binario con magic `0x46546C67`, chunk `JSON` alineado a 4 bytes con padding de espacios `0x20` y chunk `BIN\x00` con padding `0x00`, index buffers `UNSIGNED_INT` y attributes `POSITION` / `NORMAL`.
+- **Trigger:** Al exportar mallas acústicas o generativas para impresión 3D o intercambio de assets 3D en WebGL.
+
+---
+
+### L-032
+- **Tags:** #vj #timeline #q-bus #automation #playback #interpolation #scrubbing
+- **Síntoma:** Al reproducir una sesión de automatización VJ grabada o mover el playhead (scrubbing), los visualizadores tartamudean, los parámetros acústicos entran en conflicto con la señal de audio viva en el micrófono/archivo, o el salto brusco entre fotogramas discretos (a 30 FPS) produce jitter visual desagradable en los shaders a 60/120 FPS.
+- **Causa raíz:**
+  1. Intentar manipular o sobrescribir los nodos del grafo de Web Audio API (`AnalyserNode`, `BiquadFilterNode`) para "reproducir" automatizaciones pasadas corrompe el flujo de audio en vivo y genera latencias o cortes audibles.
+  2. Muestrear a 30 FPS y asignar valores discretos en el render loop a 60 FPS genera saltos visibles si no se interpola temporalmente.
+  3. Durante la reproducción, la función `runAudioDSP()` del loop maestro sobrescribe continuamente las variables $Q_1 \dots Q_{24}$ con el silencio del micrófono o del reproductor de fondo.
+- **Solución:**
+  1. **Desacoplamiento Estricto de la Capa de Telemetría (Q-Bus Override):** Al estar en modo `isPlaying`, mantener el motor Web Audio ejecutándose libremente pero interceptar inmediatamente después de `runAudioDSP()` e inyectar en `window.qVars` y en los stems los valores interpolados de la sesión grabada.
+  2. **Interpolación Hermite / Lerp Temporal:** Interpolar linealmente entre el fotograma actual y el siguiente según el delta temporal sub-frame ($t - t_{\text{prev}}$), garantizando transiciones de moduladores suaves como la seda a cualquier tasa de refresco (60 Hz, 120 Hz, 144 Hz).
+  3. **Scrubbing Bidireccional No Destructivo:** Al arrastrar el cursor sobre el canvas del timeline multipista, pausar automáticamente la grabación y evaluar la interpolación espacial en el frame exacto con búsqueda binaria o acceso $O(1)$ por índice indexado en tiempo real.
+- **Trigger:** Al diseñar sistemas de grabación, automatización y reproducción de señales reactivas (VJ timelines, DAW automation lanes, Show Control).
+
 
 
 
