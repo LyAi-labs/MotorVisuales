@@ -2,7 +2,7 @@
 // MotorVisuales PWA — Service Worker (High-Performance Audio & 3D WebGL Shell)
 // ============================================================================
 
-const CACHE_NAME = 'motorvisuales-v3';
+const CACHE_NAME = 'motorvisuales-v5';
 
 // Recursos críticos del App Shell para precargar y funcionamiento offline
 const PRECACHE_ASSETS = [

@@ -229,17 +229,26 @@
         #merCanvas {
             touch-action: none;
         }
+        /* Android PWA Ergonomics & Safe Areas */
+        :root {
+            --sat: env(safe-area-inset-top, 0px);
+            --sab: env(safe-area-inset-bottom, 0px);
+        }
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
         /* Mobile Zero-Scroll Workstation Ergonomics (< 1024px) */
         @media (max-width: 1023px) {
             .mobile-deck-scrollable {
-                max-height: calc(100dvh - 420px);
+                max-height: calc(100dvh - 35dvh - 75px);
                 min-height: 240px;
                 overflow-y: auto !important;
                 overscroll-behavior: contain !important;
                 -webkit-overflow-scrolling: touch;
                 scrollbar-width: thin;
                 scrollbar-color: rgba(6, 182, 212, 0.4) rgba(0, 0, 0, 0.2);
-                padding-bottom: 2.5rem;
+                padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 72px) !important;
             }
             .mobile-deck-scrollable::-webkit-scrollbar {
                 width: 4px;
@@ -251,7 +260,56 @@
                 background: rgba(6, 182, 212, 0.4);
                 border-radius: 4px;
             }
+
+            /* Touch Target Mínimo Ergonomía Android (48x48px) */
+            .touch-target-48 {
+                min-height: 48px;
+                min-width: 48px;
+            }
+
+            /* Modales convertidos en Bottom Sheets Deslizables en Móviles (< 1024px) */
+            #screenshot-modal,
+            #stems-export-modal,
+            #yt-mobile-modal,
+            #midi-modal,
+            #webp-loop-modal,
+            #mesh-freeze-modal,
+            #video-ingest-modal,
+            #ai-clip-studio-modal,
+            #community-hub-modal {
+                align-items: flex-end !important;
+                padding: 0 !important;
+            }
+            #screenshot-modal > div,
+            #stems-export-modal > div,
+            #yt-mobile-modal > div,
+            #midi-modal > div,
+            #webp-loop-modal > div,
+            #mesh-freeze-modal > div,
+            #video-ingest-modal > div,
+            #ai-clip-studio-modal > div,
+            #community-hub-modal > div {
+                border-bottom-left-radius: 0 !important;
+                border-bottom-right-radius: 0 !important;
+                border-top-left-radius: 1.25rem !important;
+                border-top-right-radius: 1.25rem !important;
+                max-height: 86dvh !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-y: auto !important;
+                overscroll-behavior: contain !important;
+                padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 20px) !important;
+                animation: slideUpSheet 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.85) !important;
+                border-top: 1px solid rgba(255, 255, 255, 0.15) !important;
+            }
         }
+
+        @keyframes slideUpSheet {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
         @media (min-width: 1024px) {
             .mobile-deck-scrollable {
                 max-height: none !important;
@@ -271,8 +329,8 @@
                 <!-- Brand & System Telemetry Status -->
                 <div class="flex items-center space-x-2 sm:space-x-3">
                     <!-- Vuelve al hub que ofrece las dos apps (AgenteMilkDrop / MotorVisuales),
-                         ver milkdropagent.motorvisuales.site. Enlace normal: cambia de origen. -->
-                    <a href="https://milkdropagent.motorvisuales.site/" title="Volver al landing"
+                         ver milkdropagent.motorvisuales.site. Usa history.back() si viene del hub para preservar PWA standalone -->
+                    <a href="https://milkdropagent.motorvisuales.site/" onclick="if(window.history.length > 1 && (document.referrer.includes('milkdropagent') || document.referrer.includes('motorvisuales'))){ event.preventDefault(); window.history.back(); }" title="Volver al landing"
                        class="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-lg border border-white/[0.08] text-zinc-400 hover:text-cyan-300 hover:border-cyan-500/40 transition">
                         <span class="text-sm leading-none">‹</span>
                     </a>
@@ -437,8 +495,8 @@
         <!-- TIER 1: AUDIO DECK & DSP 8-STEMS (LEFT) + MASTER WEBGL VIEWPORT & POST-PROCESSING (RIGHT) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-4 items-start">
             
-            <!-- LEFT COLUMN: AUDIO INGESTION & 8-STEM BIQUAD DSP RACK -->
-            <div id="left-dock-column" class="order-2 lg:order-1 lg:col-span-4 xl:col-span-4 space-y-3 sm:space-y-4">
+            <!-- LEFT COLUMN: AUDIO INGESTION & 8-STEM BIQUAD DSP RACK (ARRIBA DEL TODO EN MÓVIL) -->
+            <div id="left-dock-column" class="order-1 lg:order-1 lg:col-span-4 xl:col-span-4 space-y-3 sm:space-y-4">
                 
                 <!-- 1. AUDIO INGESTION DECK -->
                 <section id="sec-audio-bar" class="glass-panel rounded-xl p-3 sm:p-4 space-y-2.5 sm:space-y-3 shadow-xl mobile-deck-scrollable">
@@ -487,55 +545,55 @@
                                 </span>
                                 <span class="text-[9px] font-mono text-cyan-400 bg-cyan-950/70 border border-cyan-500/30 px-2 py-0.5 rounded">3 CANALES MASTER</span>
                             </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
                                 <!-- Track 1: Mordaza -->
-                                <button onclick="playPresetTrack('tema.mp3', 'Mordaza', this)" id="btn-track-mordaza" class="preset-track-btn w-full p-2.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-cyan-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="mordaza">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[9px] font-mono font-bold tracking-widest text-cyan-400/90 uppercase">CH 01 // REF</span>
-                                        <span class="preset-led flex items-center gap-1.5 text-[8px] font-mono text-zinc-500 group-hover:text-zinc-300">
+                                <button onclick="playPresetTrack('tema.mp3', 'Mordaza', this)" id="btn-track-mordaza" class="preset-track-btn w-full p-2 sm:p-2.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-cyan-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="mordaza">
+                                    <div class="flex items-center justify-between mb-0.5 sm:mb-1">
+                                        <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-cyan-400/90 uppercase truncate">CH 01</span>
+                                        <span class="preset-led flex items-center gap-1 text-[7px] sm:text-[8px] font-mono text-zinc-500 group-hover:text-zinc-300">
                                             <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
-                                            <span class="preset-tag">STANDBY</span>
+                                            <span class="preset-tag hidden xs:inline">STANDBY</span>
                                         </span>
                                     </div>
-                                    <div class="font-bold text-zinc-100 text-xs sm:text-[13px] tracking-wide truncate group-hover:text-cyan-300 transition">
+                                    <div class="font-bold text-zinc-100 text-[11px] sm:text-[13px] tracking-wide truncate group-hover:text-cyan-300 transition">
                                         MORDAZA
                                     </div>
-                                    <div class="flex items-center justify-between text-[9px] font-mono text-zinc-400 mt-1">
-                                        <span>Master PCM 48kHz</span>
+                                    <div class="flex items-center justify-between text-[8px] sm:text-[9px] font-mono text-zinc-400 mt-0.5 sm:mt-1">
+                                        <span class="hidden sm:inline">Master PCM</span>
                                         <span class="text-zinc-500">3:18</span>
                                     </div>
                                 </button>
                                 <!-- Track 2: Tontos Útiles -->
-                                <button onclick="playPresetTrack('tontos-utiles.mp3', 'Tontos Útiles', this)" id="btn-track-tontos" class="preset-track-btn w-full p-2.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-purple-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="tontos">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[9px] font-mono font-bold tracking-widest text-purple-400/90 uppercase">CH 02 // REF</span>
-                                        <span class="preset-led flex items-center gap-1.5 text-[8px] font-mono text-zinc-500 group-hover:text-zinc-300">
+                                <button onclick="playPresetTrack('tontos-utiles.mp3', 'Tontos Útiles', this)" id="btn-track-tontos" class="preset-track-btn w-full p-2 sm:p-2.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-purple-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="tontos">
+                                    <div class="flex items-center justify-between mb-0.5 sm:mb-1">
+                                        <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-purple-400/90 uppercase truncate">CH 02</span>
+                                        <span class="preset-led flex items-center gap-1 text-[7px] sm:text-[8px] font-mono text-zinc-500 group-hover:text-zinc-300">
                                             <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
-                                            <span class="preset-tag">STANDBY</span>
+                                            <span class="preset-tag hidden xs:inline">STANDBY</span>
                                         </span>
                                     </div>
-                                    <div class="font-bold text-zinc-100 text-xs sm:text-[13px] tracking-wide truncate group-hover:text-purple-300 transition">
+                                    <div class="font-bold text-zinc-100 text-[11px] sm:text-[13px] tracking-wide truncate group-hover:text-purple-300 transition">
                                         TONTOS ÚTILES
                                     </div>
-                                    <div class="flex items-center justify-between text-[9px] font-mono text-zinc-400 mt-1">
-                                        <span>Dynamic Mix 320k</span>
+                                    <div class="flex items-center justify-between text-[8px] sm:text-[9px] font-mono text-zinc-400 mt-0.5 sm:mt-1">
+                                        <span class="hidden sm:inline">Dynamic Mix</span>
                                         <span class="text-zinc-500">2:45</span>
                                     </div>
                                 </button>
                                 <!-- Track 3: Section 63 (YouTube) -->
-                                <button onclick="playPresetTrack('section-63.mp3', 'Section 63 (YouTube)', this)" id="btn-track-section63" class="preset-track-btn w-full p-2.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-red-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="section63">
-                                    <div class="flex items-center justify-between mb-1">
-                                        <span class="text-[9px] font-mono font-bold tracking-widest text-red-400/90 uppercase">CH 03 // STREAM</span>
-                                        <span class="preset-led flex items-center gap-1.5 text-[8px] font-mono text-zinc-500 group-hover:text-zinc-300">
+                                <button onclick="playPresetTrack('section-63.mp3', 'Section 63 (YouTube)', this)" id="btn-track-section63" class="preset-track-btn w-full p-2 sm:p-2.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-red-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="section63">
+                                    <div class="flex items-center justify-between mb-0.5 sm:mb-1">
+                                        <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-red-400/90 uppercase truncate">CH 03</span>
+                                        <span class="preset-led flex items-center gap-1 text-[7px] sm:text-[8px] font-mono text-zinc-500 group-hover:text-zinc-300">
                                             <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
-                                            <span class="preset-tag">STANDBY</span>
+                                            <span class="preset-tag hidden xs:inline">STANDBY</span>
                                         </span>
                                     </div>
-                                    <div class="font-bold text-zinc-100 text-xs sm:text-[13px] tracking-wide truncate group-hover:text-red-300 transition">
+                                    <div class="font-bold text-zinc-100 text-[11px] sm:text-[13px] tracking-wide truncate group-hover:text-red-300 transition">
                                         SECTION 63
                                     </div>
-                                    <div class="flex items-center justify-between text-[9px] font-mono text-zinc-400 mt-1">
-                                        <span>YouTube Direct Feed</span>
+                                    <div class="flex items-center justify-between text-[8px] sm:text-[9px] font-mono text-zinc-400 mt-0.5 sm:mt-1">
+                                        <span class="hidden sm:inline">YouTube Feed</span>
                                         <span class="text-zinc-500">3:30</span>
                                     </div>
                                 </button>
@@ -554,13 +612,13 @@
                                     <span class="text-[11px] font-sans font-medium">Micrófono</span>
                                     <span class="text-[8px] text-zinc-500">ANALOG</span>
                                 </button>
-                                <div class="flex gap-1">
-                                    <button onclick="selectYouTubeMobileSource()" id="btn-yt-mobile" class="flex-grow py-1.5 px-2 bg-zinc-900/90 hover:bg-red-950/40 text-red-300 hover:text-white rounded-lg border border-red-500/30 flex items-center justify-between gap-1 shadow-sm transition" title="Reproducir Section 63 de YouTube a través de MotorVisuales">
+                                <div class="flex gap-1.5">
+                                    <button type="button" onclick="selectYouTubeMobileSource(); triggerHaptic(15);" id="btn-yt-mobile" class="flex-grow py-2 px-2.5 bg-zinc-900/90 hover:bg-red-950/40 text-red-300 hover:text-white rounded-lg border border-red-500/40 flex items-center justify-between gap-1 shadow-sm transition active:scale-[0.98]" title="Conectar o capturar audio de YouTube">
                                         <span class="text-[10px] text-red-400 font-bold">[YT]</span>
                                         <span class="text-[11px] font-sans font-medium">YouTube Móvil</span>
-                                        <span class="text-[8px] text-red-400/80">DIRECT</span>
+                                        <span class="text-[8px] text-red-400/80 font-mono">INGESTA</span>
                                     </button>
-                                    <button onclick="openYouTubeMobileAssistant()" class="px-2 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] text-xs transition" title="Opciones avanzadas e ingesta de YouTube">
+                                    <button type="button" onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-11 min-w-[44px] min-h-[38px] py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.12] flex items-center justify-center text-sm transition active:scale-90" title="Opciones avanzadas e ingesta de YouTube">
                                         <span>⚙️</span>
                                     </button>
                                 </div>
@@ -755,21 +813,23 @@
             </div>
 
             <!-- RIGHT COLUMN: MASTER 3D WEBGL VIEWPORT & 9-PASS POST-PROCESSING SUITE -->
-            <div id="three-viewport-section" class="order-1 lg:order-2 lg:col-span-8 xl:col-span-8 space-y-2.5 sm:space-y-4">
+            <div id="three-viewport-section" class="order-2 lg:order-2 lg:col-span-8 xl:col-span-8 space-y-2.5 sm:space-y-4">
                 
                 <!-- 3. MOTOR GRÁFICO 3D REACTIVO (THREE.JS VIEWPORT) -->
                 <section id="sec-viewport-3d" class="glass-panel rounded-xl p-2.5 sm:p-4 space-y-2 sm:space-y-3 shadow-2xl relative">
                     
-                    <!-- Viewport Header & Scene Mode -->
-                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-1.5 sm:gap-2 border-b border-white/[0.06] pb-2">
-                        <div class="flex items-center justify-between sm:justify-start gap-2">
-                            <div class="flex items-center gap-1.5">
+                    <!-- Viewport Header & Scene Mode (Responsive Auto-Wrapping Toolbar) -->
+                    <div class="flex flex-wrap items-center justify-between gap-y-2 gap-x-2 border-b border-white/[0.06] pb-2 max-w-full">
+                        <!-- Left Group: Title, Live FPS & Scene Selector -->
+                        <div class="flex items-center gap-2 flex-wrap min-w-0">
+                            <div class="flex items-center gap-1.5 shrink-0">
                                 <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
                                 <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-200 flex items-center gap-1.5">
                                     <span>3D WebGL</span>
                                     <span id="viewport-fps" class="text-[9px] sm:text-[10px] font-mono text-cyan-400 bg-cyan-950/70 px-1.5 py-0.5 rounded border border-cyan-500/30">60 FPS</span>
                                 </h3>
                             </div>
+
                             <!-- Quick mobile buttons on row 1: Orbit, Reset & Creador IA Autónomo -->
                             <div class="flex sm:hidden items-center gap-1">
                                 <button id="btn-auto-vj-mobile" onclick="toggleAutoVJ()" class="px-2 py-0.5 bg-purple-950/90 text-purple-200 border border-purple-400/60 rounded text-[10px] font-bold transition flex items-center gap-1 shadow-sm" title="Creador IA Autónomo: Interpretación y mutación en vivo">
@@ -786,11 +846,9 @@
                                 </button>
                                 <button onclick="resetThreeCamera()" class="px-2 py-0.5 bg-zinc-900 rounded border border-white/[0.08] text-zinc-400 text-[10px] transition">Reset</button>
                             </div>
-                        </div>
 
-                        <!-- 3D Scene Selector & Orbit Camera -->
-                        <div class="flex items-center gap-1.5 text-xs">
-                            <select id="three-scene-mode" onchange="switchThreeScene(this.value)" class="flex-grow sm:flex-grow-0 bg-zinc-900 border border-white/[0.08] text-zinc-100 rounded-lg px-2 py-1 text-[11px] sm:text-xs font-semibold focus:outline-none focus:border-cyan-500 cursor-pointer truncate">
+                            <!-- 3D Scene Selector with Adaptive Width -->
+                            <select id="three-scene-mode" onchange="switchThreeScene(this.value)" class="bg-zinc-900 border border-white/[0.08] text-zinc-100 rounded-lg px-2.5 py-1 text-[11px] sm:text-xs font-semibold focus:outline-none focus:border-cyan-500 cursor-pointer max-w-[190px] sm:max-w-[240px] md:max-w-[270px] xl:max-w-[320px] truncate shrink" title="Seleccionar Universo Escénico 3D">
                                 <option value="scenic_mercury_monoliths" selected>12. 🌊 Universo Escénico: Océano de Mercurio &amp; Megalitos</option>
                                 <option value="scenic_crystal_valley">13. 💎 Universo Escénico: Valle de Cristales &amp; Nebulosa H-Alfa</option>
                                 <option value="scenic_abyss_boids">14. 🐟 Universo Escénico: Abismo Oceánico &amp; 4.096 Boids Bioluminiscentes</option>
@@ -806,48 +864,62 @@
                                 <option value="ferrofluid_chamber_scene">10. 🌌 Cámara FHD: Levitación Magnética 360°</option>
                                 <option value="waterfall">11. 🌊 Espectrograma 3D Waterfall (Cascada Temporal)</option>
                             </select>
+                        </div>
 
-                            <div class="hidden sm:flex items-center gap-1.5 border-l border-white/[0.08] pl-2">
-                                <button id="btn-camera-orbit" onclick="toggleCameraOrbit()" class="px-2.5 py-1 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 rounded-lg flex items-center gap-1.5 font-medium text-xs transition" title="Activar/Desactivar Cámara Cinemática">
+                        <!-- Right Group: Camera, AI, Cloud & Quick Toolstrip (No Overflow, Fluid Wrap) -->
+                        <div class="hidden sm:flex items-center gap-1 sm:gap-1.5 flex-wrap justify-end text-xs shrink-0">
+                            <!-- Camera Orbit Control Capsule -->
+                            <div class="flex items-center gap-1 bg-zinc-950/70 p-0.5 rounded-lg border border-white/[0.08]">
+                                <button id="btn-camera-orbit" onclick="toggleCameraOrbit()" class="h-7 px-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 border border-indigo-500/40 rounded flex items-center gap-1 font-medium text-[11px] transition" title="Activar / Desactivar Cámara Cinemática 360°">
                                     <span id="orbit-indicator" class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
                                     <span>Órbita</span>
                                 </button>
-                                <select id="camera-orbit-mode" onchange="changeCameraOrbitMode(this.value)" class="bg-zinc-900 border border-white/[0.08] text-zinc-300 rounded-lg px-2 py-1 text-[11px] font-medium focus:outline-none cursor-pointer">
+                                <select id="camera-orbit-mode" onchange="changeCameraOrbitMode(this.value)" class="h-7 bg-zinc-900 border border-white/[0.06] text-zinc-300 rounded px-1.5 text-[11px] font-medium focus:outline-none cursor-pointer" title="Modo de Órbita">
                                     <option value="circle">Circular</option>
                                     <option value="spiral">Espiral</option>
                                     <option value="lemniscate">Infinito (∞)</option>
                                     <option value="dramatic">Fly-by</option>
                                 </select>
-                                <select id="camera-orbit-speed" onchange="changeCameraOrbitSpeed(this.value)" class="bg-zinc-900 border border-white/[0.08] text-zinc-300 rounded-lg px-2 py-1 text-[11px] font-mono focus:outline-none cursor-pointer">
+                                <select id="camera-orbit-speed" onchange="changeCameraOrbitSpeed(this.value)" class="h-7 bg-zinc-900 border border-white/[0.06] text-zinc-300 rounded px-1.5 text-[11px] font-mono focus:outline-none cursor-pointer" title="Velocidad de Órbita">
                                     <option value="0.5">0.5x</option>
                                     <option value="1.0" selected>1.0x</option>
                                     <option value="1.8">1.8x</option>
                                 </select>
-                                <button id="btn-auto-vj" onclick="toggleAutoVJ()" class="px-2.5 py-1 bg-gradient-to-r from-purple-900/90 to-indigo-900/90 hover:from-purple-800 hover:to-indigo-800 border border-purple-400/60 text-purple-100 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 shadow-[0_0_12px_rgba(168,85,247,0.35)]" title="Creador IA Autónomo (Auto-VJ): Modificación autónoma de geometrías, paletas de color y transiciones cinemáticas ante drops">
-                                    <span id="auto-vj-led" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_#34d399]"></span>
-                                    <span>⚡ Creador IA: ON</span>
-                                </button>
-                                <button id="btn-open-cloud-hub" onclick="openCommunityHubModal()" class="px-2.5 py-1 bg-gradient-to-r from-sky-900/80 to-blue-900/80 hover:from-sky-800 hover:to-blue-800 border border-sky-400/50 text-sky-200 hover:text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 shadow-[0_0_10px_rgba(56,189,248,0.25)]" title="Hub Comunitario: Explorar, cargar y publicar Presets en la nube pública">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
-                                    <span>🌐 Cloud</span>
-                                </button>
-                                <button id="btn-quick-ai-fx" onclick="toggleAIFxDirector()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] text-[11px] transition flex items-center gap-1 font-medium" title="Director IA FX Autónomo: Modulación cinematográfica de los 9 passes WebGL">
+                            </div>
+
+                            <!-- Primary Action Buttons: Creador IA & Cloud Hub -->
+                            <button id="btn-auto-vj" onclick="toggleAutoVJ()" class="h-7 px-2.5 bg-gradient-to-r from-purple-900/90 to-indigo-900/90 hover:from-purple-800 hover:to-indigo-800 border border-purple-400/60 text-purple-100 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 shadow-[0_0_12px_rgba(168,85,247,0.35)] shrink-0" title="Creador IA Autónomo (Auto-VJ): Modificación autónoma de geometrías, paletas de color y transiciones cinemáticas ante drops">
+                                <span id="auto-vj-led" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_#34d399]"></span>
+                                <span>⚡ Creador IA</span>
+                            </button>
+
+                            <button id="btn-open-cloud-hub" onclick="openCommunityHubModal()" class="h-7 px-2.5 bg-gradient-to-r from-sky-900/80 to-blue-900/80 hover:from-sky-800 hover:to-blue-800 border border-sky-400/50 text-sky-200 hover:text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 shadow-[0_0_10px_rgba(56,189,248,0.25)] shrink-0" title="Hub Comunitario: Explorar, cargar y publicar Presets en la nube pública">
+                                <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+                                <span>🌐 Cloud</span>
+                            </button>
+
+                            <!-- Secondary Studio Quick Tools (Compact Icon-First Design with Tooltips) -->
+                            <div class="flex items-center gap-1 border-l border-white/[0.08] pl-1.5">
+                                <button id="btn-quick-ai-fx" onclick="toggleAIFxDirector()" class="h-7 px-2 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] text-[11px] transition flex items-center gap-1 font-medium shrink-0" title="Director IA FX Autónomo: Modulación cinematográfica de los 9 passes WebGL">
                                     <span>🧠</span>
-                                    <span class="hidden md:inline">Director FX</span>
+                                    <span class="hidden 2xl:inline">Director FX</span>
                                 </button>
-                                <button onclick="focusVjTimeline()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-teal-400 hover:text-white rounded-lg border border-teal-500/30 text-[11px] transition flex items-center gap-1 font-medium" title="Abrir / Enfocar Timeline de Automatización VJ">
+                                <button onclick="focusVjTimeline()" class="h-7 px-2 bg-zinc-900 hover:bg-zinc-800 text-teal-400 hover:text-teal-200 rounded-lg border border-teal-500/30 text-[11px] transition flex items-center gap-1 font-medium shrink-0" title="Abrir / Enfocar Timeline de Automatización VJ">
                                     <span>⏱️</span>
-                                    <span class="hidden xl:inline">Timeline VJ</span>
+                                    <span class="hidden 2xl:inline">Timeline</span>
                                 </button>
-                                <button onclick="openMeshFreezeModal()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-amber-400 hover:text-white rounded-lg border border-amber-500/30 text-[11px] transition flex items-center gap-1 font-medium" title="Congelar Malla 3D Topográfica y Exportar STL / OBJ / GLB">
+                                <button onclick="openMeshFreezeModal()" class="h-7 px-2 bg-zinc-900 hover:bg-zinc-800 text-amber-400 hover:text-amber-200 rounded-lg border border-amber-500/30 text-[11px] transition flex items-center gap-1 font-medium shrink-0" title="Congelar Malla 3D Topográfica y Exportar STL / OBJ / GLB">
                                     <span>🧊</span>
-                                    <span class="hidden xl:inline">Freeze 3D</span>
+                                    <span class="hidden 2xl:inline">Freeze 3D</span>
                                 </button>
-                                <button onclick="openAiClipStudioModal()" class="px-2 py-1 bg-purple-950/60 hover:bg-purple-900 text-purple-300 hover:text-white rounded-lg border border-purple-500/40 text-[11px] transition flex items-center gap-1 font-medium shadow-sm" title="Estudio de Creación Narrativa & Clips IA Multicapa">
+                                <button onclick="openAiClipStudioModal()" class="h-7 px-2 bg-purple-950/60 hover:bg-purple-900 text-purple-300 hover:text-purple-100 rounded-lg border border-purple-500/40 text-[11px] transition flex items-center gap-1 font-medium shadow-sm shrink-0" title="Estudio de Creación Narrativa & Clips IA Multicapa">
                                     <span>🎬</span>
-                                    <span class="hidden xl:inline">Clips IA</span>
+                                    <span class="hidden 2xl:inline">Clips IA</span>
                                 </button>
-                                <button onclick="resetThreeCamera()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-white/[0.08] text-zinc-400 hover:text-white text-[11px] transition">Reset</button>
+                                <button onclick="resetThreeCamera()" class="h-7 px-2 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-white/[0.08] text-zinc-400 hover:text-white text-[11px] transition shrink-0" title="Restablecer posición de cámara 3D">
+                                    <span>↺</span>
+                                    <span class="hidden sm:inline">Reset</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -903,14 +975,43 @@
                     </div>
 
                     <!-- THREE.JS CANVAS CONTAINER -->
-                    <div id="three-canvas-container" class="relative w-full h-[32dvh] min-h-[210px] max-h-[290px] sm:h-[440px] lg:h-[580px] bg-black rounded-xl overflow-hidden border border-white/[0.08] shadow-inner flex items-center justify-center transition-all duration-300">
+                    <div id="three-canvas-container" class="relative w-full h-[35dvh] min-h-[220px] max-h-[300px] sm:h-[440px] lg:h-[580px] bg-black rounded-xl overflow-hidden border border-white/[0.08] shadow-inner flex items-center justify-center transition-all duration-300">
                         <canvas id="threeCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
                         
                         <!-- Drop Visual Flash Overlay (Destello blanco analógico en picos y drops) -->
                         <div id="hud-drop-flash" class="absolute inset-0 bg-white pointer-events-none opacity-0 transition-opacity duration-100 z-30"></div>
 
-                        <!-- Floating Glass HUD Overlay (Interpretación Acústica & Estado Narrativo) -->
-                        <div class="absolute top-2 left-2 bg-black/75 backdrop-blur-md px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border border-white/[0.1] text-[9px] sm:text-[10px] font-mono space-y-1 pointer-events-none text-zinc-300 shadow-2xl z-20">
+                        <!-- MOBILE TACTICAL FLOATING OVERLAY (< 1024px) -->
+                        <div id="mobile-viewport-hud" class="lg:hidden absolute top-2 inset-x-2 flex items-center justify-between pointer-events-none z-30">
+                            <!-- Left: Play/Pause Big Button & 1-Tap Scene Selector Chip -->
+                            <div class="flex items-center gap-1.5 pointer-events-auto">
+                                <button type="button" id="m-vp-btn-play" onclick="togglePlayPauseUserTrack(); triggerHaptic(20);" class="w-11 h-11 rounded-full bg-cyan-500/90 hover:bg-cyan-400 text-black font-black text-xl flex items-center justify-center shadow-[0_0_16px_rgba(6,182,212,0.6)] active:scale-90 border-2 border-white/40 transition shrink-0" title="Reproducir / Pausar Audio">
+                                    <span>▶</span>
+                                </button>
+                                <button type="button" onclick="switchMobileTacticalDeck('mundos'); triggerHaptic(15);" class="h-10 px-3 rounded-full bg-black/85 backdrop-blur-md border border-cyan-400/40 text-cyan-200 font-mono text-[10px] font-bold flex items-center gap-1.5 active:scale-95 shadow-lg shrink-0" title="Seleccionar Universo Escénico (14 Mundos)">
+                                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_6px_#22d3ee]"></span>
+                                    <span id="m-vp-scene-name" class="truncate max-w-[85px]">Mercurio</span>
+                                    <span class="text-cyan-400 text-xs">▼</span>
+                                </button>
+                            </div>
+
+                            <!-- Right: Live Telemetry Chips & Quick Mobile Toggles -->
+                            <div class="flex items-center gap-1.5 pointer-events-auto">
+                                <div class="h-10 px-2 py-0.5 rounded-xl bg-black/85 backdrop-blur-md border border-white/10 text-[9px] font-mono flex flex-col justify-center items-end text-zinc-300 shadow-lg leading-tight shrink-0">
+                                    <span class="text-cyan-400 font-bold" id="m-vp-rms">RMS: 0.00</span>
+                                    <span class="text-emerald-400 font-semibold" id="m-vp-fps">60 FPS</span>
+                                </div>
+                                <button type="button" id="m-vp-btn-vj" onclick="toggleAutoVJ(); triggerHaptic(15);" class="h-10 w-10 rounded-xl bg-purple-950/85 border border-purple-500/50 text-purple-200 flex items-center justify-center text-sm font-bold active:scale-90 shadow-lg shrink-0" title="Creador IA Auto-VJ: ON/OFF">
+                                    <span>⚡</span>
+                                </button>
+                                <button type="button" id="m-vp-btn-orbit" onclick="toggleCameraOrbit(); triggerHaptic(15);" class="h-10 w-10 rounded-xl bg-indigo-950/85 border border-indigo-500/50 text-indigo-300 flex items-center justify-center text-sm font-bold active:scale-90 shadow-lg shrink-0" title="Cámara Cinemática: Órbita">
+                                    <span>🎥</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Floating Glass HUD Overlay (Interpretación Acústica & Estado Narrativo) - Desktop Only -->
+                        <div class="hidden sm:block absolute top-2 left-2 bg-black/75 backdrop-blur-md px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl border border-white/[0.1] text-[9px] sm:text-[10px] font-mono space-y-1 pointer-events-none text-zinc-300 shadow-2xl z-20">
                             <div class="flex items-center gap-1.5 font-bold">
                                 <span class="text-zinc-400">ESTADO:</span>
                                 <span id="hud-narrative-tag" class="text-cyan-300 bg-cyan-950/80 px-1.5 py-0.5 rounded border border-cyan-500/40 animate-pulse tracking-wide">INTRO ETÉREA</span>
@@ -942,9 +1043,9 @@
 
                         <!-- On-Screen Touch Zoom & Camera Controls for Mobile & Desktop -->
                         <div class="absolute bottom-2 right-2 flex items-center gap-1 sm:gap-1.5 z-20 select-none">
-                            <button onclick="zoomScene(-60)" class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 hover:border-cyan-400 text-cyan-300 font-bold text-xs sm:text-base flex items-center justify-center active:scale-90 shadow-xl transition" title="Acercar (Zoom In)">+</button>
-                            <button onclick="zoomScene(60)" class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 hover:border-cyan-400 text-cyan-300 font-bold text-xs sm:text-base flex items-center justify-center active:scale-90 shadow-xl transition" title="Alejar (Zoom Out)">−</button>
-                            <button onclick="resetCameraZoom()" class="h-7 sm:h-8 px-1.5 sm:px-2 rounded-lg bg-black/80 backdrop-blur-md border border-white/20 hover:border-cyan-400 text-zinc-300 hover:text-white font-mono text-[8px] sm:text-[9px] font-bold flex items-center justify-center active:scale-90 shadow-xl transition" title="Reset Cámara & Zoom">↺</button>
+                            <button onclick="zoomScene(-60); triggerHaptic(10);" class="w-8 h-8 rounded-lg bg-black/85 backdrop-blur-md border border-white/20 hover:border-cyan-400 text-cyan-300 font-bold text-sm flex items-center justify-center active:scale-90 shadow-xl transition" title="Acercar (Zoom In)">+</button>
+                            <button onclick="zoomScene(60); triggerHaptic(10);" class="w-8 h-8 rounded-lg bg-black/85 backdrop-blur-md border border-white/20 hover:border-cyan-400 text-cyan-300 font-bold text-sm flex items-center justify-center active:scale-90 shadow-xl transition" title="Alejar (Zoom Out)">−</button>
+                            <button onclick="resetCameraZoom(); triggerHaptic(10);" class="h-8 px-2 rounded-lg bg-black/85 backdrop-blur-md border border-white/20 hover:border-cyan-400 text-zinc-300 hover:text-white font-mono text-[9px] font-bold flex items-center justify-center active:scale-90 shadow-xl transition" title="Reset Cámara & Zoom">↺</button>
                         </div>
 
                         <!-- Floating Autonomous Genesis Concept Card -->
@@ -1001,10 +1102,21 @@
                         <!-- Camera Shutter Flash Overlay for 4K / 8K Screenshots -->
                         <div id="screenshot-flash" class="absolute inset-0 bg-white pointer-events-none opacity-0 z-40"></div>
                     </div>
+
+                    <!-- RESIZE HANDLE (Borde inferior arrastrable para ajustar altura del visor 3D con ratón o táctil) -->
+                    <div id="three-viewport-resizer" class="group relative w-full h-4 -mt-1 flex items-center justify-center cursor-row-resize select-none z-30 touch-none py-1 transition-all" title="Arrastra hacia arriba o abajo para redimensionar el visor 3D (Doble clic para restablecer)">
+                        <div class="w-20 h-1.5 rounded-full bg-zinc-700/60 group-hover:bg-cyan-400 group-hover:shadow-[0_0_10px_rgba(6,182,212,0.6)] group-active:bg-cyan-300 transition-all flex items-center justify-center gap-1">
+                            <span class="w-1 h-1 rounded-full bg-white/40 group-hover:bg-black transition-colors"></span>
+                            <span class="w-1 h-1 rounded-full bg-white/40 group-hover:bg-black transition-colors"></span>
+                            <span class="w-1 h-1 rounded-full bg-white/40 group-hover:bg-black transition-colors"></span>
+                        </div>
+                        <!-- Micro badge flotante de altura visible durante arrastre -->
+                        <div id="three-resizer-badge" class="hidden absolute -bottom-6 bg-cyan-950/95 text-cyan-300 border border-cyan-400/50 px-2 py-0.5 rounded text-[10px] font-mono font-bold shadow-lg pointer-events-none z-40">580px</div>
+                    </div>
                 </section>
 
-                <!-- 3.5 VJ AUTOMATION TIMELINE & SESSION RECORDER / PLAYER (Q-BUS DAW TIMELINE) -->
-                <section id="sec-vj-timeline" class="glass-panel rounded-xl p-3 sm:p-3.5 space-y-2.5 text-xs shadow-lg transition-all">
+                <!-- 3.5 VJ AUTOMATION TIMELINE & SESSION RECORDER / PLAYER (Q-BUS DAW TIMELINE) - Desktop Only -->
+                <section id="sec-vj-timeline" class="glass-panel rounded-xl p-3 sm:p-3.5 space-y-2.5 text-xs shadow-lg transition-all hidden lg:block">
                     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-2">
                         <div class="flex items-center gap-2 font-bold text-zinc-200">
                             <span class="text-teal-400">⏱️ Timeline de Automatización VJ &amp; Sesión Q-Bus</span>
@@ -1069,29 +1181,569 @@
                     </div>
                 </section>
 
-                <!-- Mobile Deck Switcher (Visible only on < lg) -->
-                <div id="mobile-deck-switcher" class="lg:hidden glass-panel rounded-xl p-1 border border-white/[0.08] bg-[#0c0f1d]/90 backdrop-blur-xl shadow-lg">
-                    <div class="grid grid-cols-5 gap-1 text-center font-mono">
-                        <button type="button" onclick="switchMobileDeck('audio')" id="m-deck-btn-audio" class="m-deck-btn py-2 px-1 rounded-lg text-[10px] font-bold transition flex flex-col items-center justify-center gap-0.5 border border-cyan-400/40 bg-cyan-950/80 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.3)]">
-                            <span class="text-xs">🎵</span>
-                            <span class="truncate w-full">Audio</span>
+                <!-- ========================================================================= -->
+                <!-- ANDROID PWA TACTICAL DECK (< 1024px)                                      -->
+                <!-- Ergonomic Thumb-Zone Architecture: 6 Modular Touch Panels                -->
+                <!-- ========================================================================= -->
+                <div id="mobile-tactical-deck" class="lg:hidden mobile-deck-scrollable space-y-3">
+                    
+                    <!-- PANEL 1: [🎵 AUDIO] MASTER INGESTION & FADERS -->
+                    <div id="m-panel-audio" class="glass-panel rounded-2xl p-3 space-y-3 border border-white/10 bg-[#080a14]/90 backdrop-blur-xl shadow-2xl">
+                        <!-- Panel Header -->
+                        <div class="flex items-center justify-between border-b border-white/[0.08] pb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></span>
+                                <h3 class="text-xs font-black uppercase tracking-wider text-cyan-200 font-mono">SEÑAL MASTER &amp; INGESTA</h3>
+                            </div>
+                            <span class="text-[9px] font-mono text-zinc-400 bg-zinc-900/80 px-2 py-0.5 rounded border border-white/10">32-Bit Float</span>
+                        </div>
+
+                        <!-- Master Volume Fader (48px Touch Area) -->
+                        <div class="bg-zinc-950/80 rounded-xl p-3 border border-white/[0.06] space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold text-zinc-300 font-mono flex items-center gap-1.5">
+                                    <span>🔊</span>
+                                    <span>FADER MASTER</span>
+                                </span>
+                                <div class="flex items-center gap-2">
+                                    <span id="m-master-vol-val" class="font-mono text-cyan-300 font-bold text-xs bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-500/40">100%</span>
+                                    <span id="m-master-vol-db" class="font-mono text-zinc-400 text-[10px]">0.0 dB</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="range" id="m-master-volume" min="0" max="1.5" step="0.01" value="1.0" oninput="updateMobileMasterVol(this.value)" class="flex-grow h-8 accent-cyan-400 cursor-pointer touch-target-48" title="Volumen Master">
+                                <button type="button" id="m-btn-master-mute" onclick="toggleMobileMasterMute()" class="h-10 px-3 rounded-lg bg-zinc-900 border border-white/10 text-[10px] font-mono font-bold text-zinc-300 hover:text-white transition flex items-center justify-center active:scale-95 shrink-0">
+                                    <span id="m-master-mute-icon">🔊 MUTE</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Stereo Balance L/R (Thumb Centering) -->
+                        <div class="bg-zinc-950/80 rounded-xl p-2.5 border border-white/[0.06] space-y-1.5">
+                            <div class="flex items-center justify-between text-[10px] font-mono">
+                                <span class="text-zinc-400 font-bold">BALANCE ESTÉREO (L / R)</span>
+                                <span id="m-stereo-bal-val" class="text-cyan-300 font-bold">CENTER (50/50)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-mono font-bold text-zinc-500">L</span>
+                                <input type="range" id="m-stereo-balance" min="-1" max="1" step="0.02" value="0" oninput="updateMobileStereoBal(this.value)" class="flex-grow h-7 accent-cyan-400 cursor-pointer" title="Balance Estéreo L/R">
+                                <span class="text-[10px] font-mono font-bold text-zinc-500">R</span>
+                                <button type="button" onclick="centerMobileStereoBal()" class="h-8 px-2 rounded bg-zinc-900 border border-white/10 text-[9px] font-mono text-zinc-400 hover:text-cyan-300 font-bold active:scale-95">CENTER</button>
+                            </div>
+                        </div>
+
+                        <!-- Preamp Ingest Presets (44px Height) -->
+                        <div class="space-y-1">
+                            <span class="text-[9px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Preamp Ingest (Ganancia de Entrada):</span>
+                            <div class="grid grid-cols-4 gap-1.5 font-mono text-[10px]">
+                                <button type="button" onclick="setMobilePreamp(1.0)" id="m-preamp-1" class="h-10 rounded-lg bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 font-bold transition active:scale-95 flex items-center justify-center shadow-sm">1.0x Hi-Fi</button>
+                                <button type="button" onclick="setMobilePreamp(2.5)" id="m-preamp-2_5" class="h-10 rounded-lg bg-zinc-900 border border-white/[0.08] text-zinc-400 font-bold transition active:scale-95 flex items-center justify-center">2.5x</button>
+                                <button type="button" onclick="setMobilePreamp(4.5)" id="m-preamp-4_5" class="h-10 rounded-lg bg-zinc-900 border border-white/[0.08] text-zinc-400 font-bold transition active:scale-95 flex items-center justify-center">4.5x Boost</button>
+                                <button type="button" onclick="setMobilePreamp(8.0)" id="m-preamp-8" class="h-10 rounded-lg bg-zinc-900 border border-white/[0.08] text-zinc-400 font-bold transition active:scale-95 flex items-center justify-center">8.0x Max</button>
+                            </div>
+                        </div>
+
+                        <!-- Pistas Master de Referencia -->
+                        <div class="space-y-1.5 pt-1">
+                            <span class="text-[9px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Pistas Master de Referencia (HQ):</span>
+                            <div class="space-y-1.5">
+                                <button type="button" id="btn-track-mordaza-m" onclick="playPresetTrack('tema.mp3', 'Mordaza', this, 'PCM 48kHz Master'); triggerHaptic(15);" class="w-full h-12 rounded-xl bg-zinc-900/90 border border-white/[0.08] hover:border-cyan-500/50 p-2 flex items-center justify-between text-left transition active:scale-98 shadow-sm">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-mono font-bold text-zinc-400">CH 01</span>
+                                        <div>
+                                            <div class="text-[11px] font-bold text-zinc-100 leading-tight">MORDAZA</div>
+                                            <div class="text-[9px] font-mono text-zinc-400">PCM 48kHz Master • 3:18</div>
+                                        </div>
+                                    </div>
+                                    <span id="m-led-ch01" class="text-[8px] font-mono px-1.5 py-0.5 rounded bg-zinc-950 text-zinc-500 border border-white/5">STANDBY</span>
+                                </button>
+
+                                <button type="button" id="btn-track-tontos-m" onclick="playPresetTrack('tontos-utiles.mp3', 'Tontos Útiles', this, 'Dynamic Mix 320k'); triggerHaptic(15);" class="w-full h-12 rounded-xl bg-zinc-900/90 border border-white/[0.08] hover:border-cyan-500/50 p-2 flex items-center justify-between text-left transition active:scale-98 shadow-sm">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-mono font-bold text-zinc-400">CH 02</span>
+                                        <div>
+                                            <div class="text-[11px] font-bold text-zinc-100 leading-tight">TONTOS ÚTILES</div>
+                                            <div class="text-[9px] font-mono text-zinc-400">Dynamic Mix 320k • 2:45</div>
+                                        </div>
+                                    </div>
+                                    <span id="m-led-ch02" class="text-[8px] font-mono px-1.5 py-0.5 rounded bg-zinc-950 text-zinc-500 border border-white/5">STANDBY</span>
+                                </button>
+
+                                <button type="button" id="btn-track-section63-m" onclick="playPresetTrack('section-63.mp3', 'Section 63 - Manipulation EP (YouTube HQ)', this, 'YouTube Direct Feed'); triggerHaptic(15);" class="w-full h-12 rounded-xl bg-zinc-900/90 border border-white/[0.08] hover:border-cyan-500/50 p-2 flex items-center justify-between text-left transition active:scale-98 shadow-sm">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-mono font-bold text-rose-400">CH 03</span>
+                                        <div>
+                                            <div class="text-[11px] font-bold text-zinc-100 leading-tight">SECTION 63</div>
+                                            <div class="text-[9px] font-mono text-rose-400/80">YouTube Direct Feed • HQ</div>
+                                        </div>
+                                    </div>
+                                    <span id="m-led-ch03" class="text-[8px] font-mono px-1.5 py-0.5 rounded bg-zinc-950 text-zinc-500 border border-white/5">STANDBY</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Matriz Patchbay Ingesta Rápida (Touch Grid 2x3) -->
+                        <div class="space-y-1.5 pt-1">
+                            <span class="text-[9px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Matriz de Ingesta Externa (Patchbay):</span>
+                            <div class="grid grid-cols-2 gap-2 font-mono text-xs">
+                                <button type="button" onclick="selectYouTubeMobileSource(); triggerHaptic(15);" class="h-12 rounded-xl bg-gradient-to-r from-red-950/80 to-rose-950/80 border border-red-500/40 text-rose-200 font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm">
+                                    <span>▶</span>
+                                    <span>YouTube Móvil</span>
+                                </button>
+
+                                <button type="button" onclick="startMicrophone(); triggerHaptic(15);" class="h-12 rounded-xl bg-indigo-950/80 border border-indigo-500/40 text-indigo-200 font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm">
+                                    <span>🎙️</span>
+                                    <span>Micrófono Hi-Fi</span>
+                                </button>
+
+                                <button type="button" onclick="startTabCapture(); triggerHaptic(15);" class="h-12 rounded-xl bg-cyan-950/80 border border-cyan-500/40 text-cyan-200 font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm">
+                                    <span>🖥️</span>
+                                    <span>Audio Sistema</span>
+                                </button>
+
+                                <label class="h-12 rounded-xl bg-zinc-900 border border-white/10 text-zinc-200 hover:text-white font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm cursor-pointer">
+                                    <span>📁</span>
+                                    <span>Cargar Local</span>
+                                    <input type="file" id="m-audio-file-input" accept="audio/*" class="hidden" onchange="loadAudioFile(event); triggerHaptic(15);">
+                                </label>
+
+                                <button type="button" onclick="toggleSynthDemo(); triggerHaptic(15);" class="h-12 rounded-xl bg-amber-950/80 border border-amber-500/40 text-amber-200 font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm">
+                                    <span>⚡</span>
+                                    <span>Synth Procedural</span>
+                                </button>
+
+                                <button type="button" onclick="stopAudio(); triggerHaptic(15);" class="h-12 rounded-xl bg-zinc-900 border border-red-500/30 text-red-400 font-bold transition flex items-center justify-center gap-1.5 active:scale-95 shadow-sm">
+                                    <span>⏹</span>
+                                    <span>Corte / Mute</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 2: [🎚️ STEMS] 8 BIQUAD DSP CHANNELS -->
+                    <div id="m-panel-stems" class="glass-panel rounded-2xl p-3 space-y-2.5 border border-white/10 bg-[#080a14]/90 backdrop-blur-xl shadow-2xl hidden">
+                        <!-- Panel Header -->
+                        <div class="flex items-center justify-between border-b border-white/[0.08] pb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></span>
+                                <h3 class="text-xs font-black uppercase tracking-wider text-cyan-200 font-mono">BANCO 8 STEMS BIQUAD DSP</h3>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-[10px] font-mono">
+                                <button type="button" onclick="unmuteAllStems(); triggerHaptic(15);" class="px-2 py-1 rounded-lg bg-zinc-900 border border-white/10 text-zinc-300 font-bold hover:text-white active:scale-95">🔊 Todos ON</button>
+                                <button type="button" onclick="openStemsExportModal(); triggerHaptic(15);" class="px-2 py-1 rounded-lg bg-cyan-950/80 border border-cyan-400/40 text-cyan-300 font-bold active:scale-95">⬇ 8 WAVs</button>
+                            </div>
+                        </div>
+
+                        <!-- 8 Stems List (Touch Ergonomic Rack) -->
+                        <div class="space-y-2" id="m-stems-container">
+                            <!-- Inyectado dinámicamente al inicializar o sincronizar -->
+                        </div>
+                    </div>
+
+                    <!-- PANEL 3: [🌌 MUNDOS] 14 SCENIC UNIVERSES TOUCH GRID -->
+                    <div id="m-panel-mundos" class="glass-panel rounded-2xl p-3 space-y-3 border border-white/10 bg-[#080a14]/90 backdrop-blur-xl shadow-2xl hidden">
+                        <!-- Panel Header & Quick Camera Controls -->
+                        <div class="border-b border-white/[0.08] pb-2 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 shadow-[0_0_8px_#818cf8]"></span>
+                                    <h3 class="text-xs font-black uppercase tracking-wider text-indigo-200 font-mono">14 UNIVERSOS ESCÉNICOS</h3>
+                                </div>
+                                <span class="text-[9px] font-mono text-indigo-300 bg-indigo-950/80 px-2 py-0.5 rounded border border-indigo-500/40">WebGL 60 FPS</span>
+                            </div>
+
+                            <!-- Camera Orbit Mode & Auto-VJ Row -->
+                            <div class="grid grid-cols-3 gap-1.5 text-xs font-mono">
+                                <button type="button" id="m-btn-auto-vj" onclick="toggleAutoVJ(); triggerHaptic(20);" class="h-11 rounded-xl bg-purple-950/90 border border-purple-400/50 text-purple-200 font-bold flex items-center justify-center gap-1 active:scale-95 shadow-sm">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    <span>Auto-VJ</span>
+                                </button>
+                                <select id="m-camera-orbit-mode" onchange="changeCameraOrbitMode(this.value); triggerHaptic(10);" class="h-11 rounded-xl bg-zinc-900 border border-white/10 text-zinc-200 font-bold px-2 text-[11px] focus:outline-none cursor-pointer">
+                                    <option value="circle">Circular</option>
+                                    <option value="spiral">Espiral</option>
+                                    <option value="lemniscate">Infinito (∞)</option>
+                                    <option value="dramatic">Fly-by</option>
+                                </select>
+                                <button type="button" onclick="resetThreeCamera(); triggerHaptic(15);" class="h-11 rounded-xl bg-zinc-900 border border-white/10 text-zinc-400 hover:text-white font-bold flex items-center justify-center active:scale-95">
+                                    <span>↺ Reset</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 14 Scene Touch Cards (2 Columns Grid) -->
+                        <div class="grid grid-cols-2 gap-2 select-none" id="m-scene-cards-grid">
+                            <!-- 12. Océano de Mercurio -->
+                            <button type="button" onclick="selectMobileScene('scenic_mercury_monoliths')" data-scene="scenic_mercury_monoliths" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-cyan-400 bg-cyan-950/70 shadow-[0_0_15px_rgba(6,182,212,0.3)] p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🌊</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">MERCURIO</div>
+                                        <div class="text-[9px] font-mono text-cyan-300">PBR + Basalto</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]"></span>
+                            </button>
+
+                            <!-- 13. Valle de Cristales -->
+                            <button type="button" onclick="selectMobileScene('scenic_crystal_valley')" data-scene="scenic_crystal_valley" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-pink-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">💎</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">CRISTALES</div>
+                                        <div class="text-[9px] font-mono text-pink-300">H-Alfa + Vórtice</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 14. Abismo Boids -->
+                            <button type="button" onclick="selectMobileScene('scenic_abyss_boids')" data-scene="scenic_abyss_boids" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-emerald-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🐟</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">ABISMO BOIDS</div>
+                                        <div class="text-[9px] font-mono text-emerald-300">4.096 Cardumen</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 1. Nebulosa -->
+                            <button type="button" onclick="selectMobileScene('nebula')" data-scene="nebula" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-purple-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🌌</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">NEBULOSA 30K</div>
+                                        <div class="text-[9px] font-mono text-purple-300">Partículas FFT</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 2. Túnel Infinito -->
+                            <button type="button" onclick="selectMobileScene('tunnel')" data-scene="tunnel" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-cyan-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🌀</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">TÚNEL FFT</div>
+                                        <div class="text-[9px] font-mono text-cyan-300">Cilíndrico Warp</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 3. Monolito Wireframe -->
+                            <button type="button" onclick="selectMobileScene('monolith')" data-scene="monolith" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-amber-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🔷</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">MONOLITO</div>
+                                        <div class="text-[9px] font-mono text-amber-300">Icosaedro Giro</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 4. Shader GLSL en Vivo -->
+                            <button type="button" onclick="selectMobileScene('custom_shader')" data-scene="custom_shader" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-pink-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">⚡</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">SHADER GLSL</div>
+                                        <div class="text-[9px] font-mono text-pink-300">22 Presets GPU</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 5. GPU Compute Engine -->
+                            <button type="button" onclick="selectMobileScene('gpu_compute')" data-scene="gpu_compute" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-teal-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">⚛️</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">GPU COMPUTE</div>
+                                        <div class="text-[9px] font-mono text-teal-300">65k FBO Turing</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 6. Génesis Autónoma IA -->
+                            <button type="button" onclick="selectMobileScene('autonomous_genesis')" data-scene="autonomous_genesis" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-purple-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🔮</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">GÉNESIS IA</div>
+                                        <div class="text-[9px] font-mono text-purple-300">Arte Autónomo</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 7. Cimática Cuántica 3D -->
+                            <button type="button" onclick="selectMobileScene('cymatics_scene')" data-scene="cymatics_scene" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-teal-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🔮</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">CIMÁTICA 3D</div>
+                                        <div class="text-[9px] font-mono text-teal-300">Chladni Cuántico</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 8. Espacio Poincaré H³ -->
+                            <button type="button" onclick="selectMobileScene('hyperbolic_scene')" data-scene="hyperbolic_scene" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-indigo-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🌀</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">POINCARÉ H³</div>
+                                        <div class="text-[9px] font-mono text-indigo-300">No Euclidiano</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 9. Ferrofluido Thin-Film -->
+                            <button type="button" onclick="selectMobileScene('ferrofluid_scene')" data-scene="ferrofluid_scene" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-amber-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🧲</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">FERROFLUIDO</div>
+                                        <div class="text-[9px] font-mono text-amber-300">Rosensweig FHD</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 10. Cámara FHD Levitación -->
+                            <button type="button" onclick="selectMobileScene('ferrofluid_chamber_scene')" data-scene="ferrofluid_chamber_scene" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-amber-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🌌</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">CÁMARA FHD</div>
+                                        <div class="text-[9px] font-mono text-amber-300">Levitación 360°</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+
+                            <!-- 11. Waterfall 3D -->
+                            <button type="button" onclick="selectMobileScene('waterfall')" data-scene="waterfall" class="m-scene-card h-16 rounded-xl bg-zinc-900/70 border border-white/[0.08] hover:border-cyan-400/40 p-2 flex items-center justify-between text-left transition active:scale-95">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xl">🌊</span>
+                                    <div>
+                                        <div class="text-[11px] font-bold text-zinc-100 leading-tight">WATERFALL 3D</div>
+                                        <div class="text-[9px] font-mono text-cyan-300">Topografía FFT</div>
+                                    </div>
+                                </div>
+                                <span class="m-scene-led w-2 h-2 rounded-full bg-zinc-600"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 4: [✨ FX] 9-PASS WEBGL STOMP-BOX PEDALBOARD -->
+                    <div id="m-panel-fx" class="glass-panel rounded-2xl p-3 space-y-2.5 border border-white/10 bg-[#080a14]/90 backdrop-blur-xl shadow-2xl hidden">
+                        <!-- Panel Header & Director FX -->
+                        <div class="flex items-center justify-between border-b border-white/[0.08] pb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></span>
+                                <h3 class="text-xs font-black uppercase tracking-wider text-cyan-200 font-mono">PEDALBOARD POST-FX (9 PASSES)</h3>
+                            </div>
+                            <div class="flex items-center gap-1 font-mono text-[10px]">
+                                <button type="button" onclick="enableAllFX(); syncMobileFxPedals(); triggerHaptic(15);" class="px-2 py-0.5 rounded bg-cyan-950/80 border border-cyan-400/40 text-cyan-300 font-bold active:scale-95">ON</button>
+                                <button type="button" onclick="disableAllFX(); syncMobileFxPedals(); triggerHaptic(15);" class="px-2 py-0.5 rounded bg-zinc-900 border border-white/10 text-zinc-400 font-bold active:scale-95">OFF</button>
+                                <button type="button" onclick="resetAllFX(); syncMobileFxPedals(); triggerHaptic(15);" class="px-2 py-0.5 rounded bg-zinc-900 border border-white/10 text-zinc-400 active:scale-95">Reset</button>
+                            </div>
+                        </div>
+
+                        <!-- Director IA FX Toggle Button (48px) -->
+                        <button type="button" id="m-btn-ai-fx-toggle" onclick="toggleAIFxDirector(); triggerHaptic(20);" class="w-full h-12 rounded-xl bg-gradient-to-r from-indigo-950 to-purple-950 border border-indigo-500/40 p-2.5 flex items-center justify-between transition active:scale-98 shadow-sm">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]" id="m-ai-fx-led"></span>
+                                <div class="text-left font-mono">
+                                    <div class="text-xs font-bold text-indigo-200" id="m-ai-fx-title">DIRECTOR IA FX: OFF</div>
+                                    <div class="text-[9px] text-zinc-400" id="m-ai-fx-sub">Orquestación cinematográfica autónoma</div>
+                                </div>
+                            </div>
+                            <span id="m-ai-fx-badge" class="text-[9px] font-mono px-2 py-0.5 rounded bg-black/60 text-indigo-300 border border-indigo-500/30">16s</span>
                         </button>
-                        <button type="button" onclick="switchMobileDeck('stems')" id="m-deck-btn-stems" class="m-deck-btn py-2 px-1 rounded-lg text-[10px] font-bold transition flex flex-col items-center justify-center gap-0.5 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white">
-                            <span class="text-xs">🎚️</span>
-                            <span class="truncate w-full">Stems</span>
+
+                        <!-- Stomp-Box Pedals Rack (9 Passes) -->
+                        <div class="space-y-2" id="m-fx-pedalboard-container">
+                            <!-- Inyectado dinámicamente o estático -->
+                        </div>
+                    </div>
+
+                    <!-- PANEL 5: [⚡ GLSL] SHADER LAB & SNIPPETS -->
+                    <div id="m-panel-shaders" class="glass-panel rounded-2xl p-3 space-y-3 border border-white/10 bg-[#080a14]/90 backdrop-blur-xl shadow-2xl hidden">
+                        <!-- Panel Header -->
+                        <div class="flex items-center justify-between border-b border-white/[0.08] pb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-pink-400 shadow-[0_0_8px_#f43f5e]"></span>
+                                <h3 class="text-xs font-black uppercase tracking-wider text-pink-200 font-mono">LABORATORIO GLSL PROCEDURAL</h3>
+                            </div>
+                            <span id="m-shader-status-badge" class="text-[9px] font-mono text-emerald-400 bg-emerald-950/80 px-2 py-0.5 rounded border border-emerald-500/40">✓ Compilado OK</span>
+                        </div>
+
+                        <!-- 22 Presets Dropdown Selector -->
+                        <div class="space-y-1">
+                            <span class="text-[9px] font-mono uppercase tracking-wider text-zinc-400 font-bold">22 Shaders Procedurales de Fábrica:</span>
+                            <select id="m-shader-preset-select" onchange="loadShaderPreset(this.value); const d=document.getElementById('shader-preset-select'); if(d) d.value=this.value; triggerHaptic(15);" class="w-full h-12 rounded-xl bg-zinc-900 border border-white/10 text-zinc-100 font-bold px-3 text-xs focus:outline-none focus:border-pink-500 cursor-pointer">
+                                <option value="plasma">1. ⚡ Plasma Psicodélico Reactivo</option>
+                                <option value="raymarch">2. 🌀 Raymarching Túnel Fractal (SDF)</option>
+                                <option value="spectral_waves">3. 🌊 Ondas de Luz &amp; Malla Espectral</option>
+                                <option value="voronoi">4. 🧬 Bio-Voronoi Pulsante (Beat Spike)</option>
+                                <option value="synthwave_grid">5. 🌆 Synthwave Neon Grid 80s</option>
+                                <option value="blackhole">6. 🕳️ Agujero Negro &amp; Lente Gravitacional</option>
+                                <option value="kaleidoscope">7. 🔮 Caleidoscopio Hiperdimensional</option>
+                                <option value="tesla_orb">8. ⚡ Esfera de Plasma Eléctrico (Tesla)</option>
+                                <option value="matrix_landscape">9. 🌐 Campo Topográfico Cuántico</option>
+                                <option value="cyber_tunnel">10. 🚀 Túnel Hexagonal Sci-Fi</option>
+                                <option value="neural_synapse">11. 🧠 Sinapsis Neural &amp; Red Axonal</option>
+                                <option value="aurora_borealis">12. 🌌 Aurora Boreal Fluida (SDF)</option>
+                                <option value="mandelbulb">13. 🔮 Mandelbulb 3D Hipercomplejo</option>
+                                <option value="matrix_cybercore">14. 💾 Lluvia Matrix Cybercore</option>
+                                <option value="supernova_accretion">15. 💥 Supernova &amp; Disco de Acreción</option>
+                                <option value="cymatics_chladni_3d">16. 🔮 Cimática Cuántica 3D (Chladni)</option>
+                                <option value="hyperbolic_poincare">17. 🌀 Espacio Poincaré H³</option>
+                                <option value="ferrofluid_thinfilm">18. 🧲 Ferrofluido Thin-Film (FHD)</option>
+                                <option value="attractor_quantum_rf">19. ⚛️ Atractor Caótico &amp; Espectro RF</option>
+                                <option value="ferrofluid_chamber">20. 🌌 Cámara FHD Levitación 360°</option>
+                                <option value="bismuth_crystal">21. 💎 Cristal de Bismuto Fractal</option>
+                                <option value="bioluminescent_abyss">22. 🐟 Medusa Bioluminiscente Abisal</option>
+                            </select>
+                        </div>
+
+                        <!-- Big Compile Button (48px) -->
+                        <button type="button" onclick="compileCustomShader(); triggerHaptic(25);" class="w-full h-12 rounded-xl bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white font-black text-xs font-mono uppercase tracking-wider shadow-[0_0_20px_rgba(236,72,153,0.4)] flex items-center justify-center gap-2 active:scale-98 transition">
+                            <span>⚡</span>
+                            <span>COMPILAR SHADER EN CALIENTE</span>
                         </button>
-                        <button type="button" onclick="switchMobileDeck('fx')" id="m-deck-btn-fx" class="m-deck-btn py-2 px-1 rounded-lg text-[10px] font-bold transition flex flex-col items-center justify-center gap-0.5 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white">
-                            <span class="text-xs">✨</span>
-                            <span class="truncate w-full">PostFX</span>
-                        </button>
-                        <button type="button" onclick="switchMobileDeck('shaders')" id="m-deck-btn-shaders" class="m-deck-btn py-2 px-1 rounded-lg text-[10px] font-bold transition flex flex-col items-center justify-center gap-0.5 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white">
-                            <span class="text-xs">⚡</span>
-                            <span class="truncate w-full">GLSL</span>
-                        </button>
-                        <button type="button" onclick="switchMobileDeck('metrics')" id="m-deck-btn-metrics" class="m-deck-btn py-2 px-1 rounded-lg text-[10px] font-bold transition flex flex-col items-center justify-center gap-0.5 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white">
-                            <span class="text-xs">🧠</span>
-                            <span class="truncate w-full">IA / MER</span>
-                        </button>
+
+                        <!-- Math Snippets Macro Pad (2x2 Grid) -->
+                        <div class="space-y-1.5 pt-1">
+                            <span class="text-[9px] font-mono uppercase tracking-wider text-zinc-400 font-bold">Inyección de Snippets Matemáticos (1-Toque):</span>
+                            <div class="grid grid-cols-2 gap-2 font-mono text-[11px]">
+                                <button type="button" onclick="insertShaderSnippet('rot2D'); triggerHaptic(15);" class="h-11 rounded-xl bg-zinc-900 border border-pink-500/30 text-pink-300 font-bold flex items-center justify-center gap-1.5 active:scale-95">
+                                    <span class="text-pink-400 font-black">+</span>
+                                    <span>rot2D(angle)</span>
+                                </button>
+                                <button type="button" onclick="insertShaderSnippet('snoise'); triggerHaptic(15);" class="h-11 rounded-xl bg-zinc-900 border border-emerald-500/30 text-emerald-300 font-bold flex items-center justify-center gap-1.5 active:scale-95">
+                                    <span class="text-emerald-400 font-black">+</span>
+                                    <span>snoise(vec3)</span>
+                                </button>
+                                <button type="button" onclick="insertShaderSnippet('fresnel'); triggerHaptic(15);" class="h-11 rounded-xl bg-zinc-900 border border-cyan-500/30 text-cyan-300 font-bold flex items-center justify-center gap-1.5 active:scale-95">
+                                    <span class="text-cyan-400 font-black">+</span>
+                                    <span>fresnel(N,V)</span>
+                                </button>
+                                <button type="button" onclick="insertShaderSnippet('palette'); triggerHaptic(15);" class="h-11 rounded-xl bg-zinc-900 border border-purple-500/30 text-purple-300 font-bold flex items-center justify-center gap-1.5 active:scale-95">
+                                    <span class="text-purple-400 font-black">+</span>
+                                    <span>cosPalette(t)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Live Uniforms Monitor -->
+                        <div class="bg-zinc-950/80 rounded-xl p-2.5 border border-white/[0.06] space-y-1 text-[10px] font-mono">
+                            <div class="text-zinc-400 font-bold flex items-center justify-between">
+                                <span>UNIFORMS EN VIVO:</span>
+                                <span id="m-shader-onset-led" class="px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-500 text-[8px]">uIsOnset: OFF</span>
+                            </div>
+                            <div class="grid grid-cols-4 gap-1 text-[9px]">
+                                <div class="bg-zinc-900 p-1 rounded text-center"><span class="text-cyan-400">Sub:</span> <span id="m-uni-sub">0.00</span></div>
+                                <div class="bg-zinc-900 p-1 rounded text-center"><span class="text-cyan-400">Bass:</span> <span id="m-uni-bass">0.00</span></div>
+                                <div class="bg-zinc-900 p-1 rounded text-center"><span class="text-purple-400">Mid:</span> <span id="m-uni-mid">0.00</span></div>
+                                <div class="bg-zinc-900 p-1 rounded text-center"><span class="text-pink-400">Treb:</span> <span id="m-uni-treble">0.00</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 6: [🌐 CLOUD & MÁS] MACRO PAD & TOOLS -->
+                    <div id="m-panel-cloud" class="glass-panel rounded-2xl p-3 space-y-3 border border-white/10 bg-[#080a14]/90 backdrop-blur-xl shadow-2xl hidden">
+                        <!-- Panel Header -->
+                        <div class="flex items-center justify-between border-b border-white/[0.08] pb-2">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
+                                <h3 class="text-xs font-black uppercase tracking-wider text-sky-200 font-mono">MACRO PAD TÁCTICO &amp; CLOUD</h3>
+                            </div>
+                            <span class="text-[9px] font-mono text-zinc-400 bg-zinc-900/80 px-2 py-0.5 rounded border border-white/10">Estudio VJ</span>
+                        </div>
+
+                        <!-- 8 Macro Pad Action Buttons (2 Columns Grid) -->
+                        <div class="grid grid-cols-2 gap-2.5 font-mono text-xs select-none">
+                            <!-- 1. Presets Cloud -->
+                            <button type="button" onclick="openCommunityHubModal(); triggerHaptic(15);" class="h-14 rounded-xl bg-gradient-to-br from-sky-950/90 to-blue-950/90 border border-sky-400/50 p-2.5 flex items-center gap-2.5 text-left transition active:scale-95 shadow-sm">
+                                <span class="text-2xl">🌐</span>
+                                <div>
+                                    <div class="text-[11px] font-bold text-sky-200 leading-tight">PRESETS CLOUD</div>
+                                    <div class="text-[9px] text-zinc-400">Hub Hetzner</div>
+                                </div>
+                            </button>
+
+                            <!-- 2. Timeline VJ -->
+                            <button type="button" onclick="focusVjTimeline(); triggerHaptic(15);" class="h-14 rounded-xl bg-gradient-to-br from-teal-950/90 to-cyan-950/90 border border-teal-400/50 p-2.5 flex items-center gap-2.5 text-left transition active:scale-95 shadow-sm">
+                                <span class="text-2xl">⏱️</span>
+                                <div>
+                                    <div class="text-[11px] font-bold text-teal-200 leading-tight">TIMELINE VJ</div>
+                                    <div class="text-[9px] text-zinc-400">Automatización Q</div>
+                                </div>
+                            </button>
+
+                            <!-- 3. Captura 4K -->
+                            <button type="button" onclick="captureUltraScreenshot('4k', true); triggerHaptic(30);" class="h-14 rounded-xl bg-gradient-to-br from-amber-950/90 to-yellow-950/90 border border-amber-400/50 p-2.5 flex items-center gap-2.5 text-left transition active:scale-95 shadow-sm">
+                                <span class="text-2xl">📸</span>
+                                <div>
+                                    <div class="text-[11px] font-bold text-amber-200 leading-tight">CAPTURA 4K</div>
+                                    <div class="text-[9px] text-zinc-400">Obturador [P]</div>
+                                </div>
+                            </button>
+
+                            <!-- 4. Escultura 3D STL -->
+                            <button type="button" onclick="openMeshFreezeModal(); triggerHaptic(15);" class="h-14 rounded-xl bg-gradient-to-br from-orange-950/90 to-amber-950/90 border border-orange-400/50 p-2.5 flex items-center gap-2.5 text-left transition active:scale-95 shadow-sm">
+                                <span class="text-2xl">🧊</span>
+                                <div>
+                                    <div class="text-[11px] font-bold text-orange-200 leading-tight">ESCULTURA 3D</div>
+                                    <div class="text-[9px] text-zinc-400">Exportar STL/OBJ</div>
+                                </div>
+                            </button>
+
+                            <!-- 5. Clips Narrativos IA -->
+                            <button type="button" onclick="openAiClipStudioModal(); triggerHaptic(15);" class="h-14 rounded-xl bg-gradient-to-br from-purple-950/90 to-pink-950/90 border border-purple-400/50 p-2.5 flex items-center gap-2.5 text-left transition active:scale-95 shadow-sm">
+                                <span class="text-2xl">🎬</span>
+                                <div>
+                                    <div class="text-[11px] font-bold text-purple-200 leading-tight">CLIPS IA</div>
+                                    <div class="text-[9px] text-zinc-400">Anime, Noir, 35mm</div>
+                                </div>
+                            </button>
+
+                            <!-- 6. Webcam & NDI -->
+                            <button type="button" onclick="toggleLiveVideo(); triggerHaptic(15);" class="h-14 rounded-xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 p-2.5 flex items-center gap-2.5 text-left transition active:scale-95 shadow-sm">
+                                <span class="text-2xl">📹</span>
+                                <div>
+                                    <div class="text-[11px] font-bold text-zinc-200 leading-tight">CAM / NDI</div>
+                                    <div class="text-[9px] text-zinc-400">Chroma Key GPU</div>
+                                </div>
+                            </button>
+
+                            <!-- 7. Audio Espacial 7.1 / Atmos -->
+                            <button type="button" onclick="switchV4View('spatial-audio'); triggerHaptic(15);" class="h-14 rounded-xl bg-gradient-to-br from-indigo-950/90 to-teal-950/90 border border-indigo-400/40 p-2.5 flex items-center gap-2.5 text-left transition active:scale-95 shadow-sm">
+                                <span class="text-2xl">🎧</span>
+                                <div>
+                                    <div class="text-[11px] font-bold text-indigo-200 leading-tight">SPATIAL 7.1</div>
+                                    <div class="text-[9px] text-zinc-400">Binaural &amp; Atmos</div>
+                                </div>
+                            </button>
+
+                            <!-- 8. Instalar App PWA -->
+                            <button type="button" id="m-btn-install-pwa" onclick="installPwaApp(); triggerHaptic(15);" class="h-14 rounded-xl bg-gradient-to-br from-emerald-950/90 to-green-950/90 border border-emerald-400/40 p-2.5 flex items-center gap-2.5 text-left transition active:scale-95 shadow-sm">
+                                <span class="text-2xl">📲</span>
+                                <div>
+                                    <div class="text-[11px] font-bold text-emerald-200 leading-tight">INSTALAR PWA</div>
+                                    <div class="text-[9px] text-zinc-400">Modo Android App</div>
+                                </div>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -4030,14 +4682,29 @@
                     }
                 }
             }
+
+            // Sincronizar botón maestro de transporte móvil en Viewport 3D (#m-vp-btn-play)
+            const mVpPlay = document.getElementById('m-vp-btn-play');
+            if (mVpPlay) {
+                const iconSpan = mVpPlay.querySelector('span');
+                if (isLive) {
+                    if (iconSpan) iconSpan.innerText = "⏹";
+                    mVpPlay.className = "w-11 h-11 rounded-full bg-red-500 hover:bg-red-400 text-white font-black text-xl flex items-center justify-center shadow-[0_0_16px_rgba(239,68,68,0.6)] active:scale-90 border-2 border-white/40 transition shrink-0";
+                    mVpPlay.title = "Detener ingesta de audio en vivo";
+                } else {
+                    const isPlaying = (isAudioRunning && audioElement && !audioElement.paused);
+                    if (iconSpan) iconSpan.innerText = isPlaying ? "⏸" : "▶";
+                    mVpPlay.className = isPlaying
+                        ? "w-11 h-11 rounded-full bg-amber-400 hover:bg-amber-300 text-black font-black text-xl flex items-center justify-center shadow-[0_0_16px_rgba(251,191,36,0.6)] active:scale-90 border-2 border-white/40 transition shrink-0"
+                        : "w-11 h-11 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-black text-xl flex items-center justify-center shadow-[0_0_16px_rgba(6,182,212,0.6)] active:scale-90 border-2 border-white/40 transition shrink-0";
+                    mVpPlay.title = isPlaying ? "Pausar pista" : "Reproducir pista";
+                }
+            }
         }
 
         function selectYouTubeMobileSource() {
-            // Reproducir inmediatamente Section 63 de YouTube a través de MotorVisuales con balance L / R y DSP 8-stems
-            playPresetTrack('section-63.mp3', 'Section 63 - Manipulation EP (YouTube HQ)', document.getElementById('btn-track-section63'));
-            if (typeof showToast === 'function') {
-                showToast("YouTube Conectado", "Section 63 sonando a través de MotorVisuales con balance L / R y DSP", "success");
-            }
+            if (typeof triggerHaptic === 'function') triggerHaptic(15);
+            openYouTubeMobileAssistant();
         }
 
         function setupAudioElement(srcUrl, title) {
@@ -4279,11 +4946,33 @@
         }
 
         // --- ASISTENTE DE INGESTA DE YOUTUBE EN MÓVIL ---
-        function openYouTubeMobileAssistant() {
+        async function openYouTubeMobileAssistant() {
+            if (typeof triggerHaptic === 'function') triggerHaptic(15);
             const modal = document.getElementById('yt-mobile-modal');
             if (modal) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
+            }
+            // Detección automática en segundo plano del portapapeles si contiene enlace YouTube
+            try {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    if (text && (text.includes('youtube.com/') || text.includes('youtu.be/'))) {
+                        const input = document.getElementById('yt-url-input');
+                        const badge = document.getElementById('yt-clipboard-detected-badge');
+                        const badgeUrl = document.getElementById('yt-clipboard-url-preview');
+                        if (input && !input.value.trim()) {
+                            input.value = text.trim();
+                        }
+                        if (badge) {
+                            if (badgeUrl) badgeUrl.innerText = text.trim();
+                            badge.classList.remove('hidden');
+                            badge.classList.add('flex');
+                        }
+                    }
+                }
+            } catch(e) {
+                // Silencioso si la política del navegador requiere toque directo
             }
         }
 
@@ -4295,16 +4984,41 @@
             }
         }
 
-        function startYouTubeMobileListening() {
-            closeYouTubeMobileAssistant();
-                closeCommunityHubModal();
-            startMicrophone(true);
+        async function pasteFromClipboardToYtInput() {
+            if (typeof triggerHaptic === 'function') triggerHaptic(15);
+            try {
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        const input = document.getElementById('yt-url-input');
+                        if (input) input.value = text.trim();
+                        if (typeof showToast === 'function') showToast("Enlace Pegado", "URL de YouTube lista para reproducir", "info", 1500);
+                    }
+                } else {
+                    if (typeof showToast === 'function') showToast("Portapapeles", "Mantén pulsado el campo para pegar", "warning", 2000);
+                }
+            } catch(err) {
+                if (typeof showToast === 'function') showToast("Permiso", "Mantén pulsado el campo para pegar", "warning", 2000);
+            }
         }
 
-        async function handleOnlineUrlSubmit() {
+        function startYouTubeMobileListening() {
+            if (typeof triggerHaptic === 'function') triggerHaptic(20);
+            closeYouTubeMobileAssistant();
+            closeCommunityHubModal();
+            startMicrophone(true);
+            if (typeof showToast === 'function') {
+                showToast("Escucha en Vivo Activa", "Capturando sonido de YouTube PiP / altavoz con Preamp 4.5x", "success", 4000);
+            }
+        }
+
+        async function handleOnlineUrlSubmit(explicitUrl = null) {
             const input = document.getElementById('yt-url-input');
-            if (!input || !input.value.trim()) return;
-            const url = input.value.trim();
+            const url = (explicitUrl || (input ? input.value : '')).trim();
+            if (!url) {
+                if (typeof showToast === 'function') showToast("URL Requerida", "Pega un enlace de YouTube o audio", "warning", 2500);
+                return;
+            }
 
             closeYouTubeMobileAssistant();
 
@@ -4319,25 +5033,25 @@
             if (ytMatch) {
                 const videoId = ytMatch[1];
                 if (typeof showToast === 'function') {
-                    showToast("Conectando con YouTube", "Extrayendo canal de audio libre de CORS...", "info");
+                    showToast("Conectando con YouTube", "Extrayendo audio estéreo HQ libre de CORS...", "info", 3000);
                 }
                 updateBadge('Cargando YouTube...', 'bg-rose-900 text-rose-300 border-rose-500');
 
                 // 1. Prioridad: Gateway de streaming propio LyAi / Hetzner (/api/yt-stream)
-                const gatewayBase = window.STREAM_GATEWAY_URL || '';
+                const gatewayBase = (window.location.hostname === 'motorvisuales.site' || (window.location.hostname === 'localhost' && window.IS_LOCAL_GATEWAY)) ? '' : 'https://motorvisuales.site';
                 const streamUrl = `${gatewayBase}/api/yt-stream?url=${encodeURIComponent(url)}`;
                 try {
-                    // Verificamos conexión con el stream gateway
-                    const gwProbe = await fetch(`${gatewayBase}/health`, { method: 'GET', signal: AbortSignal.timeout(2500) });
-                    if (gwProbe.ok) {
-                        playPresetTrack(streamUrl, `YouTube (${videoId})`);
+                    const infoRes = await fetch(`${gatewayBase}/api/yt-info?url=${encodeURIComponent(url)}`, { signal: AbortSignal.timeout(6000) });
+                    if (infoRes.ok) {
+                        const ytInfo = await infoRes.json();
+                        playPresetTrack(streamUrl, ytInfo.title || `YouTube (${videoId})`);
                         if (typeof showToast === 'function') {
-                            showToast("YouTube Conectado", `Stream activo vía Gateway LyAi Hetzner`, "success");
+                            showToast("YouTube Reproduciendo", ytInfo.title || "Stream activo vía Gateway Hetzner", "success", 3500);
                         }
                         return;
                     }
                 } catch(gwErr) {
-                    console.log("Gateway propio local no activo, probando stream directo o fallbacks...", gwErr);
+                    console.log("Gateway propio Hetzner falló o timeout, probando endpoints públicos...", gwErr);
                 }
 
                 // Lista de instancias públicas activas de Invidious / Piped para audio stream
@@ -4370,7 +5084,7 @@
                             streamFound = true;
                             playPresetTrack(audioUrl, data.title || `YouTube (${videoId})`);
                             if (typeof showToast === 'function') {
-                                showToast("YouTube Reproduciendo", data.title || videoId, "success");
+                                showToast("YouTube Reproduciendo", data.title || videoId, "success", 3500);
                             }
                             break;
                         }
@@ -4381,9 +5095,9 @@
 
                 if (!streamFound) {
                     if (typeof showToast === 'function') {
-                        showToast("Usando Modo Escucha Hi-Fi", "Iniciando captura acústica musical directa.", "info");
+                        showToast("Modo Escucha en Vivo", "Activando captura acústica Hi-Fi adaptativa para YouTube PiP / Altavoz.", "info", 4500);
                     }
-                    startMicrophone(true);
+                    startYouTubeMobileListening();
                 }
             } else {
                 playPresetTrack(url, 'Stream Online');
@@ -4719,16 +5433,25 @@
                     const data = stemsData[conf.id];
                     if (data) {
                         data.value *= 0.9;
+                        const pct = Math.round(data.value * 100);
                         const meterBar = document.getElementById(`meter-bar-${conf.id}`);
                         const meterVal = document.getElementById(`meter-val-${conf.id}`);
-                        if (meterBar) meterBar.style.width = `${Math.round(data.value * 100)}%`;
-                        if (meterVal) meterVal.innerText = `${Math.round(data.value * 100)}%`;
+                        if (meterBar) meterBar.style.width = `${pct}%`;
+                        if (meterVal) meterVal.innerText = `${pct}%`;
+
+                        // Sincronización móvil 60 FPS
+                        const mVu = document.getElementById(`m-stem-vu-${conf.id}`);
+                        const mVal = document.getElementById(`m-stem-val-${conf.id}`);
+                        if (mVu) mVu.style.width = `${pct}%`;
+                        if (mVal) mVal.innerText = `${pct}%`;
                     }
                 });
                 const fillEl = document.getElementById('live-meter-fill');
                 if (fillEl) fillEl.style.width = '0%';
                 const dbEl = document.getElementById('live-meter-db');
                 if (dbEl) dbEl.innerText = '-inf dB';
+                const mvpRms = document.getElementById('m-vp-rms');
+                if (mvpRms) mvpRms.innerText = 'RMS: 0.00';
                 return;
             }
 
@@ -4790,10 +5513,17 @@
                 }
                 data.value = val;
                 
+                const pct = Math.min(100, Math.round(val * 100));
                 const meterBar = document.getElementById(`meter-bar-${conf.id}`);
                 const meterVal = document.getElementById(`meter-val-${conf.id}`);
-                if (meterBar) meterBar.style.width = `${Math.min(100, Math.round(val * 100))}%`;
-                if (meterVal) meterVal.innerText = `${Math.round(val * 100)}%`;
+                if (meterBar) meterBar.style.width = `${pct}%`;
+                if (meterVal) meterVal.innerText = `${pct}%`;
+
+                // Sincronización móvil 60 FPS
+                const mVu = document.getElementById(`m-stem-vu-${conf.id}`);
+                const mVal = document.getElementById(`m-stem-val-${conf.id}`);
+                if (mVu) mVu.style.width = `${pct}%`;
+                if (mVal) mVal.innerText = `${pct}%`;
             });
 
             // Centroid, Flux & Rolloff
@@ -4853,6 +5583,18 @@
             document.getElementById('tele-flux').innerText = flux.toFixed(2);
             document.getElementById('tele-zcr').innerText = zcrCount.toString();
             document.getElementById('tele-rolloff').innerText = `${Math.round(rolloff)} Hz`;
+
+            // Telemetría Móvil HUD & Uniforms
+            const mvpRms = document.getElementById('m-vp-rms');
+            if (mvpRms) mvpRms.innerText = `RMS: ${rms.toFixed(2)}`;
+            const mSub = document.getElementById('m-uni-sub');
+            if (mSub && stemsData['sub']) mSub.innerText = stemsData['sub'].value.toFixed(2);
+            const mBass = document.getElementById('m-uni-bass');
+            if (mBass && stemsData['bass']) mBass.innerText = stemsData['bass'].value.toFixed(2);
+            const mMid = document.getElementById('m-uni-mid');
+            if (mMid && stemsData['vocal_lead']) mMid.innerText = stemsData['vocal_lead'].value.toFixed(2);
+            const mTreb = document.getElementById('m-uni-treble');
+            if (mTreb && stemsData['air']) mTreb.innerText = stemsData['air'].value.toFixed(2);
 
             // MER Tracking
             if (document.getElementById('mer-auto-track').checked) {
@@ -5945,6 +6687,7 @@
                         quickBtn.classList.add('text-zinc-400', 'border-white/[0.08]');
                     }
                 }
+                if (typeof syncMobileFxPedals === 'function') syncMobileFxPedals();
             },
 
             applyArchetype(arch, instant = false) {
@@ -6052,6 +6795,8 @@
                 if (pChk) pChk.checked = arch.pixel.enabled;
                 if (pSld) pSld.value = arch.pixel.val;
                 if (pVal) pVal.innerText = `${Math.round(arch.pixel.val)}px`;
+
+                if (typeof syncMobileFxPedals === 'function') syncMobileFxPedals();
             },
 
             update(dt, time, audioData) {
@@ -6127,6 +6872,28 @@
                     if (hud) hud.innerHTML = `Manual (Arrastrar / Zoom)`;
                 }
             }
+
+            // Sincronizar botones móviles de órbita
+            const mVpOrbit = document.getElementById('m-vp-btn-orbit');
+            if (mVpOrbit) {
+                if (cameraOrbitEnabled) {
+                    mVpOrbit.className = "px-2.5 py-1 rounded-lg bg-indigo-950/90 text-indigo-200 border border-indigo-400/60 text-[10px] font-bold flex items-center gap-1 shadow-sm";
+                    mVpOrbit.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>360° ON</span>`;
+                } else {
+                    mVpOrbit.className = "px-2.5 py-1 rounded-lg bg-zinc-900/80 text-zinc-400 border border-white/10 text-[10px] font-medium flex items-center gap-1";
+                    mVpOrbit.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span><span>360° OFF</span>`;
+                }
+            }
+            const mBtnOrbitWorlds = document.getElementById('m-btn-orbit-worlds');
+            if (mBtnOrbitWorlds) {
+                if (cameraOrbitEnabled) {
+                    mBtnOrbitWorlds.className = "h-11 px-3 rounded-xl bg-indigo-950/80 border border-indigo-400/50 text-indigo-200 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(99,102,241,0.3)] active:scale-95";
+                    mBtnOrbitWorlds.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>ÓRBITA 360°: ON</span>`;
+                } else {
+                    mBtnOrbitWorlds.className = "h-11 px-3 rounded-xl bg-zinc-900 border border-white/10 text-zinc-400 text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95";
+                    mBtnOrbitWorlds.innerHTML = `<span class="w-2 h-2 rounded-full bg-zinc-600"></span><span>ÓRBITA 360°: OFF</span>`;
+                }
+            }
         }
 
         function changeCameraOrbitMode(mode) {
@@ -6176,11 +6943,15 @@
 
 
         function toggleFullscreen() {
-            const container = document.getElementById('threeCanvas').parentElement;
             if (!document.fullscreenElement) {
-                container.requestFullscreen().catch(err => console.warn('Fullscreen error:', err));
+                const target = window.innerWidth < 1024 ? document.documentElement : (document.getElementById('threeCanvas')?.parentElement || document.documentElement);
+                const req = target.requestFullscreen || target.webkitRequestFullscreen || target.msRequestFullscreen;
+                if (req) {
+                    req.call(target).catch(err => console.warn('Fullscreen error:', err));
+                }
             } else {
-                document.exitFullscreen();
+                const exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+                if (exit) exit.call(document);
             }
         }
 
@@ -6461,6 +7232,28 @@
                     } else {
                         dockBtn.className = "text-zinc-400 hover:text-zinc-200 font-medium flex items-center gap-1 px-2 py-0.5 rounded-full border border-transparent";
                         dockBtn.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span><span>Creador IA</span>`;
+                    }
+                }
+                // 4. Botón en HUD Superior Móvil
+                const mVpBtnVj = document.getElementById('m-vp-btn-vj');
+                if (mVpBtnVj) {
+                    if (this.autoVJEnabled) {
+                        mVpBtnVj.className = "px-2.5 py-1 rounded-lg bg-purple-950/90 text-purple-200 border border-purple-400/60 text-[10px] font-bold flex items-center gap-1 shadow-sm";
+                        mVpBtnVj.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>IA: ON</span>`;
+                    } else {
+                        mVpBtnVj.className = "px-2.5 py-1 rounded-lg bg-zinc-900/80 text-zinc-400 border border-white/10 text-[10px] font-medium flex items-center gap-1";
+                        mVpBtnVj.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-zinc-600"></span><span>IA: OFF</span>`;
+                    }
+                }
+                // 5. Botón en Panel Mundos Móvil
+                const mBtnWorldsVj = document.getElementById('m-btn-autovj-worlds');
+                if (mBtnWorldsVj) {
+                    if (this.autoVJEnabled) {
+                        mBtnWorldsVj.className = "h-11 px-3 rounded-xl bg-purple-950/80 border border-purple-400/50 text-purple-200 text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-[0_0_12px_rgba(168,85,247,0.3)] active:scale-95";
+                        mBtnWorldsVj.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span><span>IA AUTO-VJ: ACTIVO</span>`;
+                    } else {
+                        mBtnWorldsVj.className = "h-11 px-3 rounded-xl bg-zinc-900 border border-white/10 text-zinc-400 text-xs font-bold transition flex items-center justify-center gap-1.5 active:scale-95";
+                        mBtnWorldsVj.innerHTML = `<span class="w-2 h-2 rounded-full bg-zinc-600"></span><span>IA AUTO-VJ: OFF</span>`;
                     }
                 }
             }
@@ -6960,6 +7753,7 @@
 
                 const hudMode = document.getElementById('hud-camera-mode');
                 if (hudMode) hudMode.innerText = vanguardName;
+                if (typeof syncMobileSceneCards === 'function') syncMobileSceneCards(type);
                 return;
             }
 
@@ -7040,6 +7834,11 @@
                     const sel = document.getElementById('shader-preset-select');
                     hudMode.innerText = `Shader GLSL (${sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : 'Custom'})`;
                 }
+            }
+
+            // Sincronizar tarjetas táctiles y chip HUD en interfaz móvil
+            if (typeof syncMobileSceneCards === 'function') {
+                syncMobileSceneCards(type);
             }
         }
 
@@ -19616,56 +20415,436 @@ Devuelve EXACTAMENTE un arreglo JSON de 6 objetos con esta estructura:
         }
 
         // =========================================================================
-        // MOBILE WORKSTATION DECK SWITCHER (< 1024px)
-        // Zero Page Scrolling: Viewport 3D on top, thumb-controlled active panel below
+        // ANDROID PWA ERGONOMIC TACTICAL DECK CONTROLLER (< 1024px)
+        // Single-Handed Thumb-Zone Navigation: 6 Modular Touch Panels & Bottom Bar
         // =========================================================================
-        let currentMobileDeck = 'audio';
+        let currentMobileTacticalDeck = 'audio';
 
-        function switchMobileDeck(deckId) {
-            currentMobileDeck = deckId;
-            const isMobile = window.innerWidth < 1024;
+        // Feedback háptico nativo para dispositivos Android / móviles
+        function triggerHaptic(duration = 15) {
+            if ('vibrate' in navigator) {
+                try {
+                    navigator.vibrate(duration);
+                } catch(e) {}
+            }
+        }
 
-            // Update mobile tab buttons
-            const decks = ['audio', 'stems', 'fx', 'shaders', 'metrics'];
+        // Conmutador del Deck Táctico Inferior
+        function switchMobileTacticalDeck(deckKey) {
+            currentMobileTacticalDeck = deckKey;
+            triggerHaptic(15);
+
+            const decks = ['audio', 'stems', 'mundos', 'fx', 'shaders', 'cloud'];
             decks.forEach(d => {
-                const btn = document.getElementById(`m-deck-btn-${d}`);
-                if (btn) {
-                    if (d === deckId) {
-                        btn.className = 'm-deck-btn py-2 px-1 rounded-lg text-[10px] font-bold transition flex flex-col items-center justify-center gap-0.5 border border-cyan-400/50 bg-cyan-950/80 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.35)]';
+                // Tab button styling
+                const tabBtn = document.getElementById(`m-tab-btn-${d}`);
+                if (tabBtn) {
+                    if (d === deckKey) {
+                        tabBtn.className = 'm-tab-btn h-[52px] rounded-xl flex flex-col items-center justify-center gap-0.5 font-mono text-[9px] font-bold transition active:scale-95 border border-cyan-400/50 bg-cyan-950/80 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.35)]';
                     } else {
-                        btn.className = 'm-deck-btn py-2 px-1 rounded-lg text-[10px] font-bold transition flex flex-col items-center justify-center gap-0.5 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white';
+                        tabBtn.className = 'm-tab-btn h-[52px] rounded-xl flex flex-col items-center justify-center gap-0.5 font-mono text-[9px] font-bold transition active:scale-95 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white';
+                    }
+                }
+                // Panel visibility
+                const panel = document.getElementById(`m-panel-${d}`);
+                if (panel) {
+                    panel.classList.toggle('hidden', d !== deckKey);
+                }
+            });
+
+            // Sincronizaciones específicas al entrar en cada pestaña
+            if (deckKey === 'stems') {
+                initMobileStems();
+                syncMobileStems();
+            } else if (deckKey === 'fx') {
+                initMobileFxPedalboard();
+                syncMobileFxPedals();
+            } else if (deckKey === 'mundos') {
+                syncMobileSceneCards(activeSceneType);
+            } else if (deckKey === 'shaders') {
+                const sel = document.getElementById('m-shader-preset-select');
+                const deskSel = document.getElementById('shader-preset-select');
+                if (sel && deskSel) sel.value = deskSel.value;
+            }
+
+            // Scroll al inicio del deck táctico
+            const deck = document.getElementById('mobile-tactical-deck');
+            if (deck) deck.scrollTop = 0;
+
+            triggerThreeResize();
+        }
+
+        // --- 14 UNIVERSOS ESCÉNICOS: SELECCIÓN Y SINCRONIZACIÓN TÁCTIL ---
+        function selectMobileScene(sceneKey) {
+            triggerHaptic(20);
+            switchThreeScene(sceneKey);
+            const deskSel = document.getElementById('three-scene-mode');
+            if (deskSel) deskSel.value = sceneKey;
+            syncMobileSceneCards(sceneKey);
+        }
+
+        function syncMobileSceneCards(activeKey) {
+            const cards = document.querySelectorAll('.m-scene-card');
+            cards.forEach(card => {
+                const key = card.getAttribute('data-scene');
+                const isActive = (key === activeKey);
+                const led = card.querySelector('.m-scene-led');
+                if (isActive) {
+                    card.className = 'm-scene-card h-16 rounded-xl border border-cyan-400 bg-cyan-950/70 shadow-[0_0_15px_rgba(6,182,212,0.3)] p-2 flex items-center justify-between text-left transition active:scale-95';
+                    if (led) led.className = 'm-scene-led w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]';
+                } else {
+                    card.className = 'm-scene-card h-16 rounded-xl border border-white/[0.08] bg-zinc-900/70 hover:border-cyan-500/30 p-2 flex items-center justify-between text-left transition active:scale-95';
+                    if (led) led.className = 'm-scene-led w-2 h-2 rounded-full bg-zinc-600';
+                }
+            });
+
+            // Actualizar chip flotante en Viewport 3D
+            const chipName = document.getElementById('m-vp-scene-name');
+            if (chipName) {
+                const names = {
+                    'scenic_mercury_monoliths': 'Mercurio',
+                    'scenic_crystal_valley': 'Cristales',
+                    'scenic_abyss_boids': 'Abismo Boids',
+                    'nebula': 'Nebulosa 30k',
+                    'tunnel': 'Túnel FFT',
+                    'monolith': 'Monolito',
+                    'custom_shader': 'Shader GLSL',
+                    'gpu_compute': 'GPU Compute',
+                    'autonomous_genesis': 'Génesis IA',
+                    'cymatics_scene': 'Cimática 3D',
+                    'hyperbolic_scene': 'Poincaré H³',
+                    'ferrofluid_scene': 'Ferrofluido',
+                    'ferrofluid_chamber_scene': 'Cámara FHD',
+                    'waterfall': 'Waterfall'
+                };
+                chipName.innerText = names[activeKey] || activeKey;
+            }
+        }
+
+        // --- 8 STEMS BIQUAD DSP: INICIALIZACIÓN Y RACK TÁCTIL MÓVIL ---
+        let mobileStemsInitialized = false;
+        function initMobileStems() {
+            if (mobileStemsInitialized) return;
+            const container = document.getElementById('m-stems-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+            stemConfigs.forEach(conf => {
+                const data = stemsData[conf.id];
+                const isMuted = data ? data.muted : false;
+                const gainVal = data && data.gain ? data.gain.gain.value : 1.0;
+
+                const row = document.createElement('div');
+                row.className = 'bg-zinc-950/80 rounded-xl p-2.5 border border-white/[0.06] space-y-1.5';
+                row.innerHTML = `
+                    <div class="flex items-center justify-between text-xs font-mono">
+                        <div class="flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full" style="background-color: ${conf.color}; box-shadow: 0 0 6px ${conf.color}"></span>
+                            <span class="font-bold text-zinc-200">${conf.name}</span>
+                            <span class="text-[9px] text-zinc-500">${conf.freq}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="m-stem-val-${conf.id}" class="text-[10px] text-zinc-400">0%</span>
+                            <span id="m-stem-gain-val-${conf.id}" class="text-cyan-300 font-bold text-[10px]">${gainVal.toFixed(1)}x</span>
+                        </div>
+                    </div>
+                    <!-- LED VU Meter Bar -->
+                    <div class="w-full bg-black/70 rounded-full h-1.5 overflow-hidden border border-white/5">
+                        <div id="m-stem-vu-${conf.id}" class="h-full rounded-full transition-all duration-75" style="width: 0%; background: linear-gradient(90deg, ${conf.color}, #f43f5e)"></div>
+                    </div>
+                    <!-- Controls: Fader & Big Mute Button & WAV Export -->
+                    <div class="flex items-center gap-2 pt-0.5">
+                        <input type="range" id="m-stem-gain-${conf.id}" min="0" max="2.5" step="0.1" value="${gainVal}" oninput="updateMobileStemGain('${conf.id}', this.value)" class="flex-grow h-7 accent-cyan-400 cursor-pointer" title="Ganancia ${conf.name}">
+                        <button type="button" id="m-btn-mute-${conf.id}" onclick="toggleMobileStemMute('${conf.id}')" class="h-10 px-3 rounded-lg text-[10px] font-mono font-bold transition flex items-center justify-center active:scale-95 shrink-0 ${isMuted ? 'bg-red-600 text-white shadow-[0_0_8px_#ef4444]' : 'bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white'}">
+                            ${isMuted ? 'MUTED' : 'Mute'}
+                        </button>
+                        <button type="button" onclick="exportSingleStemWav('${conf.id}'); triggerHaptic(15);" class="h-10 px-2 rounded-lg bg-zinc-900 border border-white/10 text-[9px] font-mono text-zinc-400 hover:text-cyan-300 font-bold active:scale-95 shrink-0" title="Descargar WAV">
+                            ⬇ WAV
+                        </button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+            mobileStemsInitialized = true;
+        }
+
+        function toggleMobileStemMute(stemId) {
+            triggerHaptic(15);
+            toggleStemMute(stemId);
+            syncMobileStems();
+        }
+
+        function updateMobileStemGain(stemId, val) {
+            const num = parseFloat(val);
+            if (stemsData[stemId] && stemsData[stemId].gain) {
+                if (!stemsData[stemId].muted) {
+                    stemsData[stemId].gain.gain.value = num;
+                }
+            }
+            const txt = document.getElementById(`m-stem-gain-val-${stemId}`);
+            if (txt) txt.innerText = `${num.toFixed(1)}x`;
+            const deskSld = document.getElementById(`gain-${stemId}`);
+            if (deskSld) deskSld.value = num;
+            const deskVal = document.getElementById(`val-${stemId}`);
+            if (deskVal) deskVal.innerText = `${num.toFixed(1)}x`;
+        }
+
+        function unmuteAllStems() {
+            stemConfigs.forEach(c => {
+                if (stemsData[c.id] && stemsData[c.id].muted) {
+                    toggleStemMute(c.id);
+                }
+            });
+            syncMobileStems();
+        }
+
+        function syncMobileStems() {
+            stemConfigs.forEach(conf => {
+                const data = stemsData[conf.id];
+                if (!data) return;
+                const mBtn = document.getElementById(`m-btn-mute-${conf.id}`);
+                if (mBtn) {
+                    if (data.muted) {
+                        mBtn.className = 'h-10 px-3 rounded-lg text-[10px] font-mono font-bold transition flex items-center justify-center active:scale-95 shrink-0 bg-red-600 text-white shadow-[0_0_8px_#ef4444]';
+                        mBtn.innerText = 'MUTED';
+                    } else {
+                        mBtn.className = 'h-10 px-3 rounded-lg text-[10px] font-mono font-bold transition flex items-center justify-center active:scale-95 shrink-0 bg-zinc-900 border border-white/10 text-zinc-300 hover:text-white';
+                        mBtn.innerText = 'Mute';
+                    }
+                }
+                const mGain = document.getElementById(`m-stem-gain-${conf.id}`);
+                const mGainTxt = document.getElementById(`m-stem-gain-val-${conf.id}`);
+                if (mGain && data.gain) {
+                    mGain.value = data.gain.gain.value;
+                    if (mGainTxt) mGainTxt.innerText = `${data.gain.gain.value.toFixed(1)}x`;
+                }
+            });
+        }
+
+        // --- 9 PASSES WEBGL FX: PEDALBOARD TÁCTIL MÓVIL ---
+        const fxPedalDefinitions = [
+            { id: 'bloom', name: 'Bloom Glow', icon: '🌸', tag: 'Lente / Halo', min: 0.1, max: 3.0, step: 0.1, default: 1.2 },
+            { id: 'chroma', name: 'Aberración RGB', icon: '🌈', tag: 'Dispersión', min: 0.001, max: 0.03, step: 0.001, default: 0.005 },
+            { id: 'glitch', name: 'Audio Glitch', icon: '👾', tag: 'Digital', min: 0.05, max: 1.0, step: 0.05, default: 0.25 },
+            { id: 'blur', name: 'Shockwave Radial', icon: '💥', tag: 'Impacto Sub', min: 0.05, max: 0.8, step: 0.05, default: 0.15 },
+            { id: 'crt', name: 'Monitor CRT VHS', icon: '📺', tag: 'Scanlines', min: 0.1, max: 1.0, step: 0.1, default: 0.6 },
+            { id: 'kaleido', name: 'Caleidoscopio', icon: '🔮', tag: 'Simetría N', min: 2, max: 16, step: 2, default: 8 },
+            { id: 'film', name: 'Film Grain 35mm', icon: '🎞️', tag: 'Grano Cine', min: 0.05, max: 0.8, step: 0.05, default: 0.2 },
+            { id: 'invert', name: 'Inversor Solar', icon: '☀️', tag: 'Térmico', min: 0.0, max: 1.0, step: 0.1, default: 0.0 },
+            { id: 'pixel', name: 'Pixelación 8-Bit', icon: '🕹️', tag: 'Retro FX', min: 2, max: 32, step: 2, default: 8 }
+        ];
+
+        let mobileFxPedalsInitialized = false;
+        function initMobileFxPedalboard() {
+            if (mobileFxPedalsInitialized) return;
+            const container = document.getElementById('m-fx-pedalboard-container');
+            if (!container) return;
+
+            container.innerHTML = '';
+            fxPedalDefinitions.forEach(fx => {
+                const pedal = document.createElement('div');
+                pedal.className = 'bg-zinc-950/80 rounded-xl p-3 border border-white/[0.06] space-y-2';
+                pedal.id = `m-pedal-card-${fx.id}`;
+                pedal.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">${fx.icon}</span>
+                            <div>
+                                <div class="text-[11px] font-bold text-zinc-200 leading-tight">${fx.name}</div>
+                                <div class="text-[9px] font-mono text-zinc-400">${fx.tag}</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span id="m-fx-val-${fx.id}" class="font-mono text-[10px] text-cyan-300 font-bold bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-500/30">${fx.default}</span>
+                            <!-- Stomp-Box Big Button (48px) -->
+                            <button type="button" id="m-btn-fx-${fx.id}" onclick="toggleMobileFx('${fx.id}')" class="h-10 px-3.5 rounded-lg font-mono text-xs font-bold transition flex items-center gap-1.5 active:scale-95 shadow-sm">
+                                <span class="w-2 h-2 rounded-full" id="m-fx-led-${fx.id}"></span>
+                                <span id="m-fx-text-${fx.id}">ON</span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Ergonomic Slider -->
+                    <div class="flex items-center gap-2">
+                        <input type="range" id="m-fx-slider-${fx.id}" min="${fx.min}" max="${fx.max}" step="${fx.step}" value="${fx.default}" oninput="updateMobileFxSlider('${fx.id}', this.value)" class="w-full h-7 accent-cyan-400 cursor-pointer" title="Intensidad ${fx.name}">
+                    </div>
+                `;
+                container.appendChild(pedal);
+            });
+            mobileFxPedalsInitialized = true;
+            syncMobileFxPedals();
+        }
+
+        function toggleMobileFx(fxKey) {
+            triggerHaptic(15);
+            const deskCheck = document.getElementById(`fx-${fxKey}-enable`);
+            if (deskCheck) {
+                deskCheck.checked = !deskCheck.checked;
+                deskCheck.dispatchEvent(new Event('change'));
+            }
+            syncMobileFxPedals();
+        }
+
+        function updateMobileFxSlider(fxKey, val) {
+            const valSpan = document.getElementById(`m-fx-val-${fxKey}`);
+            if (valSpan) {
+                valSpan.innerText = fxKey === 'pixel' ? `${Math.round(val)}px` : parseFloat(val).toFixed(fxKey === 'chroma' ? 3 : 1);
+            }
+            const sliderIds = {
+                bloom: 'fx-bloom-strength',
+                chroma: 'fx-chroma-amount',
+                glitch: 'fx-glitch-amount',
+                blur: 'fx-blur-strength',
+                crt: 'fx-crt-intensity',
+                kaleido: 'fx-kaleido-sides',
+                film: 'fx-film-grain',
+                invert: 'fx-invert-amount',
+                pixel: 'fx-pixel-size'
+            };
+            const deskSld = document.getElementById(sliderIds[fxKey]);
+            if (deskSld) {
+                deskSld.value = val;
+                deskSld.dispatchEvent(new Event('input'));
+            }
+        }
+
+        function syncMobileFxPedals() {
+            const fxStates = {
+                bloom: fxBloomEnabled,
+                chroma: fxChromaEnabled,
+                glitch: fxGlitchEnabled,
+                blur: fxBlurEnabled,
+                crt: fxCRTEnabled,
+                kaleido: fxKaleidoEnabled,
+                film: fxFilmEnabled,
+                invert: fxInvertEnabled,
+                pixel: fxPixelEnabled
+            };
+
+            fxPedalDefinitions.forEach(fx => {
+                const isEnabled = !!fxStates[fx.id];
+                const btn = document.getElementById(`m-btn-fx-${fx.id}`);
+                const led = document.getElementById(`m-fx-led-${fx.id}`);
+                const txt = document.getElementById(`m-fx-text-${fx.id}`);
+                const card = document.getElementById(`m-pedal-card-${fx.id}`);
+                if (btn && led && txt) {
+                    if (isEnabled) {
+                        btn.className = 'h-10 px-3.5 rounded-lg font-mono text-xs font-bold transition flex items-center gap-1.5 active:scale-95 shadow-sm bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.3)]';
+                        led.className = 'w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_6px_#22d3ee]';
+                        txt.innerText = 'ON';
+                        if (card) card.classList.add('border-cyan-500/30');
+                    } else {
+                        btn.className = 'h-10 px-3.5 rounded-lg font-mono text-xs font-bold transition flex items-center gap-1.5 active:scale-95 shadow-sm bg-zinc-900 border border-white/10 text-zinc-500';
+                        led.className = 'w-2 h-2 rounded-full bg-zinc-700';
+                        txt.innerText = 'OFF';
+                        if (card) card.classList.remove('border-cyan-500/30');
                     }
                 }
             });
 
-            if (!isMobile) return;
-
-            // Target elements
-            const secAudio = document.getElementById('sec-audio-bar');
-            const secStems = document.getElementById('sec-stems');
-            const secFx = document.getElementById('sec-postfx-suite');
-            const secShaders = document.getElementById('sec-shader-editor');
-            const tier2Subgrid = document.getElementById('tier2-subgrid');
-            const leftCol = document.getElementById('left-dock-column');
-            const tier2Studios = document.getElementById('tier2-studios');
-
-            // Manage visibility per deck
-            if (secAudio) secAudio.classList.toggle('hidden', deckId !== 'audio');
-            if (secStems) secStems.classList.toggle('hidden', deckId !== 'stems');
-            if (secFx) secFx.classList.toggle('hidden', deckId !== 'fx');
-            if (secShaders) secShaders.classList.toggle('hidden', deckId !== 'shaders');
-            if (tier2Subgrid) tier2Subgrid.classList.toggle('hidden', deckId !== 'metrics');
-
-            if (leftCol) leftCol.classList.toggle('hidden', deckId !== 'audio' && deckId !== 'stems');
-            if (tier2Studios) tier2Studios.classList.toggle('hidden', deckId !== 'shaders' && deckId !== 'metrics');
-
-            // Resize WebGL / charts if active panel requires it
-            if (deckId === 'metrics') {
-                if (typeof resizeCharts === 'function') resizeCharts();
+            // Director IA FX Sync
+            const dTitle = document.getElementById('m-ai-fx-title');
+            const dLed = document.getElementById('m-ai-fx-led');
+            const dBadge = document.getElementById('m-ai-fx-badge');
+            if (dTitle && dLed) {
+                if (aiFxDirector && aiFxDirector.enabled) {
+                    dTitle.innerText = `DIRECTOR IA: ${aiFxDirector.currentArchetype?.toUpperCase() || 'CINE'}`;
+                    dTitle.className = 'text-xs font-bold text-indigo-300';
+                    dLed.className = 'w-2.5 h-2.5 rounded-full bg-indigo-400 animate-pulse shadow-[0_0_8px_#818cf8]';
+                    if (dBadge) dBadge.innerText = `${Math.ceil(aiFxDirector.timer)}s`;
+                } else {
+                    dTitle.innerText = 'DIRECTOR IA FX: OFF';
+                    dTitle.className = 'text-xs font-bold text-zinc-400';
+                    dLed.className = 'w-2.5 h-2.5 rounded-full bg-zinc-600';
+                    if (dBadge) dBadge.innerText = 'OFF';
+                }
             }
-            triggerThreeResize();
         }
 
+        // --- CONTROLES DE AUDIO MASTER & BALANCE MÓVIL ---
+        function updateMobileMasterVol(val) {
+            const num = parseFloat(val);
+            if (outputMasterGain) {
+                outputMasterGain.gain.setValueAtTime(num, audioCtx.currentTime);
+            }
+            const deskVol = document.getElementById('master-volume');
+            if (deskVol) deskVol.value = num;
+            const deskVal = document.getElementById('master-vol-val');
+            if (deskVal) deskVal.innerText = `${Math.round(num * 100)}%`;
+            const deskDb = document.getElementById('master-vol-db');
+            const dbVal = num <= 0.001 ? '-inf' : (20 * Math.log10(num)).toFixed(1);
+            if (deskDb) deskDb.innerText = `${dbVal} dB`;
+
+            const mVal = document.getElementById('m-master-vol-val');
+            const mDb = document.getElementById('m-master-vol-db');
+            if (mVal) mVal.innerText = `${Math.round(num * 100)}%`;
+            if (mDb) mDb.innerText = `${dbVal} dB`;
+        }
+
+        let isMobileMasterMuted = false;
+        let prevMobileMasterVol = 1.0;
+        function toggleMobileMasterMute() {
+            triggerHaptic(15);
+            const sld = document.getElementById('m-master-volume');
+            const icon = document.getElementById('m-master-mute-icon');
+            if (!sld) return;
+
+            if (isMobileMasterMuted) {
+                updateMobileMasterVol(prevMobileMasterVol);
+                sld.value = prevMobileMasterVol;
+                if (icon) icon.innerText = '🔊 MUTE';
+                isMobileMasterMuted = false;
+            } else {
+                prevMobileMasterVol = parseFloat(sld.value) || 1.0;
+                updateMobileMasterVol(0);
+                sld.value = 0;
+                if (icon) icon.innerText = '🔇 MUTEADO';
+                isMobileMasterMuted = true;
+            }
+        }
+
+        function updateMobileStereoBal(val) {
+            const pan = parseFloat(val);
+            if (gainLeftNode && gainRightNode) {
+                const gainL = Math.cos((pan + 1) * Math.PI / 4);
+                const gainR = Math.sin((pan + 1) * Math.PI / 4);
+                gainLeftNode.gain.setValueAtTime(gainL, audioCtx.currentTime);
+                gainRightNode.gain.setValueAtTime(gainR, audioCtx.currentTime);
+            }
+            const deskBal = document.getElementById('stereo-balance');
+            if (deskBal) deskBal.value = pan;
+            const deskTxt = document.getElementById('stereo-bal-val');
+            const label = pan === 0 ? 'CENTER (50/50)' : pan < 0 ? `L ${Math.round((1 - pan/2)*50)}% | R ${Math.round((1 + pan/2)*50)}%` : `L ${Math.round((1 - pan/2)*50)}% | R ${Math.round((1 + pan/2)*50)}%`;
+            if (deskTxt) deskTxt.innerText = label;
+
+            const mTxt = document.getElementById('m-stereo-bal-val');
+            if (mTxt) mTxt.innerText = label;
+        }
+
+        function centerMobileStereoBal() {
+            triggerHaptic(15);
+            const sld = document.getElementById('m-stereo-balance');
+            if (sld) sld.value = 0;
+            updateMobileStereoBal(0);
+        }
+
+        function setMobilePreamp(mult) {
+            triggerHaptic(15);
+            setPreampGain(mult);
+            const ids = [1.0, 2.5, 4.5, 8.0];
+            ids.forEach(m => {
+                const key = m === 2.5 ? '2_5' : m === 4.5 ? '4_5' : m.toString();
+                const btn = document.getElementById(`m-preamp-${key}`);
+                if (btn) {
+                    if (m === mult) {
+                        btn.className = 'h-10 rounded-lg bg-cyan-950/80 border border-cyan-400/50 text-cyan-300 font-bold transition active:scale-95 flex items-center justify-center shadow-sm';
+                    } else {
+                        btn.className = 'h-10 rounded-lg bg-zinc-900 border border-white/[0.08] text-zinc-400 font-bold transition active:scale-95 flex items-center justify-center';
+                    }
+                }
+            });
+        }
+
+        // --- RESPONSIVE LAYOUT SYNCHRONIZER (MÓVIL VS ESCRITORIO >= 1024px) ---
         function syncResponsiveLayout() {
             const isMobile = window.innerWidth < 1024;
             const secAudio = document.getElementById('sec-audio-bar');
@@ -19675,9 +20854,12 @@ Devuelve EXACTAMENTE un arreglo JSON de 6 objetos con esta estructura:
             const tier2Subgrid = document.getElementById('tier2-subgrid');
             const leftCol = document.getElementById('left-dock-column');
             const tier2Studios = document.getElementById('tier2-studios');
+            const secVj = document.getElementById('sec-vj-timeline');
+            const tacticalDeck = document.getElementById('mobile-tactical-deck');
+            const bottomBar = document.getElementById('mobile-bottom-tab-bar');
 
             if (!isMobile) {
-                // Restore all panels in desktop mode
+                // Restore 100% full desktop console layout (Desktop integrity guarantee)
                 if (secAudio) secAudio.classList.remove('hidden');
                 if (secStems) secStems.classList.remove('hidden');
                 if (secFx) secFx.classList.remove('hidden');
@@ -19685,8 +20867,27 @@ Devuelve EXACTAMENTE un arreglo JSON de 6 objetos con esta estructura:
                 if (tier2Subgrid) tier2Subgrid.classList.remove('hidden');
                 if (leftCol) leftCol.classList.remove('hidden');
                 if (tier2Studios) tier2Studios.classList.remove('hidden');
+                if (secVj) secVj.classList.remove('hidden');
+                if (tacticalDeck) tacticalDeck.classList.add('hidden');
+                if (bottomBar) bottomBar.classList.add('hidden');
             } else {
-                switchMobileDeck(currentMobileDeck);
+                // Mobile layout (< 1024px)
+                initMobileStems();
+                initMobileFxPedalboard();
+                if (typeof activeSceneType !== 'undefined') {
+                    syncMobileSceneCards(activeSceneType);
+                }
+                syncMobileStems();
+                syncMobileFxPedals();
+                if (leftCol) leftCol.classList.remove('hidden');
+                if (secAudio) secAudio.classList.remove('hidden');
+                if (secStems) secStems.classList.add('hidden');
+                if (tier2Studios) tier2Studios.classList.add('hidden');
+                if (secVj) secVj.classList.add('hidden');
+                if (secFx) secFx.classList.add('hidden');
+                if (tacticalDeck) tacticalDeck.classList.remove('hidden');
+                if (bottomBar) bottomBar.classList.remove('hidden');
+                switchMobileTacticalDeck(currentMobileTacticalDeck);
             }
             triggerThreeResize();
         }
@@ -19695,6 +20896,125 @@ Devuelve EXACTAMENTE un arreglo JSON de 6 objetos con esta estructura:
         window.addEventListener('orientationchange', () => {
             setTimeout(syncResponsiveLayout, 200);
         });
+        window.addEventListener('DOMContentLoaded', () => {
+            initMobileStems();
+            initMobileFxPedalboard();
+            if (typeof activeSceneType !== 'undefined') {
+                syncMobileSceneCards(activeSceneType);
+            }
+            syncResponsiveLayout();
+            initViewportResizeHandle();
+        });
+
+        // --- CONTROLADOR DE REDIMENSIONAMIENTO VERTICAL DEL VISOR 3D (RESIZE HANDLE) ---
+        function initViewportResizeHandle() {
+            const resizer = document.getElementById('three-viewport-resizer');
+            const container = document.getElementById('three-canvas-container');
+            const badge = document.getElementById('three-resizer-badge');
+            if (!resizer || !container) return;
+
+            let isDragging = false;
+            let startY = 0;
+            let startH = 0;
+            let currentTargetH = 0;
+
+            // Restaurar altura personalizada guardada previamente
+            function applySavedHeight() {
+                const savedH = parseInt(localStorage.getItem('motor_viewport_height'), 10);
+                if (savedH && !isNaN(savedH) && savedH >= 200 && window.innerWidth >= 640) {
+                    container.style.height = `${savedH}px`;
+                    container.style.maxHeight = 'none';
+                    triggerThreeResize();
+                }
+            }
+            applySavedHeight();
+
+            function onPointerDown(clientY) {
+                isDragging = true;
+                startY = clientY;
+                startH = container.getBoundingClientRect().height;
+                currentTargetH = startH;
+                container.style.transition = 'none'; // Sin retardo elástico durante arrastre continuo
+                document.body.style.cursor = 'row-resize';
+                document.body.style.userSelect = 'none';
+                if (badge) {
+                    badge.classList.remove('hidden');
+                    badge.innerText = `${Math.round(startH)}px`;
+                }
+            }
+
+            function onPointerMove(clientY) {
+                if (!isDragging) return;
+                const deltaY = clientY - startY;
+                let newH = Math.round(startH + deltaY);
+                const minH = 200;
+                const maxH = Math.min(1400, Math.round(window.innerHeight * 0.90));
+                newH = Math.max(minH, Math.min(maxH, newH));
+                currentTargetH = newH;
+                container.style.height = `${newH}px`;
+                container.style.maxHeight = 'none';
+                if (badge) {
+                    badge.innerText = `${newH}px`;
+                }
+                triggerThreeResize();
+            }
+
+            function onPointerUp() {
+                if (!isDragging) return;
+                isDragging = false;
+                container.style.transition = '';
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                if (badge) {
+                    badge.classList.add('hidden');
+                }
+                const finalH = Math.round(container.getBoundingClientRect().height);
+                localStorage.setItem('motor_viewport_height', finalH.toString());
+                triggerThreeResize();
+                if (typeof showToast === 'function') {
+                    showToast("Visor 3D Ajustado", `Altura fijada en ${finalH}px (Doble clic en el borde para restablecer)`, "info", 2000);
+                }
+            }
+
+            // Eventos de Ratón
+            resizer.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                onPointerDown(e.clientY);
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) onPointerMove(e.clientY);
+            });
+
+            window.addEventListener('mouseup', onPointerUp);
+
+            // Eventos Táctiles (Móvil / Pantalla Táctil)
+            resizer.addEventListener('touchstart', (e) => {
+                if (e.touches && e.touches.length > 0) {
+                    onPointerDown(e.touches[0].clientY);
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (isDragging && e.touches && e.touches.length > 0) {
+                    onPointerMove(e.touches[0].clientY);
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchend', onPointerUp);
+            window.addEventListener('touchcancel', onPointerUp);
+
+            // Doble clic en el borde para restablecer la altura original del sistema
+            resizer.addEventListener('dblclick', () => {
+                localStorage.removeItem('motor_viewport_height');
+                container.style.height = '';
+                container.style.maxHeight = '';
+                triggerThreeResize();
+                if (typeof showToast === 'function') {
+                    showToast("Visor 3D Restablecido", "Altura predeterminada restaurada", "success", 1500);
+                }
+            });
+        }
 
         // 7. NUMERICAL INTEGRATION FOR CHAOS ATTRACTORS
         function stepLorenz(dt, speedScale) {
@@ -22753,12 +24073,28 @@ void main() {
         // MASTER RENDER LOOP (60 FPS UNIFIED EXECUTION)
         // =========================================================================
         let v4LastTime = performance.now();
+        let masterFpsFrames = 0;
+        let masterFpsLastTime = performance.now();
+        let currentMasterFps = 60;
+
         function masterRenderLoop(timestamp) {
             requestAnimationFrame(masterRenderLoop);
             const now = timestamp || performance.now();
             const time = now * 0.001;
             const dt = Math.min(0.05, (now - v4LastTime) * 0.001);
             v4LastTime = now;
+
+            // Monitor de FPS de alta resolución (muestreo continuo cada 500ms)
+            masterFpsFrames++;
+            if (now - masterFpsLastTime >= 500) {
+                currentMasterFps = Math.round((masterFpsFrames * 1000) / (now - masterFpsLastTime));
+                masterFpsFrames = 0;
+                masterFpsLastTime = now;
+                const vpFps = document.getElementById('viewport-fps');
+                if (vpFps) vpFps.innerText = currentMasterFps + ' FPS';
+                const mVpFps = document.getElementById('m-vp-fps');
+                if (mVpFps) mVpFps.innerText = currentMasterFps + ' FPS';
+            }
 
             // 1. Procesamiento DSP de Audio en tiempo real (stems, RMS, FFT, ZCR, Onset)
             runAudioDSP();
@@ -24468,109 +25804,144 @@ void main() {
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
     <!-- Modal 3: Asistente de Ingesta de YouTube & Streams en Móvil -->
     <div id="yt-mobile-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-red-500/40 rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-fadeIn p-5 space-y-4 max-h-[90vh] flex flex-col">
+        <div class="bg-zinc-950 border border-red-500/40 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden animate-fadeIn p-4 sm:p-5 space-y-3.5 max-h-[90vh] flex flex-col">
             <!-- Header -->
-            <div class="flex items-center justify-between border-b border-white/[0.08] pb-3">
+            <div class="flex items-center justify-between border-b border-white/[0.08] pb-3 shrink-0">
                 <div class="flex items-center gap-2.5">
                     <div class="w-8 h-8 rounded-lg bg-red-600/20 border border-red-500/40 flex items-center justify-center text-red-500 font-bold text-base shadow-inner">
                         ▶
                     </div>
                     <div>
-                        <h3 class="text-xs font-black tracking-widest text-zinc-100 uppercase">YouTube en Móvil &amp; Streams</h3>
-                        <p class="text-[10px] text-zinc-400 font-mono">Ingesta en Vivo y Balance Estéreo L / R</p>
+                        <h3 class="text-xs font-black tracking-widest text-zinc-100 uppercase">YouTube en Móvil &amp; Ingesta de Audio</h3>
+                        <p class="text-[10px] text-zinc-400 font-mono">Stream Directo • Captura PiP en Vivo • Balance L / R</p>
                     </div>
                 </div>
-                <button onclick="closeYouTubeMobileAssistant()" class="w-7 h-7 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-white/[0.08] flex items-center justify-center text-xs transition">✕</button>
+                <button type="button" onclick="closeYouTubeMobileAssistant(); triggerHaptic(10);" class="w-8 h-8 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-white/[0.08] flex items-center justify-center text-xs transition active:scale-90" title="Cerrar ventana">✕</button>
             </div>
 
-            <!-- Headphone Advisory Notice -->
-            <div class="p-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-[11px] text-amber-200/90 leading-relaxed flex items-start gap-2">
-                <span class="text-base shrink-0">🎧</span>
-                <span>
-                    <strong>¿Llevas auriculares en el móvil?</strong> Android aísla el sonido de otras apps por seguridad. Para que el tema de YouTube responda al <strong>balance L / R</strong> y mueva las <strong>visuales 3D</strong> al 100%, pulsa <strong>Reproducir YouTube HQ</strong> o cárgalo como archivo.
-                </span>
+            <!-- Banner Inteligente: Enlace Detectado en Portapapeles (Auto-Detect) -->
+            <div id="yt-clipboard-detected-badge" class="hidden p-3 rounded-xl bg-gradient-to-r from-red-950/90 to-rose-950/90 border border-red-500/60 items-center justify-between gap-2 shadow-lg shrink-0">
+                <div class="space-y-0.5 overflow-hidden">
+                    <div class="flex items-center gap-1.5 text-[11px] font-bold text-rose-200">
+                        <span>📋</span>
+                        <span>¡Enlace de YouTube detectado!</span>
+                    </div>
+                    <div id="yt-clipboard-url-preview" class="text-[9px] font-mono text-zinc-400 truncate max-w-[220px] sm:max-w-xs"></div>
+                </div>
+                <button type="button" onclick="handleOnlineUrlSubmit(); triggerHaptic(15);" class="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white font-bold text-xs shrink-0 shadow active:scale-95 transition">
+                    ▶ Reproducir
+                </button>
             </div>
 
             <div class="space-y-3 overflow-y-auto pr-1 flex-grow text-xs">
-                <!-- Método 0 (Recomendado): Reproducción Directa YouTube HQ -->
-                <div class="p-3 bg-gradient-to-br from-red-950/70 via-zinc-900 to-zinc-900 border border-red-500/40 rounded-xl space-y-2">
+                <!-- MÉTODO 1 (Destacado): Pegar Enlace o ID de YouTube -->
+                <div class="p-3.5 bg-gradient-to-br from-red-950/60 via-zinc-900/90 to-zinc-900/90 border border-red-500/50 rounded-xl space-y-2.5 shadow-sm">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-red-400 font-bold uppercase tracking-wider">Recomendado con Auriculares</span>
-                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">1-TAP HQ</span>
+                        <span class="text-[10px] font-mono text-red-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                            <span>Método 1 • Enlace Online de YouTube (HQ)</span>
+                        </span>
+                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">STREAM DIRECTO</span>
                     </div>
-                    <h4 class="font-bold text-zinc-100 text-xs">Section 63 - Manipulation EP (YouTube)</h4>
                     <p class="text-[10px] text-zinc-300 leading-relaxed">
-                        Reproduce el audio directo en MotorVisuales. Controla el volumen estéreo independiente en cada auricular (L / R) con análisis DSP de 8 Stems a 60 FPS.
+                        Copia el enlace de cualquier vídeo o Short en la app de YouTube y pégalo aquí. Se extrae el audio estéreo sin cortes ni anuncios a través del Gateway de Hetzner.
                     </p>
-                    <button onclick="closeYouTubeMobileAssistant(); playPresetTrack('section-63.mp3', 'Section 63 - Manipulation EP (YouTube HQ)', document.getElementById('btn-track-section63'));" class="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg glow-red transition">
-                        <span>▶</span>
-                        <span>Reproducir Ahora con Balance L / R</span>
-                    </button>
-                </div>
-
-                <!-- Método 1: Escucha Hi-Fi -->
-                <div class="p-3 bg-gradient-to-br from-zinc-900 via-zinc-900 to-zinc-900 border border-white/[0.08] rounded-xl space-y-2">
-                    <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-zinc-400 font-bold uppercase tracking-wider">Método 1 • Altavoz Móvil / Ventana PiP</span>
-                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-bold">Micrófono</span>
+                    <div class="flex gap-1.5">
+                        <div class="relative flex-grow">
+                            <input type="text" id="yt-url-input" placeholder="https://youtu.be/... o youtube.com/watch?v=..." class="w-full bg-black/80 border border-white/[0.12] focus:border-red-500 rounded-lg px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 font-mono outline-none transition">
+                        </div>
+                        <button type="button" onclick="pasteFromClipboardToYtInput()" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white rounded-lg border border-white/[0.1] text-xs font-mono font-medium flex items-center gap-1 active:scale-95 transition" title="Pegar del portapapeles">
+                            <span>📋</span>
+                            <span class="hidden sm:inline">Pegar</span>
+                        </button>
                     </div>
-                    <h4 class="font-bold text-zinc-100 text-xs">Escucha Acústica Hi-Fi con Preamp 4.5x + AGC</h4>
-                    <p class="text-[10px] text-zinc-400 leading-relaxed">
-                        Solo si escuchas por el altavoz externo del teléfono (sin auriculares). Captura espectro completo (20Hz–20kHz). Salida activa en auriculares.
+                    <button type="button" onclick="handleOnlineUrlSubmit(); triggerHaptic(15);" id="btn-yt-submit-stream" class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-red-950/50 active:scale-[0.98] transition">
+                        <span>▶</span>
+                        <span>Cargar y Reproducir Audio de YouTube</span>
+                    </button>
+                    <div id="yt-stream-status-msg" class="text-[9px] font-mono text-zinc-400 text-center">
+                        Compatible con enlaces de YouTube, Shorts, Invidious y URLs de streaming directo
+                    </div>
+                </div>
+
+                <!-- MÉTODO 2: Escucha Acústica Hi-Fi (YouTube en Ventana Flotante PiP / Altavoz) -->
+                <div class="p-3.5 bg-gradient-to-br from-indigo-950/60 via-zinc-900/90 to-zinc-900/90 border border-indigo-500/40 rounded-xl space-y-2.5 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-mono text-indigo-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <span>🎙️</span>
+                            <span>Método 2 • YouTube en Ventana Flotante (PiP) / Altavoz</span>
+                        </span>
+                        <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 font-bold">EN DIRECTO</span>
+                    </div>
+                    <p class="text-[10px] text-zinc-300 leading-relaxed">
+                        Si estás viendo YouTube en una <strong>ventana flotante (Picture-in-Picture)</strong>, con la pantalla dividida o escuchando por el altavoz de tu móvil, activa la escucha acústica. El micrófono Hi-Fi adaptativo (ganancia 4.5x) sincroniza las visuales 3D al 100% sin detener tu vídeo.
                     </p>
-                    <button onclick="startYouTubeMobileListening()" class="w-full py-1.5 px-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 active:scale-[0.98] text-zinc-200 font-bold text-xs flex items-center justify-center gap-2 transition">
+                    <button type="button" onclick="startYouTubeMobileListening()" class="w-full py-2.5 px-3 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-lg shadow-indigo-950/40 active:scale-[0.98] transition">
                         <span>🎙️</span>
-                        <span>Activar Escucha por Micrófono</span>
+                        <span>Activar Escucha en Vivo Ahora</span>
                     </button>
                 </div>
 
-                <!-- Método 2: Audio Interno / Pantalla -->
+                <!-- MÉTODO 3: Captura Digital del Sistema / Pestaña -->
                 <div class="p-3 bg-zinc-900/80 border border-cyan-500/30 rounded-xl space-y-2">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider">Método 2 • Audio Interno del Sistema</span>
+                        <span class="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                            <span>🖥️</span>
+                            <span>Método 3 • Audio Digital del Sistema</span>
+                        </span>
                         <span class="text-[9px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold">DIGITAL 100%</span>
                     </div>
-                    <h4 class="font-bold text-zinc-100 text-xs">Captura Digital de YouTube / Pestaña</h4>
                     <p class="text-[10px] text-zinc-400 leading-relaxed">
-                        Ideal con auriculares. Abre el diálogo de pantalla compartida y activa <em>"Compartir audio del dispositivo"</em>.
+                        Captura interna directa de audio (loopback). En el diálogo del navegador, selecciona la pestaña o pantalla y marca <em>"Compartir audio del dispositivo"</em>.
                     </p>
-                    <button onclick="closeYouTubeMobileAssistant(); startTabCapture();" class="w-full py-2 px-3 rounded-lg bg-cyan-700 hover:bg-cyan-600 active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 shadow transition">
+                    <button type="button" onclick="closeYouTubeMobileAssistant(); startTabCapture(); triggerHaptic(15);" class="w-full py-2 px-3 rounded-lg bg-cyan-700 hover:bg-cyan-600 active:scale-[0.98] text-white font-bold text-xs flex items-center justify-center gap-2 shadow transition">
                         <span>🖥️</span>
-                        <span>Capturar Audio Digital del Sistema</span>
+                        <span>Capturar Audio Digital de Pestaña</span>
                     </button>
                 </div>
 
-                <!-- Método 3: Archivo Descargado -->
-                <div class="p-3 bg-zinc-900/60 border border-white/[0.08] rounded-xl flex items-center justify-between">
-                    <div>
-                        <span class="text-[10px] font-mono text-emerald-400 uppercase tracking-wider font-bold block">Método 3 • Pista de Audio Descargada</span>
-                        <span class="text-[10px] text-zinc-300">Cargar MP3 / M4A / WAV de YouTube desde tu móvil</span>
-                    </div>
-                    <label class="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs cursor-pointer shadow transition shrink-0">
-                        <span>📁 Abrir Archivo</span>
-                        <input type="file" accept="audio/*" class="hidden" onchange="handleFileUpload(event); closeYouTubeMobileAssistant();">
-                    </label>
-                </div>
-
-                <!-- Método 4: Enlace Web / Stream -->
-                <div class="p-3 bg-zinc-900/50 border border-white/[0.06] rounded-xl space-y-2">
+                <!-- MÉTODO 4: Pistas de Demostración & Carga Local -->
+                <div class="p-3 bg-zinc-900/60 border border-white/[0.08] rounded-xl space-y-2.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider">Método 4 • Enlace Stream Online</span>
-                        <span class="text-[9px] font-mono text-zinc-500">URL Directa</span>
+                        <span class="text-[10px] font-mono uppercase text-zinc-400 font-bold tracking-wider">Pistas de Demostración &amp; Archivo Local</span>
+                        <span class="text-[9px] font-mono text-zinc-500">OPCIONAL</span>
                     </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="yt-url-input" placeholder="https://... stream o audio" class="flex-grow bg-black border border-white/[0.1] rounded-lg px-2.5 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-red-500 font-mono">
-                        <button onclick="handleOnlineUrlSubmit()" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-xs shrink-0 transition">Cargar</button>
+                    <p class="text-[10px] text-zinc-400">
+                        O prueba el motor 3D y los 8 stems con pistas de referencia masterizadas:
+                    </p>
+                    <div class="grid grid-cols-3 gap-1.5">
+                        <button type="button" onclick="closeYouTubeMobileAssistant(); playPresetTrack('section-63.mp3', 'Section 63 - Manipulation EP (YouTube HQ)', document.getElementById('btn-track-section63')); triggerHaptic(15);" class="py-2 px-1.5 rounded-lg bg-zinc-800 hover:bg-red-950/60 border border-white/[0.08] hover:border-red-500/40 text-center active:scale-95 transition">
+                            <div class="text-[10px] font-bold text-red-300 truncate">Section 63</div>
+                            <div class="text-[8px] font-mono text-zinc-500">Drum &amp; Bass</div>
+                        </button>
+                        <button type="button" onclick="closeYouTubeMobileAssistant(); playPresetTrack('tema.mp3', 'Mordaza (tema.mp3)', document.getElementById('btn-track-mordaza')); triggerHaptic(15);" class="py-2 px-1.5 rounded-lg bg-zinc-800 hover:bg-cyan-950/60 border border-white/[0.08] hover:border-cyan-500/40 text-center active:scale-95 transition">
+                            <div class="text-[10px] font-bold text-cyan-300 truncate">Mordaza</div>
+                            <div class="text-[8px] font-mono text-zinc-500">Rock / Riff</div>
+                        </button>
+                        <button type="button" onclick="closeYouTubeMobileAssistant(); playPresetTrack('tontos-utiles.mp3', 'Tontos Útiles (tontos-utiles.mp3)', document.getElementById('btn-track-tontos')); triggerHaptic(15);" class="py-2 px-1.5 rounded-lg bg-zinc-800 hover:bg-purple-950/60 border border-white/[0.08] hover:border-purple-500/40 text-center active:scale-95 transition">
+                            <div class="text-[10px] font-bold text-purple-300 truncate">Tontos Útiles</div>
+                            <div class="text-[8px] font-mono text-zinc-500">Groove / Funk</div>
+                        </button>
+                    </div>
+                    <div class="pt-1 flex items-center justify-between border-t border-white/[0.05]">
+                        <span class="text-[10px] text-zinc-400">¿Tienes un archivo de audio en tu móvil?</span>
+                        <label class="px-3 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-white/[0.1] text-xs font-mono cursor-pointer active:scale-95 transition">
+                            <span>📁 Cargar MP3 / M4A</span>
+                            <input type="file" accept="audio/*" class="hidden" onchange="handleFileUpload(event); closeYouTubeMobileAssistant();">
+                        </label>
                     </div>
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="border-t border-white/[0.08] pt-2 flex items-center justify-between text-[10px] font-mono text-zinc-500">
-                <span>MotorVisuales Stereo DSP</span>
-                <button onclick="closeYouTubeMobileAssistant()" class="hover:text-zinc-300 transition">Cerrar</button>
+            <div class="border-t border-white/[0.08] pt-2 flex items-center justify-between text-[10px] font-mono text-zinc-500 shrink-0">
+                <span>MotorVisuales DSP Studio</span>
+                <button type="button" onclick="closeYouTubeMobileAssistant(); triggerHaptic(10);" class="hover:text-zinc-300 transition">Cerrar</button>
             </div>
         </div>
     </div>
@@ -25411,6 +26782,39 @@ void main() {
     </div>
 
     <!-- Master Toast Notification Layer -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-[110] flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+    <div id="toast-container" class="fixed bottom-16 sm:bottom-5 right-3 sm:right-5 z-[110] flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+    <!-- ========================================================================= -->
+    <!-- ANDROID PWA BOTTOM TACTICAL TAB BAR (< 1024px)                            -->
+    <!-- Ergonomic Thumb-Zone Navigation Fixed at Bottom with Safe Area Support    -->
+    <!-- ========================================================================= -->
+    <nav id="mobile-bottom-tab-bar" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-[#080a14]/95 backdrop-blur-2xl border-t border-white/10 pb-[env(safe-area-inset-bottom,10px)] pt-1 px-1 shadow-[0_-8px_32px_rgba(0,0,0,0.85)] select-none">
+        <div class="grid grid-cols-6 gap-1 max-w-lg mx-auto">
+            <button type="button" onclick="switchMobileTacticalDeck('audio')" id="m-tab-btn-audio" class="m-tab-btn h-[52px] rounded-xl flex flex-col items-center justify-center gap-0.5 font-mono text-[9px] font-bold transition active:scale-95 border border-cyan-400/50 bg-cyan-950/80 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.35)]">
+                <span class="text-base">🎵</span>
+                <span>Audio</span>
+            </button>
+            <button type="button" onclick="switchMobileTacticalDeck('stems')" id="m-tab-btn-stems" class="m-tab-btn h-[52px] rounded-xl flex flex-col items-center justify-center gap-0.5 font-mono text-[9px] font-bold transition active:scale-95 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white">
+                <span class="text-base">🎚️</span>
+                <span>Stems</span>
+            </button>
+            <button type="button" onclick="switchMobileTacticalDeck('mundos')" id="m-tab-btn-mundos" class="m-tab-btn h-[52px] rounded-xl flex flex-col items-center justify-center gap-0.5 font-mono text-[9px] font-bold transition active:scale-95 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white">
+                <span class="text-base">🌌</span>
+                <span>Mundos</span>
+            </button>
+            <button type="button" onclick="switchMobileTacticalDeck('fx')" id="m-tab-btn-fx" class="m-tab-btn h-[52px] rounded-xl flex flex-col items-center justify-center gap-0.5 font-mono text-[9px] font-bold transition active:scale-95 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white">
+                <span class="text-base">✨</span>
+                <span>FX</span>
+            </button>
+            <button type="button" onclick="switchMobileTacticalDeck('shaders')" id="m-tab-btn-shaders" class="m-tab-btn h-[52px] rounded-xl flex flex-col items-center justify-center gap-0.5 font-mono text-[9px] font-bold transition active:scale-95 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white">
+                <span class="text-base">⚡</span>
+                <span>GLSL</span>
+            </button>
+            <button type="button" onclick="switchMobileTacticalDeck('cloud')" id="m-tab-btn-cloud" class="m-tab-btn h-[52px] rounded-xl flex flex-col items-center justify-center gap-0.5 font-mono text-[9px] font-bold transition active:scale-95 border border-white/[0.06] bg-zinc-900/60 text-zinc-400 hover:text-white">
+                <span class="text-base">🌐</span>
+                <span>Más</span>
+            </button>
+        </div>
+    </nav>
 </body>
 </html>

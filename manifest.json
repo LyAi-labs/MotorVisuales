@@ -5,9 +5,12 @@
   "description": "Visualizador de audio reactivo en tiempo real con DSP de 8 stems, shaders WebGL 3D, simulación FBO compute de 65k partículas y suite de atractores caóticos.",
   "start_url": "./index.html?source=pwa",
   "scope": "./",
+  "scope_extensions": [
+    { "origin": "https://milkdropagent.motorvisuales.site" }
+  ],
   "display": "standalone",
   "display_override": [
-    "window-controls-overlay",
+    "fullscreen",
     "standalone",
     "minimal-ui"
   ],

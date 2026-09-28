@@ -1013,3 +1013,117 @@
   - ✅ Ecosistema visual colaborativo y retroalimentativo 100% soberano en Hetzner sin dependencias de terceros.
   - ✅ Carga instantánea de presets comunitarios en tiempo real a 60 FPS con un solo clic.
   - ✅ Exportación de presets portables `.mvp` y enlaces directos para distribución comunitaria.
+
+---
+
+### D-043 — Rediseño Ergonómico y Arquitectura Modular de Menús Táctiles para Android PWA
+- **Fecha:** 2026-09-28
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - En smartphones y Android PWA (< 1024px), MotorVisuales requería una transformación integral hacia una consola creativa táctil 100% gobernable con el pulgar (*thumb-zone*), permitiendo al usuario controlar en vivo y con una sola mano el audio, los stems, los 14 mundos escénicos, el pedalboard de efectos, el laboratorio GLSL y las herramientas avanzadas, con cero regresión en desktop (>= 1024px) y eliminación completa del scroll vertical descontrolado de la ventana.
+- **Decisión:**
+  - **1. Viewport 3D Superior Dinámico con HUD Táctil Flotante:**
+    - Dimensionamiento adaptativo de `#three-canvas-container` a `h-[35dvh] min-h-[220px] max-h-[300px]`, fijando el foco visual en la parte superior.
+    - Overlay flotante `#mobile-viewport-hud` (`lg:hidden`) con botón maestro Play/Pause de 44-48px (`#m-vp-btn-play`), chip de escena de 1-toque (`#m-vp-scene-name`), telemetría en vivo RMS (`#m-vp-rms`) y FPS (`#m-vp-fps`), controles rápidos de Auto-VJ (`#m-vp-btn-vj`) y Órbita 360° (`#m-vp-btn-orbit`), y controles de zoom táctil con feedback háptico (`triggerHaptic`).
+  - **2. Deck Táctico Ergonómico Móvil (`#mobile-tactical-deck`):**
+    - Contenedor aislado con scroll vertical autocontenido (`.mobile-deck-scrollable`), `overscroll-behavior: contain` y `padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 72px)` para evitar colisiones con la barra de gestos de Android.
+    - Seis paneles tácticos modulares accesibles con un solo toque:
+      - *Audio:* Fader Master táctil con lectura en dB y %, Mute rápido, selector de balance estéreo con botón táctil `CENTER`, 4 presets preamp (`1.0x Hi-Fi`, `2.5x`, `4.5x Boost`, `8.0x Max`), 3 Pistas Master de Referencia y Patchbay de 6 entradas (YouTube Móvil, Micrófono, Audio Sistema, Local, Synth Procedural y Mute).
+      - *Stems:* Rack para los 8 stems Biquad DSP con vúmetros LED a 60 FPS, faders horizontales y botones gigantes de MUTE instantáneo (mínimo 48x48px) y exportador WAV individual y en lote.
+      - *Mundos:* Cuadrícula táctil de 2 columnas con tarjetas de 64px para los 14 universos escénicos con micro-LEDs de estado y cambio instantáneo a 1-toque.
+      - *FX:* Pedalboard táctil para los 9 Passes WebGL (bloom, chroma, glitch, blur, crt, kaleido, film, invert, pixel) con switches stomp-box ON/OFF (48px), sliders adaptados al pulgar y panel del Director IA FX.
+      - *GLSL:* Selector de 22 presets de shader, botón grande de compilación en caliente `[⚡ COMPILAR SHADER]` (48px), Macro Pad de 4 snippets táctiles (`rot2D`, `snoise`, `fresnel`, `cosPalette`) y monitor reactivo de uniforms.
+      - *Cloud & Tools:* Macro Pad táctico de 8 botones (54px) para Presets Cloud en Hetzner, Timeline VJ, Captura 4K, STL 3D, Clips IA, Webcam/NDI, Spatial 7.1 y PWA.
+  - **3. Barra de Navegación Táctica Inferior (`#mobile-bottom-tab-bar`):**
+    - Dock fijo ergonómico en la base de la pantalla (`fixed bottom-0 inset-x-0 z-40 lg:hidden`) con botones de 52px con iconos y etiquetas claras: `[🎵 Audio]`, `[🎚️ Stems]`, `[🌌 Mundos]`, `[✨ FX]`, `[⚡ GLSL]`, `[🌐 Más]`.
+  - **4. Transformación de Modales a Bottom Sheets:**
+    - Conversión en `< 1024px` de todos los modales (`#screenshot-modal`, `#stems-export-modal`, `#yt-mobile-modal`, `#midi-modal`, `#webp-loop-modal`, `#mesh-freeze-modal`, `#video-ingest-modal`, `#ai-clip-studio-modal`, `#community-hub-modal`) a hojas deslizables desde abajo con bordes redondeados (`rounded-t-2xl`), tirador táctil y animación `@keyframes slideUpSheet`.
+  - **5. Bucle Maestro a 60 FPS y Preservación de Escritorio:**
+    - Sincronización continua de RMS, stems, vúmetros, uniforms y monitor de FPS en tiempo real dentro de `runAudioDSP()` y `masterRenderLoop()`.
+    - En pantallas `>= 1024px`, `#left-dock-column`, `#sec-vj-timeline`, `#sec-postfx-suite` y `#tier2-studios` se restauran al 100% sin alteraciones.
+- **Consecuencias:**
+  - ✅ Ergonomía y operabilidad táctil perfecta con una sola mano en cualquier smartphone moderno o Android PWA.
+  - ✅ Consistencia y cero regresión visual o funcional en resoluciones de escritorio.
+  - ✅ Rendimiento a 60 FPS con feedback háptico en todas las acciones críticas.
+
+---
+
+### D-044 — Toolbar Adaptativa sin Desbordamiento y Splitter de Altura Arrastrable para el Viewport 3D
+- **Fecha:** 2026-09-28
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - En pantallas de escritorio de resolución media (1080p estándar con columna lateral de dock activa o anchos entre 1024px y 1600px), la barra superior del Viewport 3D desbordaba horizontalmente sus botones de utilidades (Director FX, Timeline VJ, Freeze 3D, Clips IA, Reset) fuera del marco sobre el fondo exterior.
+  - Además, los usuarios no disponían de un control ergonómico para dimensionar verticalmente el visor 3D según sus necesidades de visualización (expandirlo para sesiones inmersivas o reducirlo para priorizar los racks de audio y timeline).
+- **Decisión:**
+  - **1. Toolbar Superior Adaptativa con Auto-Wrap:**
+    - Estructurar el encabezado del Viewport con `flex-wrap items-center justify-between gap-y-2 gap-x-2 max-w-full`.
+    - Selector de mundos (`three-scene-mode`) con ancho adaptativo truncado (`max-w-[190px] sm:max-w-[240px] md:max-w-[270px] xl:max-w-[320px]`).
+    - Agrupación semántica en cápsulas compactas: bloque de órbita y selectores con padding refinado, botones principales destacados (`⚡ Creador IA`, `🌐 Cloud`) y strip de utilidades (`Director FX`, `Timeline`, `Freeze 3D`, `Clips IA`, `Reset`) con diseño icon-first (`h-7 px-2`) y tooltips descriptivos, expandiendo texto completo en pantallas `>= 1536px` (`2xl`). Cero desbordamiento horizontal garantizado.
+  - **2. Splitter / Resizer Vertical en el Borde Inferior (`#three-viewport-resizer`):**
+    - Tirador ergonómico horizontal (`cursor-row-resize`) situado en la base del canvas con indicador de agarre visual iluminado en cian al hover/drag.
+    - Soporte completo para arrastre continuo con **ratón** (`mousedown`, `mousemove`, `mouseup`) y **pantallas táctiles** (`touchstart`, `touchmove`, `touchend`).
+    - Rango elástico acotado: mínimo 200px, máximo 90% del alto de la ventana o 1400px.
+    - Eliminación de transiciones CSS durante el arrastre activo para respuesta a 60 FPS sin lag, seguida de llamada a `triggerThreeResize()`.
+    - Persistencia en `localStorage.setItem('motor_viewport_height')` y restauración automática en arranques posteriores.
+    - Atajo de **doble clic en el borde** para restablecer instantáneamente la altura por defecto del sistema.
+- **Consecuencias:**
+  - ✅ Erradicación total de elementos que sobresalen o se desbordan en el encabezado del visor 3D.
+  - ✅ Control total del usuario sobre las dimensiones verticales del canvas 3D con interacción táctil y ratón.
+  - ✅ Persistencia y restauración automática de la configuración del usuario.
+
+---
+
+### D-045 — Solución de Conectividad Móvil Android vía Túnel Seguro TLS Inverso
+- **Fecha:** 2026-09-28
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - Al intentar probar la PWA táctil y el motor gráfico local desde un teléfono Android conectado por cable USB con "Compartir Internet por USB" (USB Tethering) hacia la IP privada del PC (`10.37.227.157:8088`), la conexión expira con `ERR_TIMED_OUT`.
+  - Android aplica *Policy-Based Routing* (`ip rule`), forzando el tráfico de aplicaciones de usuario (como Google Chrome) a través de la interfaz activa de Internet (Wi-Fi), bloqueando el enrutamiento interno hacia subredes de interfaces esclavas downstream (`rndis0`).
+- **Decisión:**
+  - Desplegar un túnel con reenvío de puertos y terminación TLS automática hacia `localhost:8088` (vía `localhost.run` o `cloudflared`), proporcionando un enlace público seguro `https://...` accesible instantáneamente desde el navegador Chrome del móvil sin alterar la configuración del teléfono, sin contraseñas ni pantallas intermedias, y con total soporte de Service Workers, Web Audio y WebGL.
+  - Como canal privado opcional de baja latencia sin tráfico público, mantener documentada la IP de Tailscale (`100.125.237.53:8088`) para usuarios que dispongan de la app de Tailscale instalada.
+- **Consecuencias:**
+  - ✅ Acceso instantáneo y determinista a la versión en desarrollo de MotorVisuales desde cualquier dispositivo móvil.
+  - ✅ Certificado SSL válido requerido por la PWA para registrar Service Workers y habilitar audio estéreo sin restricciones de orígenes inseguros.
+
+---
+
+### D-046 — Inputs de Sonido en Primer Orden Visual Móvil y Scope Extensions para PWA Multi-Subdominio
+- **Fecha:** 2026-09-28
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - Al alternar entre la landing multi-proyecto (`milkdropagent.motorvisuales.site`) y MotorVisuales (`motorvisuales.site`), la PWA invocaba Chrome Custom Tabs con barra de navegación fija superior.
+  - Además, los usuarios requerían que la sección de inputs de audio (Pistas Master y Matriz Patchbay) estuviese visible arriba del todo al entrar a la aplicación en pantallas táctiles móviles, sin necesidad de scroll vertical ni búsqueda en pestañas secundarias.
+- **Decisión:**
+  - **1. Scope Extensions PWA & Retorno Nativo:**
+    - Incorporar `"scope_extensions": [{ "origin": "https://milkdropagent.motorvisuales.site" }]` y `"fullscreen"` en `display_override` dentro de [manifest.json](file:///c:/MotorVisuales/manifest.json).
+    - Adaptar el botón de retroceso `‹` con `window.history.back()` condicionado al referrer del ecosistema para no forzar recargas cruzadas que reinstancien el contenedor Custom Tab.
+    - Implementar pantalla completa inmersiva de documento (`document.documentElement.requestFullscreen`) en `toggleFullscreen()`.
+  - **2. Ingesta de Audio como Primer Elemento en Móvil:**
+    - Asignar `order-1 lg:order-1` a `#left-dock-column` y `order-2 lg:order-2` a `#three-viewport-section`.
+    - Mantener `#sec-audio-bar` visible en móviles mediante `syncResponsiveLayout()`, manteniendo el rack de 8 stems oculto (`hidden lg:block`) para no sobrecargar el viewport inicial.
+### D-047 — Asistente de Ingesta Unificado para YouTube en Móvil, Streaming Hetzner y Captura Acústica PiP
+- **Fecha:** 2026-09-28
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - En la interfaz táctil móvil de MotorVisuales, pulsar el botón de opciones `⚙️` en el Patchbay no mostraba el diálogo modal debido a anidación incorrecta en el DOM.
+  - Además, pulsar el botón principal "YouTube Móvil" forzaba la reproducción de una pista fija (`section-63.mp3`), impidiendo al usuario reproducir su propia música de YouTube o capturar el audio de vídeos que reproduce en ventana flotante (Picture-in-Picture / PiP) o por altavoz.
+- **Decisión:**
+  - **1. Apertura Universal del Asistente:**
+    - Hacer que tanto el botón principal `[YT] YouTube Móvil` como el botón de opciones `⚙️` (dimensionado a 44x38px para cumplir directrices táctiles) invoquen `openYouTubeMobileAssistant()` con feedback háptico (`triggerHaptic(15)`).
+    - Desacoplar completamente la selección de fuente de la pista de demo `section-63.mp3`.
+  - **2. Rediseño Orientado a Casos de Uso:**
+    - **Método 1 (Stream Online HQ):** Campo para pegar enlace o ID de YouTube con botón `[📋 Pegar]` (`navigator.clipboard.readText`) y detección automática en segundo plano de enlaces en el portapapeles. El stream se resuelve en primer término a través del Gateway de Hetzner (`https://motorvisuales.site/api/yt-stream`) con fallback a instancias de Invidious y Piped.
+    - **Método 2 (Escucha Acústica en Vivo para PiP/Altavoz):** Optimizado para cuando el usuario reproduce la app de YouTube en ventana flotante o en segundo plano; activa el micrófono Hi-Fi adaptativo con ganancia 4.5x sin interrumpir la reproducción externa.
+    - **Método 3 (Loopback Digital):** Captura directa de pestaña o pantalla (`getDisplayMedia`).
+    - **Método 4 (Demos de Referencia & Archivo Local):** Cuadrícula opcional de 3 botones (`Section 63`, `Mordaza`, `Tontos Útiles`) y selector de archivos locales MP3/M4A.
+  - **3. Corrección de Gateway Backend en Hetzner:**
+    - Corregir en [server.py](file:///c:/MotorVisuales/server.py) la comprobación de cookies (`os.path.isfile("cookies.txt") and os.path.getsize("cookies.txt") > 10`) para prevenir el error `[Errno 21] Is a directory` originado por el montaje de volúmenes de Docker.
+- **Consecuencias:**
+  - ✅ El usuario dispone de control total e inmediato sobre la ingesta de YouTube sin pistas forzadas no solicitadas.
+  - ✅ Ergonomía táctil garantizada con áreas de pulsación >= 44px.
+  - ✅ Solución natural para el caso común de reproducción en ventana flotante PiP en Android.
+
+
+
+

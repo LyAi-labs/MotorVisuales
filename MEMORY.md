@@ -53,7 +53,8 @@
    - Orquestador Creativo Autónomo sincronizado con transitorios de audio $dE/dt$, coordenadas MER y arquetipos de IA.
 8. **Agente IA "Director de Arte" & Modelo Afectivo MER:** Russell Circumplex (Valencia x Arousal), auto-tracking basado en RMS + Centroide.
 9. **Grabador de Video & Exportadores:** MediaRecorder WebM 60FPS, WebP Animado cuantizado al tempo y capturas Ultra-HD 4K/8K con SSAA.
-10. **Estudio de Creación Narrativa & Clips IA Multicapa (`AiClipStudioEngine` / D-040):** 6 arquetipos procedurales a 60 FPS (Anime Sakuga, Cómic Noir & Halftone, Cine 35mm, Aventura/Fantasía, Cyberpunk 2099, Acuarela Onírica), storyboards musicales autónomos con Gemini 2.5 Flash, transmutación GLSL y proyección universal en Three.js (`uVideoTexture`).
+10. **Estudio de Creación Narrativa & Clips IA Multicapa (`AiClipStudioEngine` / D-040):** 6 arquetipos procedurales a 60 FPS (Anime Sakuga, Cómic Noir & Halftone, Cine 35mm, Aventura/Fantasía, Cyberpunk 2099, Acuarela Onírica), storyboards musicales autónomos con Gemini 2.5 Flash, transmutación GLSL y proyección universal en Three.js (`uVideoTexture`).
+
 11. **Hub Comunitario de Presets Cloud & ADN Visual (Despliegue Hetzner / D-042):**
    - Serialización de estado visual determinista (Visual DNA): Escena 3D (1-14), 9 passes WebGL FX analógicos, modo de cámara, paleta de color y shaders GLSL.
    - Modal con 3 pestañas: Explorar Comunidad (feed con carga en directo a 1-clic y votaciones), Publicar mi Visual (con captura instantánea del canvas WebGL) y Mis Presets Locales (exportador .mvp).
@@ -253,6 +254,40 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Sintetizador de Arquetipos con Gemini IA:** Generador dinámico en el modal a partir de prompts de texto ("Prompt-to-Visual") integrado con la API de Gemini 2.5 Flash y fallback local heurístico.
   - **Exportador de Videoclip Completo 1080p Master:** Renderizado a 60 FPS con `MediaRecorder` mezclando video de alta resolución y audio master en un contenedor `.webm` con HUD de progreso y descarga directa.
   - **Tercer Universo Escénico: Abismo Oceánico & 4.096 Boids Bioluminiscentes (Escena 14):** Fondo marino abisal PBR, monolito sumergido para videoclips, 4.096 criaturas simuladas con boids a 60 FPS en `THREE.InstancedMesh` con dispersión reactiva a bombos y emisión bioluminiscente cian/azul modulada por frecuencias medias y agudas, con cinemática FPV submarina.
+
+- ✅ **Rediseño Ergonómico y Arquitectura Modular de Menús Táctiles para Android PWA (D-043):**
+  - **Viewport 3D Superior Dinámico:** `#three-canvas-container` adaptado a `35dvh` con HUD flotante (`#mobile-viewport-hud`) que incluye botón Play/Pause grande (48px), chip de escena 1-toque, telemetría en vivo RMS/FPS y accesos rápidos Auto-VJ y Órbita.
+  - **Deck Táctico Ergonómico Móvil (`#mobile-tactical-deck`):** 6 paneles modulares con contención de scroll (`.mobile-deck-scrollable`, zero window scroll):
+    - *Audio:* Fader Master táctil con dB/%, selector balance L/R con botón `CENTER`, 4 presets preamp y patchbay de 6 fuentes.
+    - *Stems:* 8 stems Biquad DSP con vúmetros LED a 60 FPS, faders horizontales y botones de MUTE gigante (mínimo 48x48px).
+    - *Mundos:* Cuadrícula táctil 2 columnas para los 14 mundos escénicos con micro-LEDs de estado activo.
+    - *FX:* Pedalboard para los 9 Passes WebGL con switches stomp-box ON/OFF (48px) y sliders adaptados al pulgar.
+    - *GLSL:* Selector de 22 presets, botón de compilación de 48px, Macro Pad de 4 snippets y monitor reactivo de uniforms.
+    - *Cloud & Tools:* Macro Pad táctico de 8 botones para Presets Hetzner, Timeline VJ, Captura 4K, STL 3D, Clips IA, NDI, Spatial y PWA.
+  - **Barra Táctica Fija Inferior (`#mobile-bottom-tab-bar`):** Dock fijo en la base de la pantalla con botones de 52px en la *thumb-zone* y safe areas adaptadas a la barra de gestos de Android.
+  - **Bottom Sheets Táctiles:** Conversión automática de modales a hojas deslizables desde abajo (`rounded-t-2xl`, animación slideUpSheet).
+  - **Telemetría a 60 FPS y Feedback Háptico:** Sincronización continua en `runAudioDSP()` y `masterRenderLoop()`, y vibración táctil suave (`triggerHaptic`).
+
+- ✅ **Toolbar Adaptativa y Splitter Arrastrable para Viewport 3D (D-044):**
+  - **Cabecera Adaptativa:** Eliminación de desbordamientos con flex-wrap, selector de mundos con ancho elástico y utilidades en formato icon-first con tooltips.
+  - **Splitter Vertical (#three-viewport-resizer):** Borde inferior interactivo con agarre táctil y de ratón a 60 FPS, actualización inmediata de Three.js (triggerThreeResize), persistencia en localStorage y reset por doble clic.
+
+- ✅ **Conectividad Remota Android PWA vía Túnel TLS Seguro (D-045):**
+  - Superación del aislamiento de Policy-Based Routing en Android (USB Tethering) mediante túnel HTTPS directo con terminación TLS ([https://fd533eea1f4613.lhr.life](https://fd533eea1f4613.lhr.life)), permitiendo probar la app en vivo en Chrome móvil sin fricción.
+
+- ✅ **Inputs de Sonido en Primer Orden Visual y Scope Extensions PWA (D-046):**
+  - **Inputs Arriba del Todo en Móvil:** Reordenamiento con order-1 para left-dock-column y order-2 para el viewport 3D, situando las 3 Pistas Master y la Matriz Patchbay como primer elemento visual en pantallas móviles.
+  - **PWA Multi-Subdominio Sin Barra de Navegador:** Configuración de scope_extensions hacia [https://milkdropagent.motorvisuales.site](https://milkdropagent.motorvisuales.site) y modo fullscreen en manifest.json, con retorno nativo history.back() en el botón ‹ para evitar la apertura de Chrome Custom Tabs.
+
+- ✅ **Asistente Unificado de Ingesta de YouTube en Móvil, Streaming Hetzner y Captura PiP (D-047):**
+  - **Resolución de Modales Anidados y Touch Targets >= 44px:** Corrección de la jerarquía de cierre HTML en `#stems-export-modal` para independizar `#yt-mobile-modal` directamente bajo `body`. Botón de opciones `⚙️` redimensionado a 44x38px con feedback háptico.
+  - **Apertura Universal sin Pistas Forzadas:** Ambos botones (`[YT] YouTube Móvil` y `⚙️`) abren ahora el Asistente Modal de Ingesta, eliminando la reproducción hardcoded no solicitada de `section-63.mp3`.
+  - **Rediseño Centrado en Casos de Uso Reales:** 
+    - *Método 1 (Stream Online HQ):* Input amplio con botón `[📋 Pegar]` (`navigator.clipboard.readText`) y banner de autodetección inteligente de enlaces de YouTube en el portapapeles. Streaming conectado al Gateway propio en Hetzner (`https://motorvisuales.site/api/yt-stream`) con fallback a Invidious/Piped.
+    - *Método 2 (Escucha Acústica en Vivo para PiP/Altavoz):* Optimizado específicamente para cuando el usuario reproduce la app de YouTube en ventana flotante Picture-in-Picture (PiP) o altavoz externo en Android; activa el micrófono Hi-Fi adaptativo con ganancia 4.5x sin interrumpir la reproducción externa.
+    - *Método 3 (Audio Digital Loopback):* Captura directa de pestaña/sistema (`startTabCapture`).
+    - *Método 4 (Demos Opcionales & Archivo Local):* Cuadrícula de 3 chips de referencia (`Section 63`, `Mordaza`, `Tontos Útiles`) y carga local de archivos de audio.
+  - **Corrección de Backend Gateway Hetzner:** Despliegue de fix en [server.py](file:///c:/MotorVisuales/server.py) con comprobación `os.path.isfile("cookies.txt") and os.path.getsize("cookies.txt") > 10` y normalización del archivo de cookies para erradicar el error `[Errno 21] Is a directory` en Docker.
 
 ## Próximas Ideas / Pendientes
 - [ ] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).

@@ -508,3 +508,91 @@
   5. Actualizar la síntesis de arquetipos a `gemini-3.5-flash-lite` con fallback heurístico y lectura de `MOTOR_CONFIG`.
 - **Trigger:** Al incorporar nuevos mundos escénicos 3D en ScenicWorldEngine o vincular materiales holográficos de proyección universal.
 
+---
+
+### L-037
+- **Tags:** #hetzner #docker #traefik #sqlite #wal #presets-hub #rest-api #cors #production
+- **Síntoma:** Al desplegar un nuevo microservicio backend en Hetzner (ej. Node.js en puerto 4000 para el Hub de Presets), las peticiones desde el exterior fallan o son rechazadas por UFW Firewall, o los navegadores móviles arrojan errores de Mixed Content al intentar consultar `http://localhost:4000/api`.
+- **Causa raíz:**
+  1. **Firewall UFW y Traefik File Provider:** En servidores de producción blindados (como el AX102 de Hetzner), UFW únicamente permite tráfico público en los puertos 22, 80 y 443. Publicar puertos adicionales al host está prohibido por políticas de seguridad, y Traefik opera con configuración dinámica en archivo (`routes.yml`) enrutando `Host('motorvisuales.site')` de forma fija al servicio principal `motorvisuales:8000`.
+  2. **Cache de Construcción en Docker Compose:** Recrear contenedores con `docker-compose restart` no aplica cambios de código si el contenedor fue construido con una imagen fija sin volúmenes activos en memoria de Docker (`.Mounts` vacío).
+  3. **Resolución Rígida de Endpoint en Frontend:** Forzar `http://localhost:4000/api` como fallback en el cliente web bloquea las conexiones en producción y en dispositivos móviles.
+- **Solución:**
+  1. **Consolidación en Gateway Principal (FastAPI + SQLite WAL):** Integrar los endpoints `/api/presets*` directamente en `server.py` utilizando `sqlite3` estándar con `PRAGMA journal_mode = WAL` y persistencia en `/app/data/presets.db`. Al servirse desde `motorvisuales:8000`, Traefik enruta automáticamente todas las peticiones con SSL de Let's Encrypt y CORS sin tocar `routes.yml` ni abrir puertos en UFW.
+  2. **Reconstrucción Determinista:** Ejecutar `docker-compose build && docker-compose up -d` para refrescar la imagen y garantizar monturas persistentes.
+  3. **Auto-Detección Inteligente de Endpoint:** En `index.html`, resolver `this.apiEndpoint` dinámicamente: si el origen es `motorvisuales.site` o `localhost:8000`, usar `${origin}/api`; si se corre en local estático (`localhost:8088`), apuntar directamente a `https://motorvisuales.site/api`, permitiendo que el desarrollo local consuma el backend real de producción en vivo sin fricción.
+- **Trigger:** Al desplegar APIs y servicios complementarios en Hetzner o conectar interfaces locales con backends en la nube.
+
+---
+
+### L-038
+- **Tags:** #android #pwa #mobile #touch #thumb-zone #ergonomics #bottom-sheet #biquad-dsp #haptic #safe-area
+- **Síntoma:** En smartphones Android y PWA (< 1024px), las consolas creativas densas sufren de scroll vertical parásito incontrolado, modales flotantes centrados que quedan tapados por el teclado o la barra de gestos, objetivos táctiles menores de 48px que provocan pulsaciones accidentales (*fat-finger*) y desconexión entre el estado gráfico de escritorio y los controles táctiles.
+- **Causa raíz:**
+  1. **Dimensionamiento del Viewport sin safe areas:** Un canvas superior fijo sin viewport units dinámicas (`dvh`) ni safe area insets colisiona con la barra de gestos de Android o genera desbordamiento vertical forzando scroll en toda la página.
+  2. **Contenedores de Scroll no aislados:** Si los paneles tácticos no cuentan con `overscroll-behavior: contain` y `overflow-y: auto` confinado en altura (`max-height: calc(100dvh - 35dvh - 75px)`), el arrastre de faders provoca scroll de la ventana principal rompiendo la interacción en vivo.
+  3. **Modales de escritorio en pantallas móviles:** Los modales con `justify-center items-center` obligan al usuario a estirar el pulgar hasta la parte superior de la pantalla para cerrarlos, violando la ergonomía de la *thumb-zone*.
+  4. **Falta de feedback sensorial háptico:** En pantallas táctiles capacitivas sin respuesta táctil física, la manipulación de faders de ganancia y mutes instantáneos genera incertidumbre en actuaciones en vivo si no hay micro-vibración háptica (`navigator.vibrate`).
+- **Solución:**
+  1. **Arquitectura de Dock Fijo Inferior & Thumb-Zone:** Implementar `#mobile-bottom-tab-bar` fija en la base (`bottom-0 z-40`) con padding de `env(safe-area-inset-bottom)` y botones táctiles de 52px, manteniendo todos los controles primarios al alcance natural del pulgar.
+  2. **Deck Scrollable Confinado:** Envolver los paneles de control en `.mobile-deck-scrollable` con `overscroll-behavior: contain` y padding inferior compensado (`calc(env(safe-area-inset-bottom, 16px) + 72px)`).
+  3. **Bottom Sheets Automáticas en CSS:** Convertir todos los modales en hojas deslizables desde la base (`align-items: flex-end`, `rounded-t-2xl`, max-height 86dvh) mediante media query `@media (max-width: 1023px)`.
+  4. **Bucle de Telemetría a 60 FPS Desacoplado:** Sincronizar simultáneamente los elementos DOM de escritorio y móvil dentro de `runAudioDSP()` y `masterRenderLoop()` (vúmetros LED de los 8 stems, telemetría RMS, FPS y medidores de uniforms GLSL).
+  5. **Feedback Háptico Resiliente:** Envolver `navigator.vibrate` en función auxiliar protegida con `try/catch` para compatibilidad universal con navegadores móviles.
+- **Trigger:** Al diseñar consolas creativas para smartphones, PWAs táctiles o paneles de control densos con requerimientos de uso con una sola mano.
+
+---
+
+### L-039
+- **Tags:** #ui-ux #viewport #threejs #resizer #splitter #overflow #toolbar #flex-wrap
+- **Síntoma:** Los botones de herramientas del encabezado del visor 3D sobresalen hacia la derecha de la tarjeta sobre el fondo de la página en monitores estándar (1080p), y el usuario no puede alterar la altura del canvas 3D para adaptarlo a su flujo de trabajo.
+- **Causa raíz:**
+  1. **Contenedor Flex Rígido sin Wrapping:** Una fila horizontal con múltiples selectores y botones de texto largo en `nowrap` excede el ancho disponible cuando la columna de docks de audio está visible.
+  2. **Altura Fija en Canvas Three.js:** El elemento `#three-canvas-container` dependía exclusivamente de clases fijas de Tailwind (`h-[580px]`), sin un tirador de separación vertical interactivo.
+- **Solución:**
+  1. **Toolbar Icon-First con Auto-Wrap:** Implementar `flex-wrap: wrap` en el header, truncar el ancho del selector de escenas y compactar las herramientas secundarias en botones con iconos de 28px y tooltips, expandiendo el texto solo en resoluciones ultra-anchas (`2xl`).
+  2. **Splitter Arrastrable en el Borde Inferior:** Añadir `#three-viewport-resizer` en la base del canvas con listeners unificados de ratón (`mousedown/move/up`) y táctil (`touchstart/move/end`), actualizando la altura en tiempo real a 60 FPS sin transiciones parásitas, invocando `triggerThreeResize()`, guardando en `localStorage` y permitiendo reset inmediato con doble clic.
+- **Trigger:** Al incorporar múltiples herramientas en barras de herramientas de consolas creativas o requerir redimensionamiento elástico de lienzos WebGL.
+
+---
+
+### L-040
+- **Tags:** #android #network #usb-tethering #rndis #policy-routing #tunnel #https #webaudio #pwa
+- **Síntoma:** Al intentar acceder al servidor local desde el navegador Chrome en un smartphone Android conectado por cable USB con "Compartir internet por USB" (USB Tethering) a la IP interna asignada (`10.37.227.157:8088`), la conexión expira con `ERR_TIMED_OUT` a pesar de que el ping desde el PC al móvil (`10.37.227.217`) responde con < 1ms.
+- **Causa raíz:**
+  1. **Policy-Based Routing en Android (Linux kernel / netd):** Todas las aplicaciones de usuario de Android (`UID >= 10000`, como Google Chrome) tienen forzado el enrutamiento de sus sockets hacia la tabla de la interfaz activa con conexión a Internet (habitualmente `wlan0` / Wi-Fi o datos móviles).
+  2. **Aislamiento de Interfaz Esclava (Downstream):** La interfaz de anclaje USB (`rndis0`) es gestionada por el daemon de tethering como interfaz esclava (*downstream*) receptora de reenvío NAT hacia la WAN. El kernel de Android no enruta paquetes originados por aplicaciones locales hacia la interfaz `rndis0`. Por tanto, cuando Chrome intenta conectar a `10.37.227.157`, la petición sale por la interfaz Wi-Fi donde esa IP privada no existe, provocando `ERR_TIMED_OUT`.
+- **Solución:**
+  1. **Túnel Seguro Inmediato con Terminación TLS:** Desplegar un túnel con reenvío de puertos y terminación TLS hacia `localhost:8088` (vía túnel SSH TLS inverso como `ssh -R 80:localhost:8088 nokey@localhost.run` o `cloudflared`). Esto entrega una URL pública HTTPS directa (ej. `https://fd533eea1f4613.lhr.life`) accesible desde Chrome en Android mediante la Wi-Fi habitual, con soporte íntegro para Service Workers, PWA, WebGL y Web Audio API sin pantallas intersticiales.
+  2. **Alternativa Privada vía Tailscale:** Aprovechar la interfaz Tailscale activa en el PC (`100.125.237.53`); al conectarse desde la app Tailscale en Android, la conexión se establece a nivel de capa de red virtual (VPN), evitando las limitaciones de enrutamiento del subsistema de tethering.
+- **Trigger:** Al intentar acceder a servidores locales de desarrollo desde dispositivos móviles Android conectados mediante anclaje de red por USB.
+
+---
+
+### L-041
+- **Tags:** #pwa #android #manifest #scope-extensions #custom-tabs #mobile #ui-order #audio-inputs
+- **Síntoma:** Al navegar entre la landing multi-proyecto (`milkdropagent.motorvisuales.site`) y MotorVisuales (`motorvisuales.site`), la PWA se abre con la barra superior del navegador (Chrome Custom Tab con botón X y URL), perdiendo el modo app standalone. Además, en dispositivos móviles, la sección de inputs de sonido quedaba desplazada bajo el visor 3D en lugar de encabezar la experiencia.
+- **Causa raíz:**
+  1. **Navegación Cross-Subdomain fuera de Scope:** Por especificación de seguridad W3C/Android, navegar a un subdominio no incluido en el `scope` del manifest fuerza a Chrome a abrir una Custom Tab para alertar de un cambio de origen. Al regresar mediante enlaces absolutos forzados (`href`), la sesión queda atrapada dentro del contenedor Custom Tab.
+  2. **Jerarquía Visual Invertida en Flex/Grid:** La clase `order-1` en el canvas 3D y `order-2` en la columna de audio relegaba la selección de fuentes de sonido debajo del visor inactivo, forzando al usuario a hacer scroll para iniciar la música.
+- **Solución:**
+  1. **Scope Extensions & Historial Nativo:** Declarar `"scope_extensions": [{ "origin": "https://milkdropagent.motorvisuales.site" }]` y `"fullscreen"` en `display_override` en [manifest.json](file:///c:/MotorVisuales/manifest.json) para que Chrome trate ambos dominios bajo el mismo shell standalone. En el botón de retroceso `‹`, utilizar `history.back()` condicional si el referrer proviene del ecosistema para no forzar recargas cruzadas.
+  2. **Priorización Inmediata de Inputs:** Reasignar `#left-dock-column` a `order-1 lg:order-1` y `#three-viewport-section` a `order-2 lg:order-2`, manteniendo `#sec-audio-bar` visible arriba del todo en móviles con un rack compacto de 3 columnas para Pistas Master y cuadrícula para el Patchbay, con toggleFullscreen de documento completo.
+### L-042
+- **Tags:** #youtube #mobile #touch-targets #modals #dom-nesting #pip #android #audio-ingest
+- **Síntoma:** Al pulsar el botón de opciones `⚙️` junto a "YouTube Móvil" en el smartphone Android no abría ningún diálogo; además, pulsar el botón principal "YouTube Móvil" reproducía forzosamente la pista de demostración `section-63.mp3` en lugar de permitir reproducir el vídeo real que el usuario estaba viendo en su móvil (como YouTube en ventana flotante PiP o por altavoz).
+- **Causa raíz:**
+  1. **Anidación Oculta de Modales en el DOM:** `#stems-export-modal` carecía de etiquetas de cierre adecuadas, provocando que `#yt-mobile-modal` quedara como nodo hijo de un contenedor con clase `hidden`. Aunque JavaScript ejecutara `classList.remove('hidden')` en el modal hijo, la propiedad CSS `display: none` heredada del ancestro impedía su renderizado en pantalla.
+  2. **Touch Targets Subdimensionados en Móvil:** El botón de configuración `⚙️` medía únicamente ~24px de ancho, por debajo de los 44–48px recomendados por directrices W3C/Android/iOS para interacción táctil con el pulgar.
+  3. **Comportamiento Hardcoded de Fuente:** `selectYouTubeMobileSource()` invocaba incondicionalmente `playPresetTrack('section-63.mp3')` y el modal destacaba esa demo como "Método 0 Recomendado", ocultando la entrada de URL al final del modal.
+- **Solución:**
+  1. **Aislamiento Estricto de Modales a Nivel de Body:** Reestructurar los modales para que todos sean hijos directos de `body`, auditando el balance de etiquetas con analizador sintáctico para garantizar profundidad nula en la raíz de cada overlay.
+  2. **Unificación Ergonómica y Touch Targets >= 44px:** Dotar al botón de opciones de un área táctil mínima de 44x38px (`min-w-[44px] min-h-[38px] active:scale-90`) y hacer que tanto el botón principal `[YT] YouTube Móvil` como `⚙️` abran directamente el Asistente Modal de Ingesta con feedback háptico (`triggerHaptic(15)`).
+  3. **Jerarquía Centrada en Casos de Uso Reales:** Rediseñar `#yt-mobile-modal` situando en primer lugar el campo para pegar enlace de YouTube con botón `[📋 Pegar]` (vía `navigator.clipboard.readText`) y auto-detección de portapapeles, seguido de la **Escucha Acústica en Vivo (Método 2)** para usuarios con YouTube reproduciendo en ventana flotante PiP o por altavoz con preamp 4.5x adaptativo sin cortar el vídeo, relegando las canciones de demo (Section 63, Mordaza, Tontos Útiles) a una cuadrícula de pruebas opcionales.
+- **Trigger:** Al depurar modales que no responden tras llamadas a `classList.remove('hidden')`, botones táctiles difíciles de pulsar o flujos de ingesta multimedia que fuerzan pistas de prueba fijas.
+
+
+
+
+
+
