@@ -1124,6 +1124,39 @@
   - ✅ Ergonomía táctil garantizada con áreas de pulsación >= 44px.
   - ✅ Solución natural para el caso común de reproducción en ventana flotante PiP en Android.
 
+---
+
+### D-048 — Arquitectura Split-Screen 100dvh Fija para Dispositivos Móviles (< 1024px) en Rama Aislada
+- **Fecha:** 2026-09-28
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - En la vista adaptable para móvil (< 1024px), la app requería estirar la altura a ~2915px para albergar todo el contenido debido al apilamiento secuencial de la columna izquierda de audio, el visor 3D, el deck modular táctico y los racks pesados de escritorio (`#tier2-studios`, `#tier2-subgrid`).
+  - Además, existía duplicidad de controles de audio (barra superior y panel táctico inferior), y el tirador `#three-viewport-resizer` inyectaba alturas en píxeles fijos que anulaban las reglas de dimensionamiento dinámico CSS `35dvh`.
+  - El usuario aprobó implementar la Opción 1 (Split-Screen 100dvh Fija) en una nueva rama del repositorio (`feature/mobile-splitscreen-100dvh`), aislando la experiencia móvil para no alterar ni comprometer la versión web de escritorio.
+- **Decisión:**
+  - **1. Contenedor Maestro Split-Screen 100dvh Fijo:**
+    - Regla CSS para `@media (max-width: 1023px)`: `html, body { height: 100dvh !important; max-height: 100dvh !important; overflow: hidden !important; overscroll-behavior: none !important; }`.
+    - `main` y `#v4-view-live-runner` fijados a `height: calc(100dvh - 46px) !important; display: flex !important; flex-direction: column !important; overflow: hidden !important;`.
+    - `#three-viewport-section` expandido a `height: 100% !important;` en columna flex.
+  - **2. Proporción Ergonómica 35/55dvh:**
+    - Mitad superior (~35dvh): `#three-canvas-container` acotado con `height: 35dvh !important; min-height: 180px !important;` manteniendo el visor 3D WebGL interactivo permanente con su HUD flotante.
+    - Mitad inferior (~55dvh): `#mobile-tactical-deck` (`flex-grow: 1 !important; overflow-y: auto !important;`) con scroll interno táctil suave para el panel activo (`Audio`, `Stems`, `Mundos`, `FX`, `GLSL`, `Más`).
+    - Base fija: `#mobile-bottom-tab-bar` barra de navegación táctica inferior de 54px con safe areas.
+  - **3. Inputs de Sonido Arriba del Todo en Móvil:**
+    - Reorganización de `#m-panel-audio`: Las Pistas Master de Referencia (CH 01, CH 02, CH 03) y la Matriz de Ingesta Patchbay (YouTube Móvil, Micrófono, Audio Sistema, Cargar Local, Synth) se ubican al principio del panel, seguidas por el Fader Master, Balance L/R y Preamp.
+  - **4. Aislamiento DOM y Limpieza Dinámica de Alturas:**
+    - Ocultar `#left-dock-column` en móvil (`hidden lg:block`).
+    - Ocultar `#three-viewport-resizer` en móvil (`hidden lg:flex`).
+    - En `syncResponsiveLayout()`, si `isMobile`: ocultar `leftCol`, `secAudio`, `secStems`, `tier2Studios`, `tier2Subgrid`, `secVj`, `secFx`, `secShaders` y limpiar `container.style.height = ''`.
+    - En `!isMobile`: restaurar la totalidad de la consola de escritorio multipanel y la altura guardada en `localStorage`.
+    - Restringir `applySavedHeight()` a `window.innerWidth >= 1024`.
+- **Consecuencias:**
+  - ✅ Cero scroll de documento en pantallas móviles (< 1024px): encaje exacto a 100dvh.
+  - ✅ Eliminación de duplicidad entre la barra de audio y el panel táctico.
+  - ✅ Los inputs de audio aparecen inmediatamente debajo del visor 3D al abrir la aplicación.
+  - ✅ Preservación íntegra y garantizada de la versión de escritorio (>= 1024px).
+  - ✅ Desarrollo aislado en la rama remota `feature/mobile-splitscreen-100dvh`.
+
 
 
 

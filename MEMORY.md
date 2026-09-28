@@ -289,6 +289,14 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
     - *Método 4 (Demos Opcionales & Archivo Local):* Cuadrícula de 3 chips de referencia (`Section 63`, `Mordaza`, `Tontos Útiles`) y carga local de archivos de audio.
   - **Corrección de Backend Gateway Hetzner:** Despliegue de fix en [server.py](file:///c:/MotorVisuales/server.py) con comprobación `os.path.isfile("cookies.txt") and os.path.getsize("cookies.txt") > 10` y normalización del archivo de cookies para erradicar el error `[Errno 21] Is a directory` en Docker.
 
+- ✅ **Arquitectura Split-Screen 100dvh Fija para Móviles (< 1024px) en Rama Aislada (D-048):**
+  - **Aislamiento en Rama:** Desarrollo y publicación en la rama de Git `feature/mobile-splitscreen-100dvh` en GitHub, garantizando cero impacto en la versión web/escritorio.
+  - **Split-Screen 100dvh Zero-Scroll:** `html, body { height: 100dvh !important; overflow: hidden !important; }` y `main { height: calc(100dvh - 46px) !important; flex-direction: column !important; }`.
+  - **Visor 3D Superior Fijo (~35dvh):** `#three-canvas-container` acotado a `35dvh` permanente con su HUD compacto flotante y controles táctiles de rotación y zoom.
+  - **Deck Táctico Modular (~55dvh):** `#mobile-tactical-deck` (`flex-grow: 1`) con contención de scroll interno para los paneles modulares (`Audio`, `Stems`, `Mundos`, `FX`, `GLSL`, `Más`) y barra táctica fija de 54px en la base.
+  - **Inputs de Audio en Cabecera:** Pistas Master de Referencia y Matriz Patchbay situadas en el primer orden visual dentro del panel de audio móvil, seguidas de Fader Master, Balance L/R y Preamp.
+  - **Aislamiento DOM y Limpieza de Alturas:** `#left-dock-column` y `#three-viewport-resizer` ocultos en móvil; `syncResponsiveLayout()` oculta racks pesados de escritorio (`tier2Studios`, `tier2Subgrid`) y limpia `container.style.height` inline para que rijan las reglas `35dvh`; la restauración de altura personalizada queda restringida a `>= 1024px`.
+
 ## Próximas Ideas / Pendientes
 - [ ] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).
 - [ ] Control de iluminación DMX / ArtNet vía WebSockets para sincronizar luces de escenario con MotorVisuales.

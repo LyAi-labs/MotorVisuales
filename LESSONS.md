@@ -591,6 +591,23 @@
   3. **Jerarquía Centrada en Casos de Uso Reales:** Rediseñar `#yt-mobile-modal` situando en primer lugar el campo para pegar enlace de YouTube con botón `[📋 Pegar]` (vía `navigator.clipboard.readText`) y auto-detección de portapapeles, seguido de la **Escucha Acústica en Vivo (Método 2)** para usuarios con YouTube reproduciendo en ventana flotante PiP o por altavoz con preamp 4.5x adaptativo sin cortar el vídeo, relegando las canciones de demo (Section 63, Mordaza, Tontos Útiles) a una cuadrícula de pruebas opcionales.
 - **Trigger:** Al depurar modales que no responden tras llamadas a `classList.remove('hidden')`, botones táctiles difíciles de pulsar o flujos de ingesta multimedia que fuerzan pistas de prueba fijas.
 
+---
+
+### L-043
+- **Tags:** #mobile-ui #split-screen #100dvh #zero-scroll #layout-overflow #responsive #inline-styles #tactical-deck
+- **Síntoma:** En la emulación o visualización adaptable en smartphone (< 1024px), el documento web se estiraba verticalmente hasta ~2915px para poder visualizar todo el contenido de la pantalla principal, forzando scroll vertical continuo y rompiendo la experiencia de aplicación nativa.
+- **Causa raíz:**
+  1. **Apilamiento Secuencial de Contenedores:** La columna izquierda (`#left-dock-column`) y el visor 3D (`#three-viewport-section`) se renderizaban en serie en el flujo vertical, seguido del deck modular táctico (`#mobile-tactical-deck`) y de los racks pesados de escritorio (`#tier2-studios` y `#tier2-subgrid`), los cuales no eran ocultados adecuadamente en móvil por `syncResponsiveLayout()`.
+  2. **Duplicidad de Controles de Audio:** Los controles de audio se mostraban dos veces: arriba en `#sec-audio-bar` y abajo dentro de `m-panel-audio` en el deck táctico.
+  3. **Sobreescritura por Estilos Inline del Resizer:** El tirador `#three-viewport-resizer` inyectaba alturas en píxeles fijos (`style.height = ...px`) al arrastrar o restaurar desde `localStorage` en resoluciones `>= 640px`, anulando la clase CSS `35dvh` en tablets y simuladores móviles.
+- **Solución:**
+  1. **Arquitectura Split-Screen 100dvh Fija:** Aplicar `height: 100dvh !important; overflow: hidden !important; overscroll-behavior: none !important;` en `html, body`, fijar `main` y `#v4-view-live-runner` a `calc(100dvh - 46px)` con `display: flex; flex-direction: column; overflow: hidden;`.
+  2. **Aislamiento DOM Quirúrgico:** Ocultar en móvil `#left-dock-column` (`hidden lg:block`), `#three-viewport-resizer` (`hidden lg:flex`) y garantizar que `syncResponsiveLayout()` oculte `tier2Subgrid` y `tier2Studios` en móvil.
+  3. **Limpieza Dinámica de Alturas:** En `syncResponsiveLayout()`, limpiar `container.style.height = ''` y `maxHeight = ''` en móvil para que las reglas CSS del 35dvh rijan sin interferencias, y condicionar la restauración de altura de escritorio a `window.innerWidth >= 1024`.
+  4. **Inputs de Audio en Cabecera del Deck:** Reordenar `m-panel-audio` para situar las Pistas Master y el Patchbay inmediatamente al principio del deck táctico modular.
+- **Trigger:** Al depurar alturas verticales desmedidas o scroll parásito en visualizadores y consolas adaptables móviles.
+
+
 
 
 
