@@ -490,6 +490,21 @@
   4. Si se detecta cualquier falla, lanzar un `Error` explícito para activar el bloque `catch`, pintar el badge en rojo palpitante (`✕ Error de Compilación`) y renderizar el registro con línea exacta en la consola del editor.
 - **Trigger:** Al crear editores de shaders GLSL en vivo o herramientas de compilación dinámica en Three.js.
 
+---
 
-
+### L-036
+- **Tags:** #threejs #scenic-worlds #boids #instancedmesh #clip-studio #gemini-api #routing
+- **Síntoma:** Al seleccionar la Escena 14 (Abismo Oceánico & 4.096 Boids Bioluminiscentes), la cámara 3D caía en la órbita estándar de la Nebulosa en lugar del vuelo cinemático submarino FPV, la cúpula celeste conservaba el gradiente solar de Mercurio en vez del océano abisal profundo, o la síntesis de arquetipos generaba errores 404/fallback.
+- **Causa raíz:**
+  1. En `renderThreeFrame`, los chequeos de excepción cinemática de cámara y actualización del `ScenicWorldEngine` solo contemplaban `scenic_mercury_monoliths` y `scenic_crystal_valley`, omitiendo `scenic_abyss_boids`.
+  2. Los métodos `initAbyssBoidsWorld` y `updateAbyssBoids` habían quedado erróneamente anidados en la clase previa (`Waterfall3DManager`) en lugar de `ScenicWorldEngine`.
+  3. El shader de la bóveda celeste `uWorldMode` solo alternaba entre 0.0 (Mercurio) y 1.0 (Valle de Cristales), sin evaluar el modo 2.0 (Abismo Marino con gradiente de profundidad y absorción lumínica sin estrellas diurnas).
+  4. La llamada de síntesis de arquetipos invocaba `gemini-2.5-flash` en vez de `gemini-3.5-flash-lite` y no consultaba prioritariamente `window.MOTOR_CONFIG.GEMINI_API_KEY` (L-009 / L-012).
+- **Solución:**
+  1. Reubicar e integrar formalmente los métodos del Abismo dentro de `ScenicWorldEngine`.
+  2. Extender las condiciones en `renderThreeFrame` a `activeSceneType === 'scenic_abyss_boids'`, permitiendo que el dron FPV submarino gobierne la cámara a 60 FPS con alabeo dinámico y dispersión acústica.
+  3. Extender el fragment shader de la cúpula celeste para soportar `uWorldMode > 1.5` con degradado crepuscular abisal azul medianoche y niebla de profundidad.
+  4. Enlazar `abyssScreenMesh.material` a `holoMaterial` de `AiClipStudioEngine` para proyectar el videoclip IA multicapa directamente sobre el monolito submarino central.
+  5. Actualizar la síntesis de arquetipos a `gemini-3.5-flash-lite` con fallback heurístico y lectura de `MOTOR_CONFIG`.
+- **Trigger:** Al incorporar nuevos mundos escénicos 3D en ScenicWorldEngine o vincular materiales holográficos de proyección universal.
 
