@@ -607,6 +607,16 @@
   4. **Inputs de Audio en Cabecera del Deck:** Reordenar `m-panel-audio` para situar las Pistas Master y el Patchbay inmediatamente al principio del deck táctico modular.
 - **Trigger:** Al depurar alturas verticales desmedidas o scroll parásito en visualizadores y consolas adaptables móviles.
 
+---
+
+### L-044
+- **Tags:** #mobile #html-nesting #dom-tree #flex #tier2 #tactical-deck #split-screen
+- **Síntoma:** En la vista móvil (< 1024px), la sección "Director de Arte IA Multimodal" aparecía indebidamente visible debajo del visor 3D, y el deck táctico modular (`#mobile-tactical-deck`) quedaba aplastado a una altura de ~68px.
+- **Causa raíz:** Un tag `</div>` espurio en el cierre del editor de shaders cerraba prematuramente `<div id="tier2-studios">`, provocando que `<div id="tier2-subgrid">` quedara como hijo directo de `#v4-view-live-runner`. Al ser un `div.grid` hijo directo, la regla CSS de layout móvil `#v4-view-live-runner > div.grid` le aplicaba `display: flex !important`, ignorando su clase `hidden` y dividiendo la altura flex con el deck táctico.
+- **Solución:** Eliminar el `</div>` redundante, manteniendo a `tier2-subgrid` dentro de `tier2-studios` (`hidden lg:block`). Con esto, `tier2-studios` se mantiene en `display: none` en móviles y el deck táctico modular `#mobile-tactical-deck` expande limpiamente a los ~55dvh con scroll interno fluido.
+- **Trigger:** Al depurar visibilidad no deseada de paneles o colapso de altura en contenedores flex/grid en móviles.
+
+
 
 
 
