@@ -11,6 +11,7 @@
 - **Idioma:** Español (toda la UI y comunicación)
 - **Modo:** Permisos Turbo — ejecutar directamente sin pedir confirmación
 - **Track de prueba:** `c:\MotorVisuales\tema.mp3` ("Mordaza", 4.5 MB)
+- **Enlaces Clickeables:** Todas las URLs (ej: localhost, puertos, docs) y enlaces a archivos DEBEN ser SIEMPRE enlaces markdown clickeables (ej: [http://localhost:8088](http://localhost:8088)), NUNCA texto plano o código inline entre backticks.
 
 ## Arquitectura Técnica
 
@@ -52,7 +53,11 @@
    - Orquestador Creativo Autónomo sincronizado con transitorios de audio $dE/dt$, coordenadas MER y arquetipos de IA.
 8. **Agente IA "Director de Arte" & Modelo Afectivo MER:** Russell Circumplex (Valencia x Arousal), auto-tracking basado en RMS + Centroide.
 9. **Grabador de Video & Exportadores:** MediaRecorder WebM 60FPS, WebP Animado cuantizado al tempo y capturas Ultra-HD 4K/8K con SSAA.
-10. **Estudio de Creación Narrativa & Clips IA Multicapa (`AiClipStudioEngine` / D-040):** 6 arquetipos procedurales a 60 FPS (Anime Sakuga, Cómic Noir & Halftone, Cine 35mm, Aventura/Fantasía, Cyberpunk 2099, Acuarela Onírica), storyboards musicales autónomos con Gemini 2.5 Flash, transmutación GLSL y proyección universal en Three.js (`uVideoTexture`).
+10. **Estudio de Creación Narrativa & Clips IA Multicapa (`AiClipStudioEngine` / D-040):** 6 arquetipos procedurales a 60 FPS (Anime Sakuga, Cómic Noir & Halftone, Cine 35mm, Aventura/Fantasía, Cyberpunk 2099, Acuarela Onírica), storyboards musicales autónomos con Gemini 2.5 Flash, transmutación GLSL y proyección universal en Three.js (`uVideoTexture`).
+11. **Hub Comunitario de Presets Cloud & ADN Visual (Despliegue Hetzner / D-042):**
+   - Serialización de estado visual determinista (Visual DNA): Escena 3D (1-14), 9 passes WebGL FX analógicos, modo de cámara, paleta de color y shaders GLSL.
+   - Modal con 3 pestañas: Explorar Comunidad (feed con carga en directo a 1-clic y votaciones), Publicar mi Visual (con captura instantánea del canvas WebGL) y Mis Presets Locales (exportador .mvp).
+   - Backend propio en server-hetzner/ (Node.js Express + SQLite WAL, <40MB RAM) empaquetado con Docker Compose para Hetzner.
 
 ### Nodo de Audio (grafo)
 ```

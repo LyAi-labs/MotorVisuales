@@ -1,0 +1,20 @@
+{
+  "name": "motorvisuales-community-api",
+  "version": "1.0.0",
+  "description": "API REST y Almacén de ADN Visual Comunitario para MotorVisuales en Hetzner",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "helmet": "^8.0.0",
+    "morgan": "^1.10.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

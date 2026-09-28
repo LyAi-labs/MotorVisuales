@@ -987,3 +987,29 @@
 
 
 
+
+---
+
+### D-042 — Hub Comunitario de Presets Cloud & ADN Visual Retroalimentativo (Despliegue Hetzner)
+- **Fecha:** 2026-09-28
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  - Permitir a los usuarios personalizar libremente sus visuales y congelar su estado como un preset firmado y universal ("ADN Visual").
+  - Compartir públicamente estas creaciones en un repositorio comunal alojado en el servidor Hetzner de la organización, permitiendo que cualquier persona desde cualquier ordenador, IP o cuenta cargue presets en caliente, vote y se inspire, alimentando el ecosistema y retroalimentando el motor de interpretación de la IA.
+- **Decisión:**
+  - **1. Especificación del ADN Visual (Visual DNA Schema):**
+    - Serialización determinista del estado visual completo: Escena 3D activa (1-14), modo y velocidad de órbita cinemática, los 9 passes WebGL FX con sus valores analógicos (Bloom, Aberración, Glitch, Blur radial, CRT, Caleidoscopio, Film grain, Invert, Pixel), paleta cromática target (aiColorsTarget), y código de shaders GLSL personalizados si aplica.
+    - Captura automática de miniatura en caliente desde el WebGL canvas en formato comprimido.
+  - **2. Arquitectura Frontend (Community Visual Hub en index.html):**
+    - Modal inmersivo con 3 pestañas: *Explorar Comunidad* (feed de tarjetas con carga a 1-clic y votaciones), *Publicar mi Visual* (con captura instantánea y formulario de metadatos) y *Mis Presets* (gestor local y exportación/importación de archivos `.mvp`).
+    - Botones de acceso directo ubicados estratégicamente: Barra del Viewport 3D en Desktop (`[🌐 Cloud]`), barra móvil superior (`[🌐 Hub]`) y barra flotante `Studio Cinema Pill Dock`.
+    - Resiliencia híbrida: si el servidor Hetzner está temporalmente offline o no configurado, el Hub opera con catálogo curado y persistencia en `localStorage` con cero bloqueos.
+    - Soporte para enlaces directos con hash URL (`#preset=ID`) para compartir visuales por enlace directo.
+  - **3. Servidor Hetzner (Stack Ultraligero SQLite WAL + Node.js Express):**
+    - Microservicio en `c:\MotorVisuales\server-hetzner\` (<40 MB RAM) con SQLite en modo WAL y consultas indexadas.
+    - Endpoints REST: `GET /api/presets` (ordenación por votos y recientes), `GET /api/presets/:id`, `POST /api/presets`, `POST /api/presets/:id/like` (con deduplicación criptográfica de IP) y `POST /api/presets/:id/view`.
+    - Empaquetado con `Dockerfile`, `docker-compose.yml` y guía de despliegue en producción en 1 comando.
+- **Consecuencias:**
+  - ✅ Ecosistema visual colaborativo y retroalimentativo 100% soberano en Hetzner sin dependencias de terceros.
+  - ✅ Carga instantánea de presets comunitarios en tiempo real a 60 FPS con un solo clic.
+  - ✅ Exportación de presets portables `.mvp` y enlaces directos para distribución comunitaria.

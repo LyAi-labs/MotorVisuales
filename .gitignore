@@ -19,4 +19,8 @@ cookies.txt
 *.mp4
 media/
 
-
+# Base de datos local
+data/
+*.db
+*.db-wal
+*.db-shm

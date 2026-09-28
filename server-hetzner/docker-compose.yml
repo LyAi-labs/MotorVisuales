@@ -1,0 +1,36 @@
+services:
+  presets-api:
+    build: .
+    container_name: motorvisuales-presets-api
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - NODE_ENV=production
+      - DATA_DIR=/app/data
+    volumes:
+      - presets-data:/app/data
+
+  # Reverse proxy Caddy opcional para SSL automático con Let's Encrypt
+  # Descomentar si no usas ya un Nginx/Traefik propio en Hetzner:
+  # caddy:
+  #   image: caddy:alpine
+  #   container_name: motorvisuales-caddy
+  #   restart: unless-stopped
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   environment:
+  #     - DOMAIN=presets.tudominio.com
+  #   volumes:
+  #     - ./Caddyfile:/etc/caddy/Caddyfile
+  #     - caddy-data:/data
+  #     - caddy-config:/config
+  #   depends_on:
+  #     - presets-api
+
+volumes:
+  presets-data:
+  # caddy-data:
+  # caddy-config:

@@ -780,6 +780,10 @@
                                     <span class="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
                                     <span>Órbita</span>
                                 </button>
+                                <button onclick="openCommunityHubModal()" class="px-2 py-0.5 bg-sky-950 text-sky-200 border border-sky-400/50 rounded text-[10px] font-bold transition flex items-center gap-1" title="Presets Cloud">
+                                    <span>🌐</span>
+                                    <span>Hub</span>
+                                </button>
                                 <button onclick="resetThreeCamera()" class="px-2 py-0.5 bg-zinc-900 rounded border border-white/[0.08] text-zinc-400 text-[10px] transition">Reset</button>
                             </div>
                         </div>
@@ -822,6 +826,10 @@
                                 <button id="btn-auto-vj" onclick="toggleAutoVJ()" class="px-2.5 py-1 bg-gradient-to-r from-purple-900/90 to-indigo-900/90 hover:from-purple-800 hover:to-indigo-800 border border-purple-400/60 text-purple-100 rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 shadow-[0_0_12px_rgba(168,85,247,0.35)]" title="Creador IA Autónomo (Auto-VJ): Modificación autónoma de geometrías, paletas de color y transiciones cinemáticas ante drops">
                                     <span id="auto-vj-led" class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_6px_#34d399]"></span>
                                     <span>⚡ Creador IA: ON</span>
+                                </button>
+                                <button id="btn-open-cloud-hub" onclick="openCommunityHubModal()" class="px-2.5 py-1 bg-gradient-to-r from-sky-900/80 to-blue-900/80 hover:from-sky-800 hover:to-blue-800 border border-sky-400/50 text-sky-200 hover:text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1.5 shadow-[0_0_10px_rgba(56,189,248,0.25)]" title="Hub Comunitario: Explorar, cargar y publicar Presets en la nube pública">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse"></span>
+                                    <span>🌐 Cloud</span>
                                 </button>
                                 <button id="btn-quick-ai-fx" onclick="toggleAIFxDirector()" class="px-2 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] text-[11px] transition flex items-center gap-1 font-medium" title="Director IA FX Autónomo: Modulación cinematográfica de los 9 passes WebGL">
                                     <span>🧠</span>
@@ -977,6 +985,7 @@
                                 <span>Creador IA</span>
                             </button>
                             <button onclick="triggerAutonomousGenesis()" class="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1" title="Génesis Autónoma de Arte">🔮 Génesis</button>
+                            <button onclick="openCommunityHubModal()" class="text-sky-300 hover:text-sky-200 font-bold flex items-center gap-1" title="Hub de Presets Comunitarios Cloud">🌐 Presets</button>
                             <button onclick="focusVjTimeline()" class="text-teal-300 hover:text-teal-200 font-bold flex items-center gap-1" title="Timeline VJ">⏱️ VJ</button>
                             <button onclick="openMeshFreezeModal()" class="text-amber-300 hover:text-amber-200 font-bold flex items-center gap-1" title="Escultura 3D STL/OBJ">🧊 3D</button>
                             <button onclick="openAiClipStudioModal()" class="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1" title="Estudio de Creación Narrativa & Clips IA">🎬 Clips</button>
@@ -4288,6 +4297,7 @@
 
         function startYouTubeMobileListening() {
             closeYouTubeMobileAssistant();
+                closeCommunityHubModal();
             startMicrophone(true);
         }
 
@@ -23531,8 +23541,773 @@ void main() {
             // Inicializar motores de Sesión VJ, Escultura 3D y Video Ingest
             setTimeout(() => {
                 initVjEngines();
+                if (typeof communityVisualHub !== 'undefined') communityVisualHub.init();
             }, 300);
         });
+
+        // =========================================================================
+        // 14. GESTOR DE ADN VISUAL & HUB COMUNITARIO CLOUD (HETZNER / P2P LOCAL)
+        // Serialización determinista, firmas SHA-256, captura de miniaturas y
+        // conmutación instantánea en caliente con fallback resiliente offline
+        // =========================================================================
+        class CommunityVisualHub {
+            constructor() {
+                let autoEndpoint = 'https://motorvisuales.site/api';
+                if (typeof window !== 'undefined' && window.location) {
+                    if (window.location.origin && window.location.origin.includes('motorvisuales.site')) {
+                        autoEndpoint = window.location.origin + '/api';
+                    } else if (window.location.port === '4000') {
+                        autoEndpoint = 'http://localhost:4000/api';
+                    } else if (window.location.port === '8000') {
+                        autoEndpoint = window.location.origin + '/api';
+                    } else {
+                        autoEndpoint = 'https://motorvisuales.site/api';
+                    }
+                }
+                this.apiEndpoint = (window.MOTOR_CONFIG && window.MOTOR_CONFIG.COMMUNITY_API_URL) 
+                    ? window.MOTOR_CONFIG.COMMUNITY_API_URL 
+                    : autoEndpoint;
+                this.currentTab = 'explore';
+                this.currentSort = 'top';
+                this.searchQuery = '';
+                this.capturedThumbnailData = null;
+                this.presets = [];
+                this.localPresets = [];
+                this.votedPresetIds = new Set();
+                this.cachedCuratedPresets = [
+                    {
+                        id: 'curated-abyss-01',
+                        name: 'Abismo Bioluminiscente & Cáusticas Ultra-Deep',
+                        author: 'MotorVisuales Core',
+                        createdAt: '2026-09-28T12:00:00Z',
+                        likes: 42,
+                        views: 189,
+                        scene: 'scenic_abyss_boids',
+                        tags: ['abismo', 'boids', 'fpv', 'bloom'],
+                        thumbnail: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><rect width="256" height="256" fill="%23020617"/><circle cx="128" cy="128" r="90" fill="none" stroke="%2338bdf8" stroke-width="3" opacity="0.6"/><circle cx="90" cy="110" r="8" fill="%2322d3ee"/><circle cx="160" cy="140" r="6" fill="%23a855f7"/><circle cx="130" cy="170" r="10" fill="%2338bdf8"/><text x="128" y="230" fill="%2338bdf8" font-size="12" font-family="monospace" text-anchor="middle">ABYSS BOIDS 4K</text></svg>',
+                        dna: {
+                            scene: 'scenic_abyss_boids',
+                            camera: { mode: 'dramatic', speed: 1.0 },
+                            fx: {
+                                bloom: { enabled: true, strength: 1.8 },
+                                chroma: { enabled: true, dist: 0.006 },
+                                glitch: { enabled: false, rate: 0.0 },
+                                blur: { enabled: true, intensity: 0.05 },
+                                crt: { enabled: false, curvature: 0.0 },
+                                kaleido: { enabled: false, sides: 8 },
+                                film: { enabled: true, noise: 0.35 },
+                                invert: { enabled: false, val: 0.0 },
+                                pixel: { enabled: false, size: 2 }
+                            },
+                            colors: { prim: '#22d3ee', accent: '#a855f7', fog: '#020617' }
+                        }
+                    },
+                    {
+                        id: 'curated-mercury-02',
+                        name: 'Océano de Mercurio & Megalitos Resonantes',
+                        author: 'VJ_Kore',
+                        createdAt: '2026-09-27T18:30:00Z',
+                        likes: 38,
+                        views: 145,
+                        scene: 'scenic_mercury_monoliths',
+                        tags: ['mercurio', 'megalitos', 'espejo', 'cinema'],
+                        thumbnail: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><rect width="256" height="256" fill="%2309090b"/><polygon points="80,180 128,40 176,180" fill="%236366f1" opacity="0.8"/><rect x="0" y="180" width="256" height="76" fill="%230f172a"/><text x="128" y="235" fill="%23818cf8" font-size="12" font-family="monospace" text-anchor="middle">MERCURY LIQUID</text></svg>',
+                        dna: {
+                            scene: 'scenic_mercury_monoliths',
+                            camera: { mode: 'circle', speed: 1.2 },
+                            fx: {
+                                bloom: { enabled: true, strength: 1.4 },
+                                chroma: { enabled: true, dist: 0.004 },
+                                glitch: { enabled: false, rate: 0.0 },
+                                blur: { enabled: false, intensity: 0.0 },
+                                crt: { enabled: false, curvature: 0.0 },
+                                kaleido: { enabled: false, sides: 8 },
+                                film: { enabled: true, noise: 0.4 },
+                                invert: { enabled: false, val: 0.0 },
+                                pixel: { enabled: false, size: 2 }
+                            },
+                            colors: { prim: '#38bdf8', accent: '#818cf8', fog: '#050510' }
+                        }
+                    },
+                    {
+                        id: 'curated-cyber-03',
+                        name: 'Cyberpunk Dystopia & Glitch Transiente',
+                        author: 'HexHunter',
+                        createdAt: '2026-09-26T22:15:00Z',
+                        likes: 29,
+                        views: 110,
+                        scene: 'tunnel',
+                        tags: ['cyberpunk', 'glitch', 'crt', 'scanlines'],
+                        thumbnail: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><rect width="256" height="256" fill="%23180424"/><rect x="20" y="40" width="216" height="8" fill="%23ec4899"/><rect x="30" y="110" width="180" height="12" fill="%2306b6d4"/><rect x="10" y="180" width="236" height="10" fill="%23f43f5e"/><text x="128" y="235" fill="%23f472b6" font-size="12" font-family="monospace" text-anchor="middle">CYBER GLITCH 80s</text></svg>',
+                        dna: {
+                            scene: 'tunnel',
+                            camera: { mode: 'spiral', speed: 1.8 },
+                            fx: {
+                                bloom: { enabled: true, strength: 2.2 },
+                                chroma: { enabled: true, dist: 0.018 },
+                                glitch: { enabled: true, rate: 0.4 },
+                                blur: { enabled: true, intensity: 0.15 },
+                                crt: { enabled: true, curvature: 0.45 },
+                                kaleido: { enabled: false, sides: 8 },
+                                film: { enabled: true, noise: 0.25 },
+                                invert: { enabled: false, val: 0.0 },
+                                pixel: { enabled: true, size: 3 }
+                            },
+                            colors: { prim: '#f43f5e', accent: '#06b6d4', fog: '#150520' }
+                        }
+                    },
+                    {
+                        id: 'curated-cymatics-04',
+                        name: 'Cimática Cuántica 3D & Chladni Nodal',
+                        author: 'SonicArchitect',
+                        createdAt: '2026-09-25T14:40:00Z',
+                        likes: 24,
+                        views: 95,
+                        scene: 'cymatics_scene',
+                        tags: ['chladni', 'nodal', 'cymatics', 'kaleido'],
+                        thumbnail: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><rect width="256" height="256" fill="%23022c22"/><circle cx="128" cy="128" r="80" fill="none" stroke="%2334d399" stroke-width="4"/><circle cx="128" cy="128" r="50" fill="none" stroke="%2322d3ee" stroke-width="3"/><circle cx="128" cy="128" r="20" fill="%2310b981"/><text x="128" y="235" fill="%2334d399" font-size="12" font-family="monospace" text-anchor="middle">CHLADNI NODAL 3D</text></svg>',
+                        dna: {
+                            scene: 'cymatics_scene',
+                            camera: { mode: 'circle', speed: 0.8 },
+                            fx: {
+                                bloom: { enabled: true, strength: 1.6 },
+                                chroma: { enabled: true, dist: 0.005 },
+                                glitch: { enabled: false, rate: 0.0 },
+                                blur: { enabled: false, intensity: 0.0 },
+                                crt: { enabled: false, curvature: 0.0 },
+                                kaleido: { enabled: true, sides: 12 },
+                                film: { enabled: false, noise: 0.0 },
+                                invert: { enabled: false, val: 0.0 },
+                                pixel: { enabled: false, size: 2 }
+                            },
+                            colors: { prim: '#34d399', accent: '#22d3ee', fog: '#022c22' }
+                        }
+                    }
+                ];
+            }
+
+            init() {
+                this.loadLocalPresets();
+                this.loadVotedHistory();
+                this.fetchCommunityPresets();
+                this.checkUrlForPreset();
+            }
+
+            loadLocalPresets() {
+                try {
+                    const raw = localStorage.getItem('mv_community_local_presets');
+                    this.localPresets = raw ? JSON.parse(raw) : [];
+                } catch (e) {
+                    this.localPresets = [];
+                }
+            }
+
+            saveLocalPresets() {
+                try {
+                    localStorage.setItem('mv_community_local_presets', JSON.stringify(this.localPresets));
+                } catch (e) {}
+            }
+
+            loadVotedHistory() {
+                try {
+                    const raw = localStorage.getItem('mv_voted_preset_ids');
+                    if (raw) this.votedPresetIds = new Set(JSON.parse(raw));
+                } catch (e) {}
+            }
+
+            saveVotedHistory() {
+                try {
+                    localStorage.setItem('mv_voted_preset_ids', JSON.stringify(Array.from(this.votedPresetIds)));
+                } catch (e) {}
+            }
+
+            async fetchCommunityPresets() {
+                try {
+                    const res = await fetch(`${this.apiEndpoint}/presets?sort=${this.currentSort}`, {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' },
+                        signal: AbortSignal.timeout(3500)
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data) && data.length > 0) {
+                            this.presets = data;
+                            this.renderExploreGrid();
+                            this.updateConnectionStatusBadge(true);
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    console.log('[CommunityHub] Servidor Hetzner no disponible en este momento, usando catálogo curado + local.');
+                }
+                // Fallback resiliente offline
+                this.presets = [...this.localPresets, ...this.cachedCuratedPresets];
+                this.renderExploreGrid();
+                this.updateConnectionStatusBadge(false);
+            }
+
+            updateConnectionStatusBadge(isOnline) {
+                const badge = document.getElementById('hub-cloud-status');
+                if (badge) {
+                    if (isOnline) {
+                        badge.className = "flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[10px] font-mono";
+                        badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span><span>HETZNER CLOUD: ONLINE</span>';
+                    } else {
+                        badge.className = "flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-amber-950/80 border border-amber-500/40 text-amber-300 text-[10px] font-mono";
+                        badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span>CATÁLOGO LOCAL / CACHÉ</span>';
+                    }
+                }
+            }
+
+            checkUrlForPreset() {
+                try {
+                    const hash = window.location.hash;
+                    if (hash && hash.startsWith('#preset=')) {
+                        const presetId = hash.replace('#preset=', '').trim();
+                        if (presetId) {
+                            setTimeout(() => {
+                                this.loadPresetById(presetId, true);
+                            }, 1000);
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            setTab(tab) {
+                this.currentTab = tab;
+                const tabs = ['explore', 'publish', 'local'];
+                tabs.forEach(t => {
+                    const btn = document.getElementById(`hub-tab-btn-${t}`);
+                    const view = document.getElementById(`hub-tab-content-${t}`);
+                    if (t === tab) {
+                        if (btn) btn.className = "px-3 py-1.5 rounded-lg bg-sky-600/30 text-sky-200 border border-sky-400/40 font-bold text-xs flex items-center gap-1.5 shadow-sm";
+                        if (view) view.classList.remove('hidden');
+                    } else {
+                        if (btn) btn.className = "px-3 py-1.5 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white border border-white/[0.08] font-medium text-xs flex items-center gap-1.5 transition";
+                        if (view) view.classList.add('hidden');
+                    }
+                });
+
+                if (tab === 'publish') {
+                    this.preparePublishSnapshot();
+                } else if (tab === 'local') {
+                    this.renderLocalGrid();
+                } else if (tab === 'explore') {
+                    this.renderExploreGrid();
+                }
+            }
+
+            setSort(sort) {
+                this.currentSort = sort;
+                const btnTop = document.getElementById('hub-sort-top');
+                const btnRecent = document.getElementById('hub-sort-recent');
+                if (sort === 'top') {
+                    if (btnTop) btnTop.className = "px-2 py-1 rounded bg-sky-950 text-sky-300 border border-sky-500/40 font-bold text-[10px]";
+                    if (btnRecent) btnRecent.className = "px-2 py-1 rounded bg-zinc-900 text-zinc-400 border border-white/[0.08] text-[10px]";
+                } else {
+                    if (btnTop) btnTop.className = "px-2 py-1 rounded bg-zinc-900 text-zinc-400 border border-white/[0.08] text-[10px]";
+                    if (btnRecent) btnRecent.className = "px-2 py-1 rounded bg-sky-950 text-sky-300 border border-sky-500/40 font-bold text-[10px]";
+                }
+                this.fetchCommunityPresets();
+            }
+
+            filterPresets(query) {
+                this.searchQuery = query.toLowerCase().trim();
+                this.renderExploreGrid();
+            }
+
+            renderExploreGrid() {
+                const container = document.getElementById('hub-explore-grid');
+                if (!container) return;
+
+                let list = [...this.presets];
+                if (this.searchQuery) {
+                    list = list.filter(p => 
+                        p.name.toLowerCase().includes(this.searchQuery) ||
+                        p.author.toLowerCase().includes(this.searchQuery) ||
+                        (p.tags && p.tags.some(t => t.toLowerCase().includes(this.searchQuery))) ||
+                        p.scene.toLowerCase().includes(this.searchQuery)
+                    );
+                }
+
+                if (this.currentSort === 'top') {
+                    list.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+                } else {
+                    list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                }
+
+                if (list.length === 0) {
+                    container.innerHTML = `
+                        <div class="col-span-full p-8 text-center bg-zinc-950/60 rounded-2xl border border-white/5 space-y-2">
+                            <span class="text-3xl block">🔍</span>
+                            <p class="text-xs font-bold text-zinc-300">No se encontraron presets con "${this.searchQuery}"</p>
+                            <p class="text-[11px] text-zinc-500">Prueba con términos como 'abismo', 'mercurio', 'glitch' o 'bloom'.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = list.map(item => {
+                    const isVoted = this.votedPresetIds.has(item.id);
+                    const tagPills = (item.tags || []).slice(0, 3).map(t => 
+                        `<span class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[9px] font-mono">#${t}</span>`
+                    ).join(' ');
+
+                    return `
+                        <div class="group flex flex-col bg-zinc-900/90 hover:bg-zinc-850 border border-white/[0.08] hover:border-sky-500/50 rounded-xl overflow-hidden shadow-lg transition duration-200">
+                            <!-- Thumbnail with Play Hover Overlay -->
+                            <div class="relative w-full aspect-video bg-black overflow-hidden cursor-pointer" onclick="communityVisualHub.applyVisualPreset('${item.id}')">
+                                <img src="${item.thumbnail || ''}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" loading="lazy">
+                                <div class="absolute inset-0 bg-sky-950/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center backdrop-blur-[2px]">
+                                    <span class="px-3 py-1.5 rounded-full bg-sky-500 text-black font-black text-xs shadow-lg flex items-center gap-1.5">
+                                        <span>⚡</span><span>CARGAR EN DIRECTO</span>
+                                    </span>
+                                </div>
+                                <span class="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-[9px] font-mono font-bold text-sky-300 border border-white/10 uppercase">
+                                    ${item.scene.replace('scenic_', '').replace('_scene', '')}
+                                </span>
+                            </div>
+
+                            <!-- Content Details -->
+                            <div class="p-3 flex-grow flex flex-col justify-between space-y-2">
+                                <div>
+                                    <h4 class="text-xs font-bold text-zinc-100 group-hover:text-sky-300 transition line-clamp-1" title="${item.name}">
+                                        ${item.name}
+                                    </h4>
+                                    <div class="flex items-center justify-between text-[10px] text-zinc-400 mt-1">
+                                        <span class="flex items-center gap-1 font-mono text-zinc-300">
+                                            <span>👤</span><span>${item.author}</span>
+                                        </span>
+                                        <span class="font-mono text-zinc-500">${new Date(item.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-1 mt-2">
+                                        ${tagPills}
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons Row -->
+                                <div class="flex items-center justify-between pt-2 border-t border-white/[0.06] text-xs font-mono">
+                                    <button onclick="communityVisualHub.votePreset('${item.id}', this)" class="flex items-center gap-1.5 px-2 py-1 rounded-md transition ${isVoted ? 'bg-pink-950/80 text-pink-300 border border-pink-500/40 font-bold' : 'bg-zinc-800 text-zinc-400 hover:text-white border border-white/5'}">
+                                        <span>${isVoted ? '❤️' : '🤍'}</span>
+                                        <span id="likes-count-${item.id}">${item.likes || 0}</span>
+                                    </button>
+                                    <div class="flex items-center gap-1.5">
+                                        <button onclick="communityVisualHub.sharePresetLink('${item.id}')" class="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-750 text-zinc-300 hover:text-white border border-white/5 transition" title="Copiar enlace directo">
+                                            🔗
+                                        </button>
+                                        <button onclick="communityVisualHub.applyVisualPreset('${item.id}')" class="px-2.5 py-1 rounded bg-sky-950 hover:bg-sky-900 text-sky-200 border border-sky-400/40 font-bold transition flex items-center gap-1">
+                                            <span>⚡ Cargar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            renderLocalGrid() {
+                const container = document.getElementById('hub-local-grid');
+                if (!container) return;
+
+                if (this.localPresets.length === 0) {
+                    container.innerHTML = `
+                        <div class="p-8 text-center bg-zinc-950/60 rounded-2xl border border-white/5 space-y-2">
+                            <span class="text-3xl block">💾</span>
+                            <p class="text-xs font-bold text-zinc-300">Aún no has guardado presets locales</p>
+                            <p class="text-[11px] text-zinc-500">Diseña una combinación visual y ve a la pestaña "Publicar Preset Actual" para conservarla.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = this.localPresets.map((item, idx) => `
+                    <div class="flex items-center justify-between p-3 bg-zinc-900 border border-white/[0.08] hover:border-sky-500/40 rounded-xl transition">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.thumbnail}" class="w-14 h-14 rounded-lg object-cover bg-black border border-white/10">
+                            <div>
+                                <h4 class="text-xs font-bold text-zinc-100">${item.name}</h4>
+                                <p class="text-[10px] text-zinc-400 font-mono">Firma: ${item.author} • Escena: ${item.scene}</p>
+                                <span class="text-[9px] text-zinc-500 font-mono">${new Date(item.createdAt).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="communityVisualHub.applyVisualPreset('${item.id}')" class="px-3 py-1.5 bg-sky-950 hover:bg-sky-900 text-sky-200 border border-sky-500/40 rounded-lg text-xs font-bold transition">
+                                ⚡ Cargar
+                            </button>
+                            <button onclick="communityVisualHub.exportPresetJson(${idx})" class="px-2 py-1.5 bg-zinc-800 hover:bg-zinc-750 text-zinc-300 rounded-lg text-xs font-mono border border-white/10" title="Descargar archivo JSON (.mvp)">
+                                📥 .mvp
+                            </button>
+                            <button onclick="communityVisualHub.deleteLocalPreset(${idx})" class="px-2 py-1.5 bg-red-950/60 hover:bg-red-900 text-red-300 rounded-lg text-xs font-mono border border-red-500/30" title="Eliminar de la memoria local">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            captureCurrentVisualDNA() {
+                const sceneSelect = document.getElementById('three-scene-mode');
+                const activeScene = sceneSelect ? sceneSelect.value : (typeof activeSceneType !== 'undefined' ? activeSceneType : 'scenic_abyss_boids');
+                const orbitSpeedSelect = document.getElementById('camera-orbit-speed');
+                const orbitModeSelect = document.getElementById('camera-orbit-mode');
+
+                // Recopilar estado de los 9 passes WebGL FX
+                const getPass = (idPrefix, valId) => {
+                    const chk = document.getElementById(`fx-${idPrefix}-enable`);
+                    const rng = document.getElementById(valId);
+                    return {
+                        enabled: chk ? chk.checked : false,
+                        val: rng ? parseFloat(rng.value) : 1.0
+                    };
+                };
+
+                const fx = {
+                    bloom: getPass('bloom', 'fx-bloom-strength'),
+                    chroma: getPass('chroma', 'fx-chroma-dist'),
+                    glitch: getPass('glitch', 'fx-glitch-rate'),
+                    blur: getPass('blur', 'fx-blur-intensity'),
+                    crt: getPass('crt', 'fx-crt-curvature'),
+                    kaleido: {
+                        enabled: document.getElementById('fx-kaleido-enable')?.checked || false,
+                        sides: parseInt(document.getElementById('fx-kaleido-sides')?.value || '8')
+                    },
+                    film: getPass('film', 'fx-film-noise'),
+                    invert: getPass('invert', 'fx-invert-val'),
+                    pixel: {
+                        enabled: document.getElementById('fx-pixel-enable')?.checked || false,
+                        size: parseInt(document.getElementById('fx-pixel-size')?.value || '2')
+                    }
+                };
+
+                // Paleta de color actual
+                const colors = {
+                    prim: (typeof aiColorsTarget !== 'undefined' && aiColorsTarget.prim) ? '#' + aiColorsTarget.prim.getHexString() : '#22d3ee',
+                    accent: (typeof aiColorsTarget !== 'undefined' && aiColorsTarget.accent) ? '#' + aiColorsTarget.accent.getHexString() : '#a855f7',
+                    fog: (typeof aiColorsTarget !== 'undefined' && aiColorsTarget.fog) ? '#' + aiColorsTarget.fog.getHexString() : '#020617'
+                };
+
+                return {
+                    scene: activeScene,
+                    camera: {
+                        mode: orbitModeSelect ? orbitModeSelect.value : 'circle',
+                        speed: orbitSpeedSelect ? parseFloat(orbitSpeedSelect.value) : 1.0
+                    },
+                    fx: fx,
+                    colors: colors,
+                    customShaderCode: (activeScene === 'custom_shader' && typeof customShaderMaterial !== 'undefined' && customShaderMaterial?.fragmentShader)
+                        ? customShaderMaterial.fragmentShader
+                        : null
+                };
+            }
+
+            preparePublishSnapshot() {
+                // Capturar fotograma actual del canvas WebGL
+                const canvas = document.getElementById('three-canvas');
+                let thumb = '';
+                if (canvas) {
+                    try {
+                        thumb = canvas.toDataURL('image/jpeg', 0.75);
+                    } catch (e) {
+                        thumb = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256"><rect width="256" height="256" fill="%230c1020"/><text x="128" y="130" fill="%2338bdf8" text-anchor="middle" font-family="monospace">PRESET SNAPSHOT</text></svg>';
+                    }
+                }
+                this.capturedThumbnailData = thumb;
+
+                const imgPreview = document.getElementById('hub-publish-preview');
+                if (imgPreview) imgPreview.src = thumb;
+
+                const currentDna = this.captureCurrentVisualDNA();
+                const dnaSummary = document.getElementById('hub-publish-dna-summary');
+                if (dnaSummary) {
+                    const activeFxList = Object.entries(currentDna.fx)
+                        .filter(([k, v]) => v.enabled)
+                        .map(([k]) => k.toUpperCase());
+                    dnaSummary.innerHTML = `
+                        <div class="grid grid-cols-2 gap-2 text-[10px] font-mono text-zinc-400">
+                            <div>ESCENA: <span class="text-sky-300 font-bold">${currentDna.scene}</span></div>
+                            <div>CÁMARA: <span class="text-indigo-300 font-bold">${currentDna.camera.mode} (${currentDna.camera.speed}x)</span></div>
+                            <div class="col-span-2">PASSES FX: <span class="text-emerald-400 font-bold">${activeFxList.length > 0 ? activeFxList.join(', ') : 'NINGUNO (NEUTRO)'}</span></div>
+                        </div>
+                    `;
+                }
+            }
+
+            async publishCurrentPreset() {
+                const nameInput = document.getElementById('hub-input-name');
+                const authorInput = document.getElementById('hub-input-author');
+                const tagsInput = document.getElementById('hub-input-tags');
+
+                const name = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : 'Visual Cosmos ' + Math.floor(Math.random() * 900 + 100);
+                const author = (authorInput && authorInput.value.trim()) ? authorInput.value.trim() : 'VJ Anónimo';
+                const tags = (tagsInput && tagsInput.value.trim()) 
+                    ? tagsInput.value.split(',').map(t => t.trim().toLowerCase()).filter(Boolean)
+                    : ['vj', 'reactivo'];
+
+                const dna = this.captureCurrentVisualDNA();
+                const id = 'preset-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7);
+
+                const presetPayload = {
+                    id: id,
+                    name: name,
+                    author: author,
+                    createdAt: new Date().toISOString(),
+                    likes: 1,
+                    views: 1,
+                    scene: dna.scene,
+                    tags: tags,
+                    thumbnail: this.capturedThumbnailData,
+                    dna: dna
+                };
+
+                // 1. Guardar siempre en local para resiliencia
+                this.localPresets.unshift(presetPayload);
+                this.saveLocalPresets();
+
+                // 2. Intentar POST al servidor Hetzner
+                let serverSynced = false;
+                try {
+                    const res = await fetch(`${this.apiEndpoint}/presets`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(presetPayload),
+                        signal: AbortSignal.timeout(4000)
+                    });
+                    if (res.ok) serverSynced = true;
+                } catch (e) {
+                    console.log('[CommunityHub] Servidor Hetzner no disponible, guardado en repositorio local.');
+                }
+
+                if (serverSynced) {
+                    if (typeof showToast === 'function') {
+                        showToast("¡Preset Publicado a la Nube!", `"${name}" ya está disponible públicamente en Hetzner Cloud.`, "success", 3500);
+                    }
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast("Preset Guardado Localmente", `"${name}" guardado. Se sincronizará con Hetzner en cuanto conectes el backend.`, "info", 3500);
+                    }
+                }
+
+                // Resetear y volver a explorar
+                if (nameInput) nameInput.value = '';
+                this.fetchCommunityPresets();
+                this.setTab('explore');
+            }
+
+            applyVisualPreset(presetId) {
+                const target = this.presets.find(p => p.id === presetId) || this.localPresets.find(p => p.id === presetId);
+                if (!target || !target.dna) {
+                    if (typeof showToast === 'function') showToast("Error al cargar", "No se encontró el ADN visual de este preset.", "error", 2500);
+                    return;
+                }
+
+                const dna = target.dna;
+
+                // 1. Conmutar Escena 3D
+                if (dna.scene && typeof switchThreeScene === 'function') {
+                    switchThreeScene(dna.scene);
+                    const sceneSelect = document.getElementById('three-scene-mode');
+                    if (sceneSelect) sceneSelect.value = dna.scene;
+                }
+
+                // 2. Aplicar Órbita y Cámara
+                if (dna.camera) {
+                    if (typeof changeCameraOrbitMode === 'function') changeCameraOrbitMode(dna.camera.mode);
+                    if (typeof changeCameraOrbitSpeed === 'function') changeCameraOrbitSpeed(dna.camera.speed);
+                    const orbitModeSelect = document.getElementById('camera-orbit-mode');
+                    if (orbitModeSelect) orbitModeSelect.value = dna.camera.mode;
+                    const orbitSpeedSelect = document.getElementById('camera-orbit-speed');
+                    if (orbitSpeedSelect) orbitSpeedSelect.value = String(dna.camera.speed);
+                }
+
+                // 3. Aplicar los 9 Passes WebGL FX
+                if (dna.fx) {
+                    const fx = dna.fx;
+                    const setPass = (chkId, rngId, cfg, fnUpdate) => {
+                        const chk = document.getElementById(chkId);
+                        const rng = document.getElementById(rngId);
+                        if (chk && cfg) chk.checked = !!cfg.enabled;
+                        if (rng && cfg && cfg.val !== undefined) rng.value = cfg.val;
+                        if (typeof fnUpdate === 'function') fnUpdate();
+                    };
+
+                    setPass('fx-bloom-enable', 'fx-bloom-strength', fx.bloom, () => {
+                        if (typeof toggleBloomPass === 'function') toggleBloomPass(fx.bloom?.enabled);
+                        if (typeof updateBloomParams === 'function') updateBloomParams();
+                    });
+
+                    setPass('fx-chroma-enable', 'fx-chroma-dist', fx.chroma, () => {
+                        if (typeof toggleChromaPass === 'function') toggleChromaPass(fx.chroma?.enabled);
+                        if (typeof updateChromaParams === 'function') updateChromaParams();
+                    });
+
+                    setPass('fx-glitch-enable', 'fx-glitch-rate', fx.glitch, () => {
+                        if (typeof toggleGlitchPass === 'function') toggleGlitchPass(fx.glitch?.enabled);
+                        if (typeof updateGlitchParams === 'function') updateGlitchParams();
+                    });
+
+                    setPass('fx-blur-enable', 'fx-blur-intensity', fx.blur, () => {
+                        if (typeof toggleRadialBlurPass === 'function') toggleRadialBlurPass(fx.blur?.enabled);
+                        if (typeof updateBlurParams === 'function') updateBlurParams();
+                    });
+
+                    setPass('fx-crt-enable', 'fx-crt-curvature', fx.crt, () => {
+                        if (typeof toggleCRTPass === 'function') toggleCRTPass(fx.crt?.enabled);
+                        if (typeof updateCRTParams === 'function') updateCRTParams();
+                    });
+
+                    const chkK = document.getElementById('fx-kaleido-enable');
+                    const selK = document.getElementById('fx-kaleido-sides');
+                    if (chkK && fx.kaleido) chkK.checked = !!fx.kaleido.enabled;
+                    if (selK && fx.kaleido) selK.value = String(fx.kaleido.sides || 8);
+                    if (typeof toggleKaleidoPass === 'function') toggleKaleidoPass(fx.kaleido?.enabled);
+
+                    setPass('fx-film-enable', 'fx-film-noise', fx.film, () => {
+                        if (typeof toggleFilmPass === 'function') toggleFilmPass(fx.film?.enabled);
+                        if (typeof updateFilmParams === 'function') updateFilmParams();
+                    });
+
+                    setPass('fx-invert-enable', 'fx-invert-val', fx.invert, () => {
+                        if (typeof toggleInvertPass === 'function') toggleInvertPass(fx.invert?.enabled);
+                        if (typeof updateInvertParams === 'function') updateInvertParams();
+                    });
+
+                    const chkP = document.getElementById('fx-pixel-enable');
+                    const selP = document.getElementById('fx-pixel-size');
+                    if (chkP && fx.pixel) chkP.checked = !!fx.pixel.enabled;
+                    if (selP && fx.pixel) selP.value = String(fx.pixel.size || 2);
+                    if (typeof togglePixelPass === 'function') togglePixelPass(fx.pixel?.enabled);
+                }
+
+                // 4. Aplicar Paleta Cromática
+                if (dna.colors && typeof aiColorsTarget !== 'undefined') {
+                    if (dna.colors.prim) aiColorsTarget.prim.set(dna.colors.prim);
+                    if (dna.colors.accent) aiColorsTarget.accent.set(dna.colors.accent);
+                    if (dna.colors.fog) aiColorsTarget.fog.set(dna.colors.fog);
+                }
+
+                // 5. Shader personalizado si aplica
+                if (dna.customShaderCode && dna.scene === 'custom_shader' && typeof applyCustomShaderCode === 'function') {
+                    applyCustomShaderCode(dna.customShaderCode);
+                }
+
+                // Actualizar hash URL para compartir en vivo
+                try {
+                    window.history.replaceState(null, '', `#preset=${target.id}`);
+                } catch (e) {}
+
+                if (typeof showToast === 'function') {
+                    showToast("⚡ ADN Visual Aplicado", `Preset "${target.name}" de ${target.author} en ejecución.`, "success", 3000);
+                }
+
+                // Registrar visualización en background
+                this.recordView(target.id);
+            }
+
+            async votePreset(presetId, btnElem) {
+                if (this.votedPresetIds.has(presetId)) {
+                    if (typeof showToast === 'function') showToast("Voto ya registrado", "Ya has votado por esta obra comunitaria.", "info", 2000);
+                    return;
+                }
+
+                this.votedPresetIds.add(presetId);
+                this.saveVotedHistory();
+
+                // Incremento optimista en UI
+                const target = this.presets.find(p => p.id === presetId);
+                if (target) target.likes = (target.likes || 0) + 1;
+                const counter = document.getElementById(`likes-count-${presetId}`);
+                if (counter && target) counter.innerText = target.likes;
+                if (btnElem) {
+                    btnElem.className = "flex items-center gap-1.5 px-2 py-1 rounded-md bg-pink-950/80 text-pink-300 border border-pink-500/40 font-bold transition";
+                }
+
+                // Llamada al backend Hetzner
+                try {
+                    await fetch(`${this.apiEndpoint}/presets/${presetId}/like`, {
+                        method: 'POST',
+                        signal: AbortSignal.timeout(3000)
+                    });
+                } catch (e) {}
+            }
+
+            async recordView(presetId) {
+                try {
+                    await fetch(`${this.apiEndpoint}/presets/${presetId}/view`, {
+                        method: 'POST',
+                        signal: AbortSignal.timeout(2000)
+                    });
+                } catch (e) {}
+            }
+
+            sharePresetLink(presetId) {
+                const url = window.location.origin + window.location.pathname + '#preset=' + presetId;
+                navigator.clipboard.writeText(url).then(() => {
+                    if (typeof showToast === 'function') showToast("Enlace Copiado", "URL del preset copiada al portapapeles. ¡Compártela!", "success", 3000);
+                }).catch(() => {
+                    prompt("Copia este enlace directo:", url);
+                });
+            }
+
+            exportPresetJson(idx) {
+                const item = this.localPresets[idx];
+                if (!item) return;
+                const blob = new Blob([JSON.stringify(item, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${item.name.replace(/[^a-z0-9_-]/gi, '_')}.mvp`;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            importPresetJson(file) {
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const parsed = JSON.parse(e.target.result);
+                        if (parsed && parsed.dna && parsed.name) {
+                            if (!parsed.id) parsed.id = 'imported-' + Date.now();
+                            this.localPresets.unshift(parsed);
+                            this.saveLocalPresets();
+                            this.renderLocalGrid();
+                            if (typeof showToast === 'function') showToast("Preset Importado", `"${parsed.name}" importado con éxito.`, "success", 2500);
+                        } else {
+                            throw new Error("Estructura de ADN no válida");
+                        }
+                    } catch (err) {
+                        if (typeof showToast === 'function') showToast("Error al importar", "El archivo no contiene un preset .mvp válido.", "error", 3000);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            deleteLocalPreset(idx) {
+                this.localPresets.splice(idx, 1);
+                this.saveLocalPresets();
+                this.renderLocalGrid();
+            }
+        }
+
+        const communityVisualHub = new CommunityVisualHub();
+
+        function openCommunityHubModal() {
+            const modal = document.getElementById('community-hub-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                communityVisualHub.fetchCommunityPresets();
+            }
+        }
+
+        function closeCommunityHubModal() {
+            const modal = document.getElementById('community-hub-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
     </script>
 
     <!-- ===================================================================== -->
@@ -24508,6 +25283,133 @@ void main() {
         </div>
     </div>
     
+    <!-- ===================================================================== -->
+    <!-- MODAL: HUB COMUNITARIO DE PRESETS CLOUD & ADN VISUAL (HETZNER / P2P) -->
+    <!-- ===================================================================== -->
+    <div id="community-hub-modal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-[115] hidden items-center justify-center p-3 sm:p-5">
+        <div class="bg-zinc-950 border border-sky-500/40 rounded-2xl max-w-4xl w-full max-h-[92vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-white/[0.08] px-5 py-3.5 bg-gradient-to-r from-sky-950/40 via-zinc-900 to-zinc-950">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-400/40 flex items-center justify-center text-sky-400 text-lg shadow-sm">
+                        🌐
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 class="text-sm font-black tracking-widest text-zinc-100 uppercase">Hub Comunitario de Visuales</h3>
+                            <div id="hub-cloud-status" class="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-zinc-900 border border-white/10 text-zinc-400 text-[10px] font-mono">
+                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-500"></span><span>CONECTANDO…</span>
+                            </div>
+                        </div>
+                        <p class="text-[10px] text-zinc-400 font-mono">Repositorio Público de Presets VJ &amp; ADN Visual Retroalimentativo (Hetzner)</p>
+                    </div>
+                </div>
+                <button onclick="closeCommunityHubModal()" class="w-8 h-8 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white border border-white/[0.08] flex items-center justify-center text-sm transition">✕</button>
+            </div>
+
+            <!-- Navigation Tabs & Search Controls -->
+            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] px-5 py-2.5 bg-zinc-900/60 text-xs">
+                <div class="flex items-center gap-1.5 font-mono">
+                    <button type="button" onclick="communityVisualHub.setTab('explore')" id="hub-tab-btn-explore" class="px-3 py-1.5 rounded-lg bg-sky-600/30 text-sky-200 border border-sky-400/40 font-bold flex items-center gap-1.5 shadow-sm">
+                        <span>🌟</span><span>Explorar Comunidad</span>
+                    </button>
+                    <button type="button" onclick="communityVisualHub.setTab('publish')" id="hub-tab-btn-publish" class="px-3 py-1.5 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white border border-white/[0.08] font-medium flex items-center gap-1.5 transition">
+                        <span>🚀</span><span>Publicar Mi Visual</span>
+                    </button>
+                    <button type="button" onclick="communityVisualHub.setTab('local')" id="hub-tab-btn-local" class="px-3 py-1.5 rounded-lg bg-zinc-900 text-zinc-400 hover:text-white border border-white/[0.08] font-medium flex items-center gap-1.5 transition">
+                        <span>💾</span><span>Mis Presets</span>
+                    </button>
+                </div>
+
+                <!-- Live Search & Sort Bar -->
+                <div class="flex items-center gap-2">
+                    <div class="relative">
+                        <input type="text" oninput="communityVisualHub.filterPresets(this.value)" placeholder="Buscar por nombre, autor o tag..." class="w-48 sm:w-64 bg-zinc-950 border border-white/[0.12] rounded-lg px-2.5 py-1 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-sky-400">
+                    </div>
+                    <div class="flex items-center gap-1 font-mono">
+                        <button type="button" onclick="communityVisualHub.setSort('top')" id="hub-sort-top" class="px-2 py-1 rounded bg-sky-950 text-sky-300 border border-sky-500/40 font-bold text-[10px]" title="Ordenar por más votados">Top ❤️</button>
+                        <button type="button" onclick="communityVisualHub.setSort('recent')" id="hub-sort-recent" class="px-2 py-1 rounded bg-zinc-900 text-zinc-400 border border-white/[0.08] text-[10px]" title="Ordenar por más recientes">Nuevos ⏱️</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Body Scrollable Area -->
+            <div class="p-5 overflow-y-auto max-h-[calc(92vh-140px)] space-y-4">
+                
+                <!-- TAB 1: EXPLORAR COMUNIDAD (GRID DE TARJETAS) -->
+                <div id="hub-tab-content-explore">
+                    <div id="hub-explore-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
+                        <!-- Las tarjetas de presets se inyectan dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- TAB 2: PUBLICAR MI VISUAL ACTUAL -->
+                <div id="hub-tab-content-publish" class="hidden space-y-4 max-w-2xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-zinc-900/60 p-4 rounded-xl border border-white/[0.08]">
+                        <!-- Live Snapshot Preview -->
+                        <div class="space-y-2">
+                            <span class="text-[10px] font-mono uppercase text-zinc-400 tracking-wider block">Miniatura del Canvas 3D</span>
+                            <div class="relative aspect-video rounded-lg overflow-hidden border border-sky-500/30 bg-black shadow-inner">
+                                <img id="hub-publish-preview" class="w-full h-full object-cover">
+                                <button onclick="communityVisualHub.preparePublishSnapshot()" class="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/80 hover:bg-black text-sky-300 border border-sky-400/40 text-[9px] font-mono transition flex items-center gap-1">
+                                    <span>📸</span><span>Re-capturar</span>
+                                </button>
+                            </div>
+                            <div id="hub-publish-dna-summary" class="p-2.5 rounded-lg bg-zinc-950 border border-white/5"></div>
+                        </div>
+
+                        <!-- Publishing Metadata Form -->
+                        <div class="space-y-3 flex flex-col justify-between">
+                            <div class="space-y-2">
+                                <div>
+                                    <label class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block mb-1">Nombre del Preset</label>
+                                    <input type="text" id="hub-input-name" placeholder="Ej: Abismo Boids 140BPM" class="w-full bg-zinc-950 border border-white/[0.12] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-sky-400 font-semibold">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block mb-1">Firma / Autor</label>
+                                    <input type="text" id="hub-input-author" placeholder="Tu pseudónimo o firma" class="w-full bg-zinc-950 border border-white/[0.12] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-sky-400 font-mono">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-mono text-zinc-400 uppercase tracking-wider block mb-1">Etiquetas (Separadas por comas)</label>
+                                    <input type="text" id="hub-input-tags" placeholder="abismo, bloom, glitch, deep" class="w-full bg-zinc-950 border border-white/[0.12] rounded-lg px-3 py-1.5 text-xs text-white placeholder-zinc-600 focus:outline-none focus:border-sky-400 font-mono">
+                                </div>
+                            </div>
+
+                            <button onclick="communityVisualHub.publishCurrentPreset()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-bold text-xs shadow-lg transition flex items-center justify-center gap-2">
+                                <span>🚀</span>
+                                <span>Publicar a la Comunidad Hetzner</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: MIS PRESETS LOCALES & EXPORTACIÓN -->
+                <div id="hub-tab-content-local" class="hidden space-y-4">
+                    <div class="flex items-center justify-between border-b border-white/[0.06] pb-3 text-xs">
+                        <span class="text-zinc-400 font-mono">Presets guardados en la memoria de este navegador:</span>
+                        <div class="flex items-center gap-2">
+                            <label class="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-sky-300 border border-sky-500/30 cursor-pointer font-bold text-xs flex items-center gap-1.5 transition">
+                                <span>📤</span><span>Importar Archivo .mvp</span>
+                                <input type="file" accept=".mvp,.json" class="hidden" onchange="communityVisualHub.importPresetJson(this.files[0])">
+                            </label>
+                        </div>
+                    </div>
+                    <div id="hub-local-grid" class="space-y-2"></div>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="border-t border-white/[0.08] px-5 py-3 flex items-center justify-between text-[11px] font-mono text-zinc-400 bg-zinc-950">
+                <span>MotorVisuales Visual DNA Hub • Sincronización P2P &amp; Hetzner Cloud API</span>
+                <button onclick="closeCommunityHubModal()" class="px-4 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-200 font-bold border border-white/10 transition">
+                    Cerrar Hub
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Master Toast Notification Layer -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-[110] flex flex-col gap-2 pointer-events-none max-w-sm"></div>
 </body>
