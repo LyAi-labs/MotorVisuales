@@ -296,6 +296,7 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Deck Táctico Modular (~55dvh):** `#mobile-tactical-deck` (`flex-grow: 1`) con contención de scroll interno para los paneles modulares (`Audio`, `Stems`, `Mundos`, `FX`, `GLSL`, `Más`) y barra táctica fija de 54px en la base.
   - **Inputs de Audio en Cabecera:** Pistas Master de Referencia y Matriz Patchbay situadas en el primer orden visual dentro del panel de audio móvil, seguidas de Fader Master, Balance L/R y Preamp.
   - **Aislamiento DOM y Limpieza de Alturas:** `#left-dock-column` y `#three-viewport-resizer` ocultos en móvil; `syncResponsiveLayout()` oculta racks pesados de escritorio (`tier2Studios`, `tier2Subgrid`) y limpia `container.style.height` inline para que rijan las reglas `35dvh`; la restauración de altura personalizada queda restringida a `>= 1024px`.
+  - **Validación Visual y Corrección de Anidamiento DOM (L-044):** Auditoría automatizada con Chrome DevTools Protocol en 390×844 px y 412×915 px ([scripts/mobile_visual_audit.js](file:///c:/MotorVisuales/scripts/mobile_visual_audit.js)), corrección de tag `</div>` espurio en línea 2498 que exponía a `#tier2-subgrid` a la regla flex de `#v4-view-live-runner > div.grid`, confirmación empírica de 100dvh Zero-Scroll (`scrollY = 0`), expansión del deck táctico a ~55dvh y verificación completa de las 6 pestañas tácticas y modales bottom sheets.
 
 ## Próximas Ideas / Pendientes
 - [ ] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).
