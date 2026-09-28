@@ -24,3 +24,6 @@ data/
 *.db
 *.db-wal
 *.db-shm
+
+# Capturas de test locales
+test-screenshots/
