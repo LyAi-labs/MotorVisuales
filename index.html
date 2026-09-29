@@ -7041,6 +7041,7 @@
                 this.stateTimer = 0.0;
                 this.lastDropTime = -10.0;
                 this.dropCount = 0;
+                this._justTriggeredDrop = false;
                 
                 // Morfogénesis de la Nebulosa (5 Arquetipos)
                 // 0: Esfera Cuántica | 1: Galaxia Espiral | 2: Toroide Vórtice | 3: Cimática 3D | 4: Hélice ADN
@@ -7086,6 +7087,7 @@
 
             update(dt, metrics, stems) {
                 if (!this.enabled) return;
+                this._justTriggeredDrop = false;
 
                 const rms = metrics.rms || 0;
                 const flux = metrics.spectralFlux || 0;
@@ -7190,6 +7192,7 @@
                 this.shockwavePower = 1.0;
                 this.tensionLevel = 0.0;
                 this.silenceTimer = 0.0;
+                this._justTriggeredDrop = true;
 
                 // 1. Destello fotográfico de impacto (Flash analógico blanco)
                 triggerVisualFlash();
@@ -7210,6 +7213,10 @@
                 if (this.autoVJEnabled && this.vjSceneTimer >= this.vjSceneMinDuration) {
                     this.advanceAutoVJScene();
                 }
+            }
+
+            isDrop() {
+                return !!this._justTriggeredDrop || (this.state === 'DROP_EXPLOSION' && this.stateTimer < 0.05);
             }
 
             advanceMorphShape() {
@@ -7352,6 +7359,7 @@
             if (!audioNarrativeDirector) {
                 audioNarrativeDirector = new AudioNarrativeDirector();
             }
+            window.narrativeDirector = audioNarrativeDirector;
         }
 
         function toggleAutoVJ() {
@@ -15157,7 +15165,7 @@ Respond ONLY with valid JSON with:
                 const sHighmid = stemsData['highmid']?.value || 0;
                 const sTreble = stemsData['treble']?.value || 0;
 
-                const isDrop = narrativeDirector ? narrativeDirector.isDrop() : false;
+                const isDrop = (narrativeDirector && typeof narrativeDirector.isDrop === 'function') ? narrativeDirector.isDrop() : false;
                 const shockwave = narrativeDirector ? narrativeDirector.shockwavePower : 0.0;
                 const tension = narrativeDirector ? narrativeDirector.tensionLevel : 0.0;
 
@@ -17198,7 +17206,8 @@ Respond ONLY with valid JSON with:
 
                         this.frames.push(frame);
 
-                        if (typeof narrativeDirector !== 'undefined' && narrativeDirector && narrativeDirector.isDrop()) {
+                        const dir = (typeof audioNarrativeDirector !== 'undefined' && audioNarrativeDirector) || (typeof narrativeDirector !== 'undefined' && narrativeDirector);
+                        if (dir && typeof dir.isDrop === 'function' && dir.isDrop()) {
                             this.events.push({ time: tSec, type: 'DROP', label: 'Drop Explosivo' });
                         }
 

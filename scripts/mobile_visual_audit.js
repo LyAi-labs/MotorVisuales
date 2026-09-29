@@ -9,7 +9,7 @@ const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
 const TARGET_URL = 'http://localhost:8088';
 const DEBUG_PORT = 9231;
 const SCREENSHOT_DIR = path.join(__dirname, '..', 'test-screenshots');
-const ARTIFACT_DIR = 'C:\\Users\\Glado\\.gemini\\antigravity\\brain\\a3d38602-266f-45f1-a314-d1b3c2fa035d';
+const ARTIFACT_DIR = process.env.ARTIFACT_DIR || 'C:\\Users\\Glado\\.gemini\\antigravity\\brain\\72a067f4-6128-4386-acb0-7ed5239ed05e';
 
 if (!fs.existsSync(SCREENSHOT_DIR)) {
     fs.mkdirSync(SCREENSHOT_DIR, { recursive: true });
