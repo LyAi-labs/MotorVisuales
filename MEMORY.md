@@ -23,9 +23,11 @@
 - Google Gemini API (`gemini-2.5-flash`)
 
 ### Módulos Principales
-1. **Matriz de Ingesta Master & Patchbay (Hardware Rack):**
-   - 3 Pistas Master de Referencia (`CH-01 // MORDAZA`, `CH-02 // TONTOS ÚTILES`, `CH-03 // SECTION 63 - YouTube Direct`) con micro-LEDs de estado `[ON AIR]` / `[STANDBY]`.
-   - Patchbay de 6 fuentes: Micrófono analógico, YouTube Direct Stream, Pestaña Loopback (`suppressLocalAudioPlayback`), Carga Local WAV/FLAC, Sintetizador DSP Procedural y Corte Mute de emergencia.
+1. **Matriz de Ingesta Master & Patchbay (Hardware Rack de 3 Secciones Colapsables, D-050):**
+   - **🎵 Pistas Master (`#btn-sec-masters`):** 3 Pistas Master de Referencia (`CH-01 // MORDAZA`, `CH-02 // TONTOS ÚTILES`, `CH-03 // SECTION 63 - YouTube Direct`) con micro-LEDs de estado `[ON AIR]` / `[STANDBY]`. **Inician plegadas por defecto** para optimizar el espacio vertical.
+   - **🔌 Fuentes / Patchbay (`#btn-sec-patchbay`):** Matriz de 7 fuentes externas (Micrófono analógico, YouTube Móvil, Pestaña Loopback `suppressLocalAudioPlayback`, Carga Local WAV/FLAC, Sintetizador DSP Procedural, Webcam/NDI y Corte Mute de emergencia). Inicia desplegada.
+   - **🎚️ Reproductor & Faders (`#btn-sec-volbal`):** Transporte, scrubber interactivo, vúmetro en vivo con ganancia Hi-Fi/boost, fader Master general, control de canales L/R y monitoreo estéreo. Inicia desplegado.
+   - **Micro-Status Bar permanente:** Integrado en la cabecera del panel junto a `FFT 2048` (`[Mordaza • 100%]`), visible siempre sin scrollbar horizontal.
 2. **DSP — Banco de 8 Stems Biquad:**
    - Sub-Graves (<60Hz), Graves (60-250Hz), Medios-Bajos (250-500Hz), Medios (500-2kHz), Medios-Altos (2k-4kHz), Presencia (4k-6kHz), Agudos (6k-10kHz), Aire (>10kHz)
    - Variables: `stemsData[id].value` (0.0 a 1.0)
@@ -304,7 +306,14 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Fallback Algorítmico Procedural Offline (Zero-Bloatware):** Funcionamiento 100% offline sin dependencias externas ni saldo de API mediante 8 plantillas analíticas en GPU (Túnel Relativista, Cristal de Bismuto PBR, Ferrofluido Rosensweig FHD, Cimática de Chladni 3D, Abismo Marino Bioluminiscente, Supernova Doppler, Malla Cuántica y Mandelbulb) con pertubación paramétrica y saneamiento sintáctico.
   - **Validación Automatizada End-to-End:** 7 pruebas deterministas ejecutadas y verificadas con Chrome DevTools Protocol en escritorio (1440x900) y móvil (390x844).
 
+- ✅ **Rediseño del Audio Deck en Rack Grid de 3 Secciones Colapsables (D-050):**
+  - **3 Botones Intuitivos en Rack Grid (`grid grid-cols-3 gap-1.5`):** `[🎵 Masters ▶]`, `[🔌 Fuentes ▼]`, `[🎚️ Faders ▼]` con nombres claros en español, micro-LEDs de estado y chevrons dinámicos.
+  - **Pistas Master Plegadas por Defecto:** Las 3 pistas de referencia (`CH 01 MORDAZA`, `CH 02 TONTOS ÚTILES`, `CH 03 SECTION 63`) inician replegadas (`hidden`) al arrancar la app, despejando la interfaz.
+  - **Micro-Status Bar en Cabecera:** Indicador de pista y volumen integrado junto a `FFT 2048` (`[Mordaza • 100%]`), visible permanentemente y eliminando cualquier scrollbar horizontal residual.
+  - **Verificación Automatizada CDP:** Suite en [scripts/audit_audio_deck.js](file:///c:/lyai-motorvisuales.site/scripts/audit_audio_deck.js) validando conmutación reactiva, reproducción sin cortes y captura visual en [test-screenshots/audio_deck_01_grid_collapsed.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_01_grid_collapsed.png) y [test-screenshots/audio_deck_02_grid_masters_expanded.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_02_grid_masters_expanded.png).
+
 ## Próximas Ideas / Pendientes
+- [x] Rediseño del Audio Deck en 3 secciones con Pistas Master plegadas por defecto (D-050).
 - [x] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).
 - [ ] Control de iluminación DMX / ArtNet vía WebSockets para sincronizar luces de escenario con MotorVisuales.
 - [ ] Soporte para modelos 3D GLTF/GLB importables por el usuario dentro de los Universos Escénicos.

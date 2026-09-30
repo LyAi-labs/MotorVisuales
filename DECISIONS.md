@@ -1192,6 +1192,34 @@
   - ✅ Cero dependencias externas y funcionamiento autónomo offline garantizado.
   - ✅ Total paridad de funciones y diseño responsive verificado en escritorio (1440x900) y móviles (390x844).
 
+---
+
+### D-050 — Rediseño del Audio Deck en Rack Grid de 3 Secciones Colapsables: Pistas Master Plegadas por Defecto, Matriz de Fuentes y Faders
+- **Fecha:** 2026-09-30
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. El rack de Ingesta de Audio (`#sec-audio-bar`) contaba previamente con dos botones de menú (`Input` y `Vol/Bal`, D-025), cuya nomenclatura resultaba críptica y poco intuitiva sobre los componentes que desplegaba cada uno.
+  2. Además, las tres Pistas Master de Referencia (`CH 01 MORDAZA`, `CH 02 TONTOS ÚTILES`, `CH 03 SECTION 63`) estaban agrupadas dentro de la misma sección que las 7 fuentes del Patchbay externo, consumiendo espacio vertical constante.
+  3. El usuario solicitó un diseño más intuitivo y auto-descriptivo, y que las piezas master de referencia inicien **plegadas por defecto** en su propio botón de menú independiente.
+- **Decisión:**
+  1. **Estructura en Grid Simétrica de 3 Columnas (`grid grid-cols-3 gap-1.5`):**
+     - **Botón 1 — `[🎵 Masters ▶]` (`#btn-sec-masters`):** Conmuta `#deck-sec-masters-content`. Inicia **plegado (`hidden`) por defecto** con LED en reposo (`bg-zinc-600`) y chevron `▶`. Contiene exclusivamente las 3 Pistas Master de Referencia.
+     - **Botón 2 — `[🔌 Fuentes ▼]` (`#btn-sec-patchbay`):** Conmuta `#deck-sec-patchbay-content`. Inicia **desplegado** con LED activo (`bg-cyan-400`) y chevron `▼`. Contiene la matriz de ingesta externa de 7 fuentes (Micrófono, YouTube Móvil, Loopback Pestaña, Archivo Local, Synth Beat, Webcam/NDI y Mute).
+     - **Botón 3 — `[🎚️ Faders ▼]` (`#btn-sec-volbal`):** Conmuta `#track-player-controls`. Inicia **desplegado** con LED activo y chevron `▼`. Contiene el transporte, scrubber temporal, VU meter live preamp, fader master general, canales L/R y monitoreo estéreo.
+  2. **Reubicación Ergonómica del Micro-Status Bar:**
+     - El indicador compacto de pista y volumen (`#compact-deck-track` y `#compact-deck-vol`) se integró en la cabecera superior del panel junto a la insignia `FFT 2048`.
+     - Esto elimina el desbordamiento horizontal y suprime cualquier scrollbar en la botonera (`overflow-x: hidden`), manteniendo visibilidad continua del estado de reproducción en todo momento.
+  3. **Controlador `toggleAudioDeckSection`:**
+     - Soporta conmutación reactiva independiente para `'masters'`, `'patchbay'` y `'faders'` (con retrocompatibilidad para invocaciones legacy `'input'` y `'volbal'`).
+     - Sincroniza dinámicamente los chevrons (`▼` vs `▶`), LEDs de estado y micro-status de audio.
+- **Consecuencias:**
+  - ✅ Interfaz significativamente más limpia, compacta y profesional al arrancar la aplicación.
+  - ✅ Simetría arquitectónica visual absoluta de 3 columnas (botones de menú perfectamente alineados con las tarjetas de los 3 canales master).
+  - ✅ Pistas Master de referencia aisladas y plegadas por defecto, desplegables con un solo clic.
+  - ✅ Cero scroll horizontal residual en la barra de secciones.
+  - ✅ Verificación empírica completa al 100% mediante suite CDP automatizada (`scripts/audit_audio_deck.js`).
+
+
 
 
 
