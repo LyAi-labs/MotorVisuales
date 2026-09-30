@@ -555,6 +555,17 @@
                             <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-200">Ingesta & Osciloscopio</h2>
                         </div>
                         <div class="flex items-center gap-1.5">
+                            <!-- Conmutador de Diseño: Rack Clásico vs Bento Butter.video -->
+                            <div class="flex items-center bg-black/70 p-0.5 rounded-lg border border-white/[0.08] text-[10px] font-mono">
+                                <button id="btn-mode-rack" onclick="setAudioDeckDisplayMode('rack')" class="px-2 py-0.5 rounded text-[10px] font-bold transition flex items-center gap-1 bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow-sm" title="Vista Rack Modular Clásica con Rail Lateral">
+                                    <span>🎚️</span><span>Rack</span>
+                                </button>
+                                <button id="btn-mode-bento" onclick="setAudioDeckDisplayMode('bento')" class="px-2 py-0.5 rounded text-[10px] font-medium transition flex items-center gap-1 text-zinc-400 hover:text-white" title="Vista Bento Grid inspirada en Butter.video y shadcn UI">
+                                    <span>🍱</span><span>Bento</span>
+                                    <span class="text-[8px] bg-purple-950/80 text-purple-300 px-1 py-0.2 rounded border border-purple-500/30 font-sans hidden xs:inline">Butter</span>
+                                </button>
+                            </div>
+
                             <!-- Micro-Status Bar permanente -->
                             <div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/60 border border-white/[0.05] text-[10px] font-mono text-zinc-400" title="Pista activa y volumen master">
                                 <span id="compact-deck-track" class="truncate max-w-[80px] sm:max-w-[110px] text-zinc-200 font-bold">Mordaza</span>
@@ -587,8 +598,10 @@
                         }
                     </style>
 
-                    <!-- WORKSTATION DE AUDIO: BANNER DE MENÚS A LA IZQUIERDA + CONTENIDO DESPLEGABLE A LA DERECHA -->
-                    <div class="flex flex-row gap-2 sm:gap-2.5 items-start">
+                    <!-- CONTENEDOR VISTA 1: RACK MODULAR TÁCTICO CON BANNER LATERAL IZQUIERDO -->
+                    <div id="view-mode-rack" class="space-y-2">
+                        <!-- WORKSTATION DE AUDIO: BANNER DE MENÚS A LA IZQUIERDA + CONTENIDO DESPLEGABLE A LA DERECHA -->
+                        <div class="flex flex-row gap-2 sm:gap-2.5 items-start">
                         <!-- BANNER LATERAL DE MENÚS (LEFT RAIL) -->
                         <div class="w-20 xs:w-24 sm:w-28 shrink-0 flex flex-col gap-1.5 p-1 bg-zinc-950/95 rounded-xl border border-white/[0.08] select-none justify-start relative shadow-md">
                             <div class="text-[8px] font-mono text-zinc-500 uppercase tracking-wider px-1 text-center border-b border-white/[0.06] pb-1 mb-0.5 font-bold">
@@ -909,7 +922,391 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
+
+                <!-- CONTENEDOR VISTA 2: BENTO GRID STUDIO (Inspirado en Butter.video y shadcn UI bento-grid.tsx) -->
+                <div id="view-mode-bento" class="hidden space-y-3">
+                    <div class="grid grid-cols-1 gap-3">
+                        
+                        <!-- BENTO CARD 1: PISTAS MASTER HQ -->
+                        <div class="group relative p-3 sm:p-3.5 rounded-2xl overflow-hidden transition-all duration-300 border border-white/[0.08] hover:border-purple-500/40 bg-[#0b0c14]/90 hover:shadow-[0_4px_24px_rgba(0,0,0,0.6)] hover:-translate-y-0.5 will-change-transform flex flex-col justify-between">
+                            <!-- Radial Dot Matrix Texture en Hover -->
+                            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(192,132,252,0.12)_1px,transparent_1px)] bg-[length:6px_6px]"></div>
+                            </div>
+                            
+                            <div class="relative z-10 space-y-2.5">
+                                <!-- Header Card -->
+                                <div class="flex items-center justify-between">
+                                    <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-purple-950/60 border border-purple-500/30 text-purple-300 group-hover:bg-purple-900/80 transition-colors shadow-sm">
+                                        <span class="text-sm">🎵</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-purple-950/60 border border-purple-500/30 text-purple-300 group-hover:bg-purple-900/80 backdrop-blur-sm transition-colors flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+                                        <span>3 Master Tracks</span>
+                                    </span>
+                                </div>
+
+                                <!-- Title & Description -->
+                                <div class="space-y-0.5">
+                                    <div class="flex items-baseline gap-1.5">
+                                        <h3 class="font-bold text-[13px] text-zinc-100 tracking-tight group-hover:text-purple-200 transition-colors">Pistas Master HQ</h3>
+                                        <span class="text-[10px] font-mono text-zinc-500">Lossless PCM</span>
+                                    </div>
+                                    <p class="text-[11px] text-zinc-400 leading-tight">Pistas curadas de estudio con rango dinámico completo para análisis DSP y visuales.</p>
+                                </div>
+
+                                <!-- Interactive Channels Grid -->
+                                <div class="grid grid-cols-1 gap-1.5 pt-1">
+                                    <!-- Track 1: Mordaza -->
+                                    <button onclick="playPresetTrack('tema.mp3', 'Mordaza', this)" id="btn-bento-track-mordaza" class="preset-track-btn w-full p-2 rounded-xl bg-zinc-900/80 hover:bg-purple-950/40 border border-zinc-800/80 hover:border-purple-500/50 active:scale-[0.98] text-left transition flex items-center justify-between group/trk" data-track="mordaza">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="text-[9px] font-mono font-bold text-purple-400 bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/30 shrink-0">CH 01</span>
+                                            <div class="truncate">
+                                                <div class="text-[11px] font-bold text-zinc-200 group-hover/trk:text-white truncate">MORDAZA</div>
+                                                <div class="text-[8px] font-mono text-zinc-500">Master PCM • 3:18</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            <span class="preset-led flex items-center gap-1 text-[7px] font-mono text-zinc-500">
+                                                <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
+                                                <span class="preset-tag">STANDBY</span>
+                                            </span>
+                                        </div>
+                                    </button>
+
+                                    <!-- Track 2: Tontos Útiles -->
+                                    <button onclick="playPresetTrack('tontos-utiles.mp3', 'Tontos Útiles', this)" id="btn-bento-track-tontos" class="preset-track-btn w-full p-2 rounded-xl bg-zinc-900/80 hover:bg-purple-950/40 border border-zinc-800/80 hover:border-purple-500/50 active:scale-[0.98] text-left transition flex items-center justify-between group/trk" data-track="tontos">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="text-[9px] font-mono font-bold text-purple-400 bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/30 shrink-0">CH 02</span>
+                                            <div class="truncate">
+                                                <div class="text-[11px] font-bold text-zinc-200 group-hover/trk:text-white truncate">TONTOS ÚTILES</div>
+                                                <div class="text-[8px] font-mono text-zinc-500">Dynamic Mix • 2:45</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            <span class="preset-led flex items-center gap-1 text-[7px] font-mono text-zinc-500">
+                                                <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
+                                                <span class="preset-tag">STANDBY</span>
+                                            </span>
+                                        </div>
+                                    </button>
+
+                                    <!-- Track 3: Section 63 -->
+                                    <button onclick="playPresetTrack('section-63.mp3', 'Section 63 (YouTube)', this)" id="btn-bento-track-section63" class="preset-track-btn w-full p-2 rounded-xl bg-zinc-900/80 hover:bg-purple-950/40 border border-zinc-800/80 hover:border-purple-500/50 active:scale-[0.98] text-left transition flex items-center justify-between group/trk" data-track="section63">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="text-[9px] font-mono font-bold text-purple-400 bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/30 shrink-0">CH 03</span>
+                                            <div class="truncate">
+                                                <div class="text-[11px] font-bold text-zinc-200 group-hover/trk:text-white truncate">SECTION 63</div>
+                                                <div class="text-[8px] font-mono text-zinc-500">YouTube Feed • 3:30</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            <span class="preset-led flex items-center gap-1 text-[7px] font-mono text-zinc-500">
+                                                <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
+                                                <span class="preset-tag">STANDBY</span>
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Footer Card: Tags & Explore CTA -->
+                            <div class="relative z-10 flex items-center justify-between pt-2 mt-2 border-t border-white/[0.05] text-[9px] font-mono text-zinc-500">
+                                <div class="flex items-center gap-1">
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.04]">#PCM-48k</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.04]">#DynamicMix</span>
+                                </div>
+                                <span class="text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                                    <span>Seleccionar</span><span>→</span>
+                                </span>
+                            </div>
+
+                            <!-- Gradient Border Glow 1px -->
+                            <div class="absolute inset-0 -z-10 rounded-2xl p-px bg-gradient-to-br from-transparent via-purple-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                        </div>
+
+                        <!-- BENTO CARD 2: MATRIZ DE INGESTA I/O -->
+                        <div class="group relative p-3 sm:p-3.5 rounded-2xl overflow-hidden transition-all duration-300 border border-white/[0.08] hover:border-cyan-500/40 bg-[#0b0c14]/90 hover:shadow-[0_4px_24px_rgba(0,0,0,0.6)] hover:-translate-y-0.5 will-change-transform flex flex-col justify-between">
+                            <!-- Radial Dot Matrix Texture en Hover -->
+                            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.12)_1px,transparent_1px)] bg-[length:6px_6px]"></div>
+                            </div>
+
+                            <div class="relative z-10 space-y-2.5">
+                                <!-- Header Card -->
+                                <div class="flex items-center justify-between">
+                                    <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 group-hover:bg-cyan-900/80 transition-colors shadow-sm">
+                                        <span class="text-sm">🔌</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 group-hover:bg-cyan-900/80 backdrop-blur-sm transition-colors flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                                        <span>7 Ingest Ports</span>
+                                    </span>
+                                </div>
+
+                                <!-- Title & Description -->
+                                <div class="space-y-0.5">
+                                    <div class="flex items-baseline gap-1.5">
+                                        <h3 class="font-bold text-[13px] text-zinc-100 tracking-tight group-hover:text-cyan-200 transition-colors">Matriz de Ingesta</h3>
+                                        <span class="text-[10px] font-mono text-zinc-500">I/O Patchbay</span>
+                                    </div>
+                                    <p class="text-[11px] text-zinc-400 leading-tight">Puertos directos analógicos y digitales sin latencia para capturar audio y video.</p>
+                                </div>
+
+                                <!-- Interactive 7 I/O Buttons Grid -->
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 pt-1">
+                                    <button onclick="startMicrophone()" class="py-1.5 px-2 bg-zinc-900/80 hover:bg-cyan-950/40 text-zinc-300 hover:text-white rounded-xl border border-white/[0.06] hover:border-cyan-500/40 flex items-center justify-between text-left transition group/b">
+                                        <span class="text-[9px] font-mono text-cyan-400 font-bold">[MIC]</span>
+                                        <span class="text-[10px] font-sans truncate">Micrófono</span>
+                                        <span class="text-[7px] text-zinc-500 font-mono">ANALOG</span>
+                                    </button>
+                                    <div class="flex gap-1">
+                                        <button onclick="selectYouTubeMobileSource(); triggerHaptic(15);" class="flex-grow py-1.5 px-1.5 bg-zinc-900/80 hover:bg-red-950/40 text-red-300 hover:text-white rounded-xl border border-red-500/30 flex items-center justify-between transition" title="YouTube Feed">
+                                            <span class="text-[9px] font-mono text-red-400 font-bold">[YT]</span>
+                                            <span class="text-[10px] font-sans truncate">YouTube</span>
+                                            <span class="text-[7px] text-red-400/80 font-mono">ING</span>
+                                        </button>
+                                        <button onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-6 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-xl border border-white/[0.08] flex items-center justify-center text-[10px] transition" title="Asistente YouTube">⚙️</button>
+                                    </div>
+                                    <button onclick="startTabCapture()" class="py-1.5 px-2 bg-zinc-900/80 hover:bg-cyan-950/40 text-zinc-300 hover:text-white rounded-xl border border-white/[0.06] hover:border-cyan-500/40 flex items-center justify-between text-left transition">
+                                        <span class="text-[9px] font-mono text-cyan-400 font-bold">[SYS]</span>
+                                        <span class="text-[10px] font-sans truncate">Pestaña</span>
+                                        <span class="text-[7px] text-zinc-500 font-mono">LOOP</span>
+                                    </button>
+                                    <label class="py-1.5 px-2 bg-zinc-900/80 hover:bg-cyan-950/40 text-zinc-300 hover:text-white rounded-xl border border-white/[0.06] hover:border-cyan-500/40 flex items-center justify-between cursor-pointer transition">
+                                        <span class="text-[9px] font-mono text-cyan-400 font-bold">[FILE]</span>
+                                        <span class="text-[10px] font-sans truncate">Cargar</span>
+                                        <span class="text-[7px] text-zinc-500 font-mono">LOCAL</span>
+                                        <input type="file" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
+                                    </label>
+                                    <button onclick="toggleSynthDemo()" class="py-1.5 px-2 bg-zinc-900/80 hover:bg-amber-950/40 text-amber-300 hover:text-white rounded-xl border border-white/[0.06] hover:border-amber-500/40 flex items-center justify-between text-left transition">
+                                        <span class="text-[9px] font-mono text-amber-400 font-bold">[SYN]</span>
+                                        <span class="text-[10px] font-sans truncate">Sintetizador</span>
+                                        <span class="text-[7px] text-amber-500/80 font-mono">PROC</span>
+                                    </button>
+                                    <div class="flex gap-1">
+                                        <button onclick="toggleLiveVideo()" class="flex-grow py-1.5 px-1.5 bg-zinc-900/80 hover:bg-cyan-950/40 text-cyan-300 hover:text-white rounded-xl border border-white/[0.06] hover:border-cyan-500/40 flex items-center justify-between transition" title="Webcam / NDI">
+                                            <span class="text-[9px] font-mono text-cyan-400 font-bold">[CAM]</span>
+                                            <span class="text-[10px] font-sans truncate">Cámara</span>
+                                            <span class="text-[7px] text-zinc-500 font-mono">NDI</span>
+                                        </button>
+                                        <button onclick="openVideoIngestModal()" class="w-6 py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-xl border border-white/[0.08] flex items-center justify-center text-[10px] transition" title="Configuración de video">⚙️</button>
+                                    </div>
+                                    <button onclick="stopAudio()" class="col-span-2 sm:col-span-3 py-1.5 px-2 bg-zinc-900/80 hover:bg-rose-950/60 text-zinc-400 hover:text-rose-300 rounded-xl border border-white/[0.06] hover:border-rose-500/40 flex items-center justify-between transition">
+                                        <span class="text-[9px] font-mono text-rose-400 font-bold">[MUTE]</span>
+                                        <span class="text-[10px] font-sans font-medium text-rose-300">Detener Señal / Silencio</span>
+                                        <span class="text-[7px] text-rose-500/80 font-mono">STOP</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Footer Card -->
+                            <div class="relative z-10 flex items-center justify-between pt-2 mt-2 border-t border-white/[0.05] text-[9px] font-mono text-zinc-500">
+                                <div class="flex items-center gap-1">
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.04]">#ZeroLatency</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.04]">#WebAudio</span>
+                                </div>
+                                <span class="text-cyan-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                                    <span>Conectar</span><span>→</span>
+                                </span>
+                            </div>
+
+                            <!-- Gradient Border Glow 1px -->
+                            <div class="absolute inset-0 -z-10 rounded-2xl p-px bg-gradient-to-br from-transparent via-cyan-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                        </div>
+
+                        <!-- BENTO CARD 3: TRANSPORTE & FADERS ESTÉREO -->
+                        <div class="group relative p-3 sm:p-3.5 rounded-2xl overflow-hidden transition-all duration-300 border border-white/[0.08] hover:border-amber-500/40 bg-[#0b0c14]/90 hover:shadow-[0_4px_24px_rgba(0,0,0,0.6)] hover:-translate-y-0.5 will-change-transform flex flex-col justify-between">
+                            <!-- Radial Dot Matrix Texture en Hover -->
+                            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,158,11,0.12)_1px,transparent_1px)] bg-[length:6px_6px]"></div>
+                            </div>
+
+                            <div class="relative z-10 space-y-2.5">
+                                <!-- Header Card -->
+                                <div class="flex items-center justify-between">
+                                    <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-amber-950/60 border border-amber-500/30 text-amber-300 group-hover:bg-amber-900/80 transition-colors shadow-sm">
+                                        <span class="text-sm">🎚️</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-amber-950/60 border border-amber-500/30 text-amber-300 group-hover:bg-amber-900/80 backdrop-blur-sm transition-colors flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                        <span>Master & Faders</span>
+                                    </span>
+                                </div>
+
+                                <!-- Title & Description -->
+                                <div class="space-y-0.5">
+                                    <div class="flex items-baseline gap-1.5">
+                                        <h3 class="font-bold text-[13px] text-zinc-100 tracking-tight group-hover:text-amber-200 transition-colors">Transporte & Faders</h3>
+                                        <span class="text-[10px] font-mono text-zinc-500">Dual L/R + Boost</span>
+                                    </div>
+                                    <p class="text-[11px] text-zinc-400 leading-tight">Control cinemático de reproducción, atenuación general y balance estéreo independiente.</p>
+                                </div>
+
+                                <!-- Transport Bar -->
+                                <div class="bg-zinc-950/80 p-2 rounded-xl border border-white/[0.06] space-y-1.5">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2 truncate">
+                                            <button onclick="togglePlayPauseUserTrack()" id="bento-btn-play-pause-track" class="w-6 h-6 rounded-full bg-cyan-500 hover:bg-cyan-400 flex items-center justify-center font-bold text-black shadow transition shrink-0 text-xs">▶</button>
+                                            <div id="bento-track-title" class="font-mono text-[11px] text-cyan-300 truncate max-w-[150px]">Mordaza (tema.mp3)</div>
+                                        </div>
+                                        <label class="flex items-center gap-1 text-[9px] text-zinc-400 font-mono cursor-pointer">
+                                            <span>LOOP</span>
+                                            <input type="checkbox" id="bento-track-loop" checked onchange="toggleTrackLoop(this.checked); if(document.getElementById('track-loop')) document.getElementById('track-loop').checked = this.checked;" class="accent-cyan-400 rounded">
+                                        </label>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span id="bento-track-current-time" class="font-mono text-[9px] text-zinc-500 w-7">00:00</span>
+                                        <input type="range" id="bento-track-progress" min="0" max="100" value="0" step="0.1" oninput="seekUserTrack(this.value); if(document.getElementById('track-progress')) document.getElementById('track-progress').value = this.value;" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-800 rounded-lg">
+                                        <span id="bento-track-duration" class="font-mono text-[9px] text-zinc-500 w-7 text-right">03:18</span>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Boost & Master Fader -->
+                                <div class="space-y-1.5 pt-0.5">
+                                    <div class="flex items-center justify-between text-[9px] font-mono">
+                                        <span class="text-zinc-400">Preamp Boost:</span>
+                                        <div class="flex items-center gap-1">
+                                            <button onclick="setLiveBoost(1.0)" id="bento-btn-boost-1x" class="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-bold shadow text-[8px]">1x</button>
+                                            <button onclick="setLiveBoost(2.5)" id="bento-btn-boost-2x" class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[8px]">2.5x</button>
+                                            <button onclick="setLiveBoost(4.5)" id="bento-btn-boost-4x" class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[8px]">4.5x</button>
+                                            <button onclick="setLiveBoost(8.0)" id="bento-btn-boost-8x" class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[8px]">8x</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-between text-[9px] font-mono text-zinc-300">
+                                        <span>🔊 Volumen Master:</span>
+                                        <span id="bento-val-vol-master" class="text-cyan-400 font-bold">100%</span>
+                                    </div>
+                                    <input type="range" id="bento-slider-vol-master" min="0" max="1.5" step="0.01" value="1.0" oninput="updateMasterVolume(this.value); if(document.getElementById('slider-vol-master')) document.getElementById('slider-vol-master').value = this.value;" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-800 rounded">
+
+                                    <!-- Sliders L y R -->
+                                    <div class="grid grid-cols-2 gap-1.5 text-[8px] font-mono pt-0.5">
+                                        <div class="bg-zinc-950/60 p-1 rounded-lg border border-cyan-500/20">
+                                            <div class="flex items-center justify-between text-cyan-300">
+                                                <span>CANAL L</span>
+                                                <span id="bento-val-vol-left">100%</span>
+                                            </div>
+                                            <input type="range" id="bento-slider-vol-left" min="0" max="1.0" step="0.01" value="1.0" oninput="updateLeftVolume(this.value); if(document.getElementById('slider-vol-left')) document.getElementById('slider-vol-left').value = this.value;" class="w-full accent-cyan-400 h-1 bg-zinc-900 rounded">
+                                        </div>
+                                        <div class="bg-zinc-950/60 p-1 rounded-lg border border-pink-500/20">
+                                            <div class="flex items-center justify-between text-pink-300">
+                                                <span>CANAL R</span>
+                                                <span id="bento-val-vol-right">100%</span>
+                                            </div>
+                                            <input type="range" id="bento-slider-vol-right" min="0" max="1.0" step="0.01" value="1.0" oninput="updateRightVolume(this.value); if(document.getElementById('slider-vol-right')) document.getElementById('slider-vol-right').value = this.value;" class="w-full accent-pink-400 h-1 bg-zinc-900 rounded">
+                                        </div>
+                                    </div>
+
+                                    <!-- Botón de Monitoreo -->
+                                    <div class="flex items-center justify-between pt-1">
+                                        <button onclick="toggleAudioMonitoring()" id="bento-btn-toggle-monitor" class="py-1 px-2 rounded-lg border border-emerald-500/40 bg-emerald-950/30 text-zinc-300 hover:text-white flex items-center justify-between gap-1 transition text-[9px] font-mono w-full">
+                                            <span>🎧 Monitoreo Auriculares:</span>
+                                            <span id="bento-txt-monitor-state" class="text-emerald-400 font-bold">ACTIVO</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer Card -->
+                            <div class="relative z-10 flex items-center justify-between pt-2 mt-2 border-t border-white/[0.05] text-[9px] font-mono text-zinc-500">
+                                <div class="flex items-center gap-1">
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.04]">#DualGain</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.04]">#StereoSplit</span>
+                                </div>
+                                <span class="text-amber-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                                    <span>Mezcla</span><span>→</span>
+                                </span>
+                            </div>
+
+                            <!-- Gradient Border Glow 1px -->
+                            <div class="absolute inset-0 -z-10 rounded-2xl p-px bg-gradient-to-br from-transparent via-amber-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                        </div>
+
+                        <!-- BENTO CARD 4: OSCILOSCOPIO PCM & TELEMETRÍA ESPECTRAL -->
+                        <div class="group relative p-3 sm:p-3.5 rounded-2xl overflow-hidden transition-all duration-300 border border-white/[0.08] hover:border-emerald-500/40 bg-[#0b0c14]/90 hover:shadow-[0_4px_24px_rgba(0,0,0,0.6)] hover:-translate-y-0.5 will-change-transform flex flex-col justify-between">
+                            <!-- Radial Dot Matrix Texture en Hover -->
+                            <div class="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                                <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.12)_1px,transparent_1px)] bg-[length:6px_6px]"></div>
+                            </div>
+
+                            <div class="relative z-10 space-y-2.5">
+                                <!-- Header Card -->
+                                <div class="flex items-center justify-between">
+                                    <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 group-hover:bg-emerald-900/80 transition-colors shadow-sm">
+                                        <span class="text-sm">⚡</span>
+                                    </div>
+                                    <span class="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 group-hover:bg-emerald-900/80 backdrop-blur-sm transition-colors flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                                        <span>60 FPS Locked</span>
+                                    </span>
+                                </div>
+
+                                <!-- Title & Description -->
+                                <div class="space-y-0.5">
+                                    <div class="flex items-baseline gap-1.5">
+                                        <h3 class="font-bold text-[13px] text-zinc-100 tracking-tight group-hover:text-emerald-200 transition-colors">Osciloscopio & Telemetría</h3>
+                                        <span class="text-[10px] font-mono text-zinc-500">FFT 2048</span>
+                                    </div>
+                                    <p class="text-[11px] text-zinc-400 leading-tight">Oscilograma de dominio temporal PCM y extracción analítica de descriptores acústicos.</p>
+                                </div>
+
+                                <!-- Oscilloscope Canvas -->
+                                <div class="relative w-full h-14 bg-black/70 rounded-xl overflow-hidden border border-white/[0.08] shadow-inner">
+                                    <canvas id="bentoWaveCanvas" class="w-full h-full block"></canvas>
+                                    <div class="absolute top-1 right-2 text-[8px] font-mono text-cyan-400/80 uppercase tracking-widest pointer-events-none">
+                                        PCM SCOPE
+                                    </div>
+                                </div>
+
+                                <!-- Telemetry Chips Grid -->
+                                <div class="grid grid-cols-3 sm:grid-cols-6 gap-1 text-center font-mono">
+                                    <div class="bg-zinc-950/80 p-1 rounded-lg border border-white/[0.05]">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">RMS</span>
+                                        <span id="bento-tele-rms" class="text-cyan-400 font-bold text-[10px]">0.00</span>
+                                    </div>
+                                    <div class="bg-zinc-950/80 p-1 rounded-lg border border-white/[0.05]">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">Centroide</span>
+                                        <span id="bento-tele-centroid" class="text-amber-400 font-bold text-[10px]">0 Hz</span>
+                                    </div>
+                                    <div class="bg-zinc-950/80 p-1 rounded-lg border border-white/[0.05]">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">Flux</span>
+                                        <span id="bento-tele-flux" class="text-pink-400 font-bold text-[10px]">0.00</span>
+                                    </div>
+                                    <div class="bg-zinc-950/80 p-1 rounded-lg border border-white/[0.05]">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">ZCR</span>
+                                        <span id="bento-tele-zcr" class="text-emerald-400 font-bold text-[10px]">0</span>
+                                    </div>
+                                    <div class="bg-zinc-950/80 p-1 rounded-lg border border-white/[0.05]">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">Rolloff</span>
+                                        <span id="bento-tele-rolloff" class="text-blue-400 font-bold text-[9px]">0 Hz</span>
+                                    </div>
+                                    <div class="bg-zinc-950/80 p-1 rounded-lg border border-white/[0.05] flex flex-col items-center justify-center">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">Onset</span>
+                                        <span id="bento-tele-beat-indicator" class="w-2 h-2 rounded-full bg-zinc-700 mt-0.5 transition-all"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer Card -->
+                            <div class="relative z-10 flex items-center justify-between pt-2 mt-2 border-t border-white/[0.05] text-[9px] font-mono text-zinc-500">
+                                <div class="flex items-center gap-1">
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.04]">#RealtimeDSP</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.04]">#Spectral</span>
+                                </div>
+                                <span class="text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                                    <span>DSP Activo</span><span>→</span>
+                                </span>
+                            </div>
+
+                            <!-- Gradient Border Glow 1px -->
+                            <div class="absolute inset-0 -z-10 rounded-2xl p-px bg-gradient-to-br from-transparent via-emerald-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
 
                 <!-- 2. SEPARADOR DE STEMS MULTICANAL (8-CHANNEL BIQUAD DSP RACK) -->
                 <section id="sec-stems" class="glass-panel rounded-xl p-3 sm:p-4 space-y-2.5 sm:space-y-3 shadow-xl mobile-deck-scrollable hidden lg:block">
@@ -4395,8 +4792,12 @@
             updateOutputVolumeNodes();
             const valEl = document.getElementById('val-vol-master');
             if (valEl) valEl.innerText = Math.round(currentVolumeMaster * 100) + '%';
+            const bValEl = document.getElementById('bento-val-vol-master');
+            if (bValEl) bValEl.innerText = Math.round(currentVolumeMaster * 100) + '%';
             const sldM = document.getElementById('slider-vol-master');
             if (sldM && sldM.value !== val.toString()) sldM.value = val;
+            const bSldM = document.getElementById('bento-slider-vol-master');
+            if (bSldM && bSldM.value !== val.toString()) bSldM.value = val;
             const fader = document.getElementById('volume-master-fader');
             if (fader && fader.value !== val.toString()) fader.value = parseFloat(val).toFixed(2);
             updateCompactAudioDeckStatus();
@@ -4407,8 +4808,12 @@
             updateOutputVolumeNodes();
             const valEl = document.getElementById('val-vol-left');
             if (valEl) valEl.innerText = Math.round(currentVolumeLeft * 100) + '%';
+            const bValEl = document.getElementById('bento-val-vol-left');
+            if (bValEl) bValEl.innerText = Math.round(currentVolumeLeft * 100) + '%';
             const sldL = document.getElementById('slider-vol-left');
             if (sldL && sldL.value !== val.toString()) sldL.value = val;
+            const bSldL = document.getElementById('bento-slider-vol-left');
+            if (bSldL && bSldL.value !== val.toString()) bSldL.value = val;
         }
 
         function updateRightVolume(val) {
@@ -4416,8 +4821,12 @@
             updateOutputVolumeNodes();
             const valEl = document.getElementById('val-vol-right');
             if (valEl) valEl.innerText = Math.round(currentVolumeRight * 100) + '%';
+            const bValEl = document.getElementById('bento-val-vol-right');
+            if (bValEl) bValEl.innerText = Math.round(currentVolumeRight * 100) + '%';
             const sldR = document.getElementById('slider-vol-right');
             if (sldR && sldR.value !== val.toString()) sldR.value = val;
+            const bSldR = document.getElementById('bento-slider-vol-right');
+            if (bSldR && bSldR.value !== val.toString()) bSldR.value = val;
         }
 
         function resetStereoVolume() {
@@ -4427,16 +4836,28 @@
             updateOutputVolumeNodes();
             const valM = document.getElementById('val-vol-master');
             if (valM) valM.innerText = '100%';
+            const bValM = document.getElementById('bento-val-vol-master');
+            if (bValM) bValM.innerText = '100%';
             const valL = document.getElementById('val-vol-left');
             if (valL) valL.innerText = '100%';
+            const bValL = document.getElementById('bento-val-vol-left');
+            if (bValL) bValL.innerText = '100%';
             const valR = document.getElementById('val-vol-right');
             if (valR) valR.innerText = '100%';
+            const bValR = document.getElementById('bento-val-vol-right');
+            if (bValR) bValR.innerText = '100%';
             const sldM = document.getElementById('slider-vol-master');
             const sldL = document.getElementById('slider-vol-left');
             const sldR = document.getElementById('slider-vol-right');
+            const bSldM = document.getElementById('bento-slider-vol-master');
+            const bSldL = document.getElementById('bento-slider-vol-left');
+            const bSldR = document.getElementById('bento-slider-vol-right');
             if (sldM) sldM.value = 1.0;
             if (sldL) sldL.value = 1.0;
             if (sldR) sldR.value = 1.0;
+            if (bSldM) bSldM.value = 1.0;
+            if (bSldL) bSldL.value = 1.0;
+            if (bSldR) bSldR.value = 1.0;
             if (typeof showToast === 'function') {
                 showToast("Volumen Estéreo Restaurado", "Master: 100% | L: 100% | R: 100%", "info");
             }
@@ -4450,9 +4871,16 @@
             updateOutputVolumeNodes();
             const stateEl = document.getElementById('txt-monitor-state');
             const btnMonitor = document.getElementById('btn-toggle-monitor');
+            const bStateEl = document.getElementById('bento-txt-monitor-state');
+            const bBtnMonitor = document.getElementById('bento-btn-toggle-monitor');
+
             if (stateEl) {
                 stateEl.innerText = isAudioMonitoringEnabled ? 'ACTIVO' : 'MUTE';
                 stateEl.className = isAudioMonitoringEnabled ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
+            }
+            if (bStateEl) {
+                bStateEl.innerText = isAudioMonitoringEnabled ? 'ACTIVO' : 'MUTE';
+                bStateEl.className = isAudioMonitoringEnabled ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
             }
             if (btnMonitor) {
                 if (isAudioMonitoringEnabled) {
@@ -4461,6 +4889,15 @@
                 } else {
                     btnMonitor.classList.remove('border-emerald-500/40', 'bg-emerald-950/30');
                     btnMonitor.classList.add('border-rose-500/50', 'bg-rose-950/40');
+                }
+            }
+            if (bBtnMonitor) {
+                if (isAudioMonitoringEnabled) {
+                    bBtnMonitor.classList.remove('border-rose-500/50', 'bg-rose-950/40');
+                    bBtnMonitor.classList.add('border-emerald-500/40', 'bg-emerald-950/30');
+                } else {
+                    bBtnMonitor.classList.remove('border-emerald-500/40', 'bg-emerald-950/30');
+                    bBtnMonitor.classList.add('border-rose-500/50', 'bg-rose-950/40');
                 }
             }
             if (currentSourceType === 'tab') {
@@ -4588,6 +5025,103 @@
             }
         }
 
+        // =========================================================================
+        // CONMUTADOR DE DISEÑO: RACK MODULAR TÁCTICO VS BENTO GRID (BUTTER VIDEO)
+        // =========================================================================
+        function setAudioDeckDisplayMode(mode) {
+            const rackEl = document.getElementById('view-mode-rack');
+            const bentoEl = document.getElementById('view-mode-bento');
+            const btnRack = document.getElementById('btn-mode-rack');
+            const btnBento = document.getElementById('btn-mode-bento');
+            if (!rackEl || !bentoEl) return;
+
+            if (mode === 'bento') {
+                rackEl.classList.add('hidden');
+                bentoEl.classList.remove('hidden');
+                if (btnRack) {
+                    btnRack.className = "px-2 py-0.5 rounded text-[10px] font-medium transition flex items-center gap-1 text-zinc-400 hover:text-white";
+                }
+                if (btnBento) {
+                    btnBento.className = "px-2 py-0.5 rounded text-[10px] font-bold transition flex items-center gap-1 bg-purple-950/80 text-purple-300 border border-purple-500/40 shadow-sm";
+                }
+            } else {
+                bentoEl.classList.add('hidden');
+                rackEl.classList.remove('hidden');
+                if (btnRack) {
+                    btnRack.className = "px-2 py-0.5 rounded text-[10px] font-bold transition flex items-center gap-1 bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow-sm";
+                }
+                if (btnBento) {
+                    btnBento.className = "px-2 py-0.5 rounded text-[10px] font-medium transition flex items-center gap-1 text-zinc-400 hover:text-white";
+                }
+            }
+            try {
+                localStorage.setItem('motor_audio_deck_mode', mode);
+            } catch (_) {}
+            updateCompactAudioDeckStatus();
+            syncBentoAudioDeckControls();
+        }
+
+        function syncBentoAudioDeckControls() {
+            // Título y Play/Pause
+            const bentoTitle = document.getElementById('bento-track-title');
+            if (bentoTitle && typeof currentTrackTitle !== 'undefined' && currentTrackTitle) {
+                bentoTitle.innerText = currentTrackTitle;
+            }
+            const bentoPlay = document.getElementById('bento-btn-play-pause-track');
+            if (bentoPlay) {
+                const isPlaying = (typeof isAudioRunning !== 'undefined' && isAudioRunning && typeof audioElement !== 'undefined' && audioElement && !audioElement.paused);
+                bentoPlay.innerText = isPlaying ? "⏸" : "▶";
+            }
+            // Scrubber y Tiempos
+            if (typeof audioElement !== 'undefined' && audioElement && !isNaN(audioElement.duration) && audioElement.duration > 0) {
+                const cur = audioElement.currentTime;
+                const dur = audioElement.duration;
+                const bProg = document.getElementById('bento-track-progress');
+                if (bProg) bProg.value = (cur / dur) * 100;
+                const bCur = document.getElementById('bento-track-current-time');
+                if (bCur && typeof formatTime === 'function') bCur.innerText = formatTime(cur);
+                const bDur = document.getElementById('bento-track-duration');
+                if (bDur && typeof formatTime === 'function') bDur.innerText = formatTime(dur);
+            }
+            // Faders y Volúmenes
+            if (typeof currentVolumeMaster !== 'undefined') {
+                const bValM = document.getElementById('bento-val-vol-master');
+                if (bValM) bValM.innerText = Math.round(currentVolumeMaster * 100) + '%';
+                const bSldM = document.getElementById('bento-slider-vol-master');
+                if (bSldM) bSldM.value = currentVolumeMaster;
+            }
+            if (typeof currentVolumeLeft !== 'undefined') {
+                const bValL = document.getElementById('bento-val-vol-left');
+                if (bValL) bValL.innerText = Math.round(currentVolumeLeft * 100) + '%';
+                const bSldL = document.getElementById('bento-slider-vol-left');
+                if (bSldL) bSldL.value = currentVolumeLeft;
+            }
+            if (typeof currentVolumeRight !== 'undefined') {
+                const bValR = document.getElementById('bento-val-vol-right');
+                if (bValR) bValR.innerText = Math.round(currentVolumeRight * 100) + '%';
+                const bSldR = document.getElementById('bento-slider-vol-right');
+                if (bSldR) bSldR.value = currentVolumeRight;
+            }
+            // Monitoreo
+            if (typeof isAudioMonitoringEnabled !== 'undefined') {
+                const bMonTxt = document.getElementById('bento-txt-monitor-state');
+                const bMonBtn = document.getElementById('bento-btn-toggle-monitor');
+                if (bMonTxt) {
+                    bMonTxt.innerText = isAudioMonitoringEnabled ? 'ACTIVO' : 'MUTE';
+                    bMonTxt.className = isAudioMonitoringEnabled ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
+                }
+                if (bMonBtn) {
+                    if (isAudioMonitoringEnabled) {
+                        bMonBtn.classList.remove('border-rose-500/50', 'bg-rose-950/40');
+                        bMonBtn.classList.add('border-emerald-500/40', 'bg-emerald-950/30');
+                    } else {
+                        bMonBtn.classList.remove('border-emerald-500/40', 'bg-emerald-950/30');
+                        bMonBtn.classList.add('border-rose-500/50', 'bg-rose-950/40');
+                    }
+                }
+            }
+        }
+
         function setLiveBoost(mult) {
             const gainInput = document.getElementById('input-gain');
             if (gainInput) {
@@ -4605,6 +5139,15 @@
                         b.className = "px-1.5 py-0.5 rounded bg-red-600 text-white font-bold shadow";
                     } else {
                         b.className = "px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300";
+                    }
+                }
+                const bentoId = `bento-btn-boost-${val === 1.0 ? '1x' : val === 2.5 ? '2x' : val === 4.5 ? '4x' : '8x'}`;
+                const bBento = document.getElementById(bentoId);
+                if (bBento) {
+                    if (val === mult) {
+                        bBento.className = "px-1.5 py-0.5 rounded bg-red-600 text-white font-bold shadow text-[8px]";
+                    } else {
+                        bBento.className = "px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[8px]";
                     }
                 }
             });
@@ -5003,6 +5546,25 @@
                     mVpPlay.title = isPlaying ? "Pausar pista" : "Reproducir pista";
                 }
             }
+
+            // Sincronización con Bento Grid Studio
+            const bentoTitleEl = document.getElementById('bento-track-title');
+            if (bentoTitleEl && title) {
+                bentoTitleEl.innerText = title;
+            }
+            const bentoBtnPlay = document.getElementById('bento-btn-play-pause-track');
+            if (bentoBtnPlay) {
+                if (isLive) {
+                    bentoBtnPlay.innerText = "⏹";
+                    bentoBtnPlay.className = "w-6 h-6 rounded-full bg-red-500 hover:bg-red-400 flex items-center justify-center font-bold text-white shadow transition shrink-0 text-xs";
+                    bentoBtnPlay.title = "Detener ingesta de audio en vivo";
+                } else {
+                    const isPlaying = (isAudioRunning && audioElement && !audioElement.paused);
+                    bentoBtnPlay.innerText = isPlaying ? "⏸" : "▶";
+                    bentoBtnPlay.className = "w-6 h-6 rounded-full bg-cyan-500 hover:bg-cyan-400 flex items-center justify-center font-bold text-black shadow transition shrink-0 text-xs";
+                    bentoBtnPlay.title = isPlaying ? "Pausar pista" : "Reproducir pista";
+                }
+            }
         }
 
         function selectYouTubeMobileSource() {
@@ -5020,17 +5582,28 @@
                     if (!audioElement.duration || isNaN(audioElement.duration)) return;
                     const cur = audioElement.currentTime;
                     const dur = audioElement.duration;
+                    const pct = (cur / dur) * 100;
                     const prog = document.getElementById('track-progress');
-                    if (prog) prog.value = (cur / dur) * 100;
+                    if (prog) prog.value = pct;
                     const curEl = document.getElementById('track-current-time');
                     if (curEl) curEl.innerText = formatTime(cur);
                     const durEl = document.getElementById('track-duration');
                     if (durEl) durEl.innerText = formatTime(dur);
+
+                    // Bento Grid Sync
+                    const bProg = document.getElementById('bento-track-progress');
+                    if (bProg) bProg.value = pct;
+                    const bCur = document.getElementById('bento-track-current-time');
+                    if (bCur) bCur.innerText = formatTime(cur);
+                    const bDur = document.getElementById('bento-track-duration');
+                    if (bDur) bDur.innerText = formatTime(dur);
                 });
 
                 audioElement.addEventListener('play', () => {
                     const btn = document.getElementById('btn-play-pause-track');
                     if (btn) btn.innerText = "⏸";
+                    const bBtn = document.getElementById('bento-btn-play-pause-track');
+                    if (bBtn) bBtn.innerText = "⏸";
                     if (audioCtx && audioCtx.state === 'suspended') {
                         audioCtx.resume();
                     }
@@ -5039,6 +5612,8 @@
                 audioElement.addEventListener('pause', () => {
                     const btn = document.getElementById('btn-play-pause-track');
                     if (btn) btn.innerText = "▶";
+                    const bBtn = document.getElementById('bento-btn-play-pause-track');
+                    if (bBtn) bBtn.innerText = "▶";
                 });
             }
 
@@ -5887,6 +6462,18 @@
             document.getElementById('tele-zcr').innerText = zcrCount.toString();
             document.getElementById('tele-rolloff').innerText = `${Math.round(rolloff)} Hz`;
 
+            // Telemetría Bento Grid Studio (Butter.video)
+            const bRms = document.getElementById('bento-tele-rms');
+            if (bRms) bRms.innerText = rms.toFixed(2);
+            const bCentroid = document.getElementById('bento-tele-centroid');
+            if (bCentroid) bCentroid.innerText = `${Math.round(centroid)} Hz`;
+            const bFlux = document.getElementById('bento-tele-flux');
+            if (bFlux) bFlux.innerText = flux.toFixed(2);
+            const bZcr = document.getElementById('bento-tele-zcr');
+            if (bZcr) bZcr.innerText = zcrCount.toString();
+            const bRolloff = document.getElementById('bento-tele-rolloff');
+            if (bRolloff) bRolloff.innerText = `${Math.round(rolloff)} Hz`;
+
             // Telemetría Móvil HUD & Uniforms
             const mvpRms = document.getElementById('m-vp-rms');
             if (mvpRms) mvpRms.innerText = `RMS: ${rms.toFixed(2)}`;
@@ -5920,6 +6507,11 @@
                 ind.className = "w-2.5 h-2.5 rounded-full bg-cyan-400 mt-0.5 shadow-[0_0_12px_#06b6d4] scale-125 transition-all";
                 setTimeout(() => { ind.className = "w-2.5 h-2.5 rounded-full bg-zinc-700 mt-0.5 transition-all"; }, 80);
             }
+            const bentoInd = document.getElementById('bento-tele-beat-indicator');
+            if (bentoInd) {
+                bentoInd.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 mt-0.5 shadow-[0_0_12px_#34d399] scale-125 transition-all";
+                setTimeout(() => { bentoInd.className = "w-2.5 h-2.5 rounded-full bg-zinc-700 mt-0.5 transition-all"; }, 80);
+            }
 
             const flash = document.getElementById('three-beat-flash');
             if (flash) {
@@ -5929,36 +6521,43 @@
         }
 
         function drawMiniWave() {
-            const canvas = document.getElementById('miniWaveCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width = canvas.clientWidth;
-            const h = canvas.height = canvas.clientHeight;
-            ctx.clearRect(0, 0, w, h);
-            
-            // Grid lines
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
-            ctx.stroke();
+            const canvasRack = document.getElementById('miniWaveCanvas');
+            const canvasBento = document.getElementById('bentoWaveCanvas');
 
-            // Waveform with neon cyan stroke
-            ctx.lineWidth = 1.5;
-            ctx.strokeStyle = '#06b6d4';
-            ctx.shadowColor = 'rgba(6, 182, 212, 0.6)';
-            ctx.shadowBlur = 6;
-            ctx.beginPath();
-            const slice = w / timeDataArray.length;
-            let x = 0;
-            for (let i = 0; i < timeDataArray.length; i++) {
-                const v = timeDataArray[i] / 128.0;
-                const y = (v * h) / 2;
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-                x += slice;
-            }
-            ctx.stroke();
-            ctx.shadowBlur = 0;
+            const renderWaveOnCanvas = (canvas) => {
+                if (!canvas || canvas.offsetParent === null) return;
+                const ctx = canvas.getContext('2d');
+                const w = canvas.width = canvas.clientWidth;
+                const h = canvas.height = canvas.clientHeight;
+                ctx.clearRect(0, 0, w, h);
+                
+                // Grid lines
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
+                ctx.stroke();
+
+                // Waveform with neon cyan stroke
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#06b6d4';
+                ctx.shadowColor = 'rgba(6, 182, 212, 0.6)';
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                const slice = w / timeDataArray.length;
+                let x = 0;
+                for (let i = 0; i < timeDataArray.length; i++) {
+                    const v = timeDataArray[i] / 128.0;
+                    const y = (v * h) / 2;
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                    x += slice;
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            };
+
+            if (canvasRack) renderWaveOnCanvas(canvasRack);
+            if (canvasBento) renderWaveOnCanvas(canvasBento);
         }
 
         // =========================================================================
@@ -25326,8 +25925,15 @@ void main() {
             const jitEl = document.getElementById('wgsl-jit-time');
             if (jitEl) jitEl.innerText = 'JIT: — (pulsa Inject)';
             const vramEl = document.getElementById('wgsl-vram');
-            if (vramEl) vramEl.innerText = `BUFFER: ${(RF_SIM_W * RF_SIM_H * 4 / 1024).toFixed(1)} KB (CPU, sin ping-pong GPU)`;
             checkMcpBridgeStatus();
+            try {
+                const savedDeckMode = localStorage.getItem('motor_audio_deck_mode');
+                if (savedDeckMode === 'bento') {
+                    setAudioDeckDisplayMode('bento');
+                } else {
+                    setAudioDeckDisplayMode('rack');
+                }
+            } catch (_) {}
         });
 
         // =========================================================================

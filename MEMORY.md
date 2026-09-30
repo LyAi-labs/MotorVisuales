@@ -325,7 +325,18 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Comportamiento Adaptativo Inteligente:** Con todos los paneles plegados, el osciloscopio PCM y la cuadrícula de 6 métricas ascienden y se sitúan a la par del rail de menús, reduciendo la altura a ~200px con 100% de densidad de información. Al desplegar cualquier panel, este se sitúa arriba y el osciloscopio se desliza inmediatamente debajo.
   - **Verificación Automatizada CDP:** Test 6 añadido y verificado con éxito, capturando [test-screenshots/audio_deck_06_all_collapsed_zero_gap.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_06_all_collapsed_zero_gap.png).
 
+- ✅ **Sistema de Vistas Dual para Audio Deck: Hardware Rack Modular vs Bento Grid Studio (Butter.video & shadcn UI, D-053):**
+  - **Selector de Vista Táctico en Cabecera:** Segmented control interactivo `[ 🎚️ Rack ]` vs `[ 🍱 Bento (Butter) ]` con persistencia en `localStorage.getItem('motor_audio_deck_mode')`.
+  - **Transmutación de React `bento-grid.tsx` a Vanilla JS + Tailwind CSS:** Cero librerías externas o npm bloatware. Estructura modular de 4 tarjetas Bento squircle (`rounded-2xl`) con estética azabache Butter.video (`#0b0c14`), textura radial dot-matrix en hover, bordes de 1px en gradiente perimetral, micro-elevación acelerada por GPU (`-translate-y-0.5 will-change-transform`) y badges temáticos translúcidos con micro-LEDs:
+    1. *Pistas Master HQ:* 3 pistas directas con estado `[ON AIR]` / `[STANDBY]` y tags `#PCM-48k #DynamicMix`.
+    2. *Matriz de Ingesta I/O:* 7 accesos directos de patchbay con tags `#ZeroLatency #WebAudio`.
+    3. *Transporte & Faders Estéreo:* Scrubber de transporte, loop, selector rápido de boost (`1x/2.5x/4.5x/8x`), fader Master y potenciómetros L/R con monitoreo.
+    4. *Osciloscopio PCM & Telemetría Espectral:* Canvas dedicado `#bentoWaveCanvas` y 6 métricas acústicas en vivo a 60 FPS con indicador Onset.
+  - **Sincronización Bidireccional Inmediata:** Funciones sincronizadas (`syncBentoAudioDeckControls`, `updateMasterVolume`, `setLiveBoost`, `runAudioDSP`, `drawMiniWave` condicional) garantizando paridad total y cero sobrecarga de render.
+  - **Verificación Automatizada CDP:** Test 7 integrado en [scripts/audit_audio_deck.js](file:///c:/lyai-motorvisuales.site/scripts/audit_audio_deck.js) validando conmutación, interacción con pista 2 ("Tontos Útiles") y capturas visuales en alta fidelidad en [test-screenshots/audio_deck_07_bento_butter_view.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_07_bento_butter_view.png), [test-screenshots/audio_deck_08_bento_cards_3_and_4.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_08_bento_cards_3_and_4.png) y [test-screenshots/audio_deck_09_bento_card_4_scope.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_09_bento_card_4_scope.png).
+
 ## Próximas Ideas / Pendientes
+- [x] Sistema de Vistas Dual para Audio Deck: Hardware Rack vs Bento Grid Butter.video (D-053).
 - [x] Adaptación espacial dinámica del Audio Deck sin huecos vacíos (D-052).
 - [x] Banner lateral izquierdo de menús en el Audio Deck con pertenencia visual por color y muesca conectora (D-051).
 - [x] Rediseño del Audio Deck en 3 secciones con Pistas Master plegadas por defecto (D-050).

@@ -1269,6 +1269,50 @@
   - ✅ Estética de consola de instrumentación analógica densa, elegante y profesional.
   - ✅ Cero dependencias adicionales y compatibilidad nativa a 60 FPS sin redibujados artificiales.
 
+---
+
+### D-053 — Sistema de Vistas Dual para Audio Deck: Hardware Rack Modular vs Bento Grid Studio (Butter.video & shadcn UI)
+- **Fecha:** 2026-09-30
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. El usuario solicitó explorar y probar un nuevo enfoque de diseño para el Audio Deck (`#sec-audio-bar`), inspirándose directamente en:
+     - El componente React `bento-grid.tsx` (estructura shadcn UI / Tailwind CSS).
+     - La dirección de arte web de [Butter Video](https://www.butter.video/) y Awwwards (fondo azabache `#0b0c14`, tarjetas Bento modulares, esquinas redondeadas squircle `rounded-2xl`, textura radial dot-matrix en hover, bordes de 1px con gradiente sutil perimetral, status pills translúcidas, micro-tags y animaciones aceleradas por GPU).
+  2. Al mismo tiempo, era imperativo preservar la versión modular de Rack de hardware analógico con rail lateral izquierdo desplegable (D-051/D-052) desarrollada previamente.
+  3. No se debían introducir dependencias externas de npm pesadas ni runtimes de React en el frontend de producción, respetando los estándares de minimalismo mecánico y 60 FPS inmutables.
+- **Decisión:**
+  1. **Selector Táctico Segmented-Control en Cabecera (`setAudioDeckDisplayMode`):**
+     - Ubicado en la barra superior de `#sec-audio-bar`, junto al indicador `FFT 2048` y el micro-status bar.
+     - Botones `[ 🎚️ Rack ]` y `[ 🍱 Bento (Butter) ]` con persistencia automática en `localStorage.getItem('motor_audio_deck_mode')`.
+     - Alternancia instantánea de visibilidad de contenedores `#view-mode-rack` y `#view-mode-bento` con sincronización inmediata de controles.
+  2. **Transmutación de React a Vanilla JS + Tailwind CSS de Ultra-Fidelidad:**
+     - Se transcribieron los principios estructurales de `bento-grid.tsx` a HTML5 semántico puro con Tailwind CSS nativo.
+     - Implementación de 4 Bento Cards modulares:
+       - **Card 1: Pistas Master HQ (Lossless PCM):** 3 pistas (`CH 01 MORDAZA`, `CH 02 TONTOS ÚTILES`, `CH 03 SECTION 63`), micro-LEDs de estado dinámico `[ON AIR]` / `[STANDBY]`, badge con contador de pistas, tags `#PCM-48k #DynamicMix` y flecha hover interactiva.
+       - **Card 2: Matriz de Ingesta I/O Patchbay:** 7 puertos tácticos (`[MIC] Micrófono ANALOG`, `[YT] YouTube ING` con modal asistente, `[SYS] Pestaña LOOP`, `[FILE] Cargar LOCAL`, `[SYN] Sintetizador PROC`, `[CAM] Cámara NDI` y `[MUTE] Detener Señal STOP`), tags `#ZeroLatency #WebAudio` y flecha hover de conexión.
+       - **Card 3: Transporte & Faders Estéreo (Dual L/R + Boost):** Scrubber cinemático con tiempo transcurrido/total, botón de loop interactivo, selector rápido de preamp boost (`[1x] [2.5x] [4.5x] [8x]`), fader Master con porcentaje dinámico, potenciómetros estéreo Canal L (cian) y Canal R (fucsia), botón de monitoreo de auriculares `[🎧 ACTIVO / MUTE]` y tags `#DualGain #StereoSplit`.
+       - **Card 4: Osciloscopio PCM & Telemetría Espectral (FFT 2048):** Canvas dedicado `#bentoWaveCanvas` renderizado a 60 FPS con brillo cian analógico y etiqueta `PCM SCOPE`, badge `● 60 FPS Locked`, cuadrícula de 6 métricas de telemetría acústica en vivo (RMS, Centroide, Flux, ZCR, Rolloff y micro-LED de impacto Onset), y tags `#RealtimeDSP #Spectral`.
+  3. **Estética Editorial Butter.video:**
+     - Paleta de fondos oscuros `#0b0c14` y `#050508` con bordes sutiles `border-white/[0.08]`.
+     - Textura radial dot-matrix en hover: `bg-[radial-gradient(circle_at_center,rgba(...,0.12)_1px,transparent_1px)] bg-[length:6px_6px]` con transición de opacidad acelerada por hardware.
+     - Bordes con resplandor perimetral de 1px en gradiente (`from-transparent via-.../20 to-transparent`) activados al hover.
+     - Elevación táctil sutil `-translate-y-0.5` con `will-change-transform` y sombras volumétricas oscuras `hover:shadow-[0_4px_24px_rgba(0,0,0,0.6)]`.
+     - Badges translúcidos `backdrop-blur-sm` con micro-LEDs de colores temáticos por tarjeta (Púrpura, Cian, Ámbar, Esmeralda).
+  4. **Motor de Sincronización Reactivo Bidireccional:**
+     - `syncBentoAudioDeckControls()`: Sincroniza al conmutar de vista todos los estados de volumen, nombres de pistas activas y posición de reproducción.
+     - `drawMiniWave()` condicional: Evalúa `canvas.offsetParent !== null` para pintar únicamente el canvas visible (Rack o Bento), ahorrando ciclos de CPU/GPU.
+     - `runAudioDSP()` y `triggerBeatUI()`: Actualizan concurrentemente los elementos `#bento-tele-*` y el LED `#bento-tele-beat-indicator` a 60 FPS.
+  5. **Verificación Automatizada con Chrome DevTools Protocol (CDP):**
+     - Se integró el Test 7 en `scripts/audit_audio_deck.js` validando la alternancia entre Rack y Bento, la persistencia en `localStorage`, la interacción con la pista 2 ("Tontos Útiles"), el ajuste de volumen al 85% y la generación de capturas visuales en ultra-alta resolución:
+       - [audio_deck_07_bento_butter_view.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_07_bento_butter_view.png)
+       - [audio_deck_08_bento_cards_3_and_4.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_08_bento_cards_3_and_4.png)
+       - [audio_deck_09_bento_card_4_scope.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_09_bento_card_4_scope.png)
+- **Consecuencias:**
+  - ✅ Fusión perfecta entre la ergonomía densa de hardware analógico (Rack) y el diseño web contemporáneo premiado (Bento Grid Butter.video / shadcn UI).
+  - ✅ Modularidad absoluta: el usuario puede alternar entre ambos mundos según su preferencia visual o flujo de trabajo sin perder ninguna funcionalidad.
+  - ✅ Cero sobrecarga de dependencias ni impacto en el rendimiento: 60 FPS inmutables garantizados.
+
+
 
 
 

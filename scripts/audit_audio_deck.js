@@ -119,7 +119,7 @@ async function runAudit() {
         '--no-default-browser-check',
         '--autoplay-policy=no-user-gesture-required',
         `--user-data-dir=${profileDir}`,
-        '--window-size=1440,900',
+        '--window-size=1440,1800',
         TARGET_URL
     ]);
 
@@ -407,7 +407,126 @@ async function runAudit() {
 
         console.log('✅ TEST 6 SUPERADO: Al plegar todos los paneles, el osciloscopio y la telemetría ocupan el espacio contiguo sin dejar ningún hueco vacío.');
 
-        console.log('\n🎉 TODAS LAS PRUEBAS EMPÍRICAS DEL BANNER LATERAL IZQUIERDO Y ADAPTACIÓN ESPACIAL HAN FINALIZADO CON ÉXITO.');
+        // Test 7: Conmutar a Vista Bento Grid Studio (Butter.video & shadcn UI)
+        console.log('\n--- TEST 7: Conmutar a Bento Grid Studio (Butter.video) y validar funcionalidad ---');
+        await cdp.evaluate(`setAudioDeckDisplayMode('bento')`);
+        await sleep(400);
+
+        const bentoStatus = await cdp.evaluate(`(() => {
+            const viewRack = document.getElementById('view-mode-rack');
+            const viewBento = document.getElementById('view-mode-bento');
+            const btnRack = document.getElementById('btn-mode-rack');
+            const btnBento = document.getElementById('btn-mode-bento');
+
+            const cardMasters = document.getElementById('btn-bento-track-mordaza');
+            const cardInput = document.querySelector('#view-mode-bento button[onclick*="startMicrophone"]');
+            const cardTransport = document.getElementById('bento-btn-play-pause-track');
+            const cardScope = document.getElementById('bentoWaveCanvas');
+
+            const scopeRect = cardScope ? cardScope.getBoundingClientRect() : null;
+
+            return {
+                rackHidden: viewRack.classList.contains('hidden'),
+                bentoVisible: !viewBento.classList.contains('hidden'),
+                btnBentoHasPurple: btnBento.className.includes('purple'),
+                hasAll4Cards: !!(cardMasters && cardInput && cardTransport && cardScope),
+                scopeCanvasW: scopeRect ? scopeRect.width : 0,
+                scopeCanvasH: scopeRect ? scopeRect.height : 0
+            };
+        })()`);
+
+        console.log('Resultados Test 7 (Bento Grid View):', JSON.stringify(bentoStatus, null, 2));
+        if (!bentoStatus.rackHidden) throw new Error('La vista Rack debe estar oculta en modo Bento');
+        if (!bentoStatus.bentoVisible) throw new Error('La vista Bento debe estar visible');
+        if (!bentoStatus.hasAll4Cards) throw new Error('Las 4 tarjetas Bento deben estar presentes en el DOM');
+        if (bentoStatus.scopeCanvasW <= 0 || bentoStatus.scopeCanvasH <= 0) {
+            throw new Error('El canvas de osciloscopio Bento debe tener dimensiones renderizables');
+        }
+
+        // Probar interacción en Bento: seleccionar Pista 2 (Tontos Útiles) y regular volumen
+        console.log('[CDP] Probando interacción en Bento: reproducir CH 02 y ajustar volumen...');
+        await cdp.evaluate(`document.getElementById('btn-bento-track-tontos').click()`);
+        await sleep(300);
+        await cdp.evaluate(`updateMasterVolume(0.85)`);
+        await sleep(200);
+
+        const bentoInteractStatus = await cdp.evaluate(`(() => {
+            const trackHeader = document.getElementById('compact-deck-track').innerText;
+            const volHeader = document.getElementById('compact-deck-vol').innerText;
+            const bentoTitle = document.getElementById('bento-track-title').innerText;
+            const bentoVol = document.getElementById('bento-val-vol-master').innerText;
+            return {
+                trackHeader,
+                volHeader,
+                bentoTitle,
+                bentoVol
+            };
+        })()`);
+
+        console.log('Resultados Interacción Bento:', JSON.stringify(bentoInteractStatus, null, 2));
+        if (!bentoInteractStatus.bentoTitle.includes('Tontos')) {
+            throw new Error(`El título en Bento debe ser Tontos Útiles, es: ${bentoInteractStatus.bentoTitle}`);
+        }
+        if (bentoInteractStatus.bentoVol !== '85%') {
+            throw new Error(`El volumen en Bento debe ser 85%, es: ${bentoInteractStatus.bentoVol}`);
+        }
+
+        const clipBoxBento = await cdp.evaluate(`(() => {
+            window.scrollTo(0, 0);
+            const el = document.getElementById('sec-audio-bar');
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return {
+                x: Math.max(0, r.left + window.scrollX - 10),
+                y: Math.max(0, r.top + window.scrollY - 10),
+                width: r.width + 20,
+                height: r.height + 20,
+                scale: 1
+            };
+        })()`);
+        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_07_bento_butter_view.png'), clipBoxBento);
+
+        // Capturar primer plano dedicado de Card 3 (Transporte & Faders) y Card 4 (Osciloscopio & Telemetría)
+        const clipBoxLower = await cdp.evaluate(`(() => {
+            const cardTransport = document.getElementById('bento-btn-play-pause-track') ? document.getElementById('bento-btn-play-pause-track').closest('.group') : null;
+            const scopeCard = document.getElementById('bentoWaveCanvas') ? document.getElementById('bentoWaveCanvas').closest('.group') : null;
+            if (!cardTransport || !scopeCard) return null;
+            const r1 = cardTransport.getBoundingClientRect();
+            const r2 = scopeCard.getBoundingClientRect();
+            const top = Math.min(r1.top, r2.top) + window.scrollY - 10;
+            const bottom = Math.max(r1.bottom, r2.bottom) + window.scrollY + 20;
+            const left = Math.min(r1.left, r2.left) + window.scrollX - 10;
+            const width = Math.max(r1.width, r2.width) + 20;
+            return {
+                x: Math.max(0, left),
+                y: Math.max(0, top),
+                width: width,
+                height: Math.max(100, bottom - top),
+                scale: 1
+            };
+        })()`);
+        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_08_bento_cards_3_and_4.png'), clipBoxLower);
+
+        // Captura macro dedicada de Card 4 (Osciloscopio & 6 Métricas de Telemetría)
+        const clipBoxCard4 = await cdp.evaluate(`(() => {
+            const scopeCard = document.getElementById('bentoWaveCanvas') ? document.getElementById('bentoWaveCanvas').closest('.group') : null;
+            if (!scopeCard) return null;
+            const r = scopeCard.getBoundingClientRect();
+            return {
+                x: Math.max(0, r.left + window.scrollX - 10),
+                y: Math.max(0, r.top + window.scrollY - 10),
+                width: r.width + 20,
+                height: r.height + 20,
+                scale: 1
+            };
+        })()`);
+        if (clipBoxCard4) {
+            await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_09_bento_card_4_scope.png'), clipBoxCard4);
+        }
+
+        console.log('✅ TEST 7 SUPERADO: Vista Bento Grid Studio (Butter.video) completamente funcional, interactiva y renderizada con captura generada.');
+
+        console.log('\n🎉 TODAS LAS PRUEBAS EMPÍRICAS (RACK BANNER + BENTO GRID BUTTER.VIDEO) HAN FINALIZADO CON ÉXITO ROTUNDO.');
 
     } finally {
         if (cdp) await cdp.close();
