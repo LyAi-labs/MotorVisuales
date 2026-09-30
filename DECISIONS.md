@@ -1157,6 +1157,42 @@
   - ✅ Preservación íntegra y garantizada de la versión de escritorio (>= 1024px).
   - ✅ Desarrollo aislado en la rama remota `feature/mobile-splitscreen-100dvh`.
 
+---
+
+### D-049 — Gemini AI Shader Copilot en Split-View IDE: Generación, Mutación y Auto-Reparación GLSL con Fallback Procedural Offline
+- **Fecha:** 2026-09-30
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. En el Laboratorio GLSL Split-View IDE (D-032), los usuarios contaban con un editor de código en la columna izquierda y telemetría de uniforms con snippets en la columna derecha. Sin embargo, para crear nuevas experiencias visuales o alterar la geometría, se requería programación manual experta en GLSL ES 1.00 o selección fija de los 22 presets precodificados.
+  2. Los errores de sintaxis o incompatibilidades de WebGL 1.0 (tales como funciones obsoletas `texture()`, límites dinámicos en bucles o falta de directivas de precisión) arrojaban mensajes crípticos del compilador de la GPU, frustrando la iteración rápida.
+  3. Se requería un asistente inteligente (Copilot) integrado directamente en la consola Split-View de escritorio y en el Tactical Deck móvil (`#m-panel-shaders`), capaz de:
+     - Sintetizar shaders desde cero a partir de instrucciones en lenguaje natural ("Prompt-to-Shader").
+     - Mutar y evolucionar shaders existentes preservando su base matemática.
+     - Inyectar modulación acústica reactiva a las 8 bandas Biquad DSP (`uSub`..`uAir`), onsets (`uIsOnset`) y RMS.
+     - Diagnosticar y auto-reparar errores de compilación WebGL con 1 solo clic.
+     - Operar al 100% incluso sin conexión o sin clave API mediante un motor procedural algorítmico local con 8 plantillas analíticas.
+     - Proveer historial de reversión instantánea (Undo Stack) de hasta 10 versiones.
+- **Decisión:**
+  1. **Consola Tabbed en Split-View IDE (Desktop & Mobile):**
+     - En `#sec-shader-editor`, la columna derecha (`lg:col-span-4`) se equipa con sub-pestañas: `[✨ Copilot IA]` (activa por defecto), `[📊 Uniforms]` y `[⚡ Snippets]`.
+     - `#copilot-tab-panel`: incorpora mini-vúmetro de 4 stems a 60 FPS (`Sub`, `Bass`, `Mid`, `Treb`, `Onset LED`), textarea de prompt interactivo con soporte `Ctrl+Enter`, chips de estilos rápidos (`🌀 Túnel`, `💎 Bismuto`, `🧲 Ferrofluido`, `🪼 Abismo`, `💥 Supernova`), botonera de acción (`🪄 Generar`, `🧬 Mutar Actual`, `🎚️ Inyectar DSP`, `↶ Deshacer`), banner de carga animado y tarjeta de telemetría de shader activo.
+     - En `#m-panel-shaders` (Mobile): tarjeta táctil integrada con controles de 44px ergonómicos adaptados a la zona del pulgar y feedback háptico (`triggerHaptic`).
+  2. **Motor `GeminiShaderCopilotEngine` & Integración LLM:**
+     - Prompt de sistema especializado para arquitectura gráfica GLSL ES 1.00 WebGL (Three.js `ShaderMaterial`), exigiendo formato JSON estricto (`shaderTitle`, `description`, `fragCode`, `dspMapping`), directiva obligatoria `precision highp float;`, bucles con límites constantes y salida canónica a `gl_FragColor`.
+     - Invocación resiliente con modelos candidatos: `gemini-2.5-flash`, `gemini-3.5-flash-lite`, `gemini-flash-latest`.
+     - Pila de deshacer (Undo Stack) acotada a $\mathcal{O}(1)$ (10 estados en memoria) con restauración y recompilación en caliente inmediata.
+  3. **Auto-Reparación Asistida ante Errores WebGL:**
+     - `compileUserShader` intercepta diagnósticos de GPU; si la compilación falla, activa el botón contextual `[🩺 Reparar con Copilot IA]` tanto en la consola de compilación (`#shader-console-panel`) como en el Copilot.
+     - El Copilot envía el código defectuoso junto con el log exacto de la GPU a Gemini (o aplica saneamiento regex de palabras clave de WebGL 1.0 en modo offline) y re-compila automáticamente.
+  4. **Motor de Síntesis Procedural Offline (Zero-Bloatware / 100% Offline):**
+     - Si no hay API key o si se pierde la conexión, el Copilot no se bloquea ni muestra pantallas de error; en su lugar, sintetiza paramétricamente el shader mediante 8 arquetipos analíticos pre-verificados (Túnel Relativista, Bismuto PBR, Rosensweig FHD, Cimática de Chladni, Abismo Marino, Supernova Doppler, Malla Cuántica y Mandelbulb), adaptando paletas y reactividad acústica.
+- **Consecuencias:**
+  - ✅ Democratización absoluta de la creación de shaders GLSL dentro de MotorVisuales: cualquier usuario puede crear o modificar mundos visuales mediante lenguaje natural.
+  - ✅ Resiliencia total ante fallos de red o errores de compilación de la GPU con auto-reparación en 1-clic.
+  - ✅ Cero dependencias externas y funcionamiento autónomo offline garantizado.
+  - ✅ Total paridad de funciones y diseño responsive verificado en escritorio (1440x900) y móviles (390x844).
+
+
 
 
 

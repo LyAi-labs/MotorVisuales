@@ -616,6 +616,20 @@
 - **Solución:** Eliminar el `</div>` redundante, manteniendo a `tier2-subgrid` dentro de `tier2-studios` (`hidden lg:block`). Con esto, `tier2-studios` se mantiene en `display: none` en móviles y el deck táctico modular `#mobile-tactical-deck` expande limpiamente a los ~55dvh con scroll interno fluido.
 - **Trigger:** Al depurar visibilidad no deseada de paneles o colapso de altura en contenedores flex/grid en móviles.
 
+---
+
+### L-045
+- **Tags:** #glsl #shader-copilot #gemini-api #split-view #webgl #procedural #error-recovery #undo-stack
+- **Síntoma:** Al generar o mutar shaders dinámicamente mediante LLM en WebGL 1.0 (GLSL ES 1.00), el modelo puede emitir palabras clave modernas no soportadas en WebGL 1.0 (tales como `texture(sampler, uv)` en vez de `texture2D()`, modificadores `in/out` en vez de `varying`, bucles con límites no constantes o ausencia de directiva de precisión `precision highp float;`), provocando que el shader falle al compilar y congele la escena WebGL.
+- **Causa raíz:** Los modelos de lenguaje están entrenados predominantemente con GLSL 3.00+ / 4.50 (OpenGL moderno) o WGSL (WebGPU) y tienden a generar sintaxis moderna salvo que se les constriña fuertemente con reglas específicas de GLSL ES 1.00 y se provea una capa de autocuración de errores.
+- **Solución:**
+  1. **Ingeniería de Prompts Gráfica Específica:** Imponer reglas explícitas de WebGL 1.0: `precision highp float;` obligatoria, uso mandatorio de `texture2D()`, asignación canónica a `gl_FragColor` y bucles indexados con constantes numéricas enteras (ej. `for (int i = 0; i < 48; i++)`).
+  2. **Pipeline de Diagnóstico y Auto-Reparación (Fail-Fast & Self-Healing):** `compileUserShader` intercepta los diagnósticos de `WebGLProgram` de Three.js. Al detectar un fallo, expone el botón `[🩺 Reparar con Copilot IA]` y permite reenviar el código roto junto con la traza de error de la GPU para que Gemini (o el motor de saneamiento regex offline) aplique correcciones quirúrgicas instantáneas.
+  3. **Pila de Deshacer (Undo Stack):** Mantener un búfer de hasta 10 estados de código para revertir instantáneamente a la versión funcional anterior en caso de experimentar con mutaciones visuales indeseadas.
+  4. **Fallback Algorítmico Local:** Proveer 8 plantillas analíticas (Túnel Relativista, Bismuto PBR, Rosensweig FHD, Cimática de Chladni, Abismo Marino, Supernova, Malla Cuántica y Mandelbulb) garantizando que el usuario obtenga siempre un shader visualmente impactante a 60 FPS incluso sin conexión a Internet ni saldo en la API.
+- **Trigger:** Al desarrollar asistentes de código generativo para WebGL o motores de shaders procedurales en caliente.
+
+
 
 
 

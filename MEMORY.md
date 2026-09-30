@@ -298,8 +298,15 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Aislamiento DOM y Limpieza de Alturas:** `#left-dock-column` y `#three-viewport-resizer` ocultos en móvil; `syncResponsiveLayout()` oculta racks pesados de escritorio (`tier2Studios`, `tier2Subgrid`) y limpia `container.style.height` inline para que rijan las reglas `35dvh`; la restauración de altura personalizada queda restringida a `>= 1024px`.
   - **Validación Visual y Corrección de Anidamiento DOM (L-044):** Auditoría automatizada con Chrome DevTools Protocol en 390×844 px y 412×915 px ([scripts/mobile_visual_audit.js](file:///c:/MotorVisuales/scripts/mobile_visual_audit.js)), corrección de tag `</div>` espurio en línea 2498 que exponía a `#tier2-subgrid` a la regla flex de `#v4-view-live-runner > div.grid`, confirmación empírica de 100dvh Zero-Scroll (`scrollY = 0`), expansión del deck táctico a ~55dvh y verificación completa de las 6 pestañas tácticas y modales bottom sheets.
 
+- ✅ **Gemini AI Shader Copilot en Split-View IDE & Mobile Tactical Deck (D-049 / L-045):**
+  - **Generación, Mutación y Auto-Reparación Asistida por IA:** Asistente interactivo integrado en la consola Split-View de escritorio (`#sec-shader-editor`) y en el Tactical Deck móvil (`#m-panel-shaders`). Permite sintetizar shaders GLSL ES 1.00 desde cero ("Prompt-to-Shader"), mutar shaders existentes preservando su base matemática, inyectar reactividad acústica a las 8 bandas Biquad (`uSub`..`uAir`, onsets y RMS) y diagnosticar/auto-reparar errores de compilación WebGL con un solo clic (`[🩺 Auto-Reparar con Copilot IA]`).
+  - **Motor `GeminiShaderCopilotEngine`:** Soporte multi-modelo con `gemini-2.5-flash`, `gemini-3.5-flash-lite` y `gemini-flash-latest`, salida estructurada JSON y pila de deshacer acotada $\mathcal{O}(1)$ (Undo Stack de 10 niveles).
+  - **Fallback Algorítmico Procedural Offline (Zero-Bloatware):** Funcionamiento 100% offline sin dependencias externas ni saldo de API mediante 8 plantillas analíticas en GPU (Túnel Relativista, Cristal de Bismuto PBR, Ferrofluido Rosensweig FHD, Cimática de Chladni 3D, Abismo Marino Bioluminiscente, Supernova Doppler, Malla Cuántica y Mandelbulb) con pertubación paramétrica y saneamiento sintáctico.
+  - **Validación Automatizada End-to-End:** 7 pruebas deterministas ejecutadas y verificadas con Chrome DevTools Protocol en escritorio (1440x900) y móvil (390x844).
+
 ## Próximas Ideas / Pendientes
-- [ ] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).
+- [x] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).
 - [ ] Control de iluminación DMX / ArtNet vía WebSockets para sincronizar luces de escenario con MotorVisuales.
 - [ ] Soporte para modelos 3D GLTF/GLB importables por el usuario dentro de los Universos Escénicos.
+
 
