@@ -358,7 +358,56 @@ async function runAudit() {
 
         console.log('✅ TEST 5 SUPERADO: Sección Input se pliega y despliega con precisión de notch y animación reactiva.');
 
-        console.log('\n🎉 TODAS LAS PRUEBAS EMPÍRICAS DEL BANNER LATERAL IZQUIERDO HAN FINALIZADO CON ÉXITO.');
+        // Test 6: Plegar TODOS los paneles (Caso específico del usuario: Masters, Input y Faders cerrados)
+        console.log('\n--- TEST 6: Plegar TODOS los paneles y comprobar aprovechamiento adaptativo de espacio ---');
+        // Plegar Input
+        await cdp.evaluate(`document.getElementById('btn-sec-patchbay').click()`);
+        await sleep(200);
+        // Plegar Faders
+        await cdp.evaluate(`document.getElementById('btn-sec-volbal').click()`);
+        await sleep(350);
+
+        const allCollapsedCheck = await cdp.evaluate(`(() => {
+            const secMasters = document.getElementById('deck-sec-masters-content');
+            const secPatchbay = document.getElementById('deck-sec-patchbay-content');
+            const secFaders = document.getElementById('track-player-controls');
+            const scopeBlock = document.getElementById('deck-scope-telemetry-block');
+            const rail = document.getElementById('btn-sec-masters') ? document.getElementById('btn-sec-masters').parentElement : null;
+
+            const scopeRect = scopeBlock ? scopeBlock.getBoundingClientRect() : null;
+            const railRect = rail ? rail.getBoundingClientRect() : null;
+
+            return {
+                allPanelsHidden: (
+                    secMasters.classList.contains('hidden') &&
+                    secPatchbay.classList.contains('hidden') &&
+                    secFaders.classList.contains('hidden')
+                ),
+                scopeExists: !!scopeBlock,
+                scopeIsDirectlyRightOfRail: (scopeRect && railRect) ? (scopeRect.left >= railRect.right - 2 && scopeRect.top <= railRect.top + 30) : false,
+                scopeHeight: scopeRect ? scopeRect.height : 0,
+                railHeight: railRect ? railRect.height : 0
+            };
+        })()`);
+
+        console.log('Resultados Test 6 (Todo Plegado):', JSON.stringify(allCollapsedCheck, null, 2));
+        if (!allCollapsedCheck.allPanelsHidden) throw new Error('Los 3 paneles deben estar plegados (hidden)');
+        if (!allCollapsedCheck.scopeExists) throw new Error('El bloque de osciloscopio y telemetría debe existir');
+        if (!allCollapsedCheck.scopeIsDirectlyRightOfRail) {
+            throw new Error('El osciloscopio debe estar inmediatamente a la derecha del rail de menús ocupando el espacio');
+        }
+
+        const clipBoxAllCollapsed = await cdp.evaluate(`(() => {
+            const el = document.getElementById('sec-audio-bar');
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return { x: Math.max(0, r.x - 10), y: Math.max(0, r.y - 10), width: r.width + 20, height: r.height + 20, scale: 1 };
+        })()`);
+        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_06_all_collapsed_zero_gap.png'), clipBoxAllCollapsed);
+
+        console.log('✅ TEST 6 SUPERADO: Al plegar todos los paneles, el osciloscopio y la telemetría ocupan el espacio contiguo sin dejar ningún hueco vacío.');
+
+        console.log('\n🎉 TODAS LAS PRUEBAS EMPÍRICAS DEL BANNER LATERAL IZQUIERDO Y ADAPTACIÓN ESPACIAL HAN FINALIZADO CON ÉXITO.');
 
     } finally {
         if (cdp) await cdp.close();

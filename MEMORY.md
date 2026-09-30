@@ -320,7 +320,13 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
     - *Animación Reactiva `@keyframes deckSectionDeploy`:* Al desplegarse cualquier sección, se ejecuta una transición fluida con desplazamiento lateral y destello perimetral glow difuso (`var(--deck-glow-rgb)`), evidenciando de forma indiscutible a qué botón pertenece lo desplegado.
   - **Verificación Automatizada CDP:** Suite [scripts/audit_audio_deck.js](file:///c:/lyai-motorvisuales.site/scripts/audit_audio_deck.js) con 5 pruebas empíricas exitosas y capturas de alta definición en [test-screenshots/audio_deck_left_banner_initial.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_left_banner_initial.png), [test-screenshots/audio_deck_left_banner_masters_expanded.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_left_banner_masters_expanded.png) y [test-screenshots/audio_deck_left_banner_input_collapsed.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_left_banner_input_collapsed.png).
 
+- ✅ **Adaptación Espacial Dinámica del Audio Deck (Zero-Gap Layout, D-052):**
+  - **Integración de Osciloscopio y Telemetría en el Flujo Derecho:** Reubicación de `#deck-scope-telemetry-block` dentro del contenedor dinámico derecho, erradicando el hueco negro vacío cuando los paneles están plegados.
+  - **Comportamiento Adaptativo Inteligente:** Con todos los paneles plegados, el osciloscopio PCM y la cuadrícula de 6 métricas ascienden y se sitúan a la par del rail de menús, reduciendo la altura a ~200px con 100% de densidad de información. Al desplegar cualquier panel, este se sitúa arriba y el osciloscopio se desliza inmediatamente debajo.
+  - **Verificación Automatizada CDP:** Test 6 añadido y verificado con éxito, capturando [test-screenshots/audio_deck_06_all_collapsed_zero_gap.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_06_all_collapsed_zero_gap.png).
+
 ## Próximas Ideas / Pendientes
+- [x] Adaptación espacial dinámica del Audio Deck sin huecos vacíos (D-052).
 - [x] Banner lateral izquierdo de menús en el Audio Deck con pertenencia visual por color y muesca conectora (D-051).
 - [x] Rediseño del Audio Deck en 3 secciones con Pistas Master plegadas por defecto (D-050).
 - [x] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).

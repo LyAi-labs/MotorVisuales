@@ -1247,7 +1247,28 @@
 - **Consecuencias:**
   - ✅ Ergonomía y legibilidad sobresaliente, estilo rack de hardware de audio profesional de gama alta (Eurorack/Pro Tools).
   - ✅ Relación causa-efecto inmediata e indiscutible: el usuario identifica al instante la procedencia de cada panel sin ambigüedad mental.
-  - ✅ Verificación empírica completa al 100% mediante suite CDP automatizada (`scripts/audit_audio_deck.js`) con capturas de alta definición.
+---
+
+### D-052 — Adaptación Espacial Dinámica del Audio Deck: Integración del Osciloscopio y Telemetría en el Flujo Derecho Adaptable (Zero-Gap Layout)
+- **Fecha:** 2026-09-30
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. Tras reubicar los botones de menú en un banner lateral a la izquierda (D-051), el osciloscopio PCM y la telemetría acústica permanecían anclados en un contenedor inferior separado debajo de todo el `flex-row`.
+  2. Cuando el usuario plegaba todos los paneles (`Masters`, `Input`, `Faders`) o mantenía solo paneles pequeños abiertos, el área de contenido a la derecha de `MENÚS` quedaba como un gran hueco negro estéril y desaprovechado, obligando a un scroll innecesario y rompiendo la densidad visual.
+- **Decisión:**
+  1. **Integración de `#deck-scope-telemetry-block` en el Flujo Derecho Dinámico (`flex-grow min-w-0 space-y-2`):**
+     - Se trasladó el bloque de osciloscopio PCM y telemetría de 6 métricas acústicas al interior del contenedor derecho adaptable.
+     - **Comportamiento en Reposo (Todo Plegado):** Al colapsar los 3 paneles, `#deck-scope-telemetry-block` asciende automáticamente y ocupa el espacio contiguo a la derecha del banner de menús. La altura de la tarjeta de Ingesta & Osciloscopio se reduce suavemente a solo ~200px, mostrando el osciloscopio PCM en vivo y las 6 métricas tácticas sin un solo píxel desaprovechado.
+     - **Comportamiento al Desplegar:** Al abrir cualquier panel (`Masters`, `Input` o `Faders`), el panel activo se sitúa en la parte superior conectado a su muesca respectiva, y el bloque de osciloscopio y telemetría se desliza inmediatamente debajo de él.
+  2. **Optimización Ergonómica de la Telemetría:**
+     - La cuadrícula de telemetría adopta una disposición simétrica de 2 filas x 3 columnas (`grid grid-cols-3 gap-1`), maximizando la legibilidad en el ancho de ~300px con tipografía de alta definición y contraste.
+  3. **Verificación Automatizada End-to-End:**
+     - Se añadió el Test 6 a `scripts/audit_audio_deck.js` comprobando que `scopeIsDirectlyRightOfRail === true` cuando todos los paneles están plegados, capturando `audio_deck_06_all_collapsed_zero_gap.png`.
+- **Consecuencias:**
+  - ✅ Erradicación total de huecos vacíos: la interfaz se adapta armónicamente tanto si hay 0, 1, 2 o 3 paneles desplegados.
+  - ✅ Estética de consola de instrumentación analógica densa, elegante y profesional.
+  - ✅ Cero dependencias adicionales y compatibilidad nativa a 60 FPS sin redibujados artificiales.
+
 
 
 

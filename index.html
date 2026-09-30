@@ -865,41 +865,47 @@
                                     <div id="tab-audio-hint" class="hidden mt-1.5 text-[9px] font-mono p-1.5 rounded bg-cyan-950/40 border border-cyan-500/20 text-cyan-200/90 leading-tight"></div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Mini Live Waveform & Telemetry Rack -->
-                    <div class="space-y-2 pt-1 border-t border-white/[0.06]">
-                        <div class="w-full h-11 bg-black rounded-lg border border-white/[0.08] overflow-hidden relative">
-                            <canvas id="miniWaveCanvas" class="w-full h-full"></canvas>
-                            <div class="absolute right-2 top-1 text-[8px] font-mono uppercase text-cyan-500/70 tracking-widest">PCM OSCILLOSCOPE</div>
-                        </div>
-                        
-                        <!-- 6-Metric Telemetry Grid -->
-                        <div class="grid grid-cols-3 sm:grid-cols-6 gap-1.5 text-center text-xs font-mono">
-                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05]">
-                                <span class="text-[8px] text-zinc-500 block uppercase">RMS</span>
-                                <span id="tele-rms" class="text-cyan-400 font-bold text-[11px]">0.00</span>
-                            </div>
-                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05]">
-                                <span class="text-[8px] text-zinc-500 block uppercase">Centroide</span>
-                                <span id="tele-centroid" class="text-amber-400 font-bold text-[10px]">0 Hz</span>
-                            </div>
-                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05]">
-                                <span class="text-[8px] text-zinc-500 block uppercase">Flujo</span>
-                                <span id="tele-flux" class="text-indigo-400 font-bold text-[11px]">0.00</span>
-                            </div>
-                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05]">
-                                <span class="text-[8px] text-zinc-500 block uppercase">ZCR</span>
-                                <span id="tele-zcr" class="text-emerald-400 font-bold text-[11px]">0</span>
-                            </div>
-                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05]">
-                                <span class="text-[8px] text-zinc-500 block uppercase">Rolloff</span>
-                                <span id="tele-rolloff" class="text-blue-400 font-bold text-[10px]">0 Hz</span>
-                            </div>
-                            <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-white/[0.05] flex flex-col items-center justify-center">
-                                <span class="text-[8px] text-zinc-500 block uppercase">Onset</span>
-                                <span id="tele-beat-indicator" class="w-2.5 h-2.5 rounded-full bg-zinc-700 mt-0.5 transition-all"></span>
+                            <!-- SECCIÓN 4: MINI LIVE WAVEFORM & TELEMETRY RACK (Auto-Ajustable al espacio del Deck) -->
+                            <div id="deck-scope-telemetry-block" class="space-y-1.5 p-2 rounded-xl bg-zinc-950/80 border border-white/[0.06] shadow-inner transition-all duration-200">
+                                <div class="flex items-center justify-between text-[8px] font-mono text-zinc-400 pb-0.5 border-b border-white/[0.04]">
+                                    <span class="flex items-center gap-1.5 font-bold tracking-wider text-cyan-300">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_6px_#22d3ee]"></span>
+                                        <span>PCM OSCILLOSCOPE</span>
+                                    </span>
+                                    <span class="text-zinc-500">FFT 2048 // 60 FPS</span>
+                                </div>
+                                <div class="w-full h-12 bg-black rounded-lg border border-white/[0.08] overflow-hidden relative shadow-inner">
+                                    <canvas id="miniWaveCanvas" class="w-full h-full"></canvas>
+                                </div>
+                                
+                                <!-- 6-Metric Telemetry Grid (2 filas de 3 columnas compactas y legibles) -->
+                                <div class="grid grid-cols-3 gap-1 text-center font-mono">
+                                    <div class="bg-zinc-900/90 p-1 rounded-lg border border-white/[0.05]">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">RMS</span>
+                                        <span id="tele-rms" class="text-cyan-400 font-bold text-[10px]">0.00</span>
+                                    </div>
+                                    <div class="bg-zinc-900/90 p-1 rounded-lg border border-white/[0.05]">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">Centroide</span>
+                                        <span id="tele-centroid" class="text-amber-400 font-bold text-[9px]">0 Hz</span>
+                                    </div>
+                                    <div class="bg-zinc-900/90 p-1 rounded-lg border border-white/[0.05]">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">Flujo</span>
+                                        <span id="tele-flux" class="text-indigo-400 font-bold text-[10px]">0.00</span>
+                                    </div>
+                                    <div class="bg-zinc-900/90 p-1 rounded-lg border border-white/[0.05]">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">ZCR</span>
+                                        <span id="tele-zcr" class="text-emerald-400 font-bold text-[10px]">0</span>
+                                    </div>
+                                    <div class="bg-zinc-900/90 p-1 rounded-lg border border-white/[0.05]">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">Rolloff</span>
+                                        <span id="tele-rolloff" class="text-blue-400 font-bold text-[9px]">0 Hz</span>
+                                    </div>
+                                    <div class="bg-zinc-900/90 p-1 rounded-lg border border-white/[0.05] flex flex-col items-center justify-center">
+                                        <span class="text-[7px] text-zinc-500 block uppercase">Onset</span>
+                                        <span id="tele-beat-indicator" class="w-2 h-2 rounded-full bg-zinc-700 mt-0.5 transition-all"></span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
