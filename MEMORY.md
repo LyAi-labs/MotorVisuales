@@ -25,7 +25,7 @@
 ### Módulos Principales
 1. **Matriz de Ingesta Master & Patchbay (Hardware Rack de 3 Secciones Colapsables, D-050):**
    - **🎵 Pistas Master (`#btn-sec-masters`):** 3 Pistas Master de Referencia (`CH-01 // MORDAZA`, `CH-02 // TONTOS ÚTILES`, `CH-03 // SECTION 63 - YouTube Direct`) con micro-LEDs de estado `[ON AIR]` / `[STANDBY]`. **Inician plegadas por defecto** para optimizar el espacio vertical.
-   - **🔌 Fuentes / Patchbay (`#btn-sec-patchbay`):** Matriz de 7 fuentes externas (Micrófono analógico, YouTube Móvil, Pestaña Loopback `suppressLocalAudioPlayback`, Carga Local WAV/FLAC, Sintetizador DSP Procedural, Webcam/NDI y Corte Mute de emergencia). Inicia desplegada.
+   - **🔌 Input (`#btn-sec-patchbay`):** Matriz de 7 fuentes externas (Micrófono analógico, YouTube Móvil, Pestaña Loopback `suppressLocalAudioPlayback`, Carga Local WAV/FLAC, Sintetizador DSP Procedural, Webcam/NDI y Corte Mute de emergencia). Plegable a demanda mediante el botón **Input**.
    - **🎚️ Reproductor & Faders (`#btn-sec-volbal`):** Transporte, scrubber interactivo, vúmetro en vivo con ganancia Hi-Fi/boost, fader Master general, control de canales L/R y monitoreo estéreo. Inicia desplegado.
    - **Micro-Status Bar permanente:** Integrado en la cabecera del panel junto a `FFT 2048` (`[Mordaza • 100%]`), visible siempre sin scrollbar horizontal.
 2. **DSP — Banco de 8 Stems Biquad:**

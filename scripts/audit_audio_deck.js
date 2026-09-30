@@ -294,6 +294,56 @@ async function runAudit() {
         })()`);
         await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_03_grid_collapsed_playing.png'), clipBoxFinal);
 
+        // Test 5: Plegar y Desplegar sección Input mediante btn-sec-patchbay
+        console.log('\n--- TEST 5: Plegado y desplegado de la sección Input ---');
+        const inputBtnText = await cdp.evaluate(`document.getElementById('btn-sec-patchbay').innerText`);
+        console.log('Texto del botón Input:', inputBtnText);
+        if (!inputBtnText.includes('Input')) throw new Error('El botón debe contener la palabra Input');
+
+        // Plegar Input
+        await cdp.evaluate(`document.getElementById('btn-sec-patchbay').click()`);
+        await sleep(300);
+
+        const inputCollapsedStatus = await cdp.evaluate(`(() => {
+            const sec = document.getElementById('deck-sec-patchbay-content');
+            const chev = document.getElementById('chevron-sec-patchbay');
+            return {
+                secHidden: sec ? sec.classList.contains('hidden') : null,
+                chevron: chev ? chev.innerText : null
+            };
+        })()`);
+
+        console.log('Resultados Test 5 (Input Plegado):', JSON.stringify(inputCollapsedStatus, null, 2));
+        if (!inputCollapsedStatus.secHidden) throw new Error('La sección Input debe estar plegada (hidden) tras hacer click');
+        if (inputCollapsedStatus.chevron !== '▶') throw new Error(`Chevron de Input debe ser ▶, es ${inputCollapsedStatus.chevron}`);
+
+        const clipBoxInputCollapsed = await cdp.evaluate(`(() => {
+            const el = document.getElementById('sec-audio-bar');
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            return { x: Math.max(0, r.x - 10), y: Math.max(0, r.y - 10), width: r.width + 20, height: r.height + 20, scale: 1 };
+        })()`);
+        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_04_input_collapsed.png'), clipBoxInputCollapsed);
+
+        // Desplegar Input nuevamente
+        await cdp.evaluate(`document.getElementById('btn-sec-patchbay').click()`);
+        await sleep(300);
+
+        const inputRestoredStatus = await cdp.evaluate(`(() => {
+            const sec = document.getElementById('deck-sec-patchbay-content');
+            const chev = document.getElementById('chevron-sec-patchbay');
+            return {
+                secHidden: sec ? sec.classList.contains('hidden') : null,
+                chevron: chev ? chev.innerText : null
+            };
+        })()`);
+
+        console.log('Resultados Test 5 (Input Restaurado):', JSON.stringify(inputRestoredStatus, null, 2));
+        if (inputRestoredStatus.secHidden) throw new Error('La sección Input debe estar visible tras volver a hacer click');
+        if (inputRestoredStatus.chevron !== '▼') throw new Error(`Chevron de Input debe ser ▼, es ${inputRestoredStatus.chevron}`);
+
+        console.log('✅ TEST 5 SUPERADO: Sección Input se pliega y despliega con precisión.');
+
         console.log('\n🎉 TODAS LAS PRUEBAS EMPÍRICAS HAN FINALIZADO CON ÉXITO.');
 
     } finally {

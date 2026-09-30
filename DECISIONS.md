@@ -1204,19 +1204,20 @@
 - **Decisión:**
   1. **Estructura en Grid Simétrica de 3 Columnas (`grid grid-cols-3 gap-1.5`):**
      - **Botón 1 — `[🎵 Masters ▶]` (`#btn-sec-masters`):** Conmuta `#deck-sec-masters-content`. Inicia **plegado (`hidden`) por defecto** con LED en reposo (`bg-zinc-600`) y chevron `▶`. Contiene exclusivamente las 3 Pistas Master de Referencia.
-     - **Botón 2 — `[🔌 Fuentes ▼]` (`#btn-sec-patchbay`):** Conmuta `#deck-sec-patchbay-content`. Inicia **desplegado** con LED activo (`bg-cyan-400`) y chevron `▼`. Contiene la matriz de ingesta externa de 7 fuentes (Micrófono, YouTube Móvil, Loopback Pestaña, Archivo Local, Synth Beat, Webcam/NDI y Mute).
+     - **Botón 2 — `[🔌 Input ▼]` (`#btn-sec-patchbay`):** Conmuta `#deck-sec-patchbay-content`. Permite **plegar y desplegar la Matriz de Ingesta Externa / Patchbay** con chevron dinámico (`▼` vs `▶`) y LED activo/reposo. Contiene las 7 fuentes de entrada (Micrófono, YouTube Móvil, Loopback Pestaña, Archivo Local, Synth Beat, Webcam/NDI y Mute).
      - **Botón 3 — `[🎚️ Faders ▼]` (`#btn-sec-volbal`):** Conmuta `#track-player-controls`. Inicia **desplegado** con LED activo y chevron `▼`. Contiene el transporte, scrubber temporal, VU meter live preamp, fader master general, canales L/R y monitoreo estéreo.
-  2. **Reubicación Ergonómica del Micro-Status Bar:**
+  2. **Reubicación Ergonómica del Micro-Status Bar & Corrección de Layout de Patchbay:**
      - El indicador compacto de pista y volumen (`#compact-deck-track` y `#compact-deck-vol`) se integró en la cabecera superior del panel junto a la insignia `FFT 2048`.
      - Esto elimina el desbordamiento horizontal y suprime cualquier scrollbar en la botonera (`overflow-x: hidden`), manteniendo visibilidad continua del estado de reproducción en todo momento.
+     - En la cuadrícula del Patchbay, se ajustaron las dimensiones de los botones de engranaje `⚙️` (`w-7 h-auto`, `min-w-0`), eliminando el solapamiento que sufría el botón de YouTube sobre `[SYS] Pestaña Audio`.
   3. **Controlador `toggleAudioDeckSection`:**
-     - Soporta conmutación reactiva independiente para `'masters'`, `'patchbay'` y `'faders'` (con retrocompatibilidad para invocaciones legacy `'input'` y `'volbal'`).
+     - Soporta conmutación reactiva independiente para `'masters'`, `'patchbay'`/`'input'` y `'faders'`/`'volbal'`.
      - Sincroniza dinámicamente los chevrons (`▼` vs `▶`), LEDs de estado y micro-status de audio.
 - **Consecuencias:**
   - ✅ Interfaz significativamente más limpia, compacta y profesional al arrancar la aplicación.
+  - ✅ Posibilidad de plegar tanto las Pistas Master como la sección **Input** a voluntad, optimizando el espacio vertical del panel.
   - ✅ Simetría arquitectónica visual absoluta de 3 columnas (botones de menú perfectamente alineados con las tarjetas de los 3 canales master).
-  - ✅ Pistas Master de referencia aisladas y plegadas por defecto, desplegables con un solo clic.
-  - ✅ Cero scroll horizontal residual en la barra de secciones.
+  - ✅ Cuadrícula de fuentes libre de desbordamientos o solapamientos de botones de configuración.
   - ✅ Verificación empírica completa al 100% mediante suite CDP automatizada (`scripts/audit_audio_deck.js`).
 
 

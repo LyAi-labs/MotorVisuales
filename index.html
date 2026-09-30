@@ -576,11 +576,11 @@
                             <span class="text-[9px] font-mono text-zinc-500 shrink-0 ml-1" id="chevron-sec-masters">▶</span>
                         </button>
 
-                        <!-- Botón 2: Fuentes / Patchbay (Inicia Desplegado) -->
-                        <button id="btn-sec-patchbay" onclick="toggleAudioDeckSection('patchbay')" class="w-full py-1.5 px-2 rounded-md border border-cyan-500/40 bg-cyan-950/70 text-cyan-200 font-bold transition flex items-center justify-between shadow-sm active:scale-95 text-[11px]" title="Plegar / Desplegar Matriz de Ingesta Externa (Micrófono, YouTube, Archivo, Synth, Webcam)">
+                        <!-- Botón 2: Input / Patchbay (Inicia Desplegado) -->
+                        <button id="btn-sec-patchbay" onclick="toggleAudioDeckSection('patchbay')" class="w-full py-1.5 px-2 rounded-md border border-cyan-500/40 bg-cyan-950/70 text-cyan-200 font-bold transition flex items-center justify-between shadow-sm active:scale-95 text-[11px]" title="Plegar / Desplegar Matriz de Ingesta Externa / Input (Micrófono, YouTube, Archivo, Synth, Webcam)">
                             <div class="flex items-center gap-1 truncate">
                                 <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee] shrink-0" id="led-sec-patchbay"></span>
-                                <span class="truncate">🔌 Fuentes</span>
+                                <span class="truncate">🔌 Input</span>
                             </div>
                             <span class="text-[9px] font-mono text-cyan-400 shrink-0 ml-1" id="chevron-sec-patchbay">▼</span>
                         </button>
@@ -667,43 +667,43 @@
                         </div>
                         <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs font-mono">
                             <button onclick="startMicrophone()" id="btn-mic" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group">
-                                <span class="text-[10px] text-cyan-400 font-bold">[MIC]</span>
-                                <span class="text-[11px] font-sans font-medium">Micrófono</span>
-                                <span class="text-[8px] text-zinc-500">ANALOG</span>
+                                <span class="text-[10px] text-cyan-400 font-bold shrink-0">[MIC]</span>
+                                <span class="text-[11px] font-sans font-medium truncate">Micrófono</span>
+                                <span class="text-[8px] text-zinc-500 shrink-0">ANALOG</span>
                             </button>
-                            <div class="flex gap-1.5">
-                                <button type="button" onclick="selectYouTubeMobileSource(); triggerHaptic(15);" id="btn-yt-mobile" class="flex-grow py-2 px-2.5 bg-zinc-900/90 hover:bg-red-950/40 text-red-300 hover:text-white rounded-lg border border-red-500/40 flex items-center justify-between gap-1 shadow-sm transition active:scale-[0.98]" title="Conectar o capturar audio de YouTube">
-                                    <span class="text-[10px] text-red-400 font-bold">[YT]</span>
-                                    <span class="text-[11px] font-sans font-medium">YouTube Móvil</span>
-                                    <span class="text-[8px] text-red-400/80 font-mono">INGESTA</span>
+                            <div class="flex gap-1 min-w-0">
+                                <button type="button" onclick="selectYouTubeMobileSource(); triggerHaptic(15);" id="btn-yt-mobile" class="flex-grow min-w-0 py-1.5 px-1.5 bg-zinc-900/90 hover:bg-red-950/40 text-red-300 hover:text-white rounded-lg border border-red-500/40 flex items-center justify-between gap-1 shadow-sm transition active:scale-[0.98]" title="Conectar o capturar audio de YouTube">
+                                    <span class="text-[10px] text-red-400 font-bold shrink-0">[YT]</span>
+                                    <span class="text-[11px] font-sans font-medium truncate">YouTube</span>
+                                    <span class="text-[8px] text-red-400/80 font-mono shrink-0 hidden xs:inline">ING</span>
                                 </button>
-                                <button type="button" onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-11 min-w-[44px] min-h-[38px] py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.12] flex items-center justify-center text-sm transition active:scale-90" title="Opciones avanzadas e ingesta de YouTube">
+                                <button type="button" onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-7 h-auto py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.12] flex items-center justify-center text-xs shrink-0 transition active:scale-90" title="Opciones avanzadas e ingesta de YouTube">
                                     <span>⚙️</span>
                                 </button>
                             </div>
                             <button onclick="startTabCapture()" id="btn-tab" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition">
-                                <span class="text-[10px] text-cyan-400 font-bold">[SYS]</span>
-                                <span class="text-[11px] font-sans font-medium">Pestaña Audio</span>
-                                <span class="text-[8px] text-zinc-500">LOOP</span>
+                                <span class="text-[10px] text-cyan-400 font-bold shrink-0">[SYS]</span>
+                                <span class="text-[11px] font-sans font-medium truncate">Pestaña Audio</span>
+                                <span class="text-[8px] text-zinc-500 shrink-0">LOOP</span>
                             </button>
                             <label class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 cursor-pointer transition">
-                                <span class="text-[10px] text-cyan-400 font-bold">[FILE]</span>
-                                <span class="text-[11px] font-sans font-medium">Cargar Archivo</span>
-                                <span class="text-[8px] text-zinc-500">LOCAL</span>
+                                <span class="text-[10px] text-cyan-400 font-bold shrink-0">[FILE]</span>
+                                <span class="text-[11px] font-sans font-medium truncate">Cargar Archivo</span>
+                                <span class="text-[8px] text-zinc-500 shrink-0">LOCAL</span>
                                 <input type="file" id="file-input" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
                             </label>
                             <button onclick="toggleSynthDemo()" id="btn-synth" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 rounded-lg border border-white/[0.08] hover:border-amber-500/40 flex items-center justify-between gap-1 transition">
-                                <span class="text-[10px] text-amber-400 font-bold">[SYN]</span>
-                                <span id="txt-synth" class="text-[11px] font-sans font-medium">Synth Beat</span>
-                                <span class="text-[8px] text-amber-500/80">PROC</span>
+                                <span class="text-[10px] text-amber-400 font-bold shrink-0">[SYN]</span>
+                                <span id="txt-synth" class="text-[11px] font-sans font-medium truncate">Synth Beat</span>
+                                <span class="text-[8px] text-amber-500/80 shrink-0">PROC</span>
                             </button>
-                            <div class="flex gap-1">
-                                <button onclick="toggleLiveVideo()" id="btn-cam" class="flex-grow py-1.5 px-2 bg-zinc-900/90 hover:bg-cyan-950/40 text-cyan-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group" title="Activar/Desactivar Cámara en Vivo / NDI / Virtual Cam">
-                                    <span class="text-[10px] text-cyan-400 font-bold">[CAM]</span>
-                                    <span class="text-[11px] font-sans font-medium truncate">Webcam/NDI</span>
-                                    <span id="cam-badge" class="text-[8px] text-zinc-500 group-hover:text-cyan-400">STANDBY</span>
+                            <div class="flex gap-1 min-w-0">
+                                <button onclick="toggleLiveVideo()" id="btn-cam" class="flex-grow min-w-0 py-1.5 px-1.5 bg-zinc-900/90 hover:bg-cyan-950/40 text-cyan-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group" title="Activar/Desactivar Cámara en Vivo / NDI / Virtual Cam">
+                                    <span class="text-[10px] text-cyan-400 font-bold shrink-0">[CAM]</span>
+                                    <span class="text-[11px] font-sans font-medium truncate">Webcam</span>
+                                    <span id="cam-badge" class="text-[8px] text-zinc-500 group-hover:text-cyan-400 shrink-0 hidden xs:inline">OFF</span>
                                 </button>
-                                <button onclick="openVideoIngestModal()" class="px-2 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] text-xs transition" title="Ajustes de Cámara, Chroma Key y Proyección 3D">
+                                <button onclick="openVideoIngestModal()" class="w-7 h-auto py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center text-xs shrink-0 transition" title="Ajustes de Cámara, Chroma Key y Proyección 3D">
                                     <span>⚙️</span>
                                 </button>
                             </div>
