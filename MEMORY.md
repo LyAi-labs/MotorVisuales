@@ -312,7 +312,16 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Micro-Status Bar en Cabecera:** Indicador de pista y volumen integrado junto a `FFT 2048` (`[Mordaza • 100%]`), visible permanentemente y eliminando cualquier scrollbar horizontal residual.
   - **Verificación Automatizada CDP:** Suite en [scripts/audit_audio_deck.js](file:///c:/lyai-motorvisuales.site/scripts/audit_audio_deck.js) validando conmutación reactiva, reproducción sin cortes y captura visual en [test-screenshots/audio_deck_01_grid_collapsed.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_01_grid_collapsed.png) y [test-screenshots/audio_deck_02_grid_masters_expanded.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_02_grid_masters_expanded.png).
 
+- ✅ **Banner Lateral Izquierdo de Menús y Pertenencia Visual Cinemática (D-051):**
+  - **Layout Left-Rail Vertical:** Sustitución de la barra horizontal superior por una columna vertical táctica (`Left Rail`, `w-20 xs:w-24 sm:w-28 shrink-0`) ubicada a la izquierda del audio deck, con los 3 botones apilados ergonómicamente: `🎵 Masters` (Púrpura Neón), `🔌 Input` (Cian Neón) y `🎚️ Faders` (Ámbar Dorado).
+  - **Efecto de Pertenencia Visual Inequívoco (Multi-Layer Binding):**
+    - *Muesca Conectora Física:* Triángulo CSS (`#notch-sec-*`) en el flanco derecho del botón activo que apunta directamente al panel correspondiente a la derecha.
+    - *Color-Coding & Ribete de 4px:* Cada panel integra un borde izquierdo de 4px y badge de canal (`CANAL: <NOMBRE>`) con el color unívoco del botón.
+    - *Animación Reactiva `@keyframes deckSectionDeploy`:* Al desplegarse cualquier sección, se ejecuta una transición fluida con desplazamiento lateral y destello perimetral glow difuso (`var(--deck-glow-rgb)`), evidenciando de forma indiscutible a qué botón pertenece lo desplegado.
+  - **Verificación Automatizada CDP:** Suite [scripts/audit_audio_deck.js](file:///c:/lyai-motorvisuales.site/scripts/audit_audio_deck.js) con 5 pruebas empíricas exitosas y capturas de alta definición en [test-screenshots/audio_deck_left_banner_initial.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_left_banner_initial.png), [test-screenshots/audio_deck_left_banner_masters_expanded.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_left_banner_masters_expanded.png) y [test-screenshots/audio_deck_left_banner_input_collapsed.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_left_banner_input_collapsed.png).
+
 ## Próximas Ideas / Pendientes
+- [x] Banner lateral izquierdo de menús en el Audio Deck con pertenencia visual por color y muesca conectora (D-051).
 - [x] Rediseño del Audio Deck en 3 secciones con Pistas Master plegadas por defecto (D-050).
 - [x] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).
 - [ ] Control de iluminación DMX / ArtNet vía WebSockets para sincronizar luces de escenario con MotorVisuales.

@@ -136,39 +136,45 @@ async function runAudit() {
         await cdp.send('Runtime.enable');
         await sleep(1500);
 
-        // Test 1: Verificar existencia y estado inicial de los 3 botones
+        // Test 1: Verificar existencia y estado inicial de los 3 botones en el banner lateral izquierdo
         console.log('\n--- TEST 1: Estado inicial al cargar ---');
         const initialStatus = await cdp.evaluate(`(() => {
             const btnMasters = document.getElementById('btn-sec-masters');
             const secMasters = document.getElementById('deck-sec-masters-content');
             const chevMasters = document.getElementById('chevron-sec-masters');
+            const notchMasters = document.getElementById('notch-sec-masters');
 
             const btnPatchbay = document.getElementById('btn-sec-patchbay');
             const secPatchbay = document.getElementById('deck-sec-patchbay-content');
             const chevPatchbay = document.getElementById('chevron-sec-patchbay');
+            const notchPatchbay = document.getElementById('notch-sec-patchbay');
 
             const btnFaders = document.getElementById('btn-sec-volbal');
             const secFaders = document.getElementById('track-player-controls');
             const chevFaders = document.getElementById('chevron-sec-volbal');
+            const notchFaders = document.getElementById('notch-sec-volbal');
 
             return {
                 masters: {
                     btnExists: !!btnMasters,
                     btnText: btnMasters ? btnMasters.innerText.replace(/\\s+/g, ' ') : null,
                     secHidden: secMasters ? secMasters.classList.contains('hidden') : null,
-                    chevron: chevMasters ? chevMasters.innerText : null
+                    chevron: chevMasters ? chevMasters.innerText : null,
+                    notchHidden: notchMasters ? notchMasters.classList.contains('hidden') : null
                 },
                 patchbay: {
                     btnExists: !!btnPatchbay,
                     btnText: btnPatchbay ? btnPatchbay.innerText.replace(/\\s+/g, ' ') : null,
                     secHidden: secPatchbay ? secPatchbay.classList.contains('hidden') : null,
-                    chevron: chevPatchbay ? chevPatchbay.innerText : null
+                    chevron: chevPatchbay ? chevPatchbay.innerText : null,
+                    notchHidden: notchPatchbay ? notchPatchbay.classList.contains('hidden') : null
                 },
                 faders: {
                     btnExists: !!btnFaders,
                     btnText: btnFaders ? btnFaders.innerText.replace(/\\s+/g, ' ') : null,
                     secHidden: secFaders ? secFaders.classList.contains('hidden') : null,
-                    chevron: chevFaders ? chevFaders.innerText : null
+                    chevron: chevFaders ? chevFaders.innerText : null,
+                    notchHidden: notchFaders ? notchFaders.classList.contains('hidden') : null
                 }
             };
         })()`);
@@ -178,10 +184,13 @@ async function runAudit() {
         if (!initialStatus.masters.btnExists) throw new Error('btn-sec-masters no existe');
         if (!initialStatus.masters.secHidden) throw new Error('Pistas Master DEBE iniciar plegada (hidden)');
         if (initialStatus.masters.chevron !== '▶') throw new Error(`Chevron masters debe ser ▶, es ${initialStatus.masters.chevron}`);
+        if (!initialStatus.masters.notchHidden) throw new Error('Notch de masters debe iniciar oculto');
         if (initialStatus.patchbay.secHidden) throw new Error('Fuentes/Patchbay debe estar desplegado inicialmente');
+        if (initialStatus.patchbay.notchHidden) throw new Error('Notch de patchbay debe ser visible');
         if (initialStatus.faders.secHidden) throw new Error('Reproductor & Faders debe estar desplegado inicialmente');
+        if (initialStatus.faders.notchHidden) throw new Error('Notch de faders debe ser visible');
 
-        console.log('✅ TEST 1 SUPERADO: Pistas Master inicia plegado y los 3 botones están presentes.');
+        console.log('✅ TEST 1 SUPERADO: Banner lateral izquierdo activo, Pistas Master inicia plegado y conectores coherentes.');
 
         // Obtener bounding box del panel para capturar screenshot enfocado
         const clipBox = await cdp.evaluate(`(() => {
@@ -191,25 +200,28 @@ async function runAudit() {
             return { x: Math.max(0, r.x - 10), y: Math.max(0, r.y - 10), width: r.width + 20, height: r.height + 20, scale: 1 };
         })()`);
 
-        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_01_grid_collapsed.png'), clipBox);
+        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_left_banner_initial.png'), clipBox);
 
         // Test 2: Desplegar Pistas Master haciendo click en btn-sec-masters
         console.log('\n--- TEST 2: Desplegando Pistas Master ---');
         await cdp.evaluate(`document.getElementById('btn-sec-masters').click()`);
-        await sleep(300);
+        await sleep(350);
 
         const expandedStatus = await cdp.evaluate(`(() => {
             const secMasters = document.getElementById('deck-sec-masters-content');
             const chevMasters = document.getElementById('chevron-sec-masters');
             const ledMasters = document.getElementById('led-sec-masters');
+            const notchMasters = document.getElementById('notch-sec-masters');
             const mordazaBtn = document.getElementById('btn-track-mordaza');
             const tontosBtn = document.getElementById('btn-track-tontos');
             const sec63Btn = document.getElementById('btn-track-section63');
 
             return {
                 secHidden: secMasters ? secMasters.classList.contains('hidden') : null,
+                hasActiveDeployAnimation: secMasters ? secMasters.classList.contains('deck-section-active') : false,
                 chevron: chevMasters ? chevMasters.innerText : null,
-                isLedActive: ledMasters ? ledMasters.classList.contains('bg-cyan-400') : false,
+                isLedPurple: ledMasters ? ledMasters.classList.contains('bg-purple-400') : false,
+                notchHidden: notchMasters ? notchMasters.classList.contains('hidden') : null,
                 tracksFound: {
                     mordaza: !!mordazaBtn,
                     tontos: !!tontosBtn,
@@ -221,12 +233,14 @@ async function runAudit() {
         console.log('Resultados Test 2:', JSON.stringify(expandedStatus, null, 2));
         if (expandedStatus.secHidden) throw new Error('Pistas Master debería estar visible tras hacer click');
         if (expandedStatus.chevron !== '▼') throw new Error(`Chevron masters debe ser ▼ tras desplegarse, es ${expandedStatus.chevron}`);
-        if (!expandedStatus.isLedActive) throw new Error('El LED de masters debería estar activo (bg-cyan-400)');
+        if (!expandedStatus.isLedPurple) throw new Error('El LED de masters debería ser púrpura (bg-purple-400)');
+        if (expandedStatus.notchHidden) throw new Error('El notch de masters debe estar visible (sin clase hidden)');
+        if (!expandedStatus.hasActiveDeployAnimation) throw new Error('Debe tener la clase de animación deck-section-active');
         if (!expandedStatus.tracksFound.mordaza || !expandedStatus.tracksFound.tontos || !expandedStatus.tracksFound.section63) {
             throw new Error('Faltan botones de tracks dentro de masters');
         }
 
-        console.log('✅ TEST 2 SUPERADO: Pistas Master desplegado correctamente con sus 3 canales.');
+        console.log('✅ TEST 2 SUPERADO: Pistas Master desplegado correctamente con animación visual, flecha púrpura y canales HQ.');
 
         const clipBoxExpanded = await cdp.evaluate(`(() => {
             const el = document.getElementById('sec-audio-bar');
@@ -234,7 +248,7 @@ async function runAudit() {
             const r = el.getBoundingClientRect();
             return { x: Math.max(0, r.x - 10), y: Math.max(0, r.y - 10), width: r.width + 20, height: r.height + 20, scale: 1 };
         })()`);
-        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_02_grid_masters_expanded.png'), clipBoxExpanded);
+        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_left_banner_masters_expanded.png'), clipBoxExpanded);
 
         // Test 3: Probar selección de una pista (CH 01 Mordaza) y verificar micro status
         console.log('\n--- TEST 3: Carga de pista master y verificación de status ---');
@@ -248,12 +262,10 @@ async function runAudit() {
         const playStatus = await cdp.evaluate(`(() => {
             const mordazaBtn = document.getElementById('btn-track-mordaza');
             const tag = mordazaBtn ? mordazaBtn.querySelector('.preset-tag') : null;
-            const compactTrack = document.getElementById('compact-deck-track');
             const trackTitle = document.getElementById('track-title');
 
             return {
                 mordazaTag: tag ? tag.innerText : null,
-                compactTrackText: compactTrack ? compactTrack.innerText : null,
                 trackTitleText: trackTitle ? trackTitle.innerText : null
             };
         })()`);
@@ -261,9 +273,9 @@ async function runAudit() {
         console.log('Resultados Test 3:', JSON.stringify(playStatus, null, 2));
         if (playStatus.mordazaTag !== 'ON AIR') throw new Error('Tag de Mordaza no pasó a ON AIR');
 
-        console.log('✅ TEST 3 SUPERADO: Mordaza seleccionada y micro-status actualizado.');
+        console.log('✅ TEST 3 SUPERADO: Mordaza seleccionada y reproductor sincronizado.');
 
-        // Test 4: Re-plegar Pistas Master y verificar que se oculta manteniendo el playback
+        // Test 4: Re-plegar Pistas Master y verificar que se oculta manteniendo el conector y chevron
         console.log('\n--- TEST 4: Re-plegar Pistas Master ---');
         await cdp.evaluate(`document.getElementById('btn-sec-masters').click()`);
         await sleep(300);
@@ -271,31 +283,24 @@ async function runAudit() {
         const reCollapsedStatus = await cdp.evaluate(`(() => {
             const secMasters = document.getElementById('deck-sec-masters-content');
             const chevMasters = document.getElementById('chevron-sec-masters');
-            const compactTrack = document.getElementById('compact-deck-track');
+            const notchMasters = document.getElementById('notch-sec-masters');
 
             return {
                 secHidden: secMasters ? secMasters.classList.contains('hidden') : null,
                 chevron: chevMasters ? chevMasters.innerText : null,
-                compactTrack: compactTrack ? compactTrack.innerText : null
+                notchHidden: notchMasters ? notchMasters.classList.contains('hidden') : null
             };
         })()`);
 
         console.log('Resultados Test 4:', JSON.stringify(reCollapsedStatus, null, 2));
         if (!reCollapsedStatus.secHidden) throw new Error('Pistas Master debería estar plegado nuevamente');
         if (reCollapsedStatus.chevron !== '▶') throw new Error('Chevron debe ser ▶');
+        if (!reCollapsedStatus.notchHidden) throw new Error('Notch de masters debe ocultarse al plegar');
 
         console.log('✅ TEST 4 SUPERADO: Pistas Master re-plegado limpiamente.');
 
-        const clipBoxFinal = await cdp.evaluate(`(() => {
-            const el = document.getElementById('sec-audio-bar');
-            if (!el) return null;
-            const r = el.getBoundingClientRect();
-            return { x: Math.max(0, r.x - 10), y: Math.max(0, r.y - 10), width: r.width + 20, height: r.height + 20, scale: 1 };
-        })()`);
-        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_03_grid_collapsed_playing.png'), clipBoxFinal);
-
         // Test 5: Plegar y Desplegar sección Input mediante btn-sec-patchbay
-        console.log('\n--- TEST 5: Plegado y desplegado de la sección Input ---');
+        console.log('\n--- TEST 5: Plegado y desplegado de la sección Input con notch y animación ---');
         const inputBtnText = await cdp.evaluate(`document.getElementById('btn-sec-patchbay').innerText`);
         console.log('Texto del botón Input:', inputBtnText);
         if (!inputBtnText.includes('Input')) throw new Error('El botón debe contener la palabra Input');
@@ -307,15 +312,18 @@ async function runAudit() {
         const inputCollapsedStatus = await cdp.evaluate(`(() => {
             const sec = document.getElementById('deck-sec-patchbay-content');
             const chev = document.getElementById('chevron-sec-patchbay');
+            const notch = document.getElementById('notch-sec-patchbay');
             return {
                 secHidden: sec ? sec.classList.contains('hidden') : null,
-                chevron: chev ? chev.innerText : null
+                chevron: chev ? chev.innerText : null,
+                notchHidden: notch ? notch.classList.contains('hidden') : null
             };
         })()`);
 
         console.log('Resultados Test 5 (Input Plegado):', JSON.stringify(inputCollapsedStatus, null, 2));
         if (!inputCollapsedStatus.secHidden) throw new Error('La sección Input debe estar plegada (hidden) tras hacer click');
         if (inputCollapsedStatus.chevron !== '▶') throw new Error(`Chevron de Input debe ser ▶, es ${inputCollapsedStatus.chevron}`);
+        if (!inputCollapsedStatus.notchHidden) throw new Error('Notch de Input debe estar oculto al plegar');
 
         const clipBoxInputCollapsed = await cdp.evaluate(`(() => {
             const el = document.getElementById('sec-audio-bar');
@@ -323,28 +331,34 @@ async function runAudit() {
             const r = el.getBoundingClientRect();
             return { x: Math.max(0, r.x - 10), y: Math.max(0, r.y - 10), width: r.width + 20, height: r.height + 20, scale: 1 };
         })()`);
-        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_04_input_collapsed.png'), clipBoxInputCollapsed);
+        await cdp.captureScreenshot(path.join(SCREENSHOT_DIR, 'audio_deck_left_banner_input_collapsed.png'), clipBoxInputCollapsed);
 
         // Desplegar Input nuevamente
         await cdp.evaluate(`document.getElementById('btn-sec-patchbay').click()`);
-        await sleep(300);
+        await sleep(350);
 
         const inputRestoredStatus = await cdp.evaluate(`(() => {
             const sec = document.getElementById('deck-sec-patchbay-content');
             const chev = document.getElementById('chevron-sec-patchbay');
+            const notch = document.getElementById('notch-sec-patchbay');
+            const hasAnim = sec ? sec.classList.contains('deck-section-active') : false;
             return {
                 secHidden: sec ? sec.classList.contains('hidden') : null,
-                chevron: chev ? chev.innerText : null
+                chevron: chev ? chev.innerText : null,
+                notchHidden: notch ? notch.classList.contains('hidden') : null,
+                hasAnim
             };
         })()`);
 
         console.log('Resultados Test 5 (Input Restaurado):', JSON.stringify(inputRestoredStatus, null, 2));
         if (inputRestoredStatus.secHidden) throw new Error('La sección Input debe estar visible tras volver a hacer click');
         if (inputRestoredStatus.chevron !== '▼') throw new Error(`Chevron de Input debe ser ▼, es ${inputRestoredStatus.chevron}`);
+        if (inputRestoredStatus.notchHidden) throw new Error('Notch de Input debe ser visible al desplegar');
+        if (!inputRestoredStatus.hasAnim) throw new Error('Input restaurado debe disparar deck-section-active');
 
-        console.log('✅ TEST 5 SUPERADO: Sección Input se pliega y despliega con precisión.');
+        console.log('✅ TEST 5 SUPERADO: Sección Input se pliega y despliega con precisión de notch y animación reactiva.');
 
-        console.log('\n🎉 TODAS LAS PRUEBAS EMPÍRICAS HAN FINALIZADO CON ÉXITO.');
+        console.log('\n🎉 TODAS LAS PRUEBAS EMPÍRICAS DEL BANNER LATERAL IZQUIERDO HAN FINALIZADO CON ÉXITO.');
 
     } finally {
         if (cdp) await cdp.close();

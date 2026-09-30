@@ -1218,7 +1218,37 @@
   - ✅ Posibilidad de plegar tanto las Pistas Master como la sección **Input** a voluntad, optimizando el espacio vertical del panel.
   - ✅ Simetría arquitectónica visual absoluta de 3 columnas (botones de menú perfectamente alineados con las tarjetas de los 3 canales master).
   - ✅ Cuadrícula de fuentes libre de desbordamientos o solapamientos de botones de configuración.
-  - ✅ Verificación empírica completa al 100% mediante suite CDP automatizada (`scripts/audit_audio_deck.js`).
+---
+
+### D-051 — Banner Lateral Izquierdo de Menús en el Audio Deck y Pertenencia Visual Cinemática por Color, Muesca Conectora y Animación Glow
+- **Fecha:** 2026-09-30
+- **Estado:** ✅ Aceptada
+- **Contexto:**
+  1. El usuario solicitó reorganizar los botones de menú en un **banner lateral a la izquierda**, en lugar de una barra de botones horizontal superior.
+  2. Asimismo, solicitó que al pulsar y desplegar cada botón se produjera un **efecto visual contundente e intuitivo**, de tal modo que se aprecie con total claridad que el panel desplegado pertenece a ese botón específico.
+- **Decisión:**
+  1. **Arquitectura de Layout Left-Rail + Main Deck (`flex flex-row gap-2 sm:gap-2.5 items-start`):**
+     - **Banner Lateral Izquierdo (Left Rail, `w-20 xs:w-24 sm:w-28 shrink-0`):** Columna vertical táctica con cabecera `MENÚS` y los 3 botones apilados verticalmente:
+       - `🎵 Masters` (Púrpura Neón `#c084fc`, 3 CH, chevron, notch).
+       - `🔌 Input` (Cian Neón `#22d3ee`, 7 In, chevron, notch).
+       - `🎚️ Faders` (Ámbar Dorado `#fbbf24`, Vol/Bal, chevron, notch).
+     - **Área de Contenido a la Derecha (`flex-grow min-w-0 space-y-2`):** Aloja los paneles correspondientes con soporte para apilamiento o colapso dinámico.
+     - **Base Inferior Unificada:** Mantiene el osciloscopio PCM y la telemetría de 6 métricas acústicas a todo el ancho (`w-full`) en la parte inferior del contenedor `#sec-audio-bar`.
+  2. **Efecto de Pertenencia Visual Inequívoco (Multi-Layer Binding):**
+     - **Color-Coding Temático:**
+       - Masters: Púrpura Neón (`--deck-glow-rgb: 168, 85, 247`, `border-l-purple-500`, `bg-purple-950/20`).
+       - Input / Patchbay: Cian Neón (`--deck-glow-rgb: 34, 211, 238`, `border-l-cyan-500`, `bg-cyan-950/20`).
+       - Faders: Ámbar Dorado (`--deck-glow-rgb: 245, 158, 11`, `border-l-amber-500`, `bg-amber-950/20`).
+     - **Muesca / Flecha Conectora Física (`#notch-sec-*`):** Un triángulo CSS en el borde derecho del botón activo (`border-y-transparent border-l-[6px]`) que sobresale del rail y apunta directamente hacia la cabecera del panel desplegado a la derecha.
+     - **Ribete Izquierdo de 4px y Badge de Canal:** Cada panel integra un borde izquierdo continuo de 4px (`border-l-4`) del color exacto de la muesca y una insignia superior `[ CANAL: <NOMBRE> ]`.
+     - **Animación Reactiva `@keyframes deckSectionDeploy`:** Al desplegar un botón, el panel se desplaza suavemente desde el rail (`translateX(-12px) -> translateX(0)`) emitiendo un destello de resplandor glow perimetral difuso del color del canal mediante `var(--deck-glow-rgb)` y disipándose de forma natural en 320ms con curva Bézier `cubic-bezier(0.16, 1, 0.3, 1)`.
+  3. **Controlador `toggleAudioDeckSection`:**
+     - Maneja el refresco dinámico de clases activas/inactivas del rail vertical, conmutación de visibilidad de los notches (`#notch-sec-*`) y reactivación forzada del reflow (`void el.offsetWidth; el.classList.add('deck-section-active')`).
+- **Consecuencias:**
+  - ✅ Ergonomía y legibilidad sobresaliente, estilo rack de hardware de audio profesional de gama alta (Eurorack/Pro Tools).
+  - ✅ Relación causa-efecto inmediata e indiscutible: el usuario identifica al instante la procedencia de cada panel sin ambigüedad mental.
+  - ✅ Verificación empírica completa al 100% mediante suite CDP automatizada (`scripts/audit_audio_deck.js`) con capturas de alta definición.
+
 
 
 

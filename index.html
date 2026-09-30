@@ -565,248 +565,306 @@
                         </div>
                     </div>
 
-                    <!-- BARRA DE MENÚ DE SECCIONES COLAPSABLES (3 BOTONES RACK GRID) -->
-                    <div class="grid grid-cols-3 gap-1.5 p-1 bg-zinc-950/90 rounded-lg border border-white/[0.08] text-xs select-none">
-                        <!-- Botón 1: Pistas Master (Inicia Plegado por Defecto) -->
-                        <button id="btn-sec-masters" onclick="toggleAudioDeckSection('masters')" class="w-full py-1.5 px-2 rounded-md border border-white/[0.08] bg-zinc-900/90 text-zinc-400 hover:text-zinc-200 font-medium transition flex items-center justify-between shadow-sm active:scale-95 text-[11px]" title="Plegar / Desplegar Pistas Master de Referencia (Mordaza, Tontos Útiles, Section 63)">
-                            <div class="flex items-center gap-1 truncate">
-                                <span class="w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0" id="led-sec-masters"></span>
-                                <span class="truncate font-bold text-zinc-300">🎵 Masters</span>
-                            </div>
-                            <span class="text-[9px] font-mono text-zinc-500 shrink-0 ml-1" id="chevron-sec-masters">▶</span>
-                        </button>
+                    <!-- ESTILOS Y ANIMACIONES DE CONEXIÓN VISUAL DE SECCIONES -->
+                    <style id="deck-banner-styles">
+                        @keyframes deckSectionDeploy {
+                            0% {
+                                opacity: 0;
+                                transform: translateX(-12px) scale(0.985);
+                                box-shadow: 0 0 24px rgba(var(--deck-glow-rgb, 34, 211, 238), 0.65);
+                            }
+                            50% {
+                                box-shadow: 0 0 16px rgba(var(--deck-glow-rgb, 34, 211, 238), 0.35);
+                            }
+                            100% {
+                                opacity: 1;
+                                transform: translateX(0) scale(1);
+                                box-shadow: none;
+                            }
+                        }
+                        .deck-section-active {
+                            animation: deckSectionDeploy 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                        }
+                    </style>
 
-                        <!-- Botón 2: Input / Patchbay (Inicia Desplegado) -->
-                        <button id="btn-sec-patchbay" onclick="toggleAudioDeckSection('patchbay')" class="w-full py-1.5 px-2 rounded-md border border-cyan-500/40 bg-cyan-950/70 text-cyan-200 font-bold transition flex items-center justify-between shadow-sm active:scale-95 text-[11px]" title="Plegar / Desplegar Matriz de Ingesta Externa / Input (Micrófono, YouTube, Archivo, Synth, Webcam)">
-                            <div class="flex items-center gap-1 truncate">
-                                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee] shrink-0" id="led-sec-patchbay"></span>
-                                <span class="truncate">🔌 Input</span>
+                    <!-- WORKSTATION DE AUDIO: BANNER DE MENÚS A LA IZQUIERDA + CONTENIDO DESPLEGABLE A LA DERECHA -->
+                    <div class="flex flex-row gap-2 sm:gap-2.5 items-start">
+                        <!-- BANNER LATERAL DE MENÚS (LEFT RAIL) -->
+                        <div class="w-20 xs:w-24 sm:w-28 shrink-0 flex flex-col gap-1.5 p-1 bg-zinc-950/95 rounded-xl border border-white/[0.08] select-none justify-start relative shadow-md">
+                            <div class="text-[8px] font-mono text-zinc-500 uppercase tracking-wider px-1 text-center border-b border-white/[0.06] pb-1 mb-0.5 font-bold">
+                                MENÚS
                             </div>
-                            <span class="text-[9px] font-mono text-cyan-400 shrink-0 ml-1" id="chevron-sec-patchbay">▼</span>
-                        </button>
 
-                        <!-- Botón 3: Reproductor & Faders (Inicia Desplegado) -->
-                        <button id="btn-sec-volbal" onclick="toggleAudioDeckSection('volbal')" class="w-full py-1.5 px-2 rounded-md border border-cyan-500/40 bg-cyan-950/70 text-cyan-200 font-bold transition flex items-center justify-between shadow-sm active:scale-95 text-[11px]" title="Plegar / Desplegar Scrubber, Reproductor, Volumen Master y Balance L/R">
-                            <div class="flex items-center gap-1 truncate">
-                                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee] shrink-0" id="led-sec-volbal"></span>
-                                <span class="truncate">🎚️ Faders</span>
-                            </div>
-                            <span class="text-[9px] font-mono text-cyan-400 shrink-0 ml-1" id="chevron-sec-volbal">▼</span>
-                        </button>
-                    </div>
+                            <!-- Botón 1: Masters (Púrpura Neón) - Inicia Plegado -->
+                            <button id="btn-sec-masters" onclick="toggleAudioDeckSection('masters')" class="w-full p-1.5 sm:p-2 rounded-lg border border-white/[0.08] bg-zinc-900/90 text-zinc-400 hover:text-zinc-200 transition flex flex-col gap-1 active:scale-95 text-left shadow-sm relative group" title="Plegar / Desplegar Pistas Master de Referencia (Mordaza, Tontos Útiles, Section 63)">
+                                <div class="flex items-center justify-between w-full">
+                                    <span class="text-xs group-hover:scale-110 transition-transform">🎵</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-zinc-600 transition-colors" id="led-sec-masters"></span>
+                                </div>
+                                <div class="font-bold text-[10px] sm:text-[11px] leading-tight text-zinc-300">Masters</div>
+                                <div class="flex items-center justify-between text-[7px] sm:text-[8px] font-mono text-zinc-500 w-full pt-0.5">
+                                    <span>3 CH</span>
+                                    <span id="chevron-sec-masters" class="transition-transform">▶</span>
+                                </div>
+                                <div id="notch-sec-masters" class="hidden absolute -right-2 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[6px] border-l-purple-500 z-10"></div>
+                            </button>
 
-                    <!-- SECCIÓN 1: PISTAS MASTER DE REFERENCIA (INICIA PLEGADA POR DEFECTO) -->
-                    <div id="deck-sec-masters-content" class="hidden space-y-1.5 p-2 rounded-lg bg-zinc-950/70 border border-white/[0.06] transition-all duration-200">
-                        <div class="flex items-center justify-between text-[10px] font-mono text-zinc-400 uppercase tracking-wider px-0.5">
-                            <span class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]"></span>
-                                <span class="font-bold text-zinc-200">Pistas Master de Referencia</span>
-                            </span>
-                            <span class="text-[9px] font-mono text-cyan-400 bg-cyan-950/70 border border-cyan-500/30 px-2 py-0.5 rounded">3 CANALES MASTER</span>
+                            <!-- Botón 2: Input (Cian Neón) - Inicia Desplegado -->
+                            <button id="btn-sec-patchbay" onclick="toggleAudioDeckSection('patchbay')" class="w-full p-1.5 sm:p-2 rounded-lg border border-cyan-500/50 bg-cyan-950/70 text-cyan-200 font-bold transition flex flex-col gap-1 active:scale-95 text-left shadow-[0_0_12px_rgba(34,211,238,0.25)] ring-1 ring-cyan-400/40 relative group" title="Plegar / Desplegar Matriz de Ingesta Externa / Input (Micrófono, YouTube, Archivo, Synth, Webcam)">
+                                <div class="flex items-center justify-between w-full">
+                                    <span class="text-xs group-hover:scale-110 transition-transform">🔌</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]" id="led-sec-patchbay"></span>
+                                </div>
+                                <div class="font-bold text-[10px] sm:text-[11px] leading-tight text-cyan-200">Input</div>
+                                <div class="flex items-center justify-between text-[7px] sm:text-[8px] font-mono text-cyan-400 w-full pt-0.5">
+                                    <span>7 In</span>
+                                    <span id="chevron-sec-patchbay" class="transition-transform">▼</span>
+                                </div>
+                                <div id="notch-sec-patchbay" class="absolute -right-2 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[6px] border-l-cyan-400 z-10"></div>
+                            </button>
+
+                            <!-- Botón 3: Faders (Ámbar Dorado) - Inicia Desplegado -->
+                            <button id="btn-sec-volbal" onclick="toggleAudioDeckSection('volbal')" class="w-full p-1.5 sm:p-2 rounded-lg border border-amber-500/50 bg-amber-950/70 text-amber-200 font-bold transition flex flex-col gap-1 active:scale-95 text-left shadow-[0_0_12px_rgba(245,158,11,0.25)] ring-1 ring-amber-400/40 relative group" title="Plegar / Desplegar Scrubber, Reproductor, Volumen Master y Balance L/R">
+                                <div class="flex items-center justify-between w-full">
+                                    <span class="text-xs group-hover:scale-110 transition-transform">🎚️</span>
+                                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_#fbbf24]" id="led-sec-volbal"></span>
+                                </div>
+                                <div class="font-bold text-[10px] sm:text-[11px] leading-tight text-amber-200">Faders</div>
+                                <div class="flex items-center justify-between text-[7px] sm:text-[8px] font-mono text-amber-400 w-full pt-0.5">
+                                    <span>Vol/Bal</span>
+                                    <span id="chevron-sec-volbal" class="transition-transform">▼</span>
+                                </div>
+                                <div id="notch-sec-volbal" class="absolute -right-2 top-1/2 -translate-y-1/2 w-0 h-0 border-y-4 border-y-transparent border-l-[6px] border-l-amber-400 z-10"></div>
+                            </button>
                         </div>
-                        <div class="grid grid-cols-3 gap-1.5 sm:gap-2">
-                            <!-- Track 1: Mordaza -->
-                            <button onclick="playPresetTrack('tema.mp3', 'Mordaza', this)" id="btn-track-mordaza" class="preset-track-btn w-full p-2 sm:p-2.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-cyan-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="mordaza">
-                                <div class="flex items-center justify-between mb-0.5 sm:mb-1">
-                                    <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-cyan-400/90 uppercase truncate">CH 01</span>
-                                    <span class="preset-led flex items-center gap-1 text-[7px] sm:text-[8px] font-mono text-zinc-500 group-hover:text-zinc-300">
-                                        <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
-                                        <span class="preset-tag hidden xs:inline">STANDBY</span>
+
+                        <!-- ÁREA DE CONTENIDO A LA DERECHA (PANELES DESPLEGADOS) -->
+                        <div class="flex-grow min-w-0 space-y-2">
+                            <!-- SECCIÓN 1: PISTAS MASTER (Púrpura Neón - Inicia Plegada) -->
+                            <div id="deck-sec-masters-content" style="--deck-glow-rgb: 168, 85, 247;" class="hidden space-y-1.5 p-2 rounded-xl bg-purple-950/20 border border-purple-500/30 border-l-4 border-l-purple-500 transition-all duration-200">
+                                <div class="flex items-center justify-between text-[9px] font-mono text-purple-300 pb-1 border-b border-purple-500/20">
+                                    <span class="flex items-center gap-1.5 font-bold tracking-wider">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_#c084fc]"></span>
+                                        <span>PISTAS MASTER DE REFERENCIA</span>
                                     </span>
+                                    <span class="text-[8px] font-mono text-purple-300 bg-purple-950/80 border border-purple-500/40 px-1.5 py-0.2 rounded font-bold">CANAL: MASTERS</span>
                                 </div>
-                                <div class="font-bold text-zinc-100 text-[11px] sm:text-[13px] tracking-wide truncate group-hover:text-cyan-300 transition">
-                                    MORDAZA
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                                    <!-- Track 1: Mordaza -->
+                                    <button onclick="playPresetTrack('tema.mp3', 'Mordaza', this)" id="btn-track-mordaza" class="preset-track-btn w-full p-2 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-purple-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="mordaza">
+                                        <div class="flex items-center justify-between mb-0.5">
+                                            <span class="text-[8px] font-mono font-bold tracking-widest text-purple-400 uppercase truncate">CH 01</span>
+                                            <span class="preset-led flex items-center gap-1 text-[7px] font-mono text-zinc-500 group-hover:text-zinc-300">
+                                                <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
+                                                <span class="preset-tag hidden xs:inline">STANDBY</span>
+                                            </span>
+                                        </div>
+                                        <div class="font-bold text-zinc-100 text-[11px] sm:text-[12px] tracking-wide truncate group-hover:text-purple-300 transition">
+                                            MORDAZA
+                                        </div>
+                                        <div class="flex items-center justify-between text-[8px] font-mono text-zinc-400 mt-0.5">
+                                            <span>Master PCM</span>
+                                            <span class="text-zinc-500">3:18</span>
+                                        </div>
+                                    </button>
+                                    <!-- Track 2: Tontos Útiles -->
+                                    <button onclick="playPresetTrack('tontos-utiles.mp3', 'Tontos Útiles', this)" id="btn-track-tontos" class="preset-track-btn w-full p-2 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-purple-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="tontos">
+                                        <div class="flex items-center justify-between mb-0.5">
+                                            <span class="text-[8px] font-mono font-bold tracking-widest text-purple-400 uppercase truncate">CH 02</span>
+                                            <span class="preset-led flex items-center gap-1 text-[7px] font-mono text-zinc-500 group-hover:text-zinc-300">
+                                                <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
+                                                <span class="preset-tag hidden xs:inline">STANDBY</span>
+                                            </span>
+                                        </div>
+                                        <div class="font-bold text-zinc-100 text-[11px] sm:text-[12px] tracking-wide truncate group-hover:text-purple-300 transition">
+                                            TONTOS ÚTILES
+                                        </div>
+                                        <div class="flex items-center justify-between text-[8px] font-mono text-zinc-400 mt-0.5">
+                                            <span>Dynamic Mix</span>
+                                            <span class="text-zinc-500">2:45</span>
+                                        </div>
+                                    </button>
+                                    <!-- Track 3: Section 63 (YouTube) -->
+                                    <button onclick="playPresetTrack('section-63.mp3', 'Section 63 (YouTube)', this)" id="btn-track-section63" class="preset-track-btn w-full p-2 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-purple-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="section63">
+                                        <div class="flex items-center justify-between mb-0.5">
+                                            <span class="text-[8px] font-mono font-bold tracking-widest text-purple-400 uppercase truncate">CH 03</span>
+                                            <span class="preset-led flex items-center gap-1 text-[7px] font-mono text-zinc-500 group-hover:text-zinc-300">
+                                                <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
+                                                <span class="preset-tag hidden xs:inline">STANDBY</span>
+                                            </span>
+                                        </div>
+                                        <div class="font-bold text-zinc-100 text-[11px] sm:text-[12px] tracking-wide truncate group-hover:text-purple-300 transition">
+                                            SECTION 63
+                                        </div>
+                                        <div class="flex items-center justify-between text-[8px] font-mono text-zinc-400 mt-0.5">
+                                            <span>YouTube Feed</span>
+                                            <span class="text-zinc-500">3:30</span>
+                                        </div>
+                                    </button>
                                 </div>
-                                <div class="flex items-center justify-between text-[8px] sm:text-[9px] font-mono text-zinc-400 mt-0.5 sm:mt-1">
-                                    <span class="hidden sm:inline">Master PCM</span>
-                                    <span class="text-zinc-500">3:18</span>
-                                </div>
-                            </button>
-                            <!-- Track 2: Tontos Útiles -->
-                            <button onclick="playPresetTrack('tontos-utiles.mp3', 'Tontos Útiles', this)" id="btn-track-tontos" class="preset-track-btn w-full p-2 sm:p-2.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-purple-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="tontos">
-                                <div class="flex items-center justify-between mb-0.5 sm:mb-1">
-                                    <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-purple-400/90 uppercase truncate">CH 02</span>
-                                    <span class="preset-led flex items-center gap-1 text-[7px] sm:text-[8px] font-mono text-zinc-500 group-hover:text-zinc-300">
-                                        <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
-                                        <span class="preset-tag hidden xs:inline">STANDBY</span>
+                            </div>
+
+                            <!-- SECCIÓN 2: MATRIZ DE INPUT // PATCHBAY (Cian Neón - Inicia Desplegada) -->
+                            <div id="deck-sec-patchbay-content" style="--deck-glow-rgb: 34, 211, 238;" class="space-y-1.5 p-2 rounded-xl bg-cyan-950/20 border border-cyan-500/30 border-l-4 border-l-cyan-500 transition-all duration-200">
+                                <div class="flex items-center justify-between text-[9px] font-mono text-cyan-300 pb-1 border-b border-cyan-500/20">
+                                    <span class="flex items-center gap-1.5 font-bold tracking-wider">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee]"></span>
+                                        <span>MATRIZ DE INPUT // PATCHBAY</span>
                                     </span>
+                                    <span class="text-[8px] font-mono text-cyan-300 bg-cyan-950/80 border border-cyan-500/40 px-1.5 py-0.2 rounded font-bold">CANAL: INPUT</span>
                                 </div>
-                                <div class="font-bold text-zinc-100 text-[11px] sm:text-[13px] tracking-wide truncate group-hover:text-purple-300 transition">
-                                    TONTOS ÚTILES
-                                </div>
-                                <div class="flex items-center justify-between text-[8px] sm:text-[9px] font-mono text-zinc-400 mt-0.5 sm:mt-1">
-                                    <span class="hidden sm:inline">Dynamic Mix</span>
-                                    <span class="text-zinc-500">2:45</span>
-                                </div>
-                            </button>
-                            <!-- Track 3: Section 63 (YouTube) -->
-                            <button onclick="playPresetTrack('section-63.mp3', 'Section 63 (YouTube)', this)" id="btn-track-section63" class="preset-track-btn w-full p-2 sm:p-2.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-850 border border-zinc-800 hover:border-red-500/50 active:scale-[0.98] text-left transition group shadow-md relative overflow-hidden" data-track="section63">
-                                <div class="flex items-center justify-between mb-0.5 sm:mb-1">
-                                    <span class="text-[8px] sm:text-[9px] font-mono font-bold tracking-widest text-red-400/90 uppercase truncate">CH 03</span>
-                                    <span class="preset-led flex items-center gap-1 text-[7px] sm:text-[8px] font-mono text-zinc-500 group-hover:text-zinc-300">
-                                        <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
-                                        <span class="preset-tag hidden xs:inline">STANDBY</span>
-                                    </span>
-                                </div>
-                                <div class="font-bold text-zinc-100 text-[11px] sm:text-[13px] tracking-wide truncate group-hover:text-red-300 transition">
-                                    SECTION 63
-                                </div>
-                                <div class="flex items-center justify-between text-[8px] sm:text-[9px] font-mono text-zinc-400 mt-0.5 sm:mt-1">
-                                    <span class="hidden sm:inline">YouTube Feed</span>
-                                    <span class="text-zinc-500">3:30</span>
-                                </div>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- SECCIÓN 2: MATRIZ DE INGESTA EXTERNA // PATCHBAY (DESPLEGADA POR DEFECTO) -->
-                    <div id="deck-sec-patchbay-content" class="space-y-1.5 transition-all duration-200">
-                        <div class="text-[9px] font-mono text-zinc-500 uppercase tracking-wider mb-1 px-0.5 flex items-center justify-between">
-                            <span>Matriz de Ingesta Externa // Patchbay</span>
-                            <span>7 FUENTES DSP & VIDEO</span>
-                        </div>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs font-mono">
-                            <button onclick="startMicrophone()" id="btn-mic" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group">
-                                <span class="text-[10px] text-cyan-400 font-bold shrink-0">[MIC]</span>
-                                <span class="text-[11px] font-sans font-medium truncate">Micrófono</span>
-                                <span class="text-[8px] text-zinc-500 shrink-0">ANALOG</span>
-                            </button>
-                            <div class="flex gap-1 min-w-0">
-                                <button type="button" onclick="selectYouTubeMobileSource(); triggerHaptic(15);" id="btn-yt-mobile" class="flex-grow min-w-0 py-1.5 px-1.5 bg-zinc-900/90 hover:bg-red-950/40 text-red-300 hover:text-white rounded-lg border border-red-500/40 flex items-center justify-between gap-1 shadow-sm transition active:scale-[0.98]" title="Conectar o capturar audio de YouTube">
-                                    <span class="text-[10px] text-red-400 font-bold shrink-0">[YT]</span>
-                                    <span class="text-[11px] font-sans font-medium truncate">YouTube</span>
-                                    <span class="text-[8px] text-red-400/80 font-mono shrink-0 hidden xs:inline">ING</span>
-                                </button>
-                                <button type="button" onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-7 h-auto py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.12] flex items-center justify-center text-xs shrink-0 transition active:scale-90" title="Opciones avanzadas e ingesta de YouTube">
-                                    <span>⚙️</span>
-                                </button>
-                            </div>
-                            <button onclick="startTabCapture()" id="btn-tab" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition">
-                                <span class="text-[10px] text-cyan-400 font-bold shrink-0">[SYS]</span>
-                                <span class="text-[11px] font-sans font-medium truncate">Pestaña Audio</span>
-                                <span class="text-[8px] text-zinc-500 shrink-0">LOOP</span>
-                            </button>
-                            <label class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 cursor-pointer transition">
-                                <span class="text-[10px] text-cyan-400 font-bold shrink-0">[FILE]</span>
-                                <span class="text-[11px] font-sans font-medium truncate">Cargar Archivo</span>
-                                <span class="text-[8px] text-zinc-500 shrink-0">LOCAL</span>
-                                <input type="file" id="file-input" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
-                            </label>
-                            <button onclick="toggleSynthDemo()" id="btn-synth" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 rounded-lg border border-white/[0.08] hover:border-amber-500/40 flex items-center justify-between gap-1 transition">
-                                <span class="text-[10px] text-amber-400 font-bold shrink-0">[SYN]</span>
-                                <span id="txt-synth" class="text-[11px] font-sans font-medium truncate">Synth Beat</span>
-                                <span class="text-[8px] text-amber-500/80 shrink-0">PROC</span>
-                            </button>
-                            <div class="flex gap-1 min-w-0">
-                                <button onclick="toggleLiveVideo()" id="btn-cam" class="flex-grow min-w-0 py-1.5 px-1.5 bg-zinc-900/90 hover:bg-cyan-950/40 text-cyan-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group" title="Activar/Desactivar Cámara en Vivo / NDI / Virtual Cam">
-                                    <span class="text-[10px] text-cyan-400 font-bold shrink-0">[CAM]</span>
-                                    <span class="text-[11px] font-sans font-medium truncate">Webcam</span>
-                                    <span id="cam-badge" class="text-[8px] text-zinc-500 group-hover:text-cyan-400 shrink-0 hidden xs:inline">OFF</span>
-                                </button>
-                                <button onclick="openVideoIngestModal()" class="w-7 h-auto py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center text-xs shrink-0 transition" title="Ajustes de Cámara, Chroma Key y Proyección 3D">
-                                    <span>⚙️</span>
-                                </button>
-                            </div>
-                            <button onclick="stopAudio()" id="btn-stop" class="col-span-2 sm:col-span-3 py-1.5 px-2 bg-zinc-900/90 hover:bg-rose-950/60 text-zinc-400 hover:text-rose-300 rounded-lg border border-white/[0.08] hover:border-rose-500/40 flex items-center justify-between gap-1 transition">
-                                <span class="text-[10px] text-rose-400 font-bold">[MUTE]</span>
-                                <span class="text-[11px] font-sans font-medium text-rose-300">Detener Audio</span>
-                                <span class="text-[8px] text-rose-500/80">STOP</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- HTML5 Audio & Video Elements persistentes en DOM -->
-                    <audio id="html5-audio-player" preload="auto" crossorigin="anonymous" class="hidden"></audio>
-                    <video id="live-video-stream" playsinline autoplay muted class="hidden"></video>
-
-                    <!-- Dedicated Track Scrubber & Master Stereo Controls -->
-                    <div id="track-player-controls" class="p-2.5 bg-black/70 rounded-lg border border-white/[0.08] space-y-2 text-xs">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2 truncate">
-                                <button onclick="togglePlayPauseUserTrack()" id="btn-play-pause-track" class="w-6 h-6 rounded-full bg-cyan-500 hover:bg-cyan-400 flex items-center justify-center font-bold text-black shadow transition shrink-0">▶</button>
-                                <div id="track-title" class="font-mono text-[11px] text-cyan-300 truncate max-w-[200px]">Mordaza (tema.mp3)</div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span id="track-live-badge" class="hidden px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-red-600/30 text-red-300 border border-red-500/40 animate-pulse">● EN VIVO</span>
-                                <label id="track-loop-container" class="flex items-center gap-1.5 text-[10px] text-zinc-400 font-mono cursor-pointer">
-                                    <span>LOOP</span>
-                                    <input type="checkbox" id="track-loop" checked onchange="toggleTrackLoop(this.checked)" class="accent-cyan-400 rounded">
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Scrubber for Local Files -->
-                        <div id="track-file-scrubber-row" class="flex items-center gap-2">
-                            <span id="track-current-time" class="font-mono text-[10px] text-zinc-500 w-8">00:00</span>
-                            <input type="range" id="track-progress" min="0" max="100" value="0" step="0.1" oninput="seekUserTrack(this.value)" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-800 rounded-lg">
-                            <span id="track-duration" class="font-mono text-[10px] text-zinc-500 w-8 text-right">03:18</span>
-                        </div>
-
-                        <!-- Live VU Meter for YouTube & Live Ingest (Visible when in Live Mode) -->
-                        <div id="track-live-meter-row" class="hidden space-y-1.5 bg-zinc-950/60 p-2 rounded-lg border border-red-500/20">
-                            <div class="flex items-center justify-between text-[10px] font-mono">
-                                <span class="text-rose-400 font-bold flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                                    <span>SEÑAL EN VIVO (DSP INGEST):</span>
-                                </span>
-                                <span id="live-meter-db" class="text-zinc-400 font-mono text-[9px]">-inf dB</span>
-                            </div>
-                            <div class="w-full bg-zinc-900 h-2 rounded-full overflow-hidden border border-white/[0.08] relative">
-                                <div id="live-meter-fill" class="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 w-0 transition-all duration-75 rounded-full" style="box-shadow: 0 0 8px rgba(244,63,94,0.6)"></div>
-                            </div>
-                            <div class="flex items-center justify-between text-[9px] font-mono text-zinc-400 pt-0.5">
-                                <span class="text-zinc-400 flex items-center gap-1">
-                                    <span>Preamp / Sensibilidad:</span>
-                                </span>
-                                <div class="flex items-center gap-1">
-                                    <button onclick="setLiveBoost(1.0)" id="btn-boost-1x" class="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-bold shadow" title="1.0x Ganancia Hi-Fi pura transparente (Sin compresión ni saturación)">1x Hi-Fi</button>
-                                    <button onclick="setLiveBoost(2.5)" id="btn-boost-2x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="2.5x Boost moderado">2.5x</button>
-                                    <button onclick="setLiveBoost(4.5)" id="btn-boost-4x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="4.5x Boost para micrófono débil">4.5x</button>
-                                    <button onclick="setLiveBoost(8.0)" id="btn-boost-8x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="8.0x Boost extremo">8x</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Master & Stereo L / R Controls Rack -->
-                        <div class="pt-2 border-t border-white/[0.06] space-y-1.5">
-                            <!-- Volumen General -->
-                            <div class="flex items-center justify-between text-[10px] font-mono">
-                                <span class="text-zinc-300 flex items-center gap-1.5 font-bold">
-                                    <span>🔊</span><span>Volumen General (Master):</span>
-                                </span>
-                                <span id="val-vol-master" class="text-cyan-400 font-bold">100%</span>
-                            </div>
-                            <input type="range" id="slider-vol-master" min="0" max="1.5" step="0.01" value="1.0" oninput="updateMasterVolume(this.value)" class="w-full accent-cyan-400 h-1.5 cursor-pointer bg-zinc-800 rounded-lg" title="Volumen Master General">
-
-                            <!-- Canales L y R -->
-                            <div class="grid grid-cols-2 gap-2 pt-0.5 text-[9px] font-mono">
-                                <!-- Canal Izquierdo (L) -->
-                                <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-cyan-500/20 space-y-1">
-                                    <div class="flex items-center justify-between text-cyan-300 font-bold">
-                                        <span>CANAL L (IZQ)</span>
-                                        <span id="val-vol-left">100%</span>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs font-mono">
+                                    <button onclick="startMicrophone()" id="btn-mic" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group">
+                                        <span class="text-[10px] text-cyan-400 font-bold shrink-0">[MIC]</span>
+                                        <span class="text-[11px] font-sans font-medium truncate">Micrófono</span>
+                                        <span class="text-[8px] text-zinc-500 shrink-0">ANALOG</span>
+                                    </button>
+                                    <div class="flex gap-1 min-w-0">
+                                        <button type="button" onclick="selectYouTubeMobileSource(); triggerHaptic(15);" id="btn-yt-mobile" class="flex-grow min-w-0 py-1.5 px-1.5 bg-zinc-900/90 hover:bg-red-950/40 text-red-300 hover:text-white rounded-lg border border-red-500/40 flex items-center justify-between gap-1 shadow-sm transition active:scale-[0.98]" title="Conectar o capturar audio de YouTube">
+                                            <span class="text-[10px] text-red-400 font-bold shrink-0">[YT]</span>
+                                            <span class="text-[11px] font-sans font-medium truncate">YouTube</span>
+                                            <span class="text-[8px] text-red-400/80 font-mono shrink-0 hidden xs:inline">ING</span>
+                                        </button>
+                                        <button type="button" onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-7 h-auto py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.12] flex items-center justify-center text-xs shrink-0 transition active:scale-90" title="Opciones avanzadas e ingesta de YouTube">
+                                            <span>⚙️</span>
+                                        </button>
                                     </div>
-                                    <input type="range" id="slider-vol-left" min="0" max="1.0" step="0.01" value="1.0" oninput="updateLeftVolume(this.value)" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-950 rounded" title="Volumen Canal Izquierdo">
-                                </div>
-                                <!-- Canal Derecho (R) -->
-                                <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-pink-500/20 space-y-1">
-                                    <div class="flex items-center justify-between text-pink-300 font-bold">
-                                        <span>CANAL R (DER)</span>
-                                        <span id="val-vol-right">100%</span>
+                                    <button onclick="startTabCapture()" id="btn-tab" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition">
+                                        <span class="text-[10px] text-cyan-400 font-bold shrink-0">[SYS]</span>
+                                        <span class="text-[11px] font-sans font-medium truncate">Pestaña Audio</span>
+                                        <span class="text-[8px] text-zinc-500 shrink-0">LOOP</span>
+                                    </button>
+                                    <label class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 cursor-pointer transition">
+                                        <span class="text-[10px] text-cyan-400 font-bold shrink-0">[FILE]</span>
+                                        <span class="text-[11px] font-sans font-medium truncate">Cargar Archivo</span>
+                                        <span class="text-[8px] text-zinc-500 shrink-0">LOCAL</span>
+                                        <input type="file" id="file-input" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
+                                    </label>
+                                    <button onclick="toggleSynthDemo()" id="btn-synth" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 rounded-lg border border-white/[0.08] hover:border-amber-500/40 flex items-center justify-between gap-1 transition">
+                                        <span class="text-[10px] text-amber-400 font-bold shrink-0">[SYN]</span>
+                                        <span id="txt-synth" class="text-[11px] font-sans font-medium truncate">Synth Beat</span>
+                                        <span class="text-[8px] text-amber-500/80 shrink-0">PROC</span>
+                                    </button>
+                                    <div class="flex gap-1 min-w-0">
+                                        <button onclick="toggleLiveVideo()" id="btn-cam" class="flex-grow min-w-0 py-1.5 px-1.5 bg-zinc-900/90 hover:bg-cyan-950/40 text-cyan-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group" title="Activar/Desactivar Cámara en Vivo / NDI / Virtual Cam">
+                                            <span class="text-[10px] text-cyan-400 font-bold shrink-0">[CAM]</span>
+                                            <span class="text-[11px] font-sans font-medium truncate">Webcam</span>
+                                            <span id="cam-badge" class="text-[8px] text-zinc-500 group-hover:text-cyan-400 shrink-0 hidden xs:inline">OFF</span>
+                                        </button>
+                                        <button onclick="openVideoIngestModal()" class="w-7 h-auto py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center text-xs shrink-0 transition" title="Ajustes de Cámara, Chroma Key y Proyección 3D">
+                                            <span>⚙️</span>
+                                        </button>
                                     </div>
-                                    <input type="range" id="slider-vol-right" min="0" max="1.0" step="0.01" value="1.0" oninput="updateRightVolume(this.value)" class="w-full accent-pink-400 h-1 cursor-pointer bg-zinc-950 rounded" title="Volumen Canal Derecho">
+                                    <button onclick="stopAudio()" id="btn-stop" class="col-span-2 sm:col-span-3 py-1.5 px-2 bg-zinc-900/90 hover:bg-rose-950/60 text-zinc-400 hover:text-rose-300 rounded-lg border border-white/[0.08] hover:border-rose-500/40 flex items-center justify-between gap-1 transition">
+                                        <span class="text-[10px] text-rose-400 font-bold">[MUTE]</span>
+                                        <span class="text-[11px] font-sans font-medium text-rose-300">Detener Audio</span>
+                                        <span class="text-[8px] text-rose-500/80">STOP</span>
+                                    </button>
                                 </div>
                             </div>
 
-                            <!-- Botón Reset Estéreo y Monitoreo -->
-                            <div class="flex items-center justify-between pt-0.5 text-[9px] font-mono">
-                                <button onclick="resetStereoVolume()" class="text-zinc-400 hover:text-white hover:underline transition">↺ Resetear Estéreo (100% / 100%)</button>
-                                <button onclick="toggleAudioMonitoring()" id="btn-toggle-monitor" class="text-zinc-400 hover:text-white transition flex items-center gap-1 bg-zinc-900 px-2 py-0.5 rounded border border-white/[0.06]">
-                                    <span>🎧 Monitoreo:</span>
-                                    <span id="txt-monitor-state" class="text-emerald-400 font-bold">ACTIVO</span>
-                                </button>
+                            <!-- HTML5 Audio & Video Elements persistentes en DOM -->
+                            <audio id="html5-audio-player" preload="auto" crossorigin="anonymous" class="hidden"></audio>
+                            <video id="live-video-stream" playsinline autoplay muted class="hidden"></video>
+
+                            <!-- SECCIÓN 3: REPRODUCTOR & FADERS (Ámbar Dorado - Inicia Desplegada) -->
+                            <div id="track-player-controls" style="--deck-glow-rgb: 245, 158, 11;" class="p-2.5 rounded-xl bg-amber-950/20 border border-amber-500/30 border-l-4 border-l-amber-500 space-y-2 text-xs transition-all duration-200">
+                                <div class="flex items-center justify-between text-[9px] font-mono text-amber-300 pb-1 border-b border-amber-500/20">
+                                    <span class="flex items-center gap-1.5 font-bold tracking-wider">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_#fbbf24]"></span>
+                                        <span>REPRODUCTOR MASTER & FADERS</span>
+                                    </span>
+                                    <span class="text-[8px] font-mono text-amber-300 bg-amber-950/80 border border-amber-500/40 px-1.5 py-0.2 rounded font-bold">CANAL: FADERS</span>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2 truncate">
+                                        <button onclick="togglePlayPauseUserTrack()" id="btn-play-pause-track" class="w-6 h-6 rounded-full bg-cyan-500 hover:bg-cyan-400 flex items-center justify-center font-bold text-black shadow transition shrink-0">▶</button>
+                                        <div id="track-title" class="font-mono text-[11px] text-cyan-300 truncate max-w-[200px]">Mordaza (tema.mp3)</div>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span id="track-live-badge" class="hidden px-2 py-0.5 rounded text-[9px] font-mono font-bold bg-red-600/30 text-red-300 border border-red-500/40 animate-pulse">● EN VIVO</span>
+                                        <label id="track-loop-container" class="flex items-center gap-1.5 text-[10px] text-zinc-400 font-mono cursor-pointer">
+                                            <span>LOOP</span>
+                                            <input type="checkbox" id="track-loop" checked onchange="toggleTrackLoop(this.checked)" class="accent-cyan-400 rounded">
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Scrubber for Local Files -->
+                                <div id="track-file-scrubber-row" class="flex items-center gap-2">
+                                    <span id="track-current-time" class="font-mono text-[10px] text-zinc-500 w-8">00:00</span>
+                                    <input type="range" id="track-progress" min="0" max="100" value="0" step="0.1" oninput="seekUserTrack(this.value)" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-800 rounded-lg">
+                                    <span id="track-duration" class="font-mono text-[10px] text-zinc-500 w-8 text-right">03:18</span>
+                                </div>
+
+                                <!-- Live VU Meter for YouTube & Live Ingest (Visible when in Live Mode) -->
+                                <div id="track-live-meter-row" class="hidden space-y-1.5 bg-zinc-950/60 p-2 rounded-lg border border-red-500/20">
+                                    <div class="flex items-center justify-between text-[10px] font-mono">
+                                        <span class="text-rose-400 font-bold flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                                            <span>SEÑAL EN VIVO (DSP INGEST):</span>
+                                        </span>
+                                        <span id="live-meter-db" class="text-zinc-400 font-mono text-[9px]">-inf dB</span>
+                                    </div>
+                                    <div class="w-full bg-zinc-900 h-2 rounded-full overflow-hidden border border-white/[0.08] relative">
+                                        <div id="live-meter-fill" class="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 w-0 transition-all duration-75 rounded-full" style="box-shadow: 0 0 8px rgba(244,63,94,0.6)"></div>
+                                    </div>
+                                    <div class="flex items-center justify-between text-[9px] font-mono text-zinc-400 pt-0.5">
+                                        <span class="text-zinc-400 flex items-center gap-1">
+                                            <span>Preamp / Sensibilidad:</span>
+                                        </span>
+                                        <div class="flex items-center gap-1">
+                                            <button onclick="setLiveBoost(1.0)" id="btn-boost-1x" class="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-bold shadow" title="1.0x Ganancia Hi-Fi pura transparente (Sin compresión ni saturación)">1x Hi-Fi</button>
+                                            <button onclick="setLiveBoost(2.5)" id="btn-boost-2x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="2.5x Boost moderado">2.5x</button>
+                                            <button onclick="setLiveBoost(4.5)" id="btn-boost-4x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="4.5x Boost para micrófono débil">4.5x</button>
+                                            <button onclick="setLiveBoost(8.0)" id="btn-boost-8x" class="px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300" title="8.0x Boost extremo">8x</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Master & Stereo L / R Controls Rack -->
+                                <div class="pt-2 border-t border-white/[0.06] space-y-1.5">
+                                    <!-- Volumen General -->
+                                    <div class="flex items-center justify-between text-[10px] font-mono">
+                                        <span class="text-zinc-300 flex items-center gap-1.5 font-bold">
+                                            <span>🔊</span><span>Volumen General (Master):</span>
+                                        </span>
+                                        <span id="val-vol-master" class="text-cyan-400 font-bold">100%</span>
+                                    </div>
+                                    <input type="range" id="slider-vol-master" min="0" max="1.5" step="0.01" value="1.0" oninput="updateMasterVolume(this.value)" class="w-full accent-cyan-400 h-1.5 cursor-pointer bg-zinc-800 rounded-lg" title="Volumen Master General">
+
+                                    <!-- Canales L y R -->
+                                    <div class="grid grid-cols-2 gap-2 pt-0.5 text-[9px] font-mono">
+                                        <!-- Canal Izquierdo (L) -->
+                                        <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-cyan-500/20 space-y-1">
+                                            <div class="flex items-center justify-between text-cyan-300 font-bold">
+                                                <span>CANAL L (IZQ)</span>
+                                                <span id="val-vol-left">100%</span>
+                                            </div>
+                                            <input type="range" id="slider-vol-left" min="0" max="1.0" step="0.01" value="1.0" oninput="updateLeftVolume(this.value)" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-950 rounded" title="Volumen Canal Izquierdo">
+                                        </div>
+                                        <!-- Canal Derecho (R) -->
+                                        <div class="bg-zinc-900/80 p-1.5 rounded-lg border border-pink-500/20 space-y-1">
+                                            <div class="flex items-center justify-between text-pink-300 font-bold">
+                                                <span>CANAL R (DER)</span>
+                                                <span id="val-vol-right">100%</span>
+                                            </div>
+                                            <input type="range" id="slider-vol-right" min="0" max="1.0" step="0.01" value="1.0" oninput="updateRightVolume(this.value)" class="w-full accent-pink-400 h-1 cursor-pointer bg-zinc-950 rounded" title="Volumen Canal Derecho">
+                                        </div>
+                                    </div>
+
+                                    <!-- Botón Reset Estéreo y Monitoreo -->
+                                    <div class="flex items-center justify-between pt-0.5 text-[9px] font-mono">
+                                        <button onclick="resetStereoVolume()" class="text-zinc-400 hover:text-white hover:underline transition">↺ Resetear Estéreo (100% / 100%)</button>
+                                        <button onclick="toggleAudioMonitoring()" id="btn-toggle-monitor" class="text-zinc-400 hover:text-white transition flex items-center gap-1 bg-zinc-900 px-2 py-0.5 rounded border border-white/[0.06]">
+                                            <span>🎧 Monitoreo:</span>
+                                            <span id="txt-monitor-state" class="text-emerald-400 font-bold">ACTIVO</span>
+                                        </button>
+                                    </div>
+                                    <div id="tab-audio-hint" class="hidden mt-1.5 text-[9px] font-mono p-1.5 rounded bg-cyan-950/40 border border-cyan-500/20 text-cyan-200/90 leading-tight"></div>
+                                </div>
                             </div>
-                            <div id="tab-audio-hint" class="hidden mt-1.5 text-[9px] font-mono p-1.5 rounded bg-cyan-950/40 border border-cyan-500/20 text-cyan-200/90 leading-tight"></div>
                         </div>
                     </div>
 
@@ -4414,34 +4472,39 @@
         }
 
         // =========================================================================
-        // CONTROL DE SECCIONES COLAPSABLES DEL RACK DE AUDIO (MASTERS / FUENTES / FADERS)
+        // CONTROL DE SECCIONES COLAPSABLES DEL RACK DE AUDIO (BANNER LATERAL IZQUIERDO)
         // =========================================================================
         function toggleAudioDeckSection(section) {
-            const classInactive = "w-full py-1.5 px-2 rounded-md border border-white/[0.08] bg-zinc-900/90 text-zinc-400 hover:text-zinc-200 font-medium transition flex items-center justify-between shadow-sm active:scale-95 text-[11px]";
-            const classActive = "w-full py-1.5 px-2 rounded-md border border-cyan-500/40 bg-cyan-950/70 text-cyan-200 font-bold transition flex items-center justify-between shadow-sm active:scale-95 text-[11px]";
+            const classBtnInactive = "w-full p-1.5 sm:p-2 rounded-lg border border-white/[0.08] bg-zinc-900/90 text-zinc-400 hover:text-zinc-200 transition flex flex-col gap-1 active:scale-95 text-left shadow-sm relative group";
 
             if (section === 'masters') {
                 const el = document.getElementById('deck-sec-masters-content');
                 const btn = document.getElementById('btn-sec-masters');
                 const led = document.getElementById('led-sec-masters');
                 const chevron = document.getElementById('chevron-sec-masters');
+                const notch = document.getElementById('notch-sec-masters');
                 if (!el) return;
                 const isHidden = el.classList.toggle('hidden');
                 if (btn) {
                     if (isHidden) {
-                        btn.className = classInactive;
-                        if (led) led.className = "w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0";
+                        btn.className = classBtnInactive;
+                        if (led) led.className = "w-1.5 h-1.5 rounded-full bg-zinc-600 transition-colors";
                         if (chevron) {
                             chevron.innerText = "▶";
-                            chevron.className = "text-[9px] font-mono text-zinc-500 shrink-0 ml-1";
+                            chevron.className = "transition-transform text-zinc-500";
                         }
+                        if (notch) notch.classList.add('hidden');
                     } else {
-                        btn.className = classActive;
-                        if (led) led.className = "w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee] shrink-0";
+                        btn.className = "w-full p-1.5 sm:p-2 rounded-lg border border-purple-500/50 bg-purple-950/70 text-purple-200 font-bold transition flex flex-col gap-1 active:scale-95 text-left shadow-[0_0_12px_rgba(168,85,247,0.25)] ring-1 ring-purple-400/40 relative group";
+                        if (led) led.className = "w-1.5 h-1.5 rounded-full bg-purple-400 shadow-[0_0_6px_#c084fc] shrink-0";
                         if (chevron) {
                             chevron.innerText = "▼";
-                            chevron.className = "text-[9px] font-mono text-cyan-400 shrink-0 ml-1";
+                            chevron.className = "transition-transform text-purple-400";
                         }
+                        if (notch) notch.classList.remove('hidden');
+                        el.classList.remove('deck-section-active');
+                        void el.offsetWidth;
+                        el.classList.add('deck-section-active');
                     }
                 }
             } else if (section === 'patchbay' || section === 'input') {
@@ -4449,23 +4512,29 @@
                 const btn = document.getElementById('btn-sec-patchbay') || document.getElementById('btn-sec-input');
                 const led = document.getElementById('led-sec-patchbay') || document.getElementById('led-sec-input');
                 const chevron = document.getElementById('chevron-sec-patchbay') || document.getElementById('chevron-sec-input');
+                const notch = document.getElementById('notch-sec-patchbay') || document.getElementById('notch-sec-input');
                 if (!el) return;
                 const isHidden = el.classList.toggle('hidden');
                 if (btn) {
                     if (isHidden) {
-                        btn.className = classInactive;
-                        if (led) led.className = "w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0";
+                        btn.className = classBtnInactive;
+                        if (led) led.className = "w-1.5 h-1.5 rounded-full bg-zinc-600 transition-colors";
                         if (chevron) {
                             chevron.innerText = "▶";
-                            chevron.className = "text-[9px] font-mono text-zinc-500 shrink-0 ml-1";
+                            chevron.className = "transition-transform text-zinc-500";
                         }
+                        if (notch) notch.classList.add('hidden');
                     } else {
-                        btn.className = classActive;
+                        btn.className = "w-full p-1.5 sm:p-2 rounded-lg border border-cyan-500/50 bg-cyan-950/70 text-cyan-200 font-bold transition flex flex-col gap-1 active:scale-95 text-left shadow-[0_0_12px_rgba(34,211,238,0.25)] ring-1 ring-cyan-400/40 relative group";
                         if (led) led.className = "w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee] shrink-0";
                         if (chevron) {
                             chevron.innerText = "▼";
-                            chevron.className = "text-[9px] font-mono text-cyan-400 shrink-0 ml-1";
+                            chevron.className = "transition-transform text-cyan-400";
                         }
+                        if (notch) notch.classList.remove('hidden');
+                        el.classList.remove('deck-section-active');
+                        void el.offsetWidth;
+                        el.classList.add('deck-section-active');
                     }
                 }
             } else if (section === 'volbal' || section === 'faders') {
@@ -4473,23 +4542,29 @@
                 const btn = document.getElementById('btn-sec-volbal');
                 const led = document.getElementById('led-sec-volbal');
                 const chevron = document.getElementById('chevron-sec-volbal');
+                const notch = document.getElementById('notch-sec-volbal');
                 if (!el) return;
                 const isHidden = el.classList.toggle('hidden');
                 if (btn) {
                     if (isHidden) {
-                        btn.className = classInactive;
-                        if (led) led.className = "w-1.5 h-1.5 rounded-full bg-zinc-600 shrink-0";
+                        btn.className = classBtnInactive;
+                        if (led) led.className = "w-1.5 h-1.5 rounded-full bg-zinc-600 transition-colors";
                         if (chevron) {
                             chevron.innerText = "▶";
-                            chevron.className = "text-[9px] font-mono text-zinc-500 shrink-0 ml-1";
+                            chevron.className = "transition-transform text-zinc-500";
                         }
+                        if (notch) notch.classList.add('hidden');
                     } else {
-                        btn.className = classActive;
-                        if (led) led.className = "w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#22d3ee] shrink-0";
+                        btn.className = "w-full p-1.5 sm:p-2 rounded-lg border border-amber-500/50 bg-amber-950/70 text-amber-200 font-bold transition flex flex-col gap-1 active:scale-95 text-left shadow-[0_0_12px_rgba(245,158,11,0.25)] ring-1 ring-amber-400/40 relative group";
+                        if (led) led.className = "w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_6px_#fbbf24] shrink-0";
                         if (chevron) {
                             chevron.innerText = "▼";
-                            chevron.className = "text-[9px] font-mono text-cyan-400 shrink-0 ml-1";
+                            chevron.className = "transition-transform text-amber-400";
                         }
+                        if (notch) notch.classList.remove('hidden');
+                        el.classList.remove('deck-section-active');
+                        void el.offsetWidth;
+                        el.classList.add('deck-section-active');
                     }
                 }
             }
