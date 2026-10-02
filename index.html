@@ -7635,7 +7635,12 @@
                 
                 const audioTracks = micStream.getAudioTracks();
                 if (audioTracks.length === 0) {
-                    alert("No se detectó canal de audio. Al proyectar la pantalla o pestaña, asegúrate de activar la casilla 'Compartir audio del dispositivo' / 'Audio de pestaña'.\n\nTambién puedes usar el botón 'YouTube Móvil' para cargar la pista directamente.");
+                    const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+                    if (isFirefox) {
+                        alert("⚠️ Limitación técnica de Mozilla Firefox:\n\nEl motor Gecko de Firefox NO soporta actualmente captura de audio en 'getDisplayMedia' (solo captura video).\n\nPara visualizar audio en vivo te recomendamos:\n1. Usar Google Chrome, Brave o Edge (soportan compartir pestaña con audio digital directo 48kHz sin pérdidas).\n2. O en Firefox: usa el botón 'Cargar Audio' (WAV/MP3 local), 'YouTube Móvil', o el 'Micrófono Hi-Fi' con tu mezcla estéreo.");
+                    } else {
+                        alert("No se detectó canal de audio. Al proyectar la pantalla o pestaña, asegúrate de activar la casilla 'Compartir audio del dispositivo' / 'Audio de pestaña'.\n\nTambién puedes usar el botón 'YouTube Móvil' para cargar la pista directamente.");
+                    }
                     micStream.getTracks().forEach(t => t.stop());
                     return;
                 }

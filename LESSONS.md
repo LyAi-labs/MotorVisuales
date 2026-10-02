@@ -3,6 +3,18 @@
 
 ---
 
+### L-008
+- **Tags:** #firefox #webrtc #getDisplayMedia #audio #loopback #screen-sharing
+- **Síntoma:** En Mozilla Firefox, al pulsar "Pestaña Audio" (`startTabCapture`), el diálogo de compartir pantalla se abre pero no captura sonido, y el sistema arroja la alerta: *"No se detectó canal de audio. Al proyectar la pantalla o pestaña, asegúrate de activar la casilla 'Compartir audio del dispositivo'..."*.
+- **Causa raíz:** El motor Gecko de Firefox **no implementa captura de audio** en la API estándar `navigator.mediaDevices.getDisplayMedia({ audio: true, video: true })` (limitación documentada en Bugzilla de Mozilla). A diferencia de los navegadores basados en Chromium (Google Chrome, Brave, Edge, Opera), que disponen de captura de audio a nivel de pestaña y de sistema con soporte para `suppressLocalAudioPlayback`, Firefox omite silenciosamente el canal de audio y solo entrega la pista de video (`stream.getAudioTracks().length === 0`).
+- **Solución:**
+  1. Detectar si el User-Agent corresponde a Firefox (`isFirefox`) en `startTabCapture()`.
+  2. Emitir un mensaje explicativo claro indicando la limitación del motor Gecko de Firefox.
+  3. Recomendar de forma explícita el uso de navegadores Chromium (Chrome / Brave / Edge) para sesiones de visualización de audio en tiempo real desde pestañas (YouTube, Suno, Spotify Web), o utilizar en Firefox la carga local de archivos WAV/MP3, el asistente YouTube Móvil o la captura analógica por micrófono / interfaz externa.
+- **Trigger:** Al depurar o implementar flujos de captura de medios (`getDisplayMedia`) o WebRTC entre diferentes motores de navegación.
+
+---
+
 ### L-007
 - **Tags:** #threejs #postprocessing #bloom #glsl #narrative-director #white-screen
 - **Síntoma:** El visor 3D se quedaba completamente blanco durante múltiples segundos y perdía dinamismo/fluidez en momentos de baja intensidad musical.
