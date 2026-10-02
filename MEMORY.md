@@ -354,6 +354,16 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Dot-matrix texture:** `radial-gradient` en `::before` a 20px×20px sin coste de GPU.
   - **Componente standalone:** [components/footer/footer.html](file:///c:/lyai-motorvisuales.site/components/footer/footer.html) — listo para subir a `/opt/lyai/app/lyai-shared/components/footer/` en Hetzner.
 
+- ✅ **Draggable Widget Grid Reorganizer con PointerEvents nativos y persistencia local (D-056):**
+  - **Tres niveles interactivos de reorganización modular:**
+    1. **Bento Grid Global Studio:** 7 tarjetas Spotlight reordenables por arrastre nativo (`data-widget-id`: `fft`, `masters`, `stems`, `postfx`, `ingest`, `faders`, `mer`) mediante su handle táctico `⠿`.
+    2. **Cockpit Tabs Navigation:** Pestañas horizontales de navegación v4.2 reordenables mediante drag & drop fluido (`data-tab-id`: `live-runner`, `audio-dsp`, `spatial-audio`, `rf-sdr`, `chaos-lab`, `clip-studio`, `system-config`) con discriminación de umbral de clic (`hypot(dx, dy) > 6px`).
+    3. **Workstation Racks Tier 2:** Paneles y racks de efectos/shaders en Tier 2 reubicables verticalmente.
+  - **Cero dependencias externas:** Implementación con `PointerEvent` nativo, `elementFromPoint` e inserciones `insertBefore` en $\mathcal{O}(1)$ por evento.
+  - **Exclusión de controles:** Filtro con `closest('button, input, a, select, canvas')` para preservar la interacción fluida con faders, botones y vúmetros sin disparar el arrastre.
+  - **Persistencia en Web Storage:** Claves `motor_bento_cards_order`, `motor_cockpit_tabs_order` y `motor_tier2_racks_order` con reordenación automática en el arranque `DOMContentLoaded`.
+  - **Recálculo de Spotlight:** Invocación de `initSpotlightCards()` tras cada drop para sincronizar de inmediato las coordenadas físicas del foco lumínico.
+
 ## Protocolo Hetzner — lyai-shared (ACTIVO desde 2026-10-02)
 > **REGLA PERMANENTE:** Todo componente, función JS, bloque CSS o snippet HTML nuevo que se añada **debe subirse también al servidor Hetzner** en `/opt/lyai/app/lyai-shared/`.
 
@@ -373,6 +383,7 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
 3. Guardar path destino en DECISIONS.md bajo el ADR de D-054+
 
 ## Próximas Ideas / Pendientes
+- [x] Draggable Widget Grid Reorganizer con PointerEvents nativos y persistencia en localStorage (D-056).
 - [x] Bento Grid Global + SpotlightCard System (D-054).
 - [x] Sistema de Vistas Dual para Audio Deck: Hardware Rack vs Bento Grid Butter.video (D-053).
 - [x] Adaptación espacial dinámica del Audio Deck sin huecos vacíos (D-052).
@@ -383,4 +394,5 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
 - [ ] Subir SpotlightCard D-054 a `/opt/lyai/app/lyai-shared/components/spotlight-card/` una vez confirmado SSH.
 - [ ] Control DMX / ArtNet vía WebSockets para sincronizar luces de escenario.
 - [ ] Soporte GLTF/GLB importable por el usuario en los Universos Escénicos.
+
 

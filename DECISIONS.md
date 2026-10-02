@@ -1378,6 +1378,32 @@
   - ✅ Footer de producción visible solo en `>= 1024px`
   - ✅ Reactivo al motor DSP (`stemsData`, `liveAudioMetrics`)
   - ✅ Componente reutilizable en `lyai-shared`
-  - ✅ Cero impacto en rendimiento mobile
-
 ---
+
+### D-056 — Draggable Widget Grid Reorganizer con PointerEvents Nativos y Persistencia Local
+- **Fecha:** 2026-10-02
+- **Estado:** ✅ Aceptada e Implementada
+- **Contexto:** La interfaz modular de MotorVisuales (Cockpit superior, Bento Grid Global Studio y Workstation Racks Tier 2) requería una experiencia de personalización táctica donde el usuario VJ pudiera reordenar libremente sus módulos de control según su flujo de trabajo, sin dependencias pesadas de terceros (como interact.js o sortable.js) y persistiendo el estado entre recargas de sesión.
+- **Decisión y Arquitectura:**
+  1. **Motor de Arrastre Nativo con PointerEvents (`initDraggableWidgetSystem`):**
+     - Tres subsistemas desacoplados:
+       - `initBentoGridDraggable()`: Reorganización bidimensional de las 7 tarjetas Spotlight del Bento Grid (`#bento-global-grid-container > [data-widget-id]`).
+       - `initCockpitTabsDraggable()`: Reordenamiento horizontal de las 7 pestañas de ruta v4.2 (`#cockpit-tabs-container > [data-tab-id]`).
+       - `initWorkstationRacksDraggable()`: Reordenamiento vertical de los paneles y racks del Tier 2 (`#tier2-studios`).
+     - Detección precisa de umbral de movimiento (`hypot(dx, dy) > 6px` en pestañas) para evitar que los clics estándar desencadenen eventos de arrastre espurios.
+     - Filtrado de elementos interactivos (`e.target.closest('button, input, a, select, canvas')`) garantizando que los controles de audio (faders, knobs, switches stomp-box) no activen el arrastre de la tarjeta contenedora.
+  2. **Inserción Dinámica en DOM:**
+     - Uso de `elementFromPoint(clientX, clientY)` e inserciones inmediatas `insertBefore` relativas al punto medio de la tarjeta sobrevolada (`rect.top + rect.height / 2` o `rect.left + rect.width / 2`), con complejidad asintótica $\mathcal{O}(1)$ por evento de movimiento.
+  3. **Persistencia en Web Storage:**
+     - Serialización JSON directa en `localStorage` bajo claves dedicadas:
+       - `motor_bento_cards_order`: Orden de los widgets del Bento (`fft`, `masters`, `stems`, `postfx`, `ingest`, `faders`, `mer`).
+       - `motor_cockpit_tabs_order`: Orden de las pestañas del Cockpit (`live-runner`, `audio-dsp`, `spatial-audio`, `rf-sdr`, `chaos-lab`, `clip-studio`, `system-config`).
+       - `motor_tier2_racks_order`: Orden de las secciones del Tier 2.
+     - Restauración en arranque `DOMContentLoaded` inyectando los elementos en el orden guardado antes del primer ciclo de renderizado.
+  4. **Recálculo de Iluminación Física:**
+     - Tras cada operación de reordenación del Bento Grid, se invoca `initSpotlightCards()` para refrescar los `getBoundingClientRect()` y preservar el tracking volumétrico de luz sin discontinuidades visuales.
+- **Consecuencias:**
+  - ✅ **Cero librerías externas:** Eliminación de dependencias de terceros; 100% JavaScript Vanilla con API moderna de `PointerEvent`.
+  - ✅ **Tolerancia a latencia:** Inserción directa en el DOM sin saltos ni pausas de Garbage Collection; coste de memoria $\mathcal{O}(N)$ con $N \le 10$.
+  - ✅ **Persistencia completa:** El estado y la disposición visual elegida por el operador VJ se mantienen inalterados tras refrescar el navegador.
+

@@ -638,5 +638,26 @@
 - **Solución:**
   1. Localizar la excepción de parseo mediante auditoría headless CDP (`Runtime.exceptionThrown`) que expone la línea exacta del fallo sintáctico.
   2. Eliminar la llave redundante preservando el anidamiento canónico del bloque `try { if (...) { ... } } catch (_) {}`.
-  3. Validar con script de auditoría automatizada (`audit_bento_spotlight.js` y `audit_audio_deck.js`) garantizando cero excepciones en runtime y captura visual confirmada.
 - **Trigger:** Al detectar `ReferenceError` en funciones globales que existen en el código o tras editar bloques anidados en archivos monolíticos.
+
+---
+
+### L-047
+- **Tags:** #drag-and-drop #pointer-events #gestures #interactive-controls #spotlight-card #localstorage #bounding-box
+- **Síntoma:** Al implementar reordenamiento modular mediante arrastre nativo (`PointerEvents`) en tarjetas de consola o pestañas interactivas, surgen dos fallos críticos de UX:
+  1. Al mover un fader de volumen, pulsar un botón de reproducción o interactuar con un canvas dentro de una tarjeta, la tarjeta entera empieza a arrastrarse en lugar de responder el control interno.
+  2. Al pulsar una pestaña para cambiar de vista, el evento `pointerdown`/`pointerup` dispara accidentalmente un micro-movimiento que bloquea el cambio de pestaña o reorganiza la barra de navegación involuntariamente.
+  3. Tras soltar una tarjeta reordenada en una cuadrícula con iluminación dinámica (Spotlight Cards), el foco lumínico queda desplazado o no responde adecuadamente a las nuevas coordenadas.
+- **Causa raíz:**
+  - El listener `pointerdown` captura todos los eventos del árbol DOM hijo sin discriminar elementos interactivos de control.
+  - La ausencia de una zona muerta o umbral mínimo de desplazamiento Euclidiano (`hypot(dx, dy)`) trata cualquier clic como el inicio de una operación de arrastre.
+  - El reordenamiento en el DOM altera la posición física de las tarjetas en pantalla, desfasando los rectángulos de coordenadas (`getBoundingClientRect`) previamente cacheados por los controladores de iluminación reactiva.
+- **Solución:**
+  1. **Filtro de exclusión interactiva:** Comprobar en `pointerdown`:
+     ```js
+     if (e.target.closest('button, input, a, select, canvas')) return;
+     ```
+  2. **Umbral Euclidiano de discriminación:** Exigir un desplazamiento mínimo antes de activar el estado de arrastre (ej. `Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6` píxeles) para preservar la respuesta táctil instantánea a clics estándar.
+  3. **Recálculo de geometría lumínica:** Reinvocar `initSpotlightCards()` en el callback `pointerup` para refrescar los `getBoundingClientRect()` de todos los elementos reorganizados en el DOM.
+- **Trigger:** Al implementar sistemas de arrastre y soltar (drag & drop) en paneles de control con micro-controles interactivos o efectos de iluminación física reactiva.
+

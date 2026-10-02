@@ -474,33 +474,39 @@
     <!-- v4.2-PRO ROUTE MATRIX NAVIGATION -->
     <div class="glass-panel border-b border-white/[0.08] bg-[#090c15]/95 sticky top-12 sm:top-14 z-40 px-2 sm:px-3 py-1 sm:py-1.5 transition-all">
         <div class="max-w-[1720px] mx-auto flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
-            <div class="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider flex-nowrap shrink-0">
-                <span class="text-zinc-500 font-bold mr-1 text-[10px] hidden md:inline">V4.2 COCKPIT:</span>
-                <button onclick="switchV4View('live-runner')" id="nav-btn-live-runner" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg v4-tab-active flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+            <div id="cockpit-tabs-container" class="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider flex-nowrap shrink-0">
+                <span class="text-zinc-500 font-bold mr-1 text-[10px] hidden md:inline select-none">V4.2 COCKPIT:</span>
+                <button data-tab-id="live-runner" onclick="switchV4View('live-runner')" id="nav-btn-live-runner" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg v4-tab-active flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span>🚀</span><span>LIVE<span class="hidden sm:inline"> RUNNER</span></span>
                 </button>
-                <button onclick="switchV4View('audio-dsp')" id="nav-btn-audio-dsp" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                <button data-tab-id="audio-dsp" onclick="switchV4View('audio-dsp')" id="nav-btn-audio-dsp" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span>🎛️</span><span>DSP<span class="hidden sm:inline"> (64-BAND)</span></span>
                 </button>
-                <button onclick="switchV4View('spatial-audio')" id="nav-btn-spatial-audio" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                <button data-tab-id="spatial-audio" onclick="switchV4View('spatial-audio')" id="nav-btn-spatial-audio" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span>🎧</span><span>SPATIAL<span class="hidden sm:inline"> 3D &amp; 5.1</span></span>
                 </button>
-                <button onclick="switchV4View('rf-sdr')" id="nav-btn-rf-sdr" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                <button data-tab-id="rf-sdr" onclick="switchV4View('rf-sdr')" id="nav-btn-rf-sdr" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                     <span>RF / SDR<span class="hidden sm:inline"> MATRIX</span></span>
                 </button>
-                <button onclick="switchV4View('chaos-lab')" id="nav-btn-chaos-lab" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                <button data-tab-id="chaos-lab" onclick="switchV4View('chaos-lab')" id="nav-btn-chaos-lab" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
                     <span>CHAOS<span class="hidden sm:inline"> LAB</span></span>
                 </button>
-                <button onclick="openAiClipStudioModal()" id="nav-btn-clip-studio" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-purple-300 hover:text-white hover:bg-purple-950/60 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap border border-purple-500/30 shadow-sm" title="Estudio de Creación Narrativa & Clips IA Multicapa">
+                <button data-tab-id="clip-studio" onclick="openAiClipStudioModal()" id="nav-btn-clip-studio" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-purple-300 hover:text-white hover:bg-purple-950/60 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap border border-purple-500/30 shadow-sm cursor-default" title="Arrastrar para reordenar pestaña · Estudio de Creación Narrativa & Clips IA Multicapa">
                     <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
                     <span>🎬 CLIPS IA<span class="hidden sm:inline"> &amp; STORY</span></span>
                 </button>
-                <button onclick="switchV4View('system-config')" id="nav-btn-system-config" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                <button data-tab-id="system-config" onclick="switchV4View('system-config')" id="nav-btn-system-config" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span>⚙️</span><span>CONFIG<span class="hidden sm:inline"> &amp; MCP</span></span>
                 </button>
             </div>
+
+            <!-- D-056: Toggle Modo Edición de Layout -->
+            <button onclick="toggleWidgetEditMode()" id="btn-widget-edit-mode" class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 hover:bg-zinc-800 text-zinc-400 hover:text-cyan-300 border border-white/[0.08] hover:border-cyan-500/40 font-mono text-[10px] font-bold uppercase tracking-wider transition shrink-0 whitespace-nowrap select-none" title="Activar/desactivar modo de reordenamiento de widgets y pestañas">
+                <span id="widget-edit-mode-icon">🔒</span>
+                <span id="widget-edit-mode-label">LAYOUT</span>
+            </button>
             
             <!-- Live Register Bus Mini Telemetry Strip (Desktop / Tablet) -->
             <div class="hidden lg:flex items-center gap-3 font-mono text-[10px] text-zinc-400 bg-black/60 px-3 py-1 rounded-lg border border-white/5 shrink-0 whitespace-nowrap">
@@ -678,6 +684,49 @@
                         .bento-card-animate:nth-child(5) { animation-delay: 160ms; }
                         .bento-card-animate:nth-child(6) { animation-delay: 200ms; }
                         .bento-card-animate:nth-child(7) { animation-delay: 240ms; }
+
+                        /* ─── Draggable Widget Grid Styles (D-056) ─────────────────────── */
+                        /* Por defecto: handles ocultos, cursores normales */
+                        .widget-drag-handle {
+                            display: none;
+                            cursor: grab;
+                            user-select: none;
+                            -webkit-user-select: none;
+                            touch-action: none;
+                        }
+                        /* Modo edición activo: handles visibles + indicadores */
+                        body.widget-edit-mode-active .widget-drag-handle {
+                            display: inline-flex;
+                        }
+                        body.widget-edit-mode-active [data-tab-id] {
+                            cursor: grab;
+                        }
+                        body.widget-edit-mode-active [data-tab-id]:active {
+                            cursor: grabbing;
+                        }
+                        body.widget-edit-mode-active [data-widget-id] {
+                            outline: 1px dashed rgba(34,211,238,0.15);
+                            outline-offset: -1px;
+                        }
+                        .widget-drag-handle:active {
+                            cursor: grabbing;
+                        }
+                        .widget-item-dragging {
+                            z-index: 50 !important;
+                            opacity: 0.92;
+                            transform: scale(1.03) !important;
+                            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7), 0 0 20px rgba(34,211,238,0.4) !important;
+                            pointer-events: none;
+                        }
+                        .widget-drop-target {
+                            outline: 2px dashed rgba(34,211,238,0.6) !important;
+                            outline-offset: -2px;
+                            background-color: rgba(34,211,238,0.06) !important;
+                        }
+                        .cockpit-tab-dragging {
+                            opacity: 0.7;
+                            transform: scale(0.96);
+                        }
                     </style>
 
                     <!-- CONTENEDOR VISTA 1: RACK MODULAR TÁCTICO CON BANNER LATERAL IZQUIERDO -->
@@ -1006,17 +1055,18 @@
                     </div>
                 </div>
 
-                <!-- CONTENEDOR VISTA 2: BENTO GRID GLOBAL STUDIO (D-054) ─ SpotlightCard + Layout Asimétrico 12-col -->
+                <!-- CONTENEDOR VISTA 2: BENTO GRID GLOBAL STUDIO (D-054/D-056) ─ SpotlightCard + Draggable Reorganizer -->
                 <div id="view-mode-bento" class="hidden">
-                    <div class="grid grid-cols-12 gap-2.5 bento-global-grid">
+                    <div id="bento-global-grid-container" class="grid grid-cols-12 gap-2.5 bento-global-grid">
 
                         <!-- ══════════════════════════════════════════════════════════════════
                              CARD 1 ─ HERO: FFT LIVE SCOPE + TELEMETRÍA ESPECTRAL (col-span-8)
                              ══════════════════════════════════════════════════════════════════ -->
-                        <div class="col-span-12 lg:col-span-8 spotlight-card spc-cyan bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5" style="min-height:200px">
+                        <div id="bento-card-fft" data-widget-id="fft" class="col-span-12 lg:col-span-8 spotlight-card spc-cyan bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5" style="min-height:200px">
                             <!-- Header -->
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-cyan-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
                                     <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-cyan-950/70 border border-cyan-500/25 text-cyan-300 text-sm">⚡</div>
                                     <div>
                                         <div class="flex items-baseline gap-1.5">
@@ -1079,10 +1129,11 @@
                         <!-- ══════════════════════════════════════════════════════════════════
                              CARD 2 ─ PISTAS MASTER HQ (col-span-4)
                              ══════════════════════════════════════════════════════════════════ -->
-                        <div class="col-span-12 lg:col-span-4 spotlight-card spc-purple bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                        <div id="bento-card-masters" data-widget-id="masters" class="col-span-12 lg:col-span-4 spotlight-card spc-purple bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
                             <!-- Header -->
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-purple-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
                                     <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-purple-950/70 border border-purple-500/25 text-purple-300 text-sm">🎵</div>
                                     <div>
                                         <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-purple-200 transition-colors">Pistas Master HQ</h3>
@@ -1152,9 +1203,10 @@
                         <!-- ══════════════════════════════════════════════════════════════════
                              CARD 3 ─ STEMS DSP LIVE (col-span-8) ─ 8 vúmetros reactivos
                              ══════════════════════════════════════════════════════════════════ -->
-                        <div class="col-span-12 lg:col-span-8 spotlight-card spc-emerald bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                        <div id="bento-card-stems" data-widget-id="stems" class="col-span-12 lg:col-span-8 spotlight-card spc-emerald bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-emerald-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
                                     <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-emerald-950/70 border border-emerald-500/25 text-emerald-300 text-sm">🎚️</div>
                                     <div>
                                         <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-emerald-200 transition-colors">Stems DSP Live</h3>
@@ -1252,9 +1304,10 @@
                         <!-- ══════════════════════════════════════════════════════════════════
                              CARD 4 ─ POSTFX SUITE (col-span-4) ─ 9 passes stomp-box
                              ══════════════════════════════════════════════════════════════════ -->
-                        <div class="col-span-12 lg:col-span-4 spotlight-card spc-fuchsia bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                        <div id="bento-card-postfx" data-widget-id="postfx" class="col-span-12 lg:col-span-4 spotlight-card spc-fuchsia bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-fuchsia-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
                                     <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-fuchsia-950/70 border border-fuchsia-500/25 text-fuchsia-300 text-sm">✨</div>
                                     <div>
                                         <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-fuchsia-200 transition-colors">PostFX Suite</h3>
@@ -1322,9 +1375,10 @@
                         <!-- ══════════════════════════════════════════════════════════════════
                              CARD 5 ─ INGESTA I/O (col-span-4)
                              ══════════════════════════════════════════════════════════════════ -->
-                        <div class="col-span-12 lg:col-span-4 spotlight-card spc-cyan bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                        <div id="bento-card-ingest" data-widget-id="ingest" class="col-span-12 lg:col-span-4 spotlight-card spc-cyan bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-cyan-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
                                     <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-cyan-950/70 border border-cyan-500/25 text-cyan-300 text-sm">🔌</div>
                                     <div>
                                         <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-cyan-200 transition-colors">Matriz de Ingesta</h3>
@@ -1388,9 +1442,10 @@
                         <!-- ══════════════════════════════════════════════════════════════════
                              CARD 6 ─ TRANSPORTE & FADERS (col-span-4)
                              ══════════════════════════════════════════════════════════════════ -->
-                        <div class="col-span-12 lg:col-span-4 spotlight-card spc-amber bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                        <div id="bento-card-faders" data-widget-id="faders" class="col-span-12 lg:col-span-4 spotlight-card spc-amber bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-amber-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
                                     <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-amber-950/70 border border-amber-500/25 text-amber-300 text-sm">🔊</div>
                                     <div>
                                         <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-amber-200 transition-colors">Transporte & Faders</h3>
@@ -1459,9 +1514,10 @@
                         <!-- ══════════════════════════════════════════════════════════════════
                              CARD 7 ─ AI DIRECTOR MER (col-span-4)
                              ══════════════════════════════════════════════════════════════════ -->
-                        <div class="col-span-12 lg:col-span-4 spotlight-card spc-rose bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                        <div id="bento-card-mer" data-widget-id="mer" class="col-span-12 lg:col-span-4 spotlight-card spc-rose bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
                             <div class="flex items-center justify-between gap-1">
                                 <div class="flex items-center gap-1.5 min-w-0">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-rose-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
                                     <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-rose-950/70 border border-rose-500/25 text-rose-300 text-sm shrink-0">🧠</div>
                                     <div class="min-w-0">
                                         <h3 class="font-bold text-[12px] text-zinc-100 group-hover:text-rose-200 transition-colors truncate">AI Director MER</h3>
@@ -2516,6 +2572,7 @@
                 <section id="sec-postfx-suite" class="glass-panel rounded-xl p-3 sm:p-3.5 space-y-2.5 text-xs shadow-lg hidden lg:block mobile-deck-scrollable">
                         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-2">
                             <div class="flex flex-wrap items-center gap-2 font-bold text-zinc-200">
+                                <span class="widget-drag-handle text-zinc-500 hover:text-cyan-400 cursor-grab active:cursor-grabbing text-xs px-1.5 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este panel">⠿</span>
                                 <span class="text-cyan-400">✨ Suite de Post-Procesado WebGL FX</span>
                                 <span class="text-[9px] font-mono text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-white/[0.08]">9 Passes Reactivos</span>
                                 <div id="ai-fx-director-badge" class="hidden flex items-center gap-1.5 px-2 py-0.5 bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 rounded font-mono text-[9px] shadow-sm">
@@ -2802,6 +2859,7 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-white/[0.06] pb-2.5">
                     <div>
                         <div class="flex items-center gap-2">
+                            <span class="widget-drag-handle text-zinc-500 hover:text-pink-400 cursor-grab active:cursor-grabbing text-xs px-1.5 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este panel">⠿</span>
                             <span class="w-2 h-2 rounded-full bg-pink-500"></span>
                             <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-200 flex items-center gap-2">
                                 Laboratorio GLSL • Hot-Reload WebGL
@@ -26375,6 +26433,10 @@ void main() {
             } catch (_) {}
             // D-054: SpotlightCard — inicializar listeners de cursor en todas las tarjetas Bento
             initSpotlightCards();
+            // D-056: Draggable Widget Grid — inicializar reordenamiento de Bento, Cockpit y Racks
+            if (typeof initDraggableWidgetSystem === 'function') {
+                initDraggableWidgetSystem();
+            }
         });
 
         /* ══ Stubs Bridge D-054 ══════════════════════════════════════════════
@@ -26434,6 +26496,262 @@ void main() {
             if (typeof triggerAiArtDirectionNow === 'function') {
                 triggerAiArtDirectionNow();
             }
+        }
+
+        /* ══════════════════════════════════════════════════════════════════════
+           DRAGGABLE WIDGET GRID ORCHESTRATOR — D-056
+           Reorganización modular interactiva mediante PointerEvents nativos
+           para los 3 niveles:
+           1. Bento Grid Studio (7 Cards con exact tiler / row packer)
+           2. Cockpit Tabs Navigation (Reordenamiento horizontal)
+           3. Racks de la Workstation
+           Persistencia en localStorage con recuperación automática en arranque.
+        ═══════════════════════════════════════════════════════════════════════ */
+        window.widgetEditMode = false;
+
+        function toggleWidgetEditMode() {
+            window.widgetEditMode = !window.widgetEditMode;
+            const body = document.body;
+            const btn = document.getElementById('btn-widget-edit-mode');
+            const icon = document.getElementById('widget-edit-mode-icon');
+            const label = document.getElementById('widget-edit-mode-label');
+
+            if (window.widgetEditMode) {
+                body.classList.add('widget-edit-mode-active');
+                if (btn) {
+                    btn.classList.remove('text-zinc-400', 'border-white/[0.08]');
+                    btn.classList.add('text-cyan-300', 'border-cyan-500/40', 'bg-cyan-950/60', 'shadow-[0_0_10px_rgba(6,182,212,0.25)]');
+                }
+                if (icon) icon.textContent = '✏️';
+                if (label) label.textContent = 'EDITANDO';
+            } else {
+                body.classList.remove('widget-edit-mode-active');
+                if (btn) {
+                    btn.classList.remove('text-cyan-300', 'border-cyan-500/40', 'bg-cyan-950/60', 'shadow-[0_0_10px_rgba(6,182,212,0.25)]');
+                    btn.classList.add('text-zinc-400', 'border-white/[0.08]');
+                }
+                if (icon) icon.textContent = '🔒';
+                if (label) label.textContent = 'LAYOUT';
+            }
+        }
+
+        function initDraggableWidgetSystem() {
+            initBentoGridDraggable();
+            initCockpitTabsDraggable();
+            initWorkstationRacksDraggable();
+        }
+
+        // ── 1. Bento Grid Global Draggable (D-056) ──────────────────────────
+        function initBentoGridDraggable() {
+            const container = document.getElementById('bento-global-grid-container');
+            if (!container) return;
+
+            // Restaurar orden previo si existe en localStorage
+            try {
+                const savedOrder = JSON.parse(localStorage.getItem('motor_bento_cards_order') || 'null');
+                if (Array.isArray(savedOrder) && savedOrder.length > 0) {
+                    savedOrder.forEach(id => {
+                        const el = container.querySelector(`[data-widget-id="${id}"]`);
+                        if (el) container.appendChild(el);
+                    });
+                }
+            } catch (_) {}
+
+            let draggedEl = null;
+            let placeholder = null;
+
+            container.querySelectorAll('[data-widget-id]').forEach(card => {
+                const handle = card.querySelector('.widget-drag-handle') || card;
+
+                handle.addEventListener('pointerdown', (e) => {
+                    if (e.button !== 0) return;
+                    if (!window.widgetEditMode) return;
+                    // No interceptar si el clic es en un botón interactivo o fader interior
+                    if (e.target.closest('button, input, a, select, canvas')) return;
+
+                    draggedEl = card;
+                    draggedEl.classList.add('widget-item-dragging');
+                    container.classList.add('select-none');
+
+                    const onPointerMove = (ev) => {
+                        if (!draggedEl) return;
+                        const target = document.elementFromPoint(ev.clientX, ev.clientY);
+                        const overCard = target ? target.closest('#bento-global-grid-container > [data-widget-id]') : null;
+
+                        if (overCard && overCard !== draggedEl) {
+                            const rect = overCard.getBoundingClientRect();
+                            const isAfter = (ev.clientY > rect.top + rect.height / 2) || (ev.clientX > rect.left + rect.width / 2);
+                            if (isAfter) {
+                                container.insertBefore(draggedEl, overCard.nextSibling);
+                            } else {
+                                container.insertBefore(draggedEl, overCard);
+                            }
+                        }
+                    };
+
+                    const onPointerUp = () => {
+                        window.removeEventListener('pointermove', onPointerMove);
+                        window.removeEventListener('pointerup', onPointerUp);
+
+                        if (draggedEl) {
+                            draggedEl.classList.remove('widget-item-dragging');
+                            draggedEl = null;
+                        }
+                        container.classList.remove('select-none');
+
+                        // Guardar nuevo orden en localStorage
+                        const currentOrder = Array.from(container.querySelectorAll('[data-widget-id]'))
+                            .map(el => el.getAttribute('data-widget-id'))
+                            .filter(Boolean);
+                        try {
+                            localStorage.setItem('motor_bento_cards_order', JSON.stringify(currentOrder));
+                        } catch (_) {}
+
+                        // Re-inicializar SpotlightCards para actualizar bounding boxes
+                        initSpotlightCards();
+                    };
+
+                    window.addEventListener('pointermove', onPointerMove);
+                    window.addEventListener('pointerup', onPointerUp);
+                });
+            });
+        }
+
+        // ── 2. Cockpit Tabs Horizontal Draggable (D-056) ─────────────────────
+        function initCockpitTabsDraggable() {
+            const container = document.getElementById('cockpit-tabs-container');
+            if (!container) return;
+
+            // Restaurar orden previo si existe en localStorage
+            try {
+                const savedOrder = JSON.parse(localStorage.getItem('motor_cockpit_tabs_order') || 'null');
+                if (Array.isArray(savedOrder) && savedOrder.length > 0) {
+                    savedOrder.forEach(id => {
+                        const btn = container.querySelector(`[data-tab-id="${id}"]`);
+                        if (btn) container.appendChild(btn);
+                    });
+                }
+            } catch (_) {}
+
+            let draggedTab = null;
+
+            container.querySelectorAll('[data-tab-id]').forEach(tab => {
+                tab.addEventListener('pointerdown', (e) => {
+                    if (e.button !== 0) return;
+                    if (!window.widgetEditMode) return;
+                    let moved = false;
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+
+                    const onPointerMove = (ev) => {
+                        if (!moved && Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6) {
+                            moved = true;
+                            draggedTab = tab;
+                            draggedTab.classList.add('cockpit-tab-dragging');
+                        }
+                        if (!moved || !draggedTab) return;
+
+                        const target = document.elementFromPoint(ev.clientX, ev.clientY);
+                        const overTab = target ? target.closest('#cockpit-tabs-container > [data-tab-id]') : null;
+
+                        if (overTab && overTab !== draggedTab) {
+                            const rect = overTab.getBoundingClientRect();
+                            if (ev.clientX > rect.left + rect.width / 2) {
+                                container.insertBefore(draggedTab, overTab.nextSibling);
+                            } else {
+                                container.insertBefore(draggedTab, overTab);
+                            }
+                        }
+                    };
+
+                    const onPointerUp = () => {
+                        window.removeEventListener('pointermove', onPointerMove);
+                        window.removeEventListener('pointerup', onPointerUp);
+
+                        if (draggedTab) {
+                            draggedTab.classList.remove('cockpit-tab-dragging');
+                            draggedTab = null;
+
+                            // Guardar nuevo orden en localStorage
+                            const order = Array.from(container.querySelectorAll('[data-tab-id]'))
+                                .map(el => el.getAttribute('data-tab-id'))
+                                .filter(Boolean);
+                            try {
+                                localStorage.setItem('motor_cockpit_tabs_order', JSON.stringify(order));
+                            } catch (_) {}
+                        }
+                    };
+
+                    window.addEventListener('pointermove', onPointerMove);
+                    window.addEventListener('pointerup', onPointerUp);
+                });
+            });
+        }
+
+        // ── 3. Workstation Racks Draggable (D-056) ───────────────────────────
+        function initWorkstationRacksDraggable() {
+            const tier2 = document.getElementById('tier2-studios');
+            if (!tier2) return;
+
+            // Restaurar orden previo si existe en localStorage
+            try {
+                const savedOrder = JSON.parse(localStorage.getItem('motor_tier2_racks_order') || 'null');
+                if (Array.isArray(savedOrder) && savedOrder.length > 0) {
+                    savedOrder.forEach(id => {
+                        const sec = tier2.querySelector(`#${id}`);
+                        if (sec) tier2.appendChild(sec);
+                    });
+                }
+            } catch (_) {}
+
+            let draggedRack = null;
+
+            tier2.querySelectorAll(':scope > section, :scope > div').forEach(rack => {
+                const handle = rack.querySelector('.widget-drag-handle');
+                if (!handle) return;
+
+                handle.addEventListener('pointerdown', (e) => {
+                    if (e.button !== 0) return;
+                    if (!window.widgetEditMode) return;
+                    draggedRack = rack;
+                    draggedRack.classList.add('widget-item-dragging');
+
+                    const onPointerMove = (ev) => {
+                        if (!draggedRack) return;
+                        const target = document.elementFromPoint(ev.clientX, ev.clientY);
+                        const overRack = target ? target.closest('#tier2-studios > section, #tier2-studios > div') : null;
+
+                        if (overRack && overRack !== draggedRack) {
+                            const rect = overRack.getBoundingClientRect();
+                            if (ev.clientY > rect.top + rect.height / 2) {
+                                tier2.insertBefore(draggedRack, overRack.nextSibling);
+                            } else {
+                                tier2.insertBefore(draggedRack, overRack);
+                            }
+                        }
+                    };
+
+                    const onPointerUp = () => {
+                        window.removeEventListener('pointermove', onPointerMove);
+                        window.removeEventListener('pointerup', onPointerUp);
+
+                        if (draggedRack) {
+                            draggedRack.classList.remove('widget-item-dragging');
+                            draggedRack = null;
+
+                            const order = Array.from(tier2.querySelectorAll(':scope > section, :scope > div'))
+                                .map(el => el.id)
+                                .filter(Boolean);
+                            try {
+                                localStorage.setItem('motor_tier2_racks_order', JSON.stringify(order));
+                            } catch (_) {}
+                        }
+                    };
+
+                    window.addEventListener('pointermove', onPointerMove);
+                    window.addEventListener('pointerup', onPointerUp);
+                });
+            });
         }
 
         // =========================================================================
