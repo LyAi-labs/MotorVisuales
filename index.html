@@ -474,33 +474,39 @@
     <!-- v4.2-PRO ROUTE MATRIX NAVIGATION -->
     <div class="glass-panel border-b border-white/[0.08] bg-[#090c15]/95 sticky top-12 sm:top-14 z-40 px-2 sm:px-3 py-1 sm:py-1.5 transition-all">
         <div class="max-w-[1720px] mx-auto flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
-            <div class="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider flex-nowrap shrink-0">
-                <span class="text-zinc-500 font-bold mr-1 text-[10px] hidden md:inline">V4.2 COCKPIT:</span>
-                <button onclick="switchV4View('live-runner')" id="nav-btn-live-runner" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg v4-tab-active flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+            <div id="cockpit-tabs-container" class="flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-wider flex-nowrap shrink-0">
+                <span class="text-zinc-500 font-bold mr-1 text-[10px] hidden md:inline select-none">V4.2 COCKPIT:</span>
+                <button data-tab-id="live-runner" onclick="switchV4View('live-runner')" id="nav-btn-live-runner" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg v4-tab-active flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span>🚀</span><span>LIVE<span class="hidden sm:inline"> RUNNER</span></span>
                 </button>
-                <button onclick="switchV4View('audio-dsp')" id="nav-btn-audio-dsp" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                <button data-tab-id="audio-dsp" onclick="switchV4View('audio-dsp')" id="nav-btn-audio-dsp" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span>🎛️</span><span>DSP<span class="hidden sm:inline"> (64-BAND)</span></span>
                 </button>
-                <button onclick="switchV4View('spatial-audio')" id="nav-btn-spatial-audio" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                <button data-tab-id="spatial-audio" onclick="switchV4View('spatial-audio')" id="nav-btn-spatial-audio" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span>🎧</span><span>SPATIAL<span class="hidden sm:inline"> 3D &amp; 5.1</span></span>
                 </button>
-                <button onclick="switchV4View('rf-sdr')" id="nav-btn-rf-sdr" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                <button data-tab-id="rf-sdr" onclick="switchV4View('rf-sdr')" id="nav-btn-rf-sdr" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
                     <span>RF / SDR<span class="hidden sm:inline"> MATRIX</span></span>
                 </button>
-                <button onclick="switchV4View('chaos-lab')" id="nav-btn-chaos-lab" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                <button data-tab-id="chaos-lab" onclick="switchV4View('chaos-lab')" id="nav-btn-chaos-lab" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
                     <span>CHAOS<span class="hidden sm:inline"> LAB</span></span>
                 </button>
-                <button onclick="openAiClipStudioModal()" id="nav-btn-clip-studio" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-purple-300 hover:text-white hover:bg-purple-950/60 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap border border-purple-500/30 shadow-sm" title="Estudio de Creación Narrativa & Clips IA Multicapa">
+                <button data-tab-id="clip-studio" onclick="openAiClipStudioModal()" id="nav-btn-clip-studio" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-purple-300 hover:text-white hover:bg-purple-950/60 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap border border-purple-500/30 shadow-sm cursor-default" title="Arrastrar para reordenar pestaña · Estudio de Creación Narrativa & Clips IA Multicapa">
                     <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
                     <span>🎬 CLIPS IA<span class="hidden sm:inline"> &amp; STORY</span></span>
                 </button>
-                <button onclick="switchV4View('system-config')" id="nav-btn-system-config" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap">
+                <button data-tab-id="system-config" onclick="switchV4View('system-config')" id="nav-btn-system-config" class="v4-tab-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/80 font-bold flex items-center gap-1.5 transition shrink-0 whitespace-nowrap cursor-default" title="Arrastrar para reordenar pestaña">
                     <span>⚙️</span><span>CONFIG<span class="hidden sm:inline"> &amp; MCP</span></span>
                 </button>
             </div>
+
+            <!-- D-056: Toggle Modo Edición de Layout -->
+            <button onclick="toggleWidgetEditMode()" id="btn-widget-edit-mode" class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-zinc-900/90 hover:bg-zinc-800 text-zinc-400 hover:text-cyan-300 border border-white/[0.08] hover:border-cyan-500/40 font-mono text-[10px] font-bold uppercase tracking-wider transition shrink-0 whitespace-nowrap select-none" title="Activar/desactivar modo de reordenamiento de widgets y pestañas">
+                <span id="widget-edit-mode-icon">🔒</span>
+                <span id="widget-edit-mode-label">LAYOUT</span>
+            </button>
             
             <!-- Live Register Bus Mini Telemetry Strip (Desktop / Tablet) -->
             <div class="hidden lg:flex items-center gap-3 font-mono text-[10px] text-zinc-400 bg-black/60 px-3 py-1 rounded-lg border border-white/5 shrink-0 whitespace-nowrap">
@@ -555,6 +561,17 @@
                             <h2 class="text-xs font-bold uppercase tracking-wider text-zinc-200">Ingesta & Osciloscopio</h2>
                         </div>
                         <div class="flex items-center gap-1.5">
+                            <!-- Conmutador de Diseño: Rack Clásico vs Bento Butter.video -->
+                            <div class="flex items-center bg-black/70 p-0.5 rounded-lg border border-white/[0.08] text-[10px] font-mono">
+                                <button id="btn-mode-rack" onclick="setAudioDeckDisplayMode('rack')" class="px-2 py-0.5 rounded text-[10px] font-bold transition flex items-center gap-1 bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow-sm" title="Vista Rack Modular Clásica con Rail Lateral">
+                                    <span>🎚️</span><span>Rack</span>
+                                </button>
+                                <button id="btn-mode-bento" onclick="setAudioDeckDisplayMode('bento')" class="px-2 py-0.5 rounded text-[10px] font-medium transition flex items-center gap-1 text-zinc-400 hover:text-white" title="Vista Bento Grid inspirada en Butter.video y shadcn UI">
+                                    <span>🍱</span><span>Bento</span>
+                                    <span class="text-[8px] bg-purple-950/80 text-purple-300 px-1 py-0.2 rounded border border-purple-500/30 font-sans hidden xs:inline">Butter</span>
+                                </button>
+                            </div>
+
                             <!-- Micro-Status Bar permanente -->
                             <div class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-black/60 border border-white/[0.05] text-[10px] font-mono text-zinc-400" title="Pista activa y volumen master">
                                 <span id="compact-deck-track" class="truncate max-w-[80px] sm:max-w-[110px] text-zinc-200 font-bold">Mordaza</span>
@@ -585,10 +602,137 @@
                         .deck-section-active {
                             animation: deckSectionDeploy 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
                         }
+
+                        /* ─── SpotlightCard System ──────────────────────────────────────────
+                           Haz de luz cónico que sigue el cursor. CSS custom props --mx/--my
+                           inyectadas vía JS (initSpotlightCards). Zero librería externa.
+                           Acelerado GPU: únicamente background cambia, no layout ni paint.
+                        ───────────────────────────────────────────────────────────────────── */
+                        .spotlight-card {
+                            position: relative;
+                            overflow: hidden;
+                        }
+                        .spotlight-card::before {
+                            content: '';
+                            position: absolute;
+                            inset: 0;
+                            border-radius: inherit;
+                            opacity: 0;
+                            transition: opacity 0.4s ease;
+                            background: radial-gradient(
+                                600px circle at var(--mx, 50%) var(--my, 50%),
+                                rgba(var(--spotlight-rgb, 99, 102, 241), 0.13) 0%,
+                                rgba(var(--spotlight-rgb, 99, 102, 241), 0.04) 40%,
+                                transparent 70%
+                            );
+                            pointer-events: none;
+                            z-index: 0;
+                            will-change: background;
+                        }
+                        .spotlight-card:hover::before {
+                            opacity: 1;
+                        }
+                        /* Borde perimetral reactivo al cursor */
+                        .spotlight-card::after {
+                            content: '';
+                            position: absolute;
+                            inset: 0;
+                            border-radius: inherit;
+                            border: 1px solid transparent;
+                            background: radial-gradient(
+                                400px circle at var(--mx, 50%) var(--my, 50%),
+                                rgba(var(--spotlight-rgb, 99, 102, 241), 0.45),
+                                transparent 60%
+                            ) border-box;
+                            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+                            -webkit-mask-composite: destination-out;
+                            mask-composite: exclude;
+                            opacity: 0;
+                            transition: opacity 0.4s ease;
+                            pointer-events: none;
+                            z-index: 0;
+                        }
+                        .spotlight-card:hover::after {
+                            opacity: 1;
+                        }
+                        /* Contenido sobre el spotlight */
+                        .spotlight-card > * {
+                            position: relative;
+                            z-index: 1;
+                        }
+                        /* Variantes de color por tipo de tarjeta */
+                        .spotlight-card.spc-purple { --spotlight-rgb: 192, 132, 252; }
+                        .spotlight-card.spc-cyan   { --spotlight-rgb: 34,  211, 238; }
+                        .spotlight-card.spc-amber  { --spotlight-rgb: 245, 158, 11;  }
+                        .spotlight-card.spc-emerald{ --spotlight-rgb: 52,  211, 153; }
+                        .spotlight-card.spc-rose   { --spotlight-rgb: 244, 63,  94;  }
+                        .spotlight-card.spc-blue   { --spotlight-rgb: 96,  165, 250; }
+                        .spotlight-card.spc-fuchsia{ --spotlight-rgb: 232, 121, 249; }
+
+                        /* Animación de entrada para el bento global */
+                        @keyframes bentoCardIn {
+                            from { opacity: 0; transform: translateY(8px) scale(0.97); }
+                            to   { opacity: 1; transform: translateY(0)  scale(1);    }
+                        }
+                        .bento-card-animate {
+                            animation: bentoCardIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+                        }
+                        .bento-card-animate:nth-child(1) { animation-delay: 0ms;   }
+                        .bento-card-animate:nth-child(2) { animation-delay: 40ms;  }
+                        .bento-card-animate:nth-child(3) { animation-delay: 80ms;  }
+                        .bento-card-animate:nth-child(4) { animation-delay: 120ms; }
+                        .bento-card-animate:nth-child(5) { animation-delay: 160ms; }
+                        .bento-card-animate:nth-child(6) { animation-delay: 200ms; }
+                        .bento-card-animate:nth-child(7) { animation-delay: 240ms; }
+
+                        /* ─── Draggable Widget Grid Styles (D-056) ─────────────────────── */
+                        /* Por defecto: handles ocultos, cursores normales */
+                        .widget-drag-handle {
+                            display: none;
+                            cursor: grab;
+                            user-select: none;
+                            -webkit-user-select: none;
+                            touch-action: none;
+                        }
+                        /* Modo edición activo: handles visibles + indicadores */
+                        body.widget-edit-mode-active .widget-drag-handle {
+                            display: inline-flex;
+                        }
+                        body.widget-edit-mode-active [data-tab-id] {
+                            cursor: grab;
+                        }
+                        body.widget-edit-mode-active [data-tab-id]:active {
+                            cursor: grabbing;
+                        }
+                        body.widget-edit-mode-active [data-widget-id] {
+                            outline: 1px dashed rgba(34,211,238,0.15);
+                            outline-offset: -1px;
+                        }
+                        .widget-drag-handle:active {
+                            cursor: grabbing;
+                        }
+                        .widget-item-dragging {
+                            z-index: 50 !important;
+                            opacity: 0.92;
+                            transform: scale(1.03) !important;
+                            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.7), 0 0 20px rgba(34,211,238,0.4) !important;
+                            pointer-events: none;
+                        }
+                        .widget-drop-target {
+                            outline: 2px dashed rgba(34,211,238,0.6) !important;
+                            outline-offset: -2px;
+                            background-color: rgba(34,211,238,0.06) !important;
+                        }
+                        .cockpit-tab-dragging {
+                            opacity: 0.7;
+                            transform: scale(0.96);
+                        }
                     </style>
 
-                    <!-- WORKSTATION DE AUDIO: BANNER DE MENÚS A LA IZQUIERDA + CONTENIDO DESPLEGABLE A LA DERECHA -->
-                    <div class="flex flex-row gap-2 sm:gap-2.5 items-start">
+                    <!-- CONTENEDOR VISTA 1: RACK MODULAR TÁCTICO CON BANNER LATERAL IZQUIERDO -->
+                    <div id="view-mode-rack" class="space-y-2">
+                        <!-- WORKSTATION DE AUDIO: BANNER DE MENÚS A LA IZQUIERDA + CONTENIDO DESPLEGABLE A LA DERECHA -->
+                        <div class="flex flex-row gap-2 sm:gap-2.5 items-start">
                         <!-- BANNER LATERAL DE MENÚS (LEFT RAIL) -->
                         <div class="w-20 xs:w-24 sm:w-28 shrink-0 flex flex-col gap-1.5 p-1 bg-zinc-950/95 rounded-xl border border-white/[0.08] select-none justify-start relative shadow-md">
                             <div class="text-[8px] font-mono text-zinc-500 uppercase tracking-wider px-1 text-center border-b border-white/[0.06] pb-1 mb-0.5 font-bold">
@@ -909,7 +1053,516 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
+
+                <!-- CONTENEDOR VISTA 2: BENTO GRID GLOBAL STUDIO (D-054/D-056) ─ SpotlightCard + Draggable Reorganizer -->
+                <div id="view-mode-bento" class="hidden">
+                    <div id="bento-global-grid-container" class="grid grid-cols-12 gap-2.5 bento-global-grid">
+
+                        <!-- ══════════════════════════════════════════════════════════════════
+                             CARD 1 ─ HERO: FFT LIVE SCOPE + TELEMETRÍA ESPECTRAL (col-span-8)
+                             ══════════════════════════════════════════════════════════════════ -->
+                        <div id="bento-card-fft" data-widget-id="fft" class="col-span-12 lg:col-span-8 spotlight-card spc-cyan bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5" style="min-height:200px">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-cyan-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
+                                    <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-cyan-950/70 border border-cyan-500/25 text-cyan-300 text-sm">⚡</div>
+                                    <div>
+                                        <div class="flex items-baseline gap-1.5">
+                                            <h3 class="font-bold text-[13px] text-zinc-100 tracking-tight group-hover:text-cyan-200 transition-colors">Analizador Espectral</h3>
+                                            <span class="text-[9px] font-mono text-zinc-500">FFT 2048 · 60 FPS</span>
+                                        </div>
+                                        <p class="text-[10px] text-zinc-500 leading-none">Oscilograma PCM + descriptores acústicos en tiempo real</p>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] font-mono px-2 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/25 text-cyan-300 flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>60 FPS Locked
+                                </span>
+                            </div>
+
+                            <!-- Canvas Osciloscopio Hero -->
+                            <div class="relative flex-1 bg-black/80 rounded-xl overflow-hidden border border-white/[0.06] shadow-inner" style="min-height:80px">
+                                <canvas id="bentoWaveCanvas" class="w-full h-full block"></canvas>
+                                <div class="absolute top-1.5 left-2 text-[8px] font-mono text-cyan-400/60 uppercase tracking-widest pointer-events-none select-none">PCM SCOPE</div>
+                                <div class="absolute top-1.5 right-2 text-[8px] font-mono text-zinc-600 pointer-events-none select-none">STEREO · 48kHz</div>
+                                <!-- Grid lines decorativas -->
+                                <div class="absolute inset-0 pointer-events-none" style="background: repeating-linear-gradient(0deg, transparent, transparent calc(25% - 1px), rgba(255,255,255,0.025) calc(25%), transparent calc(25% + 1px));"></div>
+                            </div>
+
+                            <!-- Telemetry chips 2x3 grid -->
+                            <div class="grid grid-cols-6 gap-1.5">
+                                <div class="bg-zinc-950/90 p-1.5 rounded-xl border border-white/[0.05] text-center">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase mb-0.5">RMS</div>
+                                    <div id="bento-tele-rms" class="text-cyan-400 font-bold text-[11px] font-mono">0.00</div>
+                                </div>
+                                <div class="bg-zinc-950/90 p-1.5 rounded-xl border border-white/[0.05] text-center">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase mb-0.5">Centroide</div>
+                                    <div id="bento-tele-centroid" class="text-amber-400 font-bold text-[11px] font-mono">0 Hz</div>
+                                </div>
+                                <div class="bg-zinc-950/90 p-1.5 rounded-xl border border-white/[0.05] text-center">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase mb-0.5">Flux</div>
+                                    <div id="bento-tele-flux" class="text-pink-400 font-bold text-[11px] font-mono">0.00</div>
+                                </div>
+                                <div class="bg-zinc-950/90 p-1.5 rounded-xl border border-white/[0.05] text-center">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase mb-0.5">ZCR</div>
+                                    <div id="bento-tele-zcr" class="text-emerald-400 font-bold text-[11px] font-mono">0</div>
+                                </div>
+                                <div class="bg-zinc-950/90 p-1.5 rounded-xl border border-white/[0.05] text-center">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase mb-0.5">Rolloff</div>
+                                    <div id="bento-tele-rolloff" class="text-blue-400 font-bold text-[10px] font-mono">0 Hz</div>
+                                </div>
+                                <div class="bg-zinc-950/90 p-1.5 rounded-xl border border-white/[0.05] text-center flex flex-col items-center justify-center">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase mb-0.5">Onset</div>
+                                    <span id="bento-tele-beat-indicator" class="w-2.5 h-2.5 rounded-full bg-zinc-700 transition-all duration-75"></span>
+                                </div>
+                            </div>
+
+                            <!-- Footer tags -->
+                            <div class="flex items-center gap-1 text-[8px] font-mono text-zinc-600 pt-0.5 border-t border-white/[0.04]">
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#RealtimeDSP</span>
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#Spectral</span>
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#PCM</span>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════════════════════════════
+                             CARD 2 ─ PISTAS MASTER HQ (col-span-4)
+                             ══════════════════════════════════════════════════════════════════ -->
+                        <div id="bento-card-masters" data-widget-id="masters" class="col-span-12 lg:col-span-4 spotlight-card spc-purple bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                            <!-- Header -->
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-purple-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
+                                    <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-purple-950/70 border border-purple-500/25 text-purple-300 text-sm">🎵</div>
+                                    <div>
+                                        <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-purple-200 transition-colors">Pistas Master HQ</h3>
+                                        <p class="text-[9px] font-mono text-zinc-500">Lossless PCM · 48kHz</p>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-purple-950/60 border border-purple-500/25 text-purple-300 flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>3 CH
+                                </span>
+                            </div>
+
+                            <!-- Tracks -->
+                            <div class="flex flex-col gap-1.5 flex-1">
+                                <button onclick="playPresetTrack('tema.mp3', 'Mordaza', this)" id="btn-bento-track-mordaza" class="preset-track-btn w-full p-2 rounded-xl bg-zinc-900/70 hover:bg-purple-950/40 border border-zinc-800/80 hover:border-purple-500/40 active:scale-[0.98] text-left transition-all flex items-center justify-between group/trk" data-track="mordaza">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="text-[8px] font-mono font-bold text-purple-400 bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/25 shrink-0">CH 01</span>
+                                        <div class="truncate">
+                                            <div class="text-[11px] font-bold text-zinc-200 group-hover/trk:text-white truncate">MORDAZA</div>
+                                            <div class="text-[8px] font-mono text-zinc-500">Master PCM · 3:18</div>
+                                        </div>
+                                    </div>
+                                    <span class="preset-led flex items-center gap-1 text-[7px] font-mono text-zinc-500 shrink-0">
+                                        <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
+                                        <span class="preset-tag">STANDBY</span>
+                                    </span>
+                                </button>
+
+                                <button onclick="playPresetTrack('tontos-utiles.mp3', 'Tontos Útiles', this)" id="btn-bento-track-tontos" class="preset-track-btn w-full p-2 rounded-xl bg-zinc-900/70 hover:bg-purple-950/40 border border-zinc-800/80 hover:border-purple-500/40 active:scale-[0.98] text-left transition-all flex items-center justify-between group/trk" data-track="tontos">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="text-[8px] font-mono font-bold text-purple-400 bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/25 shrink-0">CH 02</span>
+                                        <div class="truncate">
+                                            <div class="text-[11px] font-bold text-zinc-200 group-hover/trk:text-white truncate">TONTOS ÚTILES</div>
+                                            <div class="text-[8px] font-mono text-zinc-500">Dynamic Mix · 2:45</div>
+                                        </div>
+                                    </div>
+                                    <span class="preset-led flex items-center gap-1 text-[7px] font-mono text-zinc-500 shrink-0">
+                                        <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
+                                        <span class="preset-tag">STANDBY</span>
+                                    </span>
+                                </button>
+
+                                <button onclick="playPresetTrack('section-63.mp3', 'Section 63 (YouTube)', this)" id="btn-bento-track-section63" class="preset-track-btn w-full p-2 rounded-xl bg-zinc-900/70 hover:bg-purple-950/40 border border-zinc-800/80 hover:border-purple-500/40 active:scale-[0.98] text-left transition-all flex items-center justify-between group/trk" data-track="section63">
+                                    <div class="flex items-center gap-2 min-w-0">
+                                        <span class="text-[8px] font-mono font-bold text-purple-400 bg-purple-950/60 px-1.5 py-0.5 rounded border border-purple-500/25 shrink-0">CH 03</span>
+                                        <div class="truncate">
+                                            <div class="text-[11px] font-bold text-zinc-200 group-hover/trk:text-white truncate">SECTION 63</div>
+                                            <div class="text-[8px] font-mono text-zinc-500">YouTube Feed · 3:30</div>
+                                        </div>
+                                    </div>
+                                    <span class="preset-led flex items-center gap-1 text-[7px] font-mono text-zinc-500 shrink-0">
+                                        <span class="led-dot w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all"></span>
+                                        <span class="preset-tag">STANDBY</span>
+                                    </span>
+                                </button>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="flex items-center justify-between pt-1 border-t border-white/[0.04] text-[8px] font-mono text-zinc-600">
+                                <div class="flex gap-1">
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#PCM-48k</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#DynamicMix</span>
+                                </div>
+                                <span class="text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">Seleccionar →</span>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════════════════════════════
+                             CARD 3 ─ STEMS DSP LIVE (col-span-8) ─ 8 vúmetros reactivos
+                             ══════════════════════════════════════════════════════════════════ -->
+                        <div id="bento-card-stems" data-widget-id="stems" class="col-span-12 lg:col-span-8 spotlight-card spc-emerald bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-emerald-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
+                                    <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-emerald-950/70 border border-emerald-500/25 text-emerald-300 text-sm">🎚️</div>
+                                    <div>
+                                        <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-emerald-200 transition-colors">Stems DSP Live</h3>
+                                        <p class="text-[9px] font-mono text-zinc-500">8 Bandas Biquad · Sub → Air</p>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/25 text-emerald-300 flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>ACTIVO
+                                </span>
+                            </div>
+
+                            <!-- 8 Stem VU-Meters -->
+                            <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 flex-1">
+                                <!-- Sub -->
+                                <div class="flex flex-col items-center gap-1 bg-zinc-950/80 rounded-xl p-1.5 border border-white/[0.04] hover:border-fuchsia-500/30 transition-colors">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase">Sub</div>
+                                    <div class="text-[6px] font-mono text-zinc-600">&lt;60Hz</div>
+                                    <div class="w-2 flex-1 bg-zinc-900 rounded-full overflow-hidden relative" style="min-height:32px">
+                                        <div id="bento-stem-bar-sub" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-fuchsia-600 to-fuchsia-400 rounded-full transition-all duration-75" style="height:0%"></div>
+                                    </div>
+                                    <div id="bento-stem-val-sub" class="text-[8px] font-mono text-fuchsia-400">0%</div>
+                                </div>
+                                <!-- Bass -->
+                                <div class="flex flex-col items-center gap-1 bg-zinc-950/80 rounded-xl p-1.5 border border-white/[0.04] hover:border-purple-500/30 transition-colors">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase">Bass</div>
+                                    <div class="text-[6px] font-mono text-zinc-600">60-250</div>
+                                    <div class="w-2 flex-1 bg-zinc-900 rounded-full overflow-hidden relative" style="min-height:32px">
+                                        <div id="bento-stem-bar-bass" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-purple-600 to-purple-400 rounded-full transition-all duration-75" style="height:0%"></div>
+                                    </div>
+                                    <div id="bento-stem-val-bass" class="text-[8px] font-mono text-purple-400">0%</div>
+                                </div>
+                                <!-- LowMid -->
+                                <div class="flex flex-col items-center gap-1 bg-zinc-950/80 rounded-xl p-1.5 border border-white/[0.04] hover:border-blue-500/30 transition-colors">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase">LowM</div>
+                                    <div class="text-[6px] font-mono text-zinc-600">250-500</div>
+                                    <div class="w-2 flex-1 bg-zinc-900 rounded-full overflow-hidden relative" style="min-height:32px">
+                                        <div id="bento-stem-bar-lowmid" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-blue-600 to-blue-400 rounded-full transition-all duration-75" style="height:0%"></div>
+                                    </div>
+                                    <div id="bento-stem-val-lowmid" class="text-[8px] font-mono text-blue-400">0%</div>
+                                </div>
+                                <!-- Mid -->
+                                <div class="flex flex-col items-center gap-1 bg-zinc-950/80 rounded-xl p-1.5 border border-white/[0.04] hover:border-cyan-500/30 transition-colors">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase">Mid</div>
+                                    <div class="text-[6px] font-mono text-zinc-600">500-2k</div>
+                                    <div class="w-2 flex-1 bg-zinc-900 rounded-full overflow-hidden relative" style="min-height:32px">
+                                        <div id="bento-stem-bar-mid" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyan-600 to-cyan-400 rounded-full transition-all duration-75" style="height:0%"></div>
+                                    </div>
+                                    <div id="bento-stem-val-mid" class="text-[8px] font-mono text-cyan-400">0%</div>
+                                </div>
+                                <!-- HighMid -->
+                                <div class="flex flex-col items-center gap-1 bg-zinc-950/80 rounded-xl p-1.5 border border-white/[0.04] hover:border-teal-500/30 transition-colors">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase">HiMid</div>
+                                    <div class="text-[6px] font-mono text-zinc-600">2k-4k</div>
+                                    <div class="w-2 flex-1 bg-zinc-900 rounded-full overflow-hidden relative" style="min-height:32px">
+                                        <div id="bento-stem-bar-highmid" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-teal-600 to-teal-400 rounded-full transition-all duration-75" style="height:0%"></div>
+                                    </div>
+                                    <div id="bento-stem-val-highmid" class="text-[8px] font-mono text-teal-400">0%</div>
+                                </div>
+                                <!-- Presence -->
+                                <div class="flex flex-col items-center gap-1 bg-zinc-950/80 rounded-xl p-1.5 border border-white/[0.04] hover:border-emerald-500/30 transition-colors">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase">Pres</div>
+                                    <div class="text-[6px] font-mono text-zinc-600">4k-6k</div>
+                                    <div class="w-2 flex-1 bg-zinc-900 rounded-full overflow-hidden relative" style="min-height:32px">
+                                        <div id="bento-stem-bar-presence" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-emerald-600 to-emerald-400 rounded-full transition-all duration-75" style="height:0%"></div>
+                                    </div>
+                                    <div id="bento-stem-val-presence" class="text-[8px] font-mono text-emerald-400">0%</div>
+                                </div>
+                                <!-- Treble -->
+                                <div class="flex flex-col items-center gap-1 bg-zinc-950/80 rounded-xl p-1.5 border border-white/[0.04] hover:border-yellow-500/30 transition-colors">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase">Treble</div>
+                                    <div class="text-[6px] font-mono text-zinc-600">6k-10k</div>
+                                    <div class="w-2 flex-1 bg-zinc-900 rounded-full overflow-hidden relative" style="min-height:32px">
+                                        <div id="bento-stem-bar-treble" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-yellow-600 to-yellow-400 rounded-full transition-all duration-75" style="height:0%"></div>
+                                    </div>
+                                    <div id="bento-stem-val-treble" class="text-[8px] font-mono text-yellow-400">0%</div>
+                                </div>
+                                <!-- Air -->
+                                <div class="flex flex-col items-center gap-1 bg-zinc-950/80 rounded-xl p-1.5 border border-white/[0.04] hover:border-orange-500/30 transition-colors">
+                                    <div class="text-[7px] font-mono text-zinc-500 uppercase">Air</div>
+                                    <div class="text-[6px] font-mono text-zinc-600">&gt;10k</div>
+                                    <div class="w-2 flex-1 bg-zinc-900 rounded-full overflow-hidden relative" style="min-height:32px">
+                                        <div id="bento-stem-bar-air" class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-orange-600 to-orange-400 rounded-full transition-all duration-75" style="height:0%"></div>
+                                    </div>
+                                    <div id="bento-stem-val-air" class="text-[8px] font-mono text-orange-400">0%</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-1 pt-0.5 border-t border-white/[0.04] text-[8px] font-mono text-zinc-600">
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#Biquad8</span>
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#StemAnalysis</span>
+                                <span class="ml-auto"><a onclick="openStemsExportModal()" class="text-emerald-400 cursor-pointer hover:text-emerald-300 transition-colors">💽 Exportar WAV →</a></span>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════════════════════════════
+                             CARD 4 ─ POSTFX SUITE (col-span-4) ─ 9 passes stomp-box
+                             ══════════════════════════════════════════════════════════════════ -->
+                        <div id="bento-card-postfx" data-widget-id="postfx" class="col-span-12 lg:col-span-4 spotlight-card spc-fuchsia bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-fuchsia-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
+                                    <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-fuchsia-950/70 border border-fuchsia-500/25 text-fuchsia-300 text-sm">✨</div>
+                                    <div>
+                                        <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-fuchsia-200 transition-colors">PostFX Suite</h3>
+                                        <p class="text-[9px] font-mono text-zinc-500">9 Passes WebGL · 60 FPS</p>
+                                    </div>
+                                </div>
+                                <button onclick="toggleAllFx(true)" class="text-[8px] font-mono px-1.5 py-0.5 rounded bg-fuchsia-950/60 border border-fuchsia-500/25 text-fuchsia-300 hover:bg-fuchsia-900/60 transition-colors">All ON</button>
+                            </div>
+
+                            <!-- 9 FX Stomp Buttons -->
+                            <div class="grid grid-cols-3 gap-1.5 flex-1">
+                                <label class="fx-stomp-bento flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-xl border border-zinc-800/80 bg-zinc-900/70 cursor-pointer hover:border-fuchsia-500/40 transition-all group/s has-[:checked]:border-fuchsia-500/60 has-[:checked]:bg-fuchsia-950/40">
+                                    <span class="text-base">🌟</span>
+                                    <span class="text-[8px] font-bold text-zinc-300 group-has-[:checked]/s:text-fuchsia-200">Bloom</span>
+                                    <input type="checkbox" id="fx-bento-bloom" onchange="setFxState('bloom', this.checked)" class="hidden">
+                                </label>
+                                <label class="fx-stomp-bento flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-xl border border-zinc-800/80 bg-zinc-900/70 cursor-pointer hover:border-pink-500/40 transition-all group/s has-[:checked]:border-pink-500/60 has-[:checked]:bg-pink-950/40">
+                                    <span class="text-base">🌈</span>
+                                    <span class="text-[8px] font-bold text-zinc-300 group-has-[:checked]/s:text-pink-200">AberrRGB</span>
+                                    <input type="checkbox" id="fx-bento-chroma" onchange="setFxState('chroma', this.checked)" class="hidden">
+                                </label>
+                                <label class="fx-stomp-bento flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-xl border border-zinc-800/80 bg-zinc-900/70 cursor-pointer hover:border-red-500/40 transition-all group/s has-[:checked]:border-red-500/60 has-[:checked]:bg-red-950/40">
+                                    <span class="text-base">⚡</span>
+                                    <span class="text-[8px] font-bold text-zinc-300 group-has-[:checked]/s:text-red-200">Glitch</span>
+                                    <input type="checkbox" id="fx-bento-glitch" onchange="setFxState('glitch', this.checked)" class="hidden">
+                                </label>
+                                <label class="fx-stomp-bento flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-xl border border-zinc-800/80 bg-zinc-900/70 cursor-pointer hover:border-amber-500/40 transition-all group/s has-[:checked]:border-amber-500/60 has-[:checked]:bg-amber-950/40">
+                                    <span class="text-base">💥</span>
+                                    <span class="text-[8px] font-bold text-zinc-300 group-has-[:checked]/s:text-amber-200">Shockwav</span>
+                                    <input type="checkbox" id="fx-bento-radial" onchange="setFxState('radial', this.checked)" class="hidden">
+                                </label>
+                                <label class="fx-stomp-bento flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-xl border border-zinc-800/80 bg-zinc-900/70 cursor-pointer hover:border-cyan-500/40 transition-all group/s has-[:checked]:border-cyan-500/60 has-[:checked]:bg-cyan-950/40">
+                                    <span class="text-base">📺</span>
+                                    <span class="text-[8px] font-bold text-zinc-300 group-has-[:checked]/s:text-cyan-200">CRT/VHS</span>
+                                    <input type="checkbox" id="fx-bento-crt" onchange="setFxState('crt', this.checked)" class="hidden">
+                                </label>
+                                <label class="fx-stomp-bento flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-xl border border-zinc-800/80 bg-zinc-900/70 cursor-pointer hover:border-violet-500/40 transition-all group/s has-[:checked]:border-violet-500/60 has-[:checked]:bg-violet-950/40">
+                                    <span class="text-base">🔮</span>
+                                    <span class="text-[8px] font-bold text-zinc-300 group-has-[:checked]/s:text-violet-200">Kaleid</span>
+                                    <input type="checkbox" id="fx-bento-kaleid" onchange="setFxState('kaleid', this.checked)" class="hidden">
+                                </label>
+                                <label class="fx-stomp-bento flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-xl border border-zinc-800/80 bg-zinc-900/70 cursor-pointer hover:border-stone-500/40 transition-all group/s has-[:checked]:border-stone-500/60 has-[:checked]:bg-stone-950/40">
+                                    <span class="text-base">🎞️</span>
+                                    <span class="text-[8px] font-bold text-zinc-300 group-has-[:checked]/s:text-stone-200">Film 35mm</span>
+                                    <input type="checkbox" id="fx-bento-grain" onchange="setFxState('grain', this.checked)" class="hidden">
+                                </label>
+                                <label class="fx-stomp-bento flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-xl border border-zinc-800/80 bg-zinc-900/70 cursor-pointer hover:border-yellow-500/40 transition-all group/s has-[:checked]:border-yellow-500/60 has-[:checked]:bg-yellow-950/40">
+                                    <span class="text-base">☀️</span>
+                                    <span class="text-[8px] font-bold text-zinc-300 group-has-[:checked]/s:text-yellow-200">Negativo</span>
+                                    <input type="checkbox" id="fx-bento-negative" onchange="setFxState('negative', this.checked)" class="hidden">
+                                </label>
+                                <label class="fx-stomp-bento flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-xl border border-zinc-800/80 bg-zinc-900/70 cursor-pointer hover:border-emerald-500/40 transition-all group/s has-[:checked]:border-emerald-500/60 has-[:checked]:bg-emerald-950/40">
+                                    <span class="text-base">🕹️</span>
+                                    <span class="text-[8px] font-bold text-zinc-300 group-has-[:checked]/s:text-emerald-200">Pixel 8bit</span>
+                                    <input type="checkbox" id="fx-bento-pixel" onchange="setFxState('pixel', this.checked)" class="hidden">
+                                </label>
+                            </div>
+
+                            <div class="flex items-center gap-1 pt-0.5 border-t border-white/[0.04] text-[8px] font-mono text-zinc-600">
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#WebGL</span>
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#PostProcess</span>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════════════════════════════
+                             CARD 5 ─ INGESTA I/O (col-span-4)
+                             ══════════════════════════════════════════════════════════════════ -->
+                        <div id="bento-card-ingest" data-widget-id="ingest" class="col-span-12 lg:col-span-4 spotlight-card spc-cyan bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-cyan-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
+                                    <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-cyan-950/70 border border-cyan-500/25 text-cyan-300 text-sm">🔌</div>
+                                    <div>
+                                        <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-cyan-200 transition-colors">Matriz de Ingesta</h3>
+                                        <p class="text-[9px] font-mono text-zinc-500">7 Puertos I/O · Patchbay</p>
+                                    </div>
+                                </div>
+                                <span class="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-cyan-950/60 border border-cyan-500/25 text-cyan-300 flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>7 In
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-1.5 flex-1">
+                                <button onclick="startMicrophone()" class="py-1.5 px-1.5 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1 transition-all text-left min-w-0">
+                                    <span class="text-[8px] font-mono text-cyan-400 font-bold shrink-0">[MIC]</span>
+                                    <span class="text-[10px] text-zinc-300 truncate">Micrófono</span>
+                                    <span class="ml-auto text-[7px] text-zinc-600 font-mono shrink-0 hidden xs:inline">ANA</span>
+                                </button>
+                                <div class="flex gap-1 min-w-0">
+                                    <button onclick="selectYouTubeMobileSource(); triggerHaptic(15);" class="flex-1 min-w-0 py-1.5 px-1.5 bg-zinc-900/70 hover:bg-red-950/40 rounded-xl border border-red-500/25 hover:border-red-500/50 flex items-center gap-1 transition-all text-left">
+                                        <span class="text-[8px] font-mono text-red-400 font-bold shrink-0">[YT]</span>
+                                        <span class="text-[10px] text-red-300 truncate">YouTube</span>
+                                    </button>
+                                    <button onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-6 shrink-0 bg-zinc-900 hover:bg-zinc-800 rounded-xl border border-white/[0.06] flex items-center justify-center text-[10px] transition-all text-zinc-400">⚙️</button>
+                                </div>
+                                <button onclick="startTabCapture()" class="py-1.5 px-1.5 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1 transition-all min-w-0 text-left">
+                                    <span class="text-[8px] font-mono text-cyan-400 font-bold shrink-0">[SYS]</span>
+                                    <span class="text-[10px] text-zinc-300 truncate">Pestaña</span>
+                                    <span class="ml-auto text-[7px] text-zinc-600 font-mono shrink-0 hidden xs:inline">LP</span>
+                                </button>
+                                <label class="py-1.5 px-1.5 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1 cursor-pointer transition-all min-w-0">
+                                    <span class="text-[8px] font-mono text-cyan-400 font-bold shrink-0">[FILE]</span>
+                                    <span class="text-[10px] text-zinc-300 truncate">Cargar</span>
+                                    <span class="ml-auto text-[7px] text-zinc-600 font-mono shrink-0 hidden xs:inline">WAV</span>
+                                    <input type="file" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
+                                </label>
+                                <button onclick="toggleSynthDemo()" class="py-1.5 px-1.5 bg-zinc-900/70 hover:bg-amber-950/40 rounded-xl border border-zinc-800/80 hover:border-amber-500/40 flex items-center gap-1 transition-all min-w-0 text-left">
+                                    <span class="text-[8px] font-mono text-amber-400 font-bold shrink-0">[SYN]</span>
+                                    <span class="text-[10px] text-amber-300 truncate">Synth</span>
+                                    <span class="ml-auto text-[7px] text-amber-600/80 font-mono shrink-0 hidden xs:inline">PRO</span>
+                                </button>
+                                <div class="flex gap-1 min-w-0">
+                                    <button onclick="toggleLiveVideo()" class="flex-1 min-w-0 py-1.5 px-1.5 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1 transition-all text-left">
+                                        <span class="text-[8px] font-mono text-cyan-400 font-bold shrink-0">[CAM]</span>
+                                        <span class="text-[10px] text-cyan-300 truncate">Cámara</span>
+                                    </button>
+                                    <button onclick="openVideoIngestModal()" class="w-6 shrink-0 bg-zinc-900 hover:bg-zinc-800 rounded-xl border border-white/[0.06] flex items-center justify-center text-[10px] transition-all text-zinc-400">⚙️</button>
+                                </div>
+                                <button onclick="stopAudio()" class="col-span-2 py-1.5 px-2 bg-zinc-900/70 hover:bg-rose-950/60 rounded-xl border border-zinc-800/80 hover:border-rose-500/40 flex items-center justify-between transition-all">
+                                    <span class="text-[8px] font-mono text-rose-400 font-bold">[MUTE]</span>
+                                    <span class="text-[10px] text-rose-300 font-medium">Detener Señal</span>
+                                    <span class="text-[7px] text-rose-500/80 font-mono">STOP</span>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-1 pt-0.5 border-t border-white/[0.04] text-[8px] font-mono text-zinc-600">
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#ZeroLatency</span>
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#WebAudio</span>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════════════════════════════
+                             CARD 6 ─ TRANSPORTE & FADERS (col-span-4)
+                             ══════════════════════════════════════════════════════════════════ -->
+                        <div id="bento-card-faders" data-widget-id="faders" class="col-span-12 lg:col-span-4 spotlight-card spc-amber bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-amber-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
+                                    <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-amber-950/70 border border-amber-500/25 text-amber-300 text-sm">🔊</div>
+                                    <div>
+                                        <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-amber-200 transition-colors">Transporte & Faders</h3>
+                                        <p class="text-[9px] font-mono text-zinc-500">Dual L/R · Boost · Master</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Transport bar -->
+                            <div class="bg-zinc-950/90 p-2 rounded-xl border border-white/[0.05] space-y-1.5">
+                                <div class="flex items-center justify-between gap-1.5">
+                                    <div class="flex items-center gap-1.5 min-w-0 flex-1">
+                                        <button onclick="togglePlayPauseUserTrack()" id="bento-btn-play-pause-track" class="w-6 h-6 rounded-full bg-cyan-500 hover:bg-cyan-400 flex items-center justify-center font-bold text-black shadow transition shrink-0 text-xs">▶</button>
+                                        <div id="bento-track-title" class="font-mono text-[10px] text-cyan-300 truncate min-w-0">Mordaza (tema.mp3)</div>
+                                    </div>
+                                    <label class="flex items-center gap-1 text-[8px] text-zinc-400 font-mono cursor-pointer shrink-0">
+                                        <span>LOOP</span>
+                                        <input type="checkbox" id="bento-track-loop" checked onchange="toggleTrackLoop(this.checked); if(document.getElementById('track-loop')) document.getElementById('track-loop').checked = this.checked;" class="accent-cyan-400 rounded">
+                                    </label>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="bento-track-current-time" class="font-mono text-[9px] text-zinc-500 w-7">00:00</span>
+                                    <input type="range" id="bento-track-progress" min="0" max="100" value="0" step="0.1" oninput="seekUserTrack(this.value); if(document.getElementById('track-progress')) document.getElementById('track-progress').value = this.value;" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-800 rounded-lg">
+                                    <span id="bento-track-duration" class="font-mono text-[9px] text-zinc-500 w-7 text-right">03:18</span>
+                                </div>
+                            </div>
+
+                            <!-- Quick boost -->
+                            <div class="space-y-1.5">
+                                <div class="flex items-center justify-between text-[9px] font-mono">
+                                    <span class="text-zinc-400">Preamp:</span>
+                                    <div class="flex items-center gap-1">
+                                        <button onclick="setLiveBoost(1.0)"  id="bento-btn-boost-1x" class="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-bold shadow text-[8px]">1x</button>
+                                        <button onclick="setLiveBoost(2.5)"  id="bento-btn-boost-2x" class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[8px]">2.5x</button>
+                                        <button onclick="setLiveBoost(4.5)"  id="bento-btn-boost-4x" class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[8px]">4.5x</button>
+                                        <button onclick="setLiveBoost(8.0)"  id="bento-btn-boost-8x" class="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[8px]">8x</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between text-[9px] font-mono text-zinc-300">
+                                    <span>🔊 Master:</span>
+                                    <span id="bento-val-vol-master" class="text-cyan-400 font-bold">100%</span>
+                                </div>
+                                <input type="range" id="bento-slider-vol-master" min="0" max="1.5" step="0.01" value="1.0" oninput="updateMasterVolume(this.value); if(document.getElementById('slider-vol-master')) document.getElementById('slider-vol-master').value = this.value;" class="w-full accent-cyan-400 h-1 cursor-pointer bg-zinc-800 rounded">
+                                <div class="grid grid-cols-2 gap-1.5 text-[8px] font-mono">
+                                    <div class="bg-zinc-950/70 p-1.5 rounded-xl border border-cyan-500/15">
+                                        <div class="flex items-center justify-between text-cyan-300 mb-1"><span>CANAL L</span><span id="bento-val-vol-left">100%</span></div>
+                                        <input type="range" id="bento-slider-vol-left" min="0" max="1.0" step="0.01" value="1.0" oninput="updateLeftVolume(this.value); if(document.getElementById('slider-vol-left')) document.getElementById('slider-vol-left').value = this.value;" class="w-full accent-cyan-400 h-1 bg-zinc-900 rounded">
+                                    </div>
+                                    <div class="bg-zinc-950/70 p-1.5 rounded-xl border border-pink-500/15">
+                                        <div class="flex items-center justify-between text-pink-300 mb-1"><span>CANAL R</span><span id="bento-val-vol-right">100%</span></div>
+                                        <input type="range" id="bento-slider-vol-right" min="0" max="1.0" step="0.01" value="1.0" oninput="updateRightVolume(this.value); if(document.getElementById('slider-vol-right')) document.getElementById('slider-vol-right').value = this.value;" class="w-full accent-pink-400 h-1 bg-zinc-900 rounded">
+                                    </div>
+                                </div>
+                                <button onclick="toggleAudioMonitoring()" id="bento-btn-toggle-monitor" class="w-full py-1 px-2 rounded-xl border border-emerald-500/30 bg-emerald-950/30 text-zinc-300 hover:text-white flex items-center justify-between gap-1 transition text-[9px] font-mono">
+                                    <span>🎧 Monitoreo:</span>
+                                    <span id="bento-txt-monitor-state" class="text-emerald-400 font-bold">ACTIVO</span>
+                                </button>
+                            </div>
+
+                            <div class="flex items-center gap-1 pt-0.5 border-t border-white/[0.04] text-[8px] font-mono text-zinc-600">
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#DualGain</span>
+                                <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#StereoSplit</span>
+                            </div>
+                        </div>
+
+                        <!-- ══════════════════════════════════════════════════════════════════
+                             CARD 7 ─ AI DIRECTOR MER (col-span-4)
+                             ══════════════════════════════════════════════════════════════════ -->
+                        <div id="bento-card-mer" data-widget-id="mer" class="col-span-12 lg:col-span-4 spotlight-card spc-rose bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
+                            <div class="flex items-center justify-between gap-1">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <span class="widget-drag-handle text-zinc-500 hover:text-rose-400 cursor-grab active:cursor-grabbing text-xs px-1 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este módulo">⠿</span>
+                                    <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-rose-950/70 border border-rose-500/25 text-rose-300 text-sm shrink-0">🧠</div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-bold text-[12px] text-zinc-100 group-hover:text-rose-200 transition-colors truncate">AI Director MER</h3>
+                                        <p class="text-[8px] font-mono text-zinc-500 truncate">Russell Circumplex</p>
+                                    </div>
+                                </div>
+                                <button onclick="triggerAiArtDirection()" class="text-[8px] font-mono px-2 py-0.5 rounded bg-rose-950/60 border border-rose-500/25 text-rose-300 hover:bg-rose-900/60 transition-colors shrink-0">▶ Update</button>
+                            </div>
+
+                            <!-- MER Pad visual compacto -->
+                            <div class="relative bg-zinc-950/90 rounded-xl border border-white/[0.05] overflow-hidden flex items-center justify-center" style="height:90px">
+                                <canvas id="bento-mer-canvas" class="w-full h-full block" style="cursor:crosshair"></canvas>
+                                <div class="absolute top-1.5 left-2 text-[7px] font-mono text-zinc-600 uppercase tracking-wider pointer-events-none">VALENCE × AROUSAL</div>
+                            </div>
+
+                            <!-- Palette + directive -->
+                            <div class="space-y-1.5 flex-1">
+                                <div class="text-[9px] font-mono text-zinc-500 uppercase tracking-wider">Paleta IA Activa</div>
+                                <div class="flex gap-1.5 items-center">
+                                    <div id="bento-ai-color1" class="w-6 h-6 rounded-lg border border-white/[0.1] bg-indigo-500 shadow-sm transition-colors duration-700" title="Color Primario"></div>
+                                    <div id="bento-ai-color2" class="w-6 h-6 rounded-lg border border-white/[0.1] bg-fuchsia-600 shadow-sm transition-colors duration-700" title="Color Acento"></div>
+                                    <div id="bento-ai-color3" class="w-6 h-6 rounded-lg border border-white/[0.1] bg-cyan-700 shadow-sm transition-colors duration-700" title="Color Niebla"></div>
+                                    <div class="ml-auto text-right">
+                                        <div class="text-[8px] font-mono text-zinc-500">Arquetipo</div>
+                                        <div id="bento-ai-archetype" class="text-[9px] font-bold text-rose-300 font-mono">—</div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-zinc-950/80 rounded-xl p-1.5 border border-white/[0.04]">
+                                    <div class="text-[8px] font-mono text-zinc-600 mb-0.5">Directiva</div>
+                                    <div id="bento-ai-directive" class="text-[9px] text-zinc-400 leading-tight line-clamp-2">—</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-0.5 border-t border-white/[0.04] text-[8px] font-mono text-zinc-600">
+                                <div class="flex gap-1">
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#MER</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-white/[0.03]">#Gemini</span>
+                                </div>
+                                <div id="bento-ai-status" class="text-[7px] font-mono text-zinc-700">IDLE</div>
+                            </div>
+                        </div>
+
+                    </div><!-- /grid -->
+                </div><!-- /view-mode-bento -->
 
                 <!-- 2. SEPARADOR DE STEMS MULTICANAL (8-CHANNEL BIQUAD DSP RACK) -->
                 <section id="sec-stems" class="glass-panel rounded-xl p-3 sm:p-4 space-y-2.5 sm:space-y-3 shadow-xl mobile-deck-scrollable hidden lg:block">
@@ -1026,9 +1679,10 @@
                                     <span>🧠</span>
                                     <span class="hidden 2xl:inline">Director FX</span>
                                 </button>
-                                <button onclick="focusVjTimeline()" class="h-7 px-2 bg-zinc-900 hover:bg-zinc-800 text-teal-400 hover:text-teal-200 rounded-lg border border-teal-500/30 text-[11px] transition flex items-center gap-1 font-medium shrink-0" title="Abrir / Enfocar Timeline de Automatización VJ">
+                                <button id="btn-quick-vj-timeline" onclick="toggleVjTimelineSection()" class="h-7 px-2 bg-zinc-900 hover:bg-zinc-800 text-teal-400 hover:text-teal-200 rounded-lg border border-teal-500/30 text-[11px] transition flex items-center gap-1 font-medium shrink-0 active:scale-95" title="Plegar / Desplegar Timeline de Automatización VJ">
                                     <span>⏱️</span>
                                     <span class="hidden 2xl:inline">Timeline</span>
+                                    <span id="badge-vj-timeline-state" class="w-1.5 h-1.5 rounded-full bg-zinc-600 transition-all ml-0.5"></span>
                                 </button>
                                 <button onclick="openMeshFreezeModal()" class="h-7 px-2 bg-zinc-900 hover:bg-zinc-800 text-amber-400 hover:text-amber-200 rounded-lg border border-amber-500/30 text-[11px] transition flex items-center gap-1 font-medium shrink-0" title="Congelar Malla 3D Topográfica y Exportar STL / OBJ / GLB">
                                     <span>🧊</span>
@@ -1209,7 +1863,7 @@
                             </button>
                             <button onclick="triggerAutonomousGenesis()" class="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1" title="Génesis Autónoma de Arte">🔮 Génesis</button>
                             <button onclick="openCommunityHubModal()" class="text-sky-300 hover:text-sky-200 font-bold flex items-center gap-1" title="Hub de Presets Comunitarios Cloud">🌐 Presets</button>
-                            <button onclick="focusVjTimeline()" class="text-teal-300 hover:text-teal-200 font-bold flex items-center gap-1" title="Timeline VJ">⏱️ VJ</button>
+                            <button onclick="toggleVjTimelineSection()" class="text-teal-300 hover:text-teal-200 font-bold flex items-center gap-1" title="Plegar / Desplegar Timeline VJ">⏱️ VJ</button>
                             <button onclick="openMeshFreezeModal()" class="text-amber-300 hover:text-amber-200 font-bold flex items-center gap-1" title="Escultura 3D STL/OBJ">🧊 3D</button>
                             <button onclick="openAiClipStudioModal()" class="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1" title="Estudio de Creación Narrativa & Clips IA">🎬 Clips</button>
                             <button onclick="captureUltraScreenshot('4k', true)" class="text-zinc-200 hover:text-amber-300 font-medium flex items-center gap-1" title="Captura 4K instantánea [P]">📸 4K</button>
@@ -1237,8 +1891,8 @@
                     </div>
                 </section>
 
-                <!-- 3.5 VJ AUTOMATION TIMELINE & SESSION RECORDER / PLAYER (Q-BUS DAW TIMELINE) - Desktop Only -->
-                <section id="sec-vj-timeline" class="glass-panel rounded-xl p-3 sm:p-3.5 space-y-2.5 text-xs shadow-lg transition-all hidden lg:block">
+                <!-- 3.5 VJ AUTOMATION TIMELINE & SESSION RECORDER / PLAYER (Q-BUS DAW TIMELINE) - Plegable a Demanda -->
+                <section id="sec-vj-timeline" class="glass-panel rounded-xl p-3 sm:p-3.5 space-y-2.5 text-xs shadow-lg transition-all hidden border border-teal-500/30">
                     <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-2">
                         <div class="flex items-center gap-2 font-bold text-zinc-200">
                             <span class="text-teal-400">⏱️ Timeline de Automatización VJ &amp; Sesión Q-Bus</span>
@@ -1279,8 +1933,9 @@
                                 <span>⬆ CARGAR</span>
                                 <input type="file" id="vj-file-input" accept=".mvj,.json" class="hidden" onchange="loadVjSessionFile(event)">
                             </label>
-                            <button onclick="toggleVjTimelineCollapse()" id="btn-vj-collapse" class="px-1.5 py-1 text-zinc-400 hover:text-white rounded bg-zinc-900 border border-white/5 transition" title="Plegar / Desplegar Timeline">
-                                <span id="vj-collapse-icon">▲</span>
+                            <button onclick="toggleVjTimelineSection(false)" id="btn-vj-collapse" class="px-2 py-1 text-zinc-400 hover:text-teal-300 rounded bg-zinc-900 border border-white/10 hover:border-teal-500/40 transition flex items-center gap-1 text-[10px]" title="Plegar y ocultar panel de Timeline">
+                                <span>▲</span>
+                                <span class="text-[9px] font-sans">Plegar</span>
                             </button>
                         </div>
                     </div>
@@ -1848,7 +2503,7 @@
                             </button>
 
                             <!-- 2. Timeline VJ -->
-                            <button type="button" onclick="focusVjTimeline(); triggerHaptic(15);" class="h-14 rounded-xl bg-gradient-to-br from-teal-950/90 to-cyan-950/90 border border-teal-400/50 p-2.5 flex items-center gap-2.5 text-left transition active:scale-95 shadow-sm">
+                            <button type="button" onclick="toggleVjTimelineSection(); triggerHaptic(15);" class="h-14 rounded-xl bg-gradient-to-br from-teal-950/90 to-cyan-950/90 border border-teal-400/50 p-2.5 flex items-center gap-2.5 text-left transition active:scale-95 shadow-sm">
                                 <span class="text-2xl">⏱️</span>
                                 <div>
                                     <div class="text-[11px] font-bold text-teal-200 leading-tight">TIMELINE VJ</div>
@@ -1917,6 +2572,7 @@
                 <section id="sec-postfx-suite" class="glass-panel rounded-xl p-3 sm:p-3.5 space-y-2.5 text-xs shadow-lg hidden lg:block mobile-deck-scrollable">
                         <div class="flex flex-wrap items-center justify-between gap-2 border-b border-white/[0.06] pb-2">
                             <div class="flex flex-wrap items-center gap-2 font-bold text-zinc-200">
+                                <span class="widget-drag-handle text-zinc-500 hover:text-cyan-400 cursor-grab active:cursor-grabbing text-xs px-1.5 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este panel">⠿</span>
                                 <span class="text-cyan-400">✨ Suite de Post-Procesado WebGL FX</span>
                                 <span class="text-[9px] font-mono text-zinc-400 bg-zinc-900 px-2 py-0.5 rounded border border-white/[0.08]">9 Passes Reactivos</span>
                                 <div id="ai-fx-director-badge" class="hidden flex items-center gap-1.5 px-2 py-0.5 bg-indigo-950/80 border border-indigo-500/40 text-indigo-300 rounded font-mono text-[9px] shadow-sm">
@@ -2203,6 +2859,7 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-white/[0.06] pb-2.5">
                     <div>
                         <div class="flex items-center gap-2">
+                            <span class="widget-drag-handle text-zinc-500 hover:text-pink-400 cursor-grab active:cursor-grabbing text-xs px-1.5 py-0.5 rounded bg-white/[0.03] border border-white/[0.06]" title="Arrastrar para mover este panel">⠿</span>
                             <span class="w-2 h-2 rounded-full bg-pink-500"></span>
                             <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-200 flex items-center gap-2">
                                 Laboratorio GLSL • Hot-Reload WebGL
@@ -4395,8 +5052,12 @@
             updateOutputVolumeNodes();
             const valEl = document.getElementById('val-vol-master');
             if (valEl) valEl.innerText = Math.round(currentVolumeMaster * 100) + '%';
+            const bValEl = document.getElementById('bento-val-vol-master');
+            if (bValEl) bValEl.innerText = Math.round(currentVolumeMaster * 100) + '%';
             const sldM = document.getElementById('slider-vol-master');
             if (sldM && sldM.value !== val.toString()) sldM.value = val;
+            const bSldM = document.getElementById('bento-slider-vol-master');
+            if (bSldM && bSldM.value !== val.toString()) bSldM.value = val;
             const fader = document.getElementById('volume-master-fader');
             if (fader && fader.value !== val.toString()) fader.value = parseFloat(val).toFixed(2);
             updateCompactAudioDeckStatus();
@@ -4407,8 +5068,12 @@
             updateOutputVolumeNodes();
             const valEl = document.getElementById('val-vol-left');
             if (valEl) valEl.innerText = Math.round(currentVolumeLeft * 100) + '%';
+            const bValEl = document.getElementById('bento-val-vol-left');
+            if (bValEl) bValEl.innerText = Math.round(currentVolumeLeft * 100) + '%';
             const sldL = document.getElementById('slider-vol-left');
             if (sldL && sldL.value !== val.toString()) sldL.value = val;
+            const bSldL = document.getElementById('bento-slider-vol-left');
+            if (bSldL && bSldL.value !== val.toString()) bSldL.value = val;
         }
 
         function updateRightVolume(val) {
@@ -4416,8 +5081,12 @@
             updateOutputVolumeNodes();
             const valEl = document.getElementById('val-vol-right');
             if (valEl) valEl.innerText = Math.round(currentVolumeRight * 100) + '%';
+            const bValEl = document.getElementById('bento-val-vol-right');
+            if (bValEl) bValEl.innerText = Math.round(currentVolumeRight * 100) + '%';
             const sldR = document.getElementById('slider-vol-right');
             if (sldR && sldR.value !== val.toString()) sldR.value = val;
+            const bSldR = document.getElementById('bento-slider-vol-right');
+            if (bSldR && bSldR.value !== val.toString()) bSldR.value = val;
         }
 
         function resetStereoVolume() {
@@ -4427,16 +5096,28 @@
             updateOutputVolumeNodes();
             const valM = document.getElementById('val-vol-master');
             if (valM) valM.innerText = '100%';
+            const bValM = document.getElementById('bento-val-vol-master');
+            if (bValM) bValM.innerText = '100%';
             const valL = document.getElementById('val-vol-left');
             if (valL) valL.innerText = '100%';
+            const bValL = document.getElementById('bento-val-vol-left');
+            if (bValL) bValL.innerText = '100%';
             const valR = document.getElementById('val-vol-right');
             if (valR) valR.innerText = '100%';
+            const bValR = document.getElementById('bento-val-vol-right');
+            if (bValR) bValR.innerText = '100%';
             const sldM = document.getElementById('slider-vol-master');
             const sldL = document.getElementById('slider-vol-left');
             const sldR = document.getElementById('slider-vol-right');
+            const bSldM = document.getElementById('bento-slider-vol-master');
+            const bSldL = document.getElementById('bento-slider-vol-left');
+            const bSldR = document.getElementById('bento-slider-vol-right');
             if (sldM) sldM.value = 1.0;
             if (sldL) sldL.value = 1.0;
             if (sldR) sldR.value = 1.0;
+            if (bSldM) bSldM.value = 1.0;
+            if (bSldL) bSldL.value = 1.0;
+            if (bSldR) bSldR.value = 1.0;
             if (typeof showToast === 'function') {
                 showToast("Volumen Estéreo Restaurado", "Master: 100% | L: 100% | R: 100%", "info");
             }
@@ -4450,9 +5131,16 @@
             updateOutputVolumeNodes();
             const stateEl = document.getElementById('txt-monitor-state');
             const btnMonitor = document.getElementById('btn-toggle-monitor');
+            const bStateEl = document.getElementById('bento-txt-monitor-state');
+            const bBtnMonitor = document.getElementById('bento-btn-toggle-monitor');
+
             if (stateEl) {
                 stateEl.innerText = isAudioMonitoringEnabled ? 'ACTIVO' : 'MUTE';
                 stateEl.className = isAudioMonitoringEnabled ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
+            }
+            if (bStateEl) {
+                bStateEl.innerText = isAudioMonitoringEnabled ? 'ACTIVO' : 'MUTE';
+                bStateEl.className = isAudioMonitoringEnabled ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
             }
             if (btnMonitor) {
                 if (isAudioMonitoringEnabled) {
@@ -4461,6 +5149,15 @@
                 } else {
                     btnMonitor.classList.remove('border-emerald-500/40', 'bg-emerald-950/30');
                     btnMonitor.classList.add('border-rose-500/50', 'bg-rose-950/40');
+                }
+            }
+            if (bBtnMonitor) {
+                if (isAudioMonitoringEnabled) {
+                    bBtnMonitor.classList.remove('border-rose-500/50', 'bg-rose-950/40');
+                    bBtnMonitor.classList.add('border-emerald-500/40', 'bg-emerald-950/30');
+                } else {
+                    bBtnMonitor.classList.remove('border-emerald-500/40', 'bg-emerald-950/30');
+                    bBtnMonitor.classList.add('border-rose-500/50', 'bg-rose-950/40');
                 }
             }
             if (currentSourceType === 'tab') {
@@ -4588,6 +5285,277 @@
             }
         }
 
+        // =========================================================================
+        // CONMUTADOR DE DISEÑO: RACK MODULAR TÁCTICO VS BENTO GRID (BUTTER VIDEO)
+        // =========================================================================
+        function setAudioDeckDisplayMode(mode) {
+            const rackEl = document.getElementById('view-mode-rack');
+            const bentoEl = document.getElementById('view-mode-bento');
+            const btnRack = document.getElementById('btn-mode-rack');
+            const btnBento = document.getElementById('btn-mode-bento');
+            if (!rackEl || !bentoEl) return;
+
+            if (mode === 'bento') {
+                rackEl.classList.add('hidden');
+                bentoEl.classList.remove('hidden');
+                if (btnRack) {
+                    btnRack.className = "px-2 py-0.5 rounded text-[10px] font-medium transition flex items-center gap-1 text-zinc-400 hover:text-white";
+                }
+                if (btnBento) {
+                    btnBento.className = "px-2 py-0.5 rounded text-[10px] font-bold transition flex items-center gap-1 bg-purple-950/80 text-purple-300 border border-purple-500/40 shadow-sm";
+                }
+            } else {
+                bentoEl.classList.add('hidden');
+                rackEl.classList.remove('hidden');
+                if (btnRack) {
+                    btnRack.className = "px-2 py-0.5 rounded text-[10px] font-bold transition flex items-center gap-1 bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 shadow-sm";
+                }
+                if (btnBento) {
+                    btnBento.className = "px-2 py-0.5 rounded text-[10px] font-medium transition flex items-center gap-1 text-zinc-400 hover:text-white";
+                }
+            }
+            try {
+                localStorage.setItem('motor_audio_deck_mode', mode);
+            } catch (_) {}
+            updateCompactAudioDeckStatus();
+            syncBentoAudioDeckControls();
+            // Re-registrar SpotlightCards cuando se activa la vista Bento
+            if (mode === 'bento') initSpotlightCards();
+        }
+
+        /* ══════════════════════════════════════════════════════════════════════
+           SPOTLIGHT CARD SYSTEM — D-054
+           Registra mousemove sobre cada .spotlight-card inyectando --mx/--my
+           como porcentajes relativos al elemento. AbortController garantiza
+           cero fugas de listeners en re-inicializaciones sucesivas.
+           Coste por frame: 2× setProperty() → O(1), sin reflow ni paint.
+        ══════════════════════════════════════════════════════════════════════ */
+        function initSpotlightCards() {
+            // Cancela listeners anteriores
+            if (window._spotlightCtrl) {
+                window._spotlightCtrl.forEach(c => c.abort());
+            }
+            window._spotlightCtrl = [];
+
+            document.querySelectorAll('.spotlight-card').forEach(card => {
+                const ctrl = new AbortController();
+                window._spotlightCtrl.push(ctrl);
+
+                card.addEventListener('mousemove', (e) => {
+                    const r = card.getBoundingClientRect();
+                    card.style.setProperty('--mx', ((e.clientX - r.left)  / r.width  * 100).toFixed(1) + '%');
+                    card.style.setProperty('--my', ((e.clientY - r.top)   / r.height * 100).toFixed(1) + '%');
+                }, { signal: ctrl.signal, passive: true });
+
+                card.addEventListener('mouseleave', () => {
+                    // Reset suave al centro → el ::before hace fade-out automático
+                    card.style.setProperty('--mx', '50%');
+                    card.style.setProperty('--my', '50%');
+                }, { signal: ctrl.signal, passive: true });
+            });
+        }
+
+        /* ══════════════════════════════════════════════════════════════════════
+           BENTO STEMS LIVE — actualiza los 8 vúmetros verticales a 60 FPS
+           Solo se ejecuta cuando el Bento está visible (early-return si oculto)
+        ══════════════════════════════════════════════════════════════════════ */
+        function updateBentoStemsLive() {
+            const bentoEl = document.getElementById('view-mode-bento');
+            if (!bentoEl || bentoEl.classList.contains('hidden')) return;
+            if (typeof stemsData === 'undefined') return;
+
+            const stemMap = [
+                { id: 'sub',      key: 'sub'      },
+                { id: 'bass',     key: 'bass'     },
+                { id: 'lowmid',   key: 'lowmid'   },
+                { id: 'mid',      key: 'mid'      },
+                { id: 'highmid',  key: 'highmid'  },
+                { id: 'presence', key: 'presence' },
+                { id: 'treble',   key: 'treble'   },
+                { id: 'air',      key: 'air'       },
+            ];
+
+            for (const s of stemMap) {
+                const stem = stemsData[s.key];
+                if (!stem) continue;
+                const v = Math.min(1, stem.value || 0);
+                const pct = (v * 100).toFixed(0);
+
+                const bar = document.getElementById('bento-stem-bar-' + s.id);
+                const val = document.getElementById('bento-stem-val-' + s.id);
+                if (bar) bar.style.height = pct + '%';
+                if (val) val.textContent  = pct + '%';
+            }
+        }
+
+        /* ══════════════════════════════════════════════════════════════════════
+           BENTO AI CARD — sincroniza paleta IA, arquetipo y directiva
+           Llamada desde applyAiDirectionToThree() cada vez que llega una directiva
+        ══════════════════════════════════════════════════════════════════════ */
+        function updateBentoAiCard(directiveData) {
+            const bentoEl = document.getElementById('view-mode-bento');
+            if (!bentoEl || bentoEl.classList.contains('hidden')) return;
+
+            // Paleta de colores
+            if (directiveData && directiveData.palette) {
+                const pal = directiveData.palette;
+                const c1 = document.getElementById('bento-ai-color1');
+                const c2 = document.getElementById('bento-ai-color2');
+                const c3 = document.getElementById('bento-ai-color3');
+                if (c1 && pal[0]) c1.style.backgroundColor = pal[0];
+                if (c2 && pal[1]) c2.style.backgroundColor = pal[1];
+                if (c3 && pal[2]) c3.style.backgroundColor = pal[2];
+            }
+
+            // Arquetipo y directiva
+            const archEl = document.getElementById('bento-ai-archetype');
+            const dirEl  = document.getElementById('bento-ai-directive');
+            const staEl  = document.getElementById('bento-ai-status');
+
+            if (directiveData && directiveData.archetype && archEl) {
+                archEl.textContent = directiveData.archetype;
+            }
+            if (directiveData && directiveData.description && dirEl) {
+                dirEl.textContent = directiveData.description.substring(0, 120);
+            }
+            if (staEl) {
+                staEl.textContent = directiveData ? '🟢 LLM LIVE' : '🟡 HEURÍSTICO';
+            }
+        }
+
+        /* ══════════════════════════════════════════════════════════════════════
+           BENTO MER CANVAS — dibuja el pad Russell Circumplex compacto
+           Eje X = Valencia (negativo→positivo), Eje Y = Arousal (bajo→alto)
+           Punto = merX, merY actualizados por el Director IA
+        ══════════════════════════════════════════════════════════════════════ */
+        function drawBentoMerCanvas() {
+            const canvas = document.getElementById('bento-mer-canvas');
+            if (!canvas) return;
+            const bentoEl = document.getElementById('view-mode-bento');
+            if (!bentoEl || bentoEl.classList.contains('hidden')) return;
+
+            const ctx = canvas.getContext('2d');
+            const W = canvas.offsetWidth;
+            const H = canvas.offsetHeight;
+            if (W === 0 || H === 0) return;
+
+            // Sync DPR
+            if (canvas.width !== W || canvas.height !== H) {
+                canvas.width  = W;
+                canvas.height = H;
+            }
+
+            ctx.clearRect(0, 0, W, H);
+
+            // Fondo
+            ctx.fillStyle = 'rgba(0,0,0,0.0)';
+            ctx.fillRect(0, 0, W, H);
+
+            // Ejes
+            ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(W/2, 0); ctx.lineTo(W/2, H);
+            ctx.moveTo(0, H/2); ctx.lineTo(W, H/2);
+            ctx.stroke();
+
+            // Círculos de referencia
+            for (const r of [0.25, 0.5, 0.75]) {
+                ctx.beginPath();
+                ctx.arc(W/2, H/2, r * Math.min(W, H) / 2, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+                ctx.stroke();
+            }
+
+            // Punto MER
+            const mx = typeof merX !== 'undefined' ? merX : 0.5;
+            const my = typeof merY !== 'undefined' ? merY : 0.5;
+            const px = mx * W;
+            const py = (1 - my) * H;
+
+            // Halo
+            const grad = ctx.createRadialGradient(px, py, 0, px, py, 14);
+            grad.addColorStop(0, 'rgba(244,63,94,0.6)');
+            grad.addColorStop(1, 'rgba(244,63,94,0)');
+            ctx.beginPath();
+            ctx.arc(px, py, 14, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Punto
+            ctx.beginPath();
+            ctx.arc(px, py, 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#f43f5e';
+            ctx.fill();
+
+            // Labels cuadrantes
+            ctx.font = '7px monospace';
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.fillText('AROUSAL', W/2 + 3, 10);
+            ctx.fillText('VALENCE', W - 40, H/2 - 3);
+        }
+
+        function syncBentoAudioDeckControls() {
+            // Título y Play/Pause
+            const bentoTitle = document.getElementById('bento-track-title');
+            if (bentoTitle && typeof currentTrackTitle !== 'undefined' && currentTrackTitle) {
+                bentoTitle.innerText = currentTrackTitle;
+            }
+            const bentoPlay = document.getElementById('bento-btn-play-pause-track');
+            if (bentoPlay) {
+                const isPlaying = (typeof isAudioRunning !== 'undefined' && isAudioRunning && typeof audioElement !== 'undefined' && audioElement && !audioElement.paused);
+                bentoPlay.innerText = isPlaying ? "⏸" : "▶";
+            }
+            // Scrubber y Tiempos
+            if (typeof audioElement !== 'undefined' && audioElement && !isNaN(audioElement.duration) && audioElement.duration > 0) {
+                const cur = audioElement.currentTime;
+                const dur = audioElement.duration;
+                const bProg = document.getElementById('bento-track-progress');
+                if (bProg) bProg.value = (cur / dur) * 100;
+                const bCur = document.getElementById('bento-track-current-time');
+                if (bCur && typeof formatTime === 'function') bCur.innerText = formatTime(cur);
+                const bDur = document.getElementById('bento-track-duration');
+                if (bDur && typeof formatTime === 'function') bDur.innerText = formatTime(dur);
+            }
+            // Faders y Volúmenes
+            if (typeof currentVolumeMaster !== 'undefined') {
+                const bValM = document.getElementById('bento-val-vol-master');
+                if (bValM) bValM.innerText = Math.round(currentVolumeMaster * 100) + '%';
+                const bSldM = document.getElementById('bento-slider-vol-master');
+                if (bSldM) bSldM.value = currentVolumeMaster;
+            }
+            if (typeof currentVolumeLeft !== 'undefined') {
+                const bValL = document.getElementById('bento-val-vol-left');
+                if (bValL) bValL.innerText = Math.round(currentVolumeLeft * 100) + '%';
+                const bSldL = document.getElementById('bento-slider-vol-left');
+                if (bSldL) bSldL.value = currentVolumeLeft;
+            }
+            if (typeof currentVolumeRight !== 'undefined') {
+                const bValR = document.getElementById('bento-val-vol-right');
+                if (bValR) bValR.innerText = Math.round(currentVolumeRight * 100) + '%';
+                const bSldR = document.getElementById('bento-slider-vol-right');
+                if (bSldR) bSldR.value = currentVolumeRight;
+            }
+            // Monitoreo
+            if (typeof isAudioMonitoringEnabled !== 'undefined') {
+                const bMonTxt = document.getElementById('bento-txt-monitor-state');
+                const bMonBtn = document.getElementById('bento-btn-toggle-monitor');
+                if (bMonTxt) {
+                    bMonTxt.innerText = isAudioMonitoringEnabled ? 'ACTIVO' : 'MUTE';
+                    bMonTxt.className = isAudioMonitoringEnabled ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold';
+                }
+                if (bMonBtn) {
+                    if (isAudioMonitoringEnabled) {
+                        bMonBtn.classList.remove('border-rose-500/50', 'bg-rose-950/40');
+                        bMonBtn.classList.add('border-emerald-500/40', 'bg-emerald-950/30');
+                    } else {
+                        bMonBtn.classList.remove('border-emerald-500/40', 'bg-emerald-950/30');
+                        bMonBtn.classList.add('border-rose-500/50', 'bg-rose-950/40');
+                    }
+                }
+            }
+        }
+
         function setLiveBoost(mult) {
             const gainInput = document.getElementById('input-gain');
             if (gainInput) {
@@ -4605,6 +5573,15 @@
                         b.className = "px-1.5 py-0.5 rounded bg-red-600 text-white font-bold shadow";
                     } else {
                         b.className = "px-1.5 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300";
+                    }
+                }
+                const bentoId = `bento-btn-boost-${val === 1.0 ? '1x' : val === 2.5 ? '2x' : val === 4.5 ? '4x' : '8x'}`;
+                const bBento = document.getElementById(bentoId);
+                if (bBento) {
+                    if (val === mult) {
+                        bBento.className = "px-1.5 py-0.5 rounded bg-red-600 text-white font-bold shadow text-[8px]";
+                    } else {
+                        bBento.className = "px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 text-[8px]";
                     }
                 }
             });
@@ -5003,6 +5980,25 @@
                     mVpPlay.title = isPlaying ? "Pausar pista" : "Reproducir pista";
                 }
             }
+
+            // Sincronización con Bento Grid Studio
+            const bentoTitleEl = document.getElementById('bento-track-title');
+            if (bentoTitleEl && title) {
+                bentoTitleEl.innerText = title;
+            }
+            const bentoBtnPlay = document.getElementById('bento-btn-play-pause-track');
+            if (bentoBtnPlay) {
+                if (isLive) {
+                    bentoBtnPlay.innerText = "⏹";
+                    bentoBtnPlay.className = "w-6 h-6 rounded-full bg-red-500 hover:bg-red-400 flex items-center justify-center font-bold text-white shadow transition shrink-0 text-xs";
+                    bentoBtnPlay.title = "Detener ingesta de audio en vivo";
+                } else {
+                    const isPlaying = (isAudioRunning && audioElement && !audioElement.paused);
+                    bentoBtnPlay.innerText = isPlaying ? "⏸" : "▶";
+                    bentoBtnPlay.className = "w-6 h-6 rounded-full bg-cyan-500 hover:bg-cyan-400 flex items-center justify-center font-bold text-black shadow transition shrink-0 text-xs";
+                    bentoBtnPlay.title = isPlaying ? "Pausar pista" : "Reproducir pista";
+                }
+            }
         }
 
         function selectYouTubeMobileSource() {
@@ -5020,17 +6016,28 @@
                     if (!audioElement.duration || isNaN(audioElement.duration)) return;
                     const cur = audioElement.currentTime;
                     const dur = audioElement.duration;
+                    const pct = (cur / dur) * 100;
                     const prog = document.getElementById('track-progress');
-                    if (prog) prog.value = (cur / dur) * 100;
+                    if (prog) prog.value = pct;
                     const curEl = document.getElementById('track-current-time');
                     if (curEl) curEl.innerText = formatTime(cur);
                     const durEl = document.getElementById('track-duration');
                     if (durEl) durEl.innerText = formatTime(dur);
+
+                    // Bento Grid Sync
+                    const bProg = document.getElementById('bento-track-progress');
+                    if (bProg) bProg.value = pct;
+                    const bCur = document.getElementById('bento-track-current-time');
+                    if (bCur) bCur.innerText = formatTime(cur);
+                    const bDur = document.getElementById('bento-track-duration');
+                    if (bDur) bDur.innerText = formatTime(dur);
                 });
 
                 audioElement.addEventListener('play', () => {
                     const btn = document.getElementById('btn-play-pause-track');
                     if (btn) btn.innerText = "⏸";
+                    const bBtn = document.getElementById('bento-btn-play-pause-track');
+                    if (bBtn) bBtn.innerText = "⏸";
                     if (audioCtx && audioCtx.state === 'suspended') {
                         audioCtx.resume();
                     }
@@ -5039,6 +6046,8 @@
                 audioElement.addEventListener('pause', () => {
                     const btn = document.getElementById('btn-play-pause-track');
                     if (btn) btn.innerText = "▶";
+                    const bBtn = document.getElementById('bento-btn-play-pause-track');
+                    if (bBtn) bBtn.innerText = "▶";
                 });
             }
 
@@ -5887,6 +6896,18 @@
             document.getElementById('tele-zcr').innerText = zcrCount.toString();
             document.getElementById('tele-rolloff').innerText = `${Math.round(rolloff)} Hz`;
 
+            // Telemetría Bento Grid Studio (Butter.video)
+            const bRms = document.getElementById('bento-tele-rms');
+            if (bRms) bRms.innerText = rms.toFixed(2);
+            const bCentroid = document.getElementById('bento-tele-centroid');
+            if (bCentroid) bCentroid.innerText = `${Math.round(centroid)} Hz`;
+            const bFlux = document.getElementById('bento-tele-flux');
+            if (bFlux) bFlux.innerText = flux.toFixed(2);
+            const bZcr = document.getElementById('bento-tele-zcr');
+            if (bZcr) bZcr.innerText = zcrCount.toString();
+            const bRolloff = document.getElementById('bento-tele-rolloff');
+            if (bRolloff) bRolloff.innerText = `${Math.round(rolloff)} Hz`;
+
             // Telemetría Móvil HUD & Uniforms
             const mvpRms = document.getElementById('m-vp-rms');
             if (mvpRms) mvpRms.innerText = `RMS: ${rms.toFixed(2)}`;
@@ -5920,6 +6941,11 @@
                 ind.className = "w-2.5 h-2.5 rounded-full bg-cyan-400 mt-0.5 shadow-[0_0_12px_#06b6d4] scale-125 transition-all";
                 setTimeout(() => { ind.className = "w-2.5 h-2.5 rounded-full bg-zinc-700 mt-0.5 transition-all"; }, 80);
             }
+            const bentoInd = document.getElementById('bento-tele-beat-indicator');
+            if (bentoInd) {
+                bentoInd.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 mt-0.5 shadow-[0_0_12px_#34d399] scale-125 transition-all";
+                setTimeout(() => { bentoInd.className = "w-2.5 h-2.5 rounded-full bg-zinc-700 mt-0.5 transition-all"; }, 80);
+            }
 
             const flash = document.getElementById('three-beat-flash');
             if (flash) {
@@ -5929,36 +6955,43 @@
         }
 
         function drawMiniWave() {
-            const canvas = document.getElementById('miniWaveCanvas');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            const w = canvas.width = canvas.clientWidth;
-            const h = canvas.height = canvas.clientHeight;
-            ctx.clearRect(0, 0, w, h);
-            
-            // Grid lines
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
-            ctx.lineWidth = 1;
-            ctx.beginPath();
-            ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
-            ctx.stroke();
+            const canvasRack = document.getElementById('miniWaveCanvas');
+            const canvasBento = document.getElementById('bentoWaveCanvas');
 
-            // Waveform with neon cyan stroke
-            ctx.lineWidth = 1.5;
-            ctx.strokeStyle = '#06b6d4';
-            ctx.shadowColor = 'rgba(6, 182, 212, 0.6)';
-            ctx.shadowBlur = 6;
-            ctx.beginPath();
-            const slice = w / timeDataArray.length;
-            let x = 0;
-            for (let i = 0; i < timeDataArray.length; i++) {
-                const v = timeDataArray[i] / 128.0;
-                const y = (v * h) / 2;
-                if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-                x += slice;
-            }
-            ctx.stroke();
-            ctx.shadowBlur = 0;
+            const renderWaveOnCanvas = (canvas) => {
+                if (!canvas || canvas.offsetParent === null) return;
+                const ctx = canvas.getContext('2d');
+                const w = canvas.width = canvas.clientWidth;
+                const h = canvas.height = canvas.clientHeight;
+                ctx.clearRect(0, 0, w, h);
+                
+                // Grid lines
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, h/2); ctx.lineTo(w, h/2);
+                ctx.stroke();
+
+                // Waveform with neon cyan stroke
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#06b6d4';
+                ctx.shadowColor = 'rgba(6, 182, 212, 0.6)';
+                ctx.shadowBlur = 6;
+                ctx.beginPath();
+                const slice = w / timeDataArray.length;
+                let x = 0;
+                for (let i = 0; i < timeDataArray.length; i++) {
+                    const v = timeDataArray[i] / 128.0;
+                    const y = (v * h) / 2;
+                    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                    x += slice;
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            };
+
+            if (canvasRack) renderWaveOnCanvas(canvasRack);
+            if (canvasBento) renderWaveOnCanvas(canvasBento);
         }
 
         // =========================================================================
@@ -19208,15 +20241,49 @@ Respond ONLY with valid JSON with:
         function focusVjTimeline() {
             const sec = document.getElementById('sec-vj-timeline');
             const body = document.getElementById('vj-timeline-body');
-            const icon = document.getElementById('vj-collapse-icon');
             if (body && body.classList.contains('hidden')) {
                 body.classList.remove('hidden');
-                if (icon) icon.innerText = '▲';
             }
             if (sec) {
                 sec.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 sec.classList.add('ring-2', 'ring-teal-400');
                 setTimeout(() => sec.classList.remove('ring-2', 'ring-teal-400'), 1500);
+            }
+        }
+
+        // Función de toggle para mostrar/ocultar el panel Timeline VJ completo.
+        // forceOpen: true = forzar apertura, false = forzar cierre, undefined = alternar
+        function toggleVjTimelineSection(forceOpen) {
+            const sec = document.getElementById('sec-vj-timeline');
+            const badge = document.getElementById('badge-vj-timeline-state');
+            if (!sec) return;
+
+            const isHidden = sec.classList.contains('hidden');
+            const shouldOpen = forceOpen !== undefined ? forceOpen : isHidden;
+
+            if (shouldOpen) {
+                sec.classList.remove('hidden');
+                sec.classList.add('block');
+                // Inicializar el engine si es la primera vez
+                if (!vjSessionTimelineEngine) initVjEngines();
+                // Redimensionar canvas tras hacerse visible
+                requestAnimationFrame(() => {
+                    if (vjSessionTimelineEngine) vjSessionTimelineEngine.resizeCanvas();
+                });
+                if (badge) {
+                    badge.classList.remove('bg-zinc-600');
+                    badge.classList.add('bg-teal-400', 'shadow-[0_0_6px_#2dd4bf]');
+                }
+                // Persistir estado
+                try { localStorage.setItem('motor_vj_timeline_open', '1'); } catch(_) {}
+            } else {
+                sec.classList.add('hidden');
+                sec.classList.remove('block');
+                if (badge) {
+                    badge.classList.add('bg-zinc-600');
+                    badge.classList.remove('bg-teal-400', 'shadow-[0_0_6px_#2dd4bf]');
+                }
+                try { localStorage.setItem('motor_vj_timeline_open', '0'); } catch(_) {}
             }
         }
 
@@ -21978,7 +23045,11 @@ Devuelve EXACTAMENTE un arreglo JSON de 6 objetos con esta estructura:
                 if (tier2Subgrid) tier2Subgrid.classList.remove('hidden');
                 if (leftCol) leftCol.classList.remove('hidden');
                 if (tier2Studios) tier2Studios.classList.remove('hidden');
-                if (secVj) secVj.classList.remove('hidden');
+                // Respetar el estado del usuario: sólo mostrar si nunca se plegó o si estaba abierto
+                if (secVj) {
+                    const vjPref = localStorage.getItem('motor_vj_timeline_open');
+                    if (vjPref !== '0') secVj.classList.remove('hidden');
+                }
                 if (tacticalDeck) tacticalDeck.classList.add('hidden');
                 if (bottomBar) bottomBar.classList.add('hidden');
 
@@ -25235,6 +26306,13 @@ void main() {
             // 1. Procesamiento DSP de Audio en tiempo real (stems, RMS, FFT, ZCR, Onset)
             runAudioDSP();
 
+            // 1.05 Bento Grid Live Updates (D-054) — throttle ×1/2: ejecuta solo en frames pares
+            //      para no competir con el render WebGL en el mismo frame
+            if ((masterFpsFrames & 1) === 0) {
+                updateBentoStemsLive();
+                drawBentoMerCanvas();
+            }
+
             // 1.1 Actualización de Goniómetro de Fase y Correlación Estéreo Lissajous
             updatePhaseAndGoniometer();
 
@@ -25326,9 +26404,355 @@ void main() {
             const jitEl = document.getElementById('wgsl-jit-time');
             if (jitEl) jitEl.innerText = 'JIT: — (pulsa Inject)';
             const vramEl = document.getElementById('wgsl-vram');
-            if (vramEl) vramEl.innerText = `BUFFER: ${(RF_SIM_W * RF_SIM_H * 4 / 1024).toFixed(1)} KB (CPU, sin ping-pong GPU)`;
             checkMcpBridgeStatus();
+            try {
+                const savedDeckMode = localStorage.getItem('motor_audio_deck_mode');
+                if (savedDeckMode === 'bento') {
+                    setAudioDeckDisplayMode('bento');
+                } else {
+                    setAudioDeckDisplayMode('rack');
+                }
+            } catch (_) {}
+            // Restaurar estado del panel Timeline VJ (abre si se cerró con '0', respeta el defecto oculto)
+            try {
+                const vjOpen = localStorage.getItem('motor_vj_timeline_open');
+                const secVj = document.getElementById('sec-vj-timeline');
+                const badgeVj = document.getElementById('badge-vj-timeline-state');
+                if (secVj) {
+                    if (vjOpen === '1') {
+                        secVj.classList.remove('hidden');
+                        if (badgeVj) {
+                            badgeVj.classList.remove('bg-zinc-600');
+                            badgeVj.classList.add('bg-teal-400', 'shadow-[0_0_6px_#2dd4bf]');
+                        }
+                    } else {
+                        // '0' o null → mantener oculto (default del HTML)
+                        secVj.classList.add('hidden');
+                    }
+                }
+            } catch (_) {}
+            // D-054: SpotlightCard — inicializar listeners de cursor en todas las tarjetas Bento
+            initSpotlightCards();
+            // D-056: Draggable Widget Grid — inicializar reordenamiento de Bento, Cockpit y Racks
+            if (typeof initDraggableWidgetSystem === 'function') {
+                initDraggableWidgetSystem();
+            }
         });
+
+        /* ══ Stubs Bridge D-054 ══════════════════════════════════════════════
+           Mapean los botones del Bento PostFX y AI Director a las funciones
+           reales del motor (que pueden tener nombres distintos o vivir en
+           módulos separados). Fail-safe: si la función real no existe, no rompe.
+        ═══════════════════════════════════════════════════════════════════════ */
+        function setFxState(fxName, enabled) {
+            // Mapeo a las checkboxes del panel PostFX clásico para mantener sincronía
+            const fxIdMap = {
+                bloom:    'fx-bloom-enable',
+                chroma:   'fx-chroma-enable',
+                glitch:   'fx-glitch-enable',
+                radial:   'fx-blur-enable',
+                crt:      'fx-crt-enable',
+                kaleid:   'fx-kaleid-enable',
+                grain:    'fx-grain-enable',
+                negative: 'fx-negative-enable',
+                pixel:    'fx-pixel-enable',
+            };
+            const rackId = fxIdMap[fxName];
+            if (rackId) {
+                const rackEl = document.getElementById(rackId);
+                if (rackEl) {
+                    rackEl.checked = enabled;
+                    rackEl.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+            // Invocación directa del controlador de pase como respaldo
+            const fnMap = {
+                bloom:    typeof toggleBloomPass === 'function' ? toggleBloomPass : null,
+                chroma:   typeof toggleChromaPass === 'function' ? toggleChromaPass : null,
+                glitch:   typeof toggleGlitchPass === 'function' ? toggleGlitchPass : null,
+                radial:   typeof toggleRadialBlurPass === 'function' ? toggleRadialBlurPass : null,
+                crt:      typeof toggleCRTPass === 'function' ? toggleCRTPass : null,
+                kaleid:   typeof toggleKaleidoscopePass === 'function' ? toggleKaleidoscopePass : null,
+                grain:    typeof toggleFilmGrainPass === 'function' ? toggleFilmGrainPass : null,
+                negative: typeof toggleNegativeInvertPass === 'function' ? toggleNegativeInvertPass : null,
+                pixel:    typeof togglePixelatePass === 'function' ? togglePixelatePass : null,
+            };
+            if (fnMap[fxName]) fnMap[fxName](enabled);
+
+            // Sincronizar el checkbox Bento correspondiente también
+            const bentoEl = document.getElementById('fx-bento-' + fxName);
+            if (bentoEl && bentoEl.checked !== enabled) {
+                bentoEl.checked = enabled;
+            }
+        }
+
+        function toggleAllFx(enable) {
+            const fxNames = ['bloom','chroma','glitch','radial','crt','kaleid','grain','negative','pixel'];
+            fxNames.forEach(name => setFxState(name, enable));
+        }
+
+        function triggerAiArtDirection() {
+            // Alias hacia la función real del Director IA
+            if (typeof triggerAiArtDirectionNow === 'function') {
+                triggerAiArtDirectionNow();
+            }
+        }
+
+        /* ══════════════════════════════════════════════════════════════════════
+           DRAGGABLE WIDGET GRID ORCHESTRATOR — D-056
+           Reorganización modular interactiva mediante PointerEvents nativos
+           para los 3 niveles:
+           1. Bento Grid Studio (7 Cards con exact tiler / row packer)
+           2. Cockpit Tabs Navigation (Reordenamiento horizontal)
+           3. Racks de la Workstation
+           Persistencia en localStorage con recuperación automática en arranque.
+        ═══════════════════════════════════════════════════════════════════════ */
+        window.widgetEditMode = false;
+
+        function toggleWidgetEditMode() {
+            window.widgetEditMode = !window.widgetEditMode;
+            const body = document.body;
+            const btn = document.getElementById('btn-widget-edit-mode');
+            const icon = document.getElementById('widget-edit-mode-icon');
+            const label = document.getElementById('widget-edit-mode-label');
+
+            if (window.widgetEditMode) {
+                body.classList.add('widget-edit-mode-active');
+                if (btn) {
+                    btn.classList.remove('text-zinc-400', 'border-white/[0.08]');
+                    btn.classList.add('text-cyan-300', 'border-cyan-500/40', 'bg-cyan-950/60', 'shadow-[0_0_10px_rgba(6,182,212,0.25)]');
+                }
+                if (icon) icon.textContent = '✏️';
+                if (label) label.textContent = 'EDITANDO';
+            } else {
+                body.classList.remove('widget-edit-mode-active');
+                if (btn) {
+                    btn.classList.remove('text-cyan-300', 'border-cyan-500/40', 'bg-cyan-950/60', 'shadow-[0_0_10px_rgba(6,182,212,0.25)]');
+                    btn.classList.add('text-zinc-400', 'border-white/[0.08]');
+                }
+                if (icon) icon.textContent = '🔒';
+                if (label) label.textContent = 'LAYOUT';
+            }
+        }
+
+        function initDraggableWidgetSystem() {
+            initBentoGridDraggable();
+            initCockpitTabsDraggable();
+            initWorkstationRacksDraggable();
+        }
+
+        // ── 1. Bento Grid Global Draggable (D-056) ──────────────────────────
+        function initBentoGridDraggable() {
+            const container = document.getElementById('bento-global-grid-container');
+            if (!container) return;
+
+            // Restaurar orden previo si existe en localStorage
+            try {
+                const savedOrder = JSON.parse(localStorage.getItem('motor_bento_cards_order') || 'null');
+                if (Array.isArray(savedOrder) && savedOrder.length > 0) {
+                    savedOrder.forEach(id => {
+                        const el = container.querySelector(`[data-widget-id="${id}"]`);
+                        if (el) container.appendChild(el);
+                    });
+                }
+            } catch (_) {}
+
+            let draggedEl = null;
+            let placeholder = null;
+
+            container.querySelectorAll('[data-widget-id]').forEach(card => {
+                const handle = card.querySelector('.widget-drag-handle') || card;
+
+                handle.addEventListener('pointerdown', (e) => {
+                    if (e.button !== 0) return;
+                    if (!window.widgetEditMode) return;
+                    // No interceptar si el clic es en un botón interactivo o fader interior
+                    if (e.target.closest('button, input, a, select, canvas')) return;
+
+                    draggedEl = card;
+                    draggedEl.classList.add('widget-item-dragging');
+                    container.classList.add('select-none');
+
+                    const onPointerMove = (ev) => {
+                        if (!draggedEl) return;
+                        const target = document.elementFromPoint(ev.clientX, ev.clientY);
+                        const overCard = target ? target.closest('#bento-global-grid-container > [data-widget-id]') : null;
+
+                        if (overCard && overCard !== draggedEl) {
+                            const rect = overCard.getBoundingClientRect();
+                            const isAfter = (ev.clientY > rect.top + rect.height / 2) || (ev.clientX > rect.left + rect.width / 2);
+                            if (isAfter) {
+                                container.insertBefore(draggedEl, overCard.nextSibling);
+                            } else {
+                                container.insertBefore(draggedEl, overCard);
+                            }
+                        }
+                    };
+
+                    const onPointerUp = () => {
+                        window.removeEventListener('pointermove', onPointerMove);
+                        window.removeEventListener('pointerup', onPointerUp);
+
+                        if (draggedEl) {
+                            draggedEl.classList.remove('widget-item-dragging');
+                            draggedEl = null;
+                        }
+                        container.classList.remove('select-none');
+
+                        // Guardar nuevo orden en localStorage
+                        const currentOrder = Array.from(container.querySelectorAll('[data-widget-id]'))
+                            .map(el => el.getAttribute('data-widget-id'))
+                            .filter(Boolean);
+                        try {
+                            localStorage.setItem('motor_bento_cards_order', JSON.stringify(currentOrder));
+                        } catch (_) {}
+
+                        // Re-inicializar SpotlightCards para actualizar bounding boxes
+                        initSpotlightCards();
+                    };
+
+                    window.addEventListener('pointermove', onPointerMove);
+                    window.addEventListener('pointerup', onPointerUp);
+                });
+            });
+        }
+
+        // ── 2. Cockpit Tabs Horizontal Draggable (D-056) ─────────────────────
+        function initCockpitTabsDraggable() {
+            const container = document.getElementById('cockpit-tabs-container');
+            if (!container) return;
+
+            // Restaurar orden previo si existe en localStorage
+            try {
+                const savedOrder = JSON.parse(localStorage.getItem('motor_cockpit_tabs_order') || 'null');
+                if (Array.isArray(savedOrder) && savedOrder.length > 0) {
+                    savedOrder.forEach(id => {
+                        const btn = container.querySelector(`[data-tab-id="${id}"]`);
+                        if (btn) container.appendChild(btn);
+                    });
+                }
+            } catch (_) {}
+
+            let draggedTab = null;
+
+            container.querySelectorAll('[data-tab-id]').forEach(tab => {
+                tab.addEventListener('pointerdown', (e) => {
+                    if (e.button !== 0) return;
+                    if (!window.widgetEditMode) return;
+                    let moved = false;
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+
+                    const onPointerMove = (ev) => {
+                        if (!moved && Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6) {
+                            moved = true;
+                            draggedTab = tab;
+                            draggedTab.classList.add('cockpit-tab-dragging');
+                        }
+                        if (!moved || !draggedTab) return;
+
+                        const target = document.elementFromPoint(ev.clientX, ev.clientY);
+                        const overTab = target ? target.closest('#cockpit-tabs-container > [data-tab-id]') : null;
+
+                        if (overTab && overTab !== draggedTab) {
+                            const rect = overTab.getBoundingClientRect();
+                            if (ev.clientX > rect.left + rect.width / 2) {
+                                container.insertBefore(draggedTab, overTab.nextSibling);
+                            } else {
+                                container.insertBefore(draggedTab, overTab);
+                            }
+                        }
+                    };
+
+                    const onPointerUp = () => {
+                        window.removeEventListener('pointermove', onPointerMove);
+                        window.removeEventListener('pointerup', onPointerUp);
+
+                        if (draggedTab) {
+                            draggedTab.classList.remove('cockpit-tab-dragging');
+                            draggedTab = null;
+
+                            // Guardar nuevo orden en localStorage
+                            const order = Array.from(container.querySelectorAll('[data-tab-id]'))
+                                .map(el => el.getAttribute('data-tab-id'))
+                                .filter(Boolean);
+                            try {
+                                localStorage.setItem('motor_cockpit_tabs_order', JSON.stringify(order));
+                            } catch (_) {}
+                        }
+                    };
+
+                    window.addEventListener('pointermove', onPointerMove);
+                    window.addEventListener('pointerup', onPointerUp);
+                });
+            });
+        }
+
+        // ── 3. Workstation Racks Draggable (D-056) ───────────────────────────
+        function initWorkstationRacksDraggable() {
+            const tier2 = document.getElementById('tier2-studios');
+            if (!tier2) return;
+
+            // Restaurar orden previo si existe en localStorage
+            try {
+                const savedOrder = JSON.parse(localStorage.getItem('motor_tier2_racks_order') || 'null');
+                if (Array.isArray(savedOrder) && savedOrder.length > 0) {
+                    savedOrder.forEach(id => {
+                        const sec = tier2.querySelector(`#${id}`);
+                        if (sec) tier2.appendChild(sec);
+                    });
+                }
+            } catch (_) {}
+
+            let draggedRack = null;
+
+            tier2.querySelectorAll(':scope > section, :scope > div').forEach(rack => {
+                const handle = rack.querySelector('.widget-drag-handle');
+                if (!handle) return;
+
+                handle.addEventListener('pointerdown', (e) => {
+                    if (e.button !== 0) return;
+                    if (!window.widgetEditMode) return;
+                    draggedRack = rack;
+                    draggedRack.classList.add('widget-item-dragging');
+
+                    const onPointerMove = (ev) => {
+                        if (!draggedRack) return;
+                        const target = document.elementFromPoint(ev.clientX, ev.clientY);
+                        const overRack = target ? target.closest('#tier2-studios > section, #tier2-studios > div') : null;
+
+                        if (overRack && overRack !== draggedRack) {
+                            const rect = overRack.getBoundingClientRect();
+                            if (ev.clientY > rect.top + rect.height / 2) {
+                                tier2.insertBefore(draggedRack, overRack.nextSibling);
+                            } else {
+                                tier2.insertBefore(draggedRack, overRack);
+                            }
+                        }
+                    };
+
+                    const onPointerUp = () => {
+                        window.removeEventListener('pointermove', onPointerMove);
+                        window.removeEventListener('pointerup', onPointerUp);
+
+                        if (draggedRack) {
+                            draggedRack.classList.remove('widget-item-dragging');
+                            draggedRack = null;
+
+                            const order = Array.from(tier2.querySelectorAll(':scope > section, :scope > div'))
+                                .map(el => el.id)
+                                .filter(Boolean);
+                            try {
+                                localStorage.setItem('motor_tier2_racks_order', JSON.stringify(order));
+                            } catch (_) {}
+                        }
+                    };
+
+                    window.addEventListener('pointermove', onPointerMove);
+                    window.addEventListener('pointerup', onPointerUp);
+                });
+            });
+        }
 
         // =========================================================================
         // LYAI MCP BRIDGE — chequeo real (antes: "Google Stitch MCP Bridge" 100% estático,
@@ -27919,6 +29343,215 @@ void main() {
 
     <!-- Master Toast Notification Layer -->
     <div id="toast-container" class="fixed bottom-16 sm:bottom-5 right-3 sm:right-5 z-[110] flex flex-col gap-2 pointer-events-none max-w-sm"></div>
+
+    <!-- ========================================================================= -->
+    <!-- FOOTER SECTION (D-055 / lyai-shared)                                      -->
+    <!-- Estilo 21st.dev / Efferd UI — Vanilla JS + CSS puro                       -->
+    <!-- Solo visible en desktop (lg:). Archivo: components/footer/footer.html     -->
+    <!-- ========================================================================= -->
+    <style id="mv-footer-styles">
+        /* ─── Variables del componente ─────────────────────────────── */
+        #mv-footer {
+            --footer-bg:        rgba(5, 6, 10, 0.98);
+            --footer-border:    rgba(255, 255, 255, 0.07);
+            --footer-text:      rgba(160, 170, 190, 0.8);
+            --footer-muted:     rgba(90, 100, 120, 0.7);
+            --footer-accent-c:  #06b6d4;
+            --footer-accent-p:  #8b5cf6;
+            --footer-accent-a:  #f59e0b;
+            --footer-glow-c:    rgba(6, 182, 212, 0.18);
+            --footer-reveal-dur: 0.7s;
+            --footer-reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #mv-footer { display: none; }
+        @media (min-width: 1024px) { #mv-footer { display: block; } }
+        #mv-footer { position: relative; background: var(--footer-bg); backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%); overflow: hidden; margin-top: 0; }
+        #mv-footer-topline { position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent 0%, var(--footer-accent-c) 30%, var(--footer-accent-p) 60%, var(--footer-accent-a) 85%, transparent 100%); transform: scaleX(0); transform-origin: left center; transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1); will-change: transform; }
+        #mv-footer.footer-visible #mv-footer-topline { transform: scaleX(1); }
+        #mv-footer::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; z-index: 0; }
+        .footer-inner { position: relative; z-index: 1; max-width: 1440px; margin: 0 auto; padding: 48px 32px 28px; }
+        .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px 32px; margin-bottom: 40px; }
+        .footer-brand-wordmark { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; color: #fff; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        .footer-brand-wordmark .brand-icon { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg, var(--footer-accent-c), var(--footer-accent-p)); display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 0 14px var(--footer-glow-c); flex-shrink: 0; }
+        .footer-tagline { font-family: 'Inter', sans-serif; font-size: 0.8125rem; line-height: 1.6; color: var(--footer-text); max-width: 280px; margin-bottom: 20px; }
+        .footer-vu-bar { display: flex; align-items: flex-end; gap: 2px; height: 24px; margin-bottom: 20px; }
+        .footer-vu-bar span { display: block; width: 3px; border-radius: 2px; background: var(--footer-accent-c); transition: height 0.08s linear; will-change: height; min-height: 2px; opacity: 0.7; }
+        .footer-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+        .footer-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 500; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--footer-border); color: var(--footer-muted); background: rgba(255,255,255,0.025); letter-spacing: 0.04em; text-transform: uppercase; transition: color 0.2s, border-color 0.2s, box-shadow 0.2s; }
+        .footer-badge:hover { color: var(--footer-accent-c); border-color: rgba(6,182,212,0.4); box-shadow: 0 0 8px rgba(6,182,212,0.12); }
+        .footer-col-title { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 16px; }
+        .footer-links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+        .footer-links li { opacity: 0; transform: translateY(10px); transition: opacity var(--footer-reveal-dur) var(--footer-reveal-ease), transform var(--footer-reveal-dur) var(--footer-reveal-ease); }
+        #mv-footer.footer-visible .footer-links li { opacity: 1; transform: translateY(0); }
+        .footer-links a { font-family: 'Inter', sans-serif; font-size: 0.8125rem; color: var(--footer-text); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.18s, gap 0.18s; cursor: pointer; }
+        .footer-links a::before { content: ''; display: inline-block; width: 3px; height: 3px; border-radius: 50%; background: var(--footer-accent-c); opacity: 0; transition: opacity 0.18s; flex-shrink: 0; }
+        .footer-links a:hover { color: #fff; gap: 9px; }
+        .footer-links a:hover::before { opacity: 1; }
+        .footer-col.col-engine .footer-links a:hover { color: var(--footer-accent-c); }
+        .footer-col.col-engine .footer-links a:hover::before { background: var(--footer-accent-c); }
+        .footer-col.col-studio .footer-links a:hover { color: var(--footer-accent-p); }
+        .footer-col.col-studio .footer-links a:hover::before { background: var(--footer-accent-p); }
+        .footer-col.col-links  .footer-links a:hover { color: var(--footer-accent-a); }
+        .footer-col.col-links  .footer-links a:hover::before { background: var(--footer-accent-a); }
+        .footer-divider { height: 1px; background: var(--footer-border); margin-bottom: 20px; opacity: 0; transform: scaleX(0.6); transform-origin: left; transition: opacity 0.8s var(--footer-reveal-ease), transform 0.8s var(--footer-reveal-ease); }
+        #mv-footer.footer-visible .footer-divider { opacity: 1; transform: scaleX(1); }
+        .footer-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; opacity: 0; transform: translateY(8px); transition: opacity 0.7s var(--footer-reveal-ease) 0.3s, transform 0.7s var(--footer-reveal-ease) 0.3s; }
+        #mv-footer.footer-visible .footer-bottom { opacity: 1; transform: translateY(0); }
+        .footer-copy { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--footer-muted); letter-spacing: 0.03em; }
+        .footer-copy em { font-style: normal; color: rgba(255,255,255,0.25); }
+        .footer-version-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 600; padding: 3px 10px 3px 8px; border-radius: 100px; border: 1px solid rgba(6,182,212,0.25); background: rgba(6,182,212,0.06); color: var(--footer-accent-c); letter-spacing: 0.06em; display: flex; align-items: center; gap: 6px; }
+        .footer-version-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--footer-accent-c); box-shadow: 0 0 6px var(--footer-accent-c); animation: footer-pulse-led 2s ease-in-out infinite; }
+        @keyframes footer-pulse-led { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.35;transform:scale(.75)} }
+        .footer-socials { display: flex; gap: 10px; align-items: center; }
+        .footer-social-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--footer-border); background: rgba(255,255,255,0.025); color: var(--footer-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; text-decoration: none; font-size: 13px; transition: color 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.18s; }
+        .footer-social-btn:hover { color: var(--footer-accent-c); border-color: rgba(6,182,212,0.4); box-shadow: 0 0 10px rgba(6,182,212,0.15); transform: translateY(-2px); }
+        .footer-brand-col { opacity: 0; transform: translateY(14px); transition: opacity var(--footer-reveal-dur) var(--footer-reveal-ease) 0.05s, transform var(--footer-reveal-dur) var(--footer-reveal-ease) 0.05s; }
+        #mv-footer.footer-visible .footer-brand-col { opacity: 1; transform: translateY(0); }
+    </style>
+
+    <footer id="mv-footer" role="contentinfo" aria-label="Footer MotorVisuales">
+        <div id="mv-footer-topline" aria-hidden="true"></div>
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <!-- Col 1: Brand -->
+                <div class="footer-col footer-brand-col">
+                    <div class="footer-brand-wordmark">
+                        <div class="brand-icon" aria-hidden="true">⚡</div>
+                        MotorVisuales
+                    </div>
+                    <p class="footer-tagline">Estación audiovisual y electromagnética ciberfísica. DSP en tiempo real, shaders GLSL y síntesis de universos visuales.</p>
+                    <div class="footer-vu-bar" id="footer-vu" aria-hidden="true" title="RMS reactivo al audio">
+                        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                    <div class="footer-badges">
+                        <span class="footer-badge">WebGL</span>
+                        <span class="footer-badge">Web Audio</span>
+                        <span class="footer-badge">GLSL</span>
+                        <span class="footer-badge">Three.js</span>
+                        <span class="footer-badge">GPGPU</span>
+                        <span class="footer-badge">PWA</span>
+                    </div>
+                </div>
+                <!-- Col 2: Motor 3D -->
+                <div class="footer-col col-engine">
+                    <div class="footer-col-title">Motor 3D</div>
+                    <ul class="footer-links">
+                        <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(12)">🌊 Océano de Mercurio</a></li>
+                        <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(13)">💎 Valle de Cristales</a></li>
+                        <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(14)">🐟 Abismo Oceánico</a></li>
+                        <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(4)">⚡ Shader GLSL en Vivo</a></li>
+                        <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(5)">⚛️ GPU Compute GPGPU</a></li>
+                        <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(11)">🌊 Espectrograma 3D</a></li>
+                    </ul>
+                </div>
+                <!-- Col 3: Estudio -->
+                <div class="footer-col col-studio">
+                    <div class="footer-col-title">Estudio</div>
+                    <ul class="footer-links">
+                        <li><a onclick="if(typeof switchCockpitView==='function')switchCockpitView('audio-dsp')">🎨 GLSL Split-View IDE</a></li>
+                        <li><a onclick="if(typeof switchCockpitView==='function')switchCockpitView('audio-dsp')">✨ Suite PostFX 9 Passes</a></li>
+                        <li><a onclick="if(typeof switchCockpitView==='function')switchCockpitView('chaos-lab')">🌀 Chaos Lab & Atractores</a></li>
+                        <li><a onclick="if(typeof openAiClipStudio==='function')openAiClipStudio()">🎬 Clips IA Multicapa</a></li>
+                        <li><a onclick="if(typeof switchCockpitView==='function')switchCockpitView('spatial')">🎧 Spatial 3D & 5.1/7.1</a></li>
+                        <li><a onclick="if(typeof openPresetsHub==='function')openPresetsHub()">☁️ Hub Cloud Presets</a></li>
+                    </ul>
+                </div>
+                <!-- Col 4: Recursos -->
+                <div class="footer-col col-links">
+                    <div class="footer-col-title">Recursos</div>
+                    <ul class="footer-links">
+                        <li><a href="https://motorvisuales.site" target="_blank" rel="noopener">🌐 motorvisuales.site</a></li>
+                        <li><a href="https://milkdropagent.motorvisuales.site" target="_blank" rel="noopener">🎛 MilkDrop Agent</a></li>
+                        <li><a onclick="if(typeof openCaptureModal==='function')openCaptureModal()">📷 Captura Ultra-HD 4K/8K</a></li>
+                        <li><a onclick="if(typeof openMidiConfig==='function')openMidiConfig()">🎹 MIDI USB Mapping</a></li>
+                        <li><a onclick="document.getElementById('stems-export-modal')&&(document.getElementById('stems-export-modal').classList.remove('hidden'))">💾 Exportar Audio Stems</a></li>
+                        <li><a onclick="if(typeof openVjTimeline==='function')openVjTimeline()">⏺ Timeline VJ (.mvj)</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-divider" aria-hidden="true"></div>
+            <div class="footer-bottom">
+                <p class="footer-copy">
+                    &copy; 2026 MotorVisuales &mdash; <em>Estación Audiovisual Ciberfísica</em><br>
+                    Construido con WebGL &middot; Web Audio API &middot; Three.js r128 &middot; Gemini 2.5 Flash
+                </p>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <div class="footer-socials">
+                        <a class="footer-social-btn" href="https://github.com" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                        </a>
+                        <a class="footer-social-btn" href="https://motorvisuales.site" target="_blank" rel="noopener" title="Web" aria-label="Web">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                        </a>
+                    </div>
+                    <div class="footer-version-badge" aria-label="Versión actual">v5.0 PRO &middot; LIVE</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script id="mv-footer-script">
+    (function initMvFooter() {
+        'use strict';
+        const footer = document.getElementById('mv-footer');
+        if (!footer) return;
+        // Stagger delays en items de lista
+        const colOrder = ['col-engine','col-studio','col-links'];
+        footer.querySelectorAll('.footer-col:not(.footer-brand-col) .footer-links li').forEach(li => {
+            const col = li.closest('.footer-col');
+            const colIdx = colOrder.findIndex(c => col.classList.contains(c));
+            const items = Array.from(col.querySelectorAll('.footer-links li'));
+            const itemIdx = items.indexOf(li);
+            li.style.transitionDelay = (0.12 + colIdx * 0.08 + itemIdx * 0.055) + 's';
+        });
+        // IntersectionObserver — reveal al entrar en viewport
+        const io = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting) {
+                footer.classList.add('footer-visible');
+                io.disconnect();
+            }
+        }, { threshold: 0.08 });
+        io.observe(footer);
+        // Mini vúmetro reactivo
+        const vuBars = footer.querySelectorAll('#footer-vu span');
+        const N = vuBars.length;
+        const STEM_KEYS = ['sub','bass','mids_low','mids','mids_hi','presence','treble','air'];
+        function updateFooterVU() {
+            if (!footer.classList.contains('footer-visible')) return;
+            const stems = window.stemsData;
+            const metrics = window.liveAudioMetrics;
+            for (let i = 0; i < N; i++) {
+                let h = 2;
+                if (stems && metrics) {
+                    const sk = STEM_KEYS[Math.floor(i * STEM_KEYS.length / N)];
+                    const sv = stems[sk] ? (stems[sk].value || 0) : 0;
+                    h = Math.max(2, Math.round(sv * 22 * (1 + (Math.random() - 0.5) * 0.2)));
+                    const t = i / (N - 1);
+                    vuBars[i].style.background = `rgb(${Math.round(6+t*133)},${Math.round(182+t*-90)},${Math.round(212+t*34)})`;
+                } else {
+                    const phase = (Date.now() * 0.003 + i * 0.4) % (Math.PI * 2);
+                    h = Math.max(2, Math.round(3 + Math.sin(phase) * 2.5 + Math.random() * 1.5));
+                }
+                vuBars[i].style.height = h + 'px';
+            }
+        }
+        if (!window._footerVuHooked) {
+            window._footerVuHooked = true;
+            if (Array.isArray(window.postRenderHooks)) {
+                window.postRenderHooks.push(updateFooterVU);
+            } else {
+                let lastT = 0;
+                (function loop(t) {
+                    if (t - lastT > 33) { updateFooterVU(); lastT = t; }
+                    requestAnimationFrame(loop);
+                })(0);
+            }
+        }
+        // Año dinámico
+        const cp = footer.querySelector('.footer-copy');
+        if (cp) cp.innerHTML = cp.innerHTML.replace('2026', new Date().getFullYear());
+    })();
+    </script>
 
     <!-- ========================================================================= -->
     <!-- ANDROID PWA BOTTOM TACTICAL TAB BAR (< 1024px)                            -->
