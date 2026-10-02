@@ -1,0 +1,568 @@
+<!-- ============================================================
+     MotorVisuales — Footer Section (D-055 / lyai-shared)
+     Estilo: 21st.dev / Efferd UI — Vanilla JS + CSS puro
+     Sin dependencias externas. Compatible con Tailwind CDN.
+     Subir a: /opt/lyai/app/lyai-shared/components/footer/
+     ============================================================ -->
+
+<!-- ESTILOS DEL FOOTER — insertar en <style> del <head> o como bloque independiente -->
+<style id="mv-footer-styles">
+    /* ─── Variables del componente ─────────────────────────────── */
+    #mv-footer {
+        --footer-bg:        rgba(5, 6, 10, 0.98);
+        --footer-border:    rgba(255, 255, 255, 0.07);
+        --footer-text:      rgba(160, 170, 190, 0.8);
+        --footer-muted:     rgba(90, 100, 120, 0.7);
+        --footer-accent-c:  #06b6d4;   /* cian */
+        --footer-accent-p:  #8b5cf6;   /* púrpura */
+        --footer-accent-a:  #f59e0b;   /* ámbar */
+        --footer-glow-c:    rgba(6, 182, 212, 0.18);
+        --footer-reveal-dur: 0.7s;
+        --footer-reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ─── Visibilidad: solo desktop ─────────────────────────────── */
+    /* (en móvil el 100dvh Zero-Scroll no permite footer)            */
+    #mv-footer {
+        display: none;
+    }
+    @media (min-width: 1024px) {
+        #mv-footer {
+            display: block;
+        }
+    }
+
+    /* ─── Contenedor principal ──────────────────────────────────── */
+    #mv-footer {
+        position: relative;
+        background: var(--footer-bg);
+        backdrop-filter: blur(20px) saturate(160%);
+        -webkit-backdrop-filter: blur(20px) saturate(160%);
+        overflow: hidden;
+        margin-top: 0;
+    }
+
+    /* ─── Línea superior animada (se dibuja al entrar) ─────────── */
+    #mv-footer-topline {
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            var(--footer-accent-c) 30%,
+            var(--footer-accent-p) 60%,
+            var(--footer-accent-a) 85%,
+            transparent 100%
+        );
+        transform: scaleX(0);
+        transform-origin: left center;
+        transition: transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform;
+    }
+    #mv-footer.footer-visible #mv-footer-topline {
+        transform: scaleX(1);
+    }
+
+    /* ─── Ruido de textura (dot-matrix) ────────────────────────── */
+    #mv-footer::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(
+            rgba(255, 255, 255, 0.025) 1px, transparent 1px
+        );
+        background-size: 20px 20px;
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    /* ─── Contenedor interior ────────────────────────────────────  */
+    .footer-inner {
+        position: relative;
+        z-index: 1;
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 48px 32px 28px;
+    }
+
+    /* ─── Grid principal ─────────────────────────────────────────  */
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr;
+        gap: 40px 32px;
+        margin-bottom: 40px;
+    }
+
+    /* ─── Columna brand ──────────────────────────────────────────  */
+    .footer-brand-wordmark {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 1.1rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+    .footer-brand-wordmark .brand-icon {
+        width: 28px; height: 28px;
+        border-radius: 7px;
+        background: linear-gradient(135deg, var(--footer-accent-c), var(--footer-accent-p));
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px;
+        box-shadow: 0 0 14px var(--footer-glow-c);
+        flex-shrink: 0;
+    }
+    .footer-tagline {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.8125rem;
+        line-height: 1.6;
+        color: var(--footer-text);
+        max-width: 280px;
+        margin-bottom: 20px;
+    }
+
+    /* ─── Mini Vúmetro reactivo ──────────────────────────────────  */
+    .footer-vu-bar {
+        display: flex;
+        align-items: flex-end;
+        gap: 2px;
+        height: 24px;
+        margin-bottom: 20px;
+    }
+    .footer-vu-bar span {
+        display: block;
+        width: 3px;
+        border-radius: 2px;
+        background: var(--footer-accent-c);
+        transition: height 0.08s linear;
+        will-change: height;
+        min-height: 2px;
+        opacity: 0.7;
+    }
+
+    /* ─── Badges de stack ────────────────────────────────────────  */
+    .footer-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .footer-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        font-weight: 500;
+        padding: 3px 8px;
+        border-radius: 4px;
+        border: 1px solid var(--footer-border);
+        color: var(--footer-muted);
+        background: rgba(255, 255, 255, 0.025);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        transition: color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .footer-badge:hover {
+        color: var(--footer-accent-c);
+        border-color: rgba(6, 182, 212, 0.4);
+        box-shadow: 0 0 8px rgba(6, 182, 212, 0.12);
+    }
+
+    /* ─── Columnas de links ──────────────────────────────────────  */
+    .footer-col-title {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.6875rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.35);
+        margin-bottom: 16px;
+    }
+    .footer-links {
+        list-style: none;
+        margin: 0; padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .footer-links li {
+        opacity: 0;
+        transform: translateY(10px);
+        transition:
+            opacity var(--footer-reveal-dur) var(--footer-reveal-ease),
+            transform var(--footer-reveal-dur) var(--footer-reveal-ease);
+        /* stagger delay aplicado via JS inline style */
+    }
+    #mv-footer.footer-visible .footer-links li {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .footer-links a {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.8125rem;
+        color: var(--footer-text);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.18s, gap 0.18s;
+        cursor: pointer;
+    }
+    .footer-links a::before {
+        content: '';
+        display: inline-block;
+        width: 3px; height: 3px;
+        border-radius: 50%;
+        background: var(--footer-accent-c);
+        opacity: 0;
+        transition: opacity 0.18s;
+        flex-shrink: 0;
+    }
+    .footer-links a:hover {
+        color: #fff;
+        gap: 9px;
+    }
+    .footer-links a:hover::before {
+        opacity: 1;
+    }
+
+    /* ─── Colores de acento por columna ─────────────────────────  */
+    .footer-col.col-engine .footer-links a:hover { color: var(--footer-accent-c); }
+    .footer-col.col-engine .footer-links a:hover::before { background: var(--footer-accent-c); }
+    .footer-col.col-studio .footer-links a:hover { color: var(--footer-accent-p); }
+    .footer-col.col-studio .footer-links a:hover::before { background: var(--footer-accent-p); }
+    .footer-col.col-links  .footer-links a:hover { color: var(--footer-accent-a); }
+    .footer-col.col-links  .footer-links a:hover::before { background: var(--footer-accent-a); }
+
+    /* ─── Separador inferior ─────────────────────────────────────  */
+    .footer-divider {
+        height: 1px;
+        background: var(--footer-border);
+        margin-bottom: 20px;
+        opacity: 0;
+        transform: scaleX(0.6);
+        transform-origin: left;
+        transition:
+            opacity 0.8s var(--footer-reveal-ease),
+            transform 0.8s var(--footer-reveal-ease);
+    }
+    #mv-footer.footer-visible .footer-divider {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    /* ─── Bottom bar ─────────────────────────────────────────────  */
+    .footer-bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 12px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+            opacity 0.7s var(--footer-reveal-ease) 0.3s,
+            transform 0.7s var(--footer-reveal-ease) 0.3s;
+    }
+    #mv-footer.footer-visible .footer-bottom {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .footer-copy {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.7rem;
+        color: var(--footer-muted);
+        letter-spacing: 0.03em;
+    }
+    .footer-copy em {
+        font-style: normal;
+        color: rgba(255, 255, 255, 0.25);
+    }
+
+    /* ─── Version badge ─────────────────────────────────────────  */
+    .footer-version-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.65rem;
+        font-weight: 600;
+        padding: 3px 10px 3px 8px;
+        border-radius: 100px;
+        border: 1px solid rgba(6, 182, 212, 0.25);
+        background: rgba(6, 182, 212, 0.06);
+        color: var(--footer-accent-c);
+        letter-spacing: 0.06em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .footer-version-badge::before {
+        content: '';
+        width: 5px; height: 5px;
+        border-radius: 50%;
+        background: var(--footer-accent-c);
+        box-shadow: 0 0 6px var(--footer-accent-c);
+        animation: footer-pulse-led 2s ease-in-out infinite;
+    }
+    @keyframes footer-pulse-led {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.35; transform: scale(0.75); }
+    }
+
+    /* ─── Social icons ───────────────────────────────────────────  */
+    .footer-socials {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .footer-social-btn {
+        width: 30px; height: 30px;
+        border-radius: 8px;
+        border: 1px solid var(--footer-border);
+        background: rgba(255, 255, 255, 0.025);
+        color: var(--footer-muted);
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 13px;
+        transition: color 0.18s, border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+    }
+    .footer-social-btn:hover {
+        color: var(--footer-accent-c);
+        border-color: rgba(6, 182, 212, 0.4);
+        box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+        transform: translateY(-2px);
+    }
+
+    /* ─── Brand column reveal ────────────────────────────────────  */
+    .footer-brand-col {
+        opacity: 0;
+        transform: translateY(14px);
+        transition:
+            opacity var(--footer-reveal-dur) var(--footer-reveal-ease) 0.05s,
+            transform var(--footer-reveal-dur) var(--footer-reveal-ease) 0.05s;
+    }
+    #mv-footer.footer-visible .footer-brand-col {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
+
+<!-- MARKUP DEL FOOTER -->
+<footer id="mv-footer" role="contentinfo" aria-label="Footer MotorVisuales">
+    <!-- Línea superior animada -->
+    <div id="mv-footer-topline" aria-hidden="true"></div>
+
+    <div class="footer-inner">
+        <!-- Grid 4 columnas -->
+        <div class="footer-grid">
+
+            <!-- ── Col 1: Brand ─────────────────────────────────── -->
+            <div class="footer-col footer-brand-col">
+                <div class="footer-brand-wordmark">
+                    <div class="brand-icon" aria-hidden="true">⚡</div>
+                    MotorVisuales
+                </div>
+                <p class="footer-tagline">
+                    Estación audiovisual y electromagnética ciberfísica.
+                    DSP en tiempo real, shaders GLSL y síntesis de universos visuales.
+                </p>
+
+                <!-- Mini vúmetro reactivo (16 barras) -->
+                <div class="footer-vu-bar" id="footer-vu" aria-hidden="true" title="RMS reactivo al audio">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                </div>
+
+                <!-- Stack badges -->
+                <div class="footer-badges">
+                    <span class="footer-badge">WebGL</span>
+                    <span class="footer-badge">Web Audio</span>
+                    <span class="footer-badge">GLSL</span>
+                    <span class="footer-badge">Three.js</span>
+                    <span class="footer-badge">GPGPU</span>
+                    <span class="footer-badge">PWA</span>
+                </div>
+            </div>
+
+            <!-- ── Col 2: Motor 3D ─────────────────────────────── -->
+            <div class="footer-col col-engine">
+                <div class="footer-col-title">Motor 3D</div>
+                <ul class="footer-links">
+                    <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(12)">🌊 Océano de Mercurio</a></li>
+                    <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(13)">💎 Valle de Cristales</a></li>
+                    <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(14)">🐟 Abismo Oceánico</a></li>
+                    <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(4)">⚡ Shader GLSL en Vivo</a></li>
+                    <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(5)">⚛️ GPU Compute GPGPU</a></li>
+                    <li><a onclick="if(typeof selectThreeScene==='function')selectThreeScene(11)">🌊 Espectrograma 3D</a></li>
+                </ul>
+            </div>
+
+            <!-- ── Col 3: Estudio ──────────────────────────────── -->
+            <div class="footer-col col-studio">
+                <div class="footer-col-title">Estudio</div>
+                <ul class="footer-links">
+                    <li><a onclick="if(typeof openSection==='function')openSection('sec-shader-editor')">🎨 GLSL Split-View IDE</a></li>
+                    <li><a onclick="if(typeof openSection==='function')openSection('sec-postfx')">✨ Suite PostFX 9 Passes</a></li>
+                    <li><a onclick="if(typeof openSection==='function')openSection('sec-chaos-lab')">🌀 Chaos Lab & Atractores</a></li>
+                    <li><a onclick="if(typeof openSection==='function')openSection('sec-clips-ai')">🎬 Clips IA Multicapa</a></li>
+                    <li><a onclick="if(typeof openSection==='function')openSection('sec-spatial')">🎧 Spatial 3D & 5.1/7.1</a></li>
+                    <li><a onclick="if(typeof openSection==='function')openSection('sec-presets-hub')">☁️ Hub Cloud Presets</a></li>
+                </ul>
+            </div>
+
+            <!-- ── Col 4: Recursos ─────────────────────────────── -->
+            <div class="footer-col col-links">
+                <div class="footer-col-title">Recursos</div>
+                <ul class="footer-links">
+                    <li><a href="https://motorvisuales.site" target="_blank" rel="noopener">🌐 motorvisuales.site</a></li>
+                    <li><a href="https://milkdropagent.motorvisuales.site" target="_blank" rel="noopener">🎛 MilkDrop Agent</a></li>
+                    <li><a onclick="if(typeof openModal==='function')openModal('modal-capture-settings')">📷 Captura Ultra-HD 4K/8K</a></li>
+                    <li><a onclick="if(typeof openModal==='function')openModal('modal-midi-config')">🎹 MIDI USB Mapping</a></li>
+                    <li><a onclick="if(typeof openModal==='function')openModal('modal-stems-export')">💾 Exportar Audio Stems</a></li>
+                    <li><a onclick="if(typeof openModal==='function')openModal('modal-vj-timeline')">⏺ Timeline VJ (.mvj)</a></li>
+                </ul>
+            </div>
+
+        </div><!-- /footer-grid -->
+
+        <!-- ── Separador ──────────────────────────────────────── -->
+        <div class="footer-divider" aria-hidden="true"></div>
+
+        <!-- ── Bottom bar ──────────────────────────────────────── -->
+        <div class="footer-bottom">
+            <p class="footer-copy">
+                © 2026 MotorVisuales &mdash; <em>Estación Audiovisual Ciberfísica</em><br>
+                Construido con WebGL · Web Audio API · Three.js r128 · Gemini 2.5 Flash
+            </p>
+
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                <!-- Socials -->
+                <div class="footer-socials">
+                    <a class="footer-social-btn"
+                       href="https://github.com" target="_blank" rel="noopener"
+                       title="GitHub" aria-label="GitHub">
+                        <!-- GitHub SVG inline -->
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                        </svg>
+                    </a>
+                    <a class="footer-social-btn"
+                       href="https://motorvisuales.site" target="_blank" rel="noopener"
+                       title="Web" aria-label="Web">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- Version badge -->
+                <div class="footer-version-badge" aria-label="Versión actual">
+                    v5.0 PRO · LIVE
+                </div>
+            </div>
+        </div>
+    </div><!-- /footer-inner -->
+</footer>
+
+<!-- SCRIPT DEL FOOTER — colocar antes del </body> o al final del bloque JS -->
+<script id="mv-footer-script">
+(function initMvFooter() {
+    'use strict';
+
+    const footer = document.getElementById('mv-footer');
+    if (!footer) return;
+
+    // ── Stagger delays en items de listas ──────────────────────
+    footer.querySelectorAll('.footer-links li').forEach((li, i) => {
+        const col = li.closest('.footer-col');
+        const colItems = Array.from(col.querySelectorAll('.footer-links li'));
+        const idx = colItems.indexOf(li);
+        // base delay: 0.1s por columna + 0.06s por item dentro de la columna
+        const colOffset = ['col-engine','col-studio','col-links']
+            .indexOf(col.classList[1]) * 0.08;
+        li.style.transitionDelay = (0.12 + colOffset + idx * 0.055) + 's';
+    });
+
+    // ── IntersectionObserver — reveal al entrar en viewport ────
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                footer.classList.add('footer-visible');
+                io.disconnect(); // solo se dispara una vez
+            }
+        });
+    }, { threshold: 0.08 });
+
+    io.observe(footer);
+
+    // ── Mini vúmetro reactivo al RMS del motor ─────────────────
+    const vuBars = footer.querySelectorAll('#footer-vu span');
+    const N = vuBars.length;
+
+    // Frecuencias de bandas para mapear desde stemsData del motor
+    const STEM_KEYS = ['sub','bass','mids_low','mids','mids_hi','presence','treble','air'];
+
+    function updateFooterVU() {
+        // Solo animar si el footer es visible en el DOM
+        if (!footer.classList.contains('footer-visible')) return;
+
+        const stems = window.stemsData;   // referencia al motor
+        const metrics = window.liveAudioMetrics;
+
+        for (let i = 0; i < N; i++) {
+            let h = 2; // altura mínima en px
+
+            if (stems && metrics) {
+                // Mapear cada barra a un stem (ciclado si N > 8)
+                const stemKey = STEM_KEYS[Math.floor(i * STEM_KEYS.length / N)];
+                const stemVal = stems[stemKey] ? (stems[stemKey].value || 0) : 0;
+                // Añadir micro-variación aleatoria para look analógico
+                const jitter = 1 + (Math.random() - 0.5) * 0.2;
+                h = Math.max(2, Math.round(stemVal * 22 * jitter));
+                // Color: cian en bajos, púrpura en agudos
+                const t = i / (N - 1); // 0..1
+                const r = Math.round(6 + t * (139 - 6));
+                const g = Math.round(182 + t * (92 - 182));
+                const b = Math.round(212 + t * (246 - 212));
+                vuBars[i].style.background = `rgb(${r},${g},${b})`;
+            } else {
+                // Sin audio: animación idle suave para indicar vida
+                const phase = (Date.now() * 0.003 + i * 0.4) % (Math.PI * 2);
+                h = Math.max(2, Math.round(3 + Math.sin(phase) * 2.5 + Math.random() * 1.5));
+            }
+            vuBars[i].style.height = h + 'px';
+        }
+    }
+
+    // Enganchar al masterRenderLoop si existe, o usar rAF propio
+    const _origMasterRenderLoop = window.masterRenderLoopHooks;
+    if (window.masterRenderLoopFooterHook === undefined) {
+        window.masterRenderLoopFooterHook = true;
+        // Añadir al array de hooks post-render si el motor lo soporta
+        if (Array.isArray(window.postRenderHooks)) {
+            window.postRenderHooks.push(updateFooterVU);
+        } else {
+            // Fallback: rAF independiente a ~30 FPS
+            let lastT = 0;
+            function vuLoop(t) {
+                if (t - lastT > 33) { // ~30 FPS
+                    updateFooterVU();
+                    lastT = t;
+                }
+                requestAnimationFrame(vuLoop);
+            }
+            requestAnimationFrame(vuLoop);
+        }
+    }
+
+    // ── Año dinámico en copyright ──────────────────────────────
+    const copyEl = footer.querySelector('.footer-copy');
+    if (copyEl) {
+        const yr = new Date().getFullYear();
+        copyEl.innerHTML = copyEl.innerHTML.replace('2026', yr);
+    }
+
+})();
+</script>

@@ -335,13 +335,51 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Sincronización Bidireccional Inmediata:** Funciones sincronizadas (`syncBentoAudioDeckControls`, `updateMasterVolume`, `setLiveBoost`, `runAudioDSP`, `drawMiniWave` condicional) garantizando paridad total y cero sobrecarga de render.
   - **Verificación Automatizada CDP:** Test 7 integrado en [scripts/audit_audio_deck.js](file:///c:/lyai-motorvisuales.site/scripts/audit_audio_deck.js) validando conmutación, interacción con pista 2 ("Tontos Útiles") y capturas visuales en alta fidelidad en [test-screenshots/audio_deck_07_bento_butter_view.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_07_bento_butter_view.png), [test-screenshots/audio_deck_08_bento_cards_3_and_4.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_08_bento_cards_3_and_4.png) y [test-screenshots/audio_deck_09_bento_card_4_scope.png](file:///c:/lyai-motorvisuales.site/test-screenshots/audio_deck_09_bento_card_4_scope.png).
 
+- ✅ **Bento Grid Global + SpotlightCard System (D-054):**
+  - **SpotlightCard CSS:** Haz de luz cónico reactivo al cursor via `::before` (fill interior) + `::after` (borde perimetral con `mask-composite: exclude`). Custom props `--mx`/`--my` en porcentajes. 7 variantes: `spc-purple`, `spc-cyan`, `spc-amber`, `spc-emerald`, `spc-rose`, `spc-blue`, `spc-fuchsia`.
+  - **`initSpotlightCards()` JS:** `AbortController` por tarjeta — cero fugas. Se llama en `DOMContentLoaded` y al activar el modo Bento.
+  - **Bento Grid Global 12 columnas (7 cards asimétricos):** Hero FFT (col-8), Pistas Master (col-4), Stems DSP Live con 8 vúmetros (col-8), PostFX Suite 9 stomp-boxes (col-4), Ingesta I/O (col-4), Transporte+Faders (col-4), AI Director MER con canvas Russell Circumplex (col-4).
+  - **Hooks render loop:** `updateBentoStemsLive()` + `drawBentoMerCanvas()` a 30 FPS (throttle ×½ en `masterRenderLoop`). Early-return si Bento oculto.
+  - **Stubs Bridge:** `setFxState()`, `toggleAllFx()`, `triggerAiArtDirection()` → sincronizan con funciones reales del motor.
+  - **Limpieza:** 380 líneas huérfanas del Bento D-053 eliminadas.
+
+- ✅ **Footer Section animado estilo 21st.dev/Efferd (D-055):**
+  - **Solo desktop (`lg:`):** Media query `min-width: 1024px` — invisible en móvil para preservar el layout 100dvh Zero-Scroll.
+  - **Diseño Efferd/21st.dev en Vanilla JS + CSS puro:** Grid 4 columnas (`2fr 1fr 1fr 1fr`) — Brand, Motor 3D, Estudio y Recursos.
+  - **Línea superior animada:** `scaleX(0→1)` con gradiente cian→púrpura→ámbar activada por `IntersectionObserver` (threshold 0.08).
+  - **Reveal escalonado:** `IntersectionObserver` añade clase `.footer-visible` → transiciones CSS `translateY(10px→0) + opacity(0→1)` con stagger delay calculado por JS (`colIdx * 0.08s + itemIdx * 0.055s`).
+  - **Mini vúmetro reactivo:** 16 barras conectadas a `window.stemsData` y `window.liveAudioMetrics`; hook a `postRenderHooks[]` si existe o rAF propio a 30 FPS. Idle animation sinusoidal si no hay audio.
+  - **Version badge LED pulsante:** Animación `footer-pulse-led` CSS pura a 2s.
+  - **Dot-matrix texture:** `radial-gradient` en `::before` a 20px×20px sin coste de GPU.
+  - **Componente standalone:** [components/footer/footer.html](file:///c:/lyai-motorvisuales.site/components/footer/footer.html) — listo para subir a `/opt/lyai/app/lyai-shared/components/footer/` en Hetzner.
+
+## Protocolo Hetzner — lyai-shared (ACTIVO desde 2026-10-02)
+> **REGLA PERMANENTE:** Todo componente, función JS, bloque CSS o snippet HTML nuevo que se añada **debe subirse también al servidor Hetzner** en `/opt/lyai/app/lyai-shared/`.
+
+### Estructura de directorios `/opt/lyai/app/lyai-shared/`
+- `/components/` — Componentes UI reutilizables (HTML+CSS+JS standalone)
+- `/scripts/` — Funciones JS standalone (DSP, SpotlightCard, FX bridges…)
+- `/styles/` — Bloques CSS standalone
+- `/assets/` — Recursos estáticos
+
+### Conexión SSH
+- **Host:** `motorvisuales.site` | **Usuario:** `root` | **Clave:** `~/.ssh/id_ed25519`
+- **Estado:** Método de conexión pendiente de confirmar con el usuario (sesión anterior: `Permission denied (publickey)`).
+
+### Flujo de subida
+1. Validar localmente en [http://localhost:8088](http://localhost:8088)
+2. `scp`/`rsync` del fragmento al path en Hetzner (NO copiar el monolito `index.html` completo)
+3. Guardar path destino en DECISIONS.md bajo el ADR de D-054+
+
 ## Próximas Ideas / Pendientes
+- [x] Bento Grid Global + SpotlightCard System (D-054).
 - [x] Sistema de Vistas Dual para Audio Deck: Hardware Rack vs Bento Grid Butter.video (D-053).
 - [x] Adaptación espacial dinámica del Audio Deck sin huecos vacíos (D-052).
-- [x] Banner lateral izquierdo de menús en el Audio Deck con pertenencia visual por color y muesca conectora (D-051).
-- [x] Rediseño del Audio Deck en 3 secciones con Pistas Master plegadas por defecto (D-050).
-- [x] Gemini AI Shader Copilot en Split-View IDE (Generación y mutación de shaders asistida por LLM).
-- [ ] Control de iluminación DMX / ArtNet vía WebSockets para sincronizar luces de escenario con MotorVisuales.
-- [ ] Soporte para modelos 3D GLTF/GLB importables por el usuario dentro de los Universos Escénicos.
-
+- [x] Banner lateral izquierdo de menús en el Audio Deck (D-051).
+- [x] Rediseño del Audio Deck en 3 secciones (D-050).
+- [x] Gemini AI Shader Copilot en Split-View IDE (D-049).
+- [x] Footer Section animado estilo 21st.dev/Efferd (D-055) — Vanilla JS sin React/motion. Subido a `components/footer/footer.html`. Pendiente: rsync a `/opt/lyai/app/lyai-shared/components/footer/` en Hetzner una vez confirmado SSH.
+- [ ] Subir SpotlightCard D-054 a `/opt/lyai/app/lyai-shared/components/spotlight-card/` una vez confirmado SSH.
+- [ ] Control DMX / ArtNet vía WebSockets para sincronizar luces de escenario.
+- [ ] Soporte GLTF/GLB importable por el usuario en los Universos Escénicos.
 

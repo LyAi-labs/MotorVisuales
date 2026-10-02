@@ -1320,3 +1320,26 @@
 
 
 
+
+### D-055 — Footer Section animado estilo 21st.dev/Efferd
+- **Fecha:** 2026-10-02
+- **Estado:** ✅ Implementada
+- **Contexto:** Necesitamos un footer de alta calidad visual para la versión desktop de MotorVisuales, alineado con la estética Efferd/21st.dev pero sin React ni Framer Motion. Además debe ser un componente standalone subible a `lyai-shared` en Hetzner.
+- **Decisiones técnicas:**
+  - **Visibilidad:** `display:none` por defecto + `@media (min-width:1024px) { display:block }` — garantía absoluta de que no interfiere con el layout 100dvh Zero-Scroll de móvil (D-048).
+  - **Reveal engine:** `IntersectionObserver` (threshold 0.08) + clase `.footer-visible` — cero setTimeout, cero polling. Disparo único con `io.disconnect()` post-activación.
+  - **Animaciones:** Exclusivamente `transform` + `opacity` en GPU. Stagger calculado en JS con `transitionDelay` inline — `O(n)` lineal en init, `O(1)` en runtime.
+  - **Línea superior:** `scaleX(0→1)` con gradiente 3-paradas cian/púrpura/ámbar en `::before` del `#mv-footer-topline`. Duración 1.1s `cubic-bezier(0.16,1,0.3,1)`.
+  - **Mini vúmetro:** Hook a `window.postRenderHooks[]` si el motor lo expone; fallback rAF propio a 30 FPS con early-return si el footer no es visible. `Math.random()` para jitter analógico — `O(1)` por frame.
+  - **Zero bloatware:** Sin librerías externas, sin npm, sin build step. Componente HTML+CSS+JS autocontenido.
+- **Archivos:**
+  - `index.html` líneas ~29016-29230: bloque `<style>` + `<footer>` + `<script>` inline.
+  - [`components/footer/footer.html`](file:///c:/lyai-motorvisuales.site/components/footer/footer.html): copia standalone para `lyai-shared`.
+- **Destino Hetzner:** `/opt/lyai/app/lyai-shared/components/footer/` — pendiente SSH.
+- **Consecuencias:**
+  - ✅ Footer de producción visible solo en `>= 1024px`
+  - ✅ Reactivo al motor DSP (`stemsData`, `liveAudioMetrics`)
+  - ✅ Componente reutilizable en `lyai-shared`
+  - ✅ Cero impacto en rendimiento mobile
+
+---
