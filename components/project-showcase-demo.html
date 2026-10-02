@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProjectShowcase Tooltip HUD — Demo Vanilla JS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' };
+    </script>
+    <style>
+        body { background: #06080d; font-family: 'Inter', system-ui, sans-serif; }
+    </style>
+</head>
+<body class="min-h-screen p-8 text-zinc-200 flex flex-col justify-between">
+
+    <div>
+        <h1 class="text-xl font-bold text-zinc-100 mb-2">ProjectShowcase Tooltip HUD — Vanilla JS Port</h1>
+        <p class="text-sm text-zinc-500 mb-8 font-mono">
+            Inspirado en: <a href="https://21st.dev/@jatin-yadav05/components/project-showcase" class="text-cyan-400 underline" target="_blank">21st.dev/@jatin-yadav05/project-showcase</a>
+            · Stack: Vanilla JS + CSS Glassmorphism + Lerp Motion · Zero dependencias externas
+        </p>
+
+        <!-- DEMO 1: Lista de proyectos estilo 21st.dev -->
+        <h2 class="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-4">Demo 1 — Lista interactiva estilo 21st.dev Showcase</h2>
+        <div class="max-w-2xl bg-zinc-950/80 border border-white/10 rounded-2xl divide-y divide-white/[0.06] overflow-hidden mb-12 shadow-2xl">
+            
+            <div class="p-4 hover:bg-white/[0.03] transition flex items-center justify-between cursor-pointer"
+                 data-tooltip-category="AUDIO DSP"
+                 data-tooltip-title="Banco de 8 Stems Espectrales"
+                 data-tooltip-desc="Descomposición Biquad en tiempo real: Sub, Bass, LowMid, Mid, HighMid, Presence, Brilliance y Air a 60 FPS."
+                 data-tooltip-shortcut="DSP"
+                 data-tooltip-theme="cyan"
+                 data-tooltip-icon="⚡">
+                <div class="flex items-center gap-3">
+                    <span class="text-lg">⚡</span>
+                    <div>
+                        <div class="font-bold text-sm text-zinc-100">Motor de Stems Multicanal</div>
+                        <div class="text-xs text-zinc-500 font-mono">Web Audio API · Filtros IIR Butterworth</div>
+                    </div>
+                </div>
+                <span class="text-xs font-mono text-cyan-400 font-bold bg-cyan-950/60 px-2.5 py-1 rounded-full border border-cyan-500/30">8 CANALES</span>
+            </div>
+
+            <div class="p-4 hover:bg-white/[0.03] transition flex items-center justify-between cursor-pointer"
+                 data-tooltip-category="AI AGENT"
+                 data-tooltip-title="Director Creativo Autónomo (Auto-VJ)"
+                 data-tooltip-desc="Agente de inteligencia artificial que detecta compases y muta shaders, paletas y geometrías en vivo."
+                 data-tooltip-shortcut="AUTO-VJ"
+                 data-tooltip-theme="purple"
+                 data-tooltip-icon="🔮">
+                <div class="flex items-center gap-3">
+                    <span class="text-lg">🔮</span>
+                    <div>
+                        <div class="font-bold text-sm text-zinc-100">Agente Autónomo Gemini VJ</div>
+                        <div class="text-xs text-zinc-500 font-mono">Multimodal Reasoning · Live Mutation</div>
+                    </div>
+                </div>
+                <span class="text-xs font-mono text-purple-400 font-bold bg-purple-950/60 px-2.5 py-1 rounded-full border border-purple-500/30">GEMINI LIVE</span>
+            </div>
+
+            <div class="p-4 hover:bg-white/[0.03] transition flex items-center justify-between cursor-pointer"
+                 data-tooltip-category="CLOUD HUB"
+                 data-tooltip-title="Hub de Presets Comunitarios Cloud"
+                 data-tooltip-desc="Explora, descarga y sincroniza presets audiovisuales en la nube comunitaria con almacenamiento sin servidor."
+                 data-tooltip-shortcut="PRESETS"
+                 data-tooltip-theme="sky"
+                 data-tooltip-icon="🌐">
+                <div class="flex items-center gap-3">
+                    <span class="text-lg">🌐</span>
+                    <div>
+                        <div class="font-bold text-sm text-zinc-100">Cloud Community Presets</div>
+                        <div class="text-xs text-zinc-500 font-mono">Serverless Database · Instant Sync</div>
+                    </div>
+                </div>
+                <span class="text-xs font-mono text-sky-400 font-bold bg-sky-950/60 px-2.5 py-1 rounded-full border border-sky-500/30">CLOUD SYNC</span>
+            </div>
+
+            <div class="p-4 hover:bg-white/[0.03] transition flex items-center justify-between cursor-pointer"
+                 data-tooltip-category="3D VFX"
+                 data-tooltip-title="Escultura Topográfica Espectral 3D"
+                 data-tooltip-desc="Congela la malla de relieve espectral y genera modelos 3D sólidos herméticos STL para impresión física."
+                 data-tooltip-shortcut="STL/OBJ"
+                 data-tooltip-theme="amber"
+                 data-tooltip-icon="🧊">
+                <div class="flex items-center gap-3">
+                    <span class="text-lg">🧊</span>
+                    <div>
+                        <div class="font-bold text-sm text-zinc-100">Exportador STL / OBJ / GLB</div>
+                        <div class="text-xs text-zinc-500 font-mono">Three.js BufferGeometry · Watertight Manifold</div>
+                    </div>
+                </div>
+                <span class="text-xs font-mono text-amber-400 font-bold bg-amber-950/60 px-2.5 py-1 rounded-full border border-amber-500/30">3D PRINT</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- DEMO 2: Barra Flotante Studio Cinema (Reproducción exacta del caso del usuario) -->
+    <div class="w-full flex flex-col items-center pb-8">
+        <h2 class="text-xs font-mono text-zinc-500 uppercase tracking-wider mb-3">Demo 2 — Barra Flotante Studio Cinema (Pill Dock)</h2>
+        <p class="text-xs text-zinc-400 mb-4">Pasa el ratón por los botones inferiores para ver el HUD flotante con física Lerp sustituyendo al tooltip nativo:</p>
+        
+        <div class="studio-pill-dock flex bg-black/85 backdrop-blur-md px-3 py-1.5 rounded-full border border-cyan-500/40 text-xs shadow-2xl items-center gap-3">
+            <span class="text-[10px] font-black text-cyan-400 font-mono uppercase tracking-wider">STUDIO CINEMA</span>
+            <div class="h-3 w-px bg-white/20"></div>
+            <button class="text-zinc-200 hover:text-cyan-300 font-medium flex items-center gap-1">▶ Pista</button>
+            <button class="text-zinc-200 hover:text-cyan-300 font-medium flex items-center gap-1">🎙️ Mic</button>
+            <button class="text-zinc-200 hover:text-cyan-300 font-medium flex items-center gap-1" title="Cámara en Vivo">📹 Cam</button>
+            <button class="text-zinc-200 hover:text-amber-300 font-medium flex items-center gap-1">⚡ Synth</button>
+            <div class="h-3 w-px bg-white/20"></div>
+            <button class="text-purple-300 font-bold flex items-center gap-1 bg-purple-950/80 px-2 py-0.5 rounded-full border border-purple-400/50" title="Creador IA Autónomo (Auto-VJ & Mutación)">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Creador IA</span>
+            </button>
+            <button class="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1" title="Génesis Autónoma de Arte">🔮 Génesis</button>
+            <button id="btn-demo-presets" class="text-sky-300 hover:text-sky-200 font-bold flex items-center gap-1" title="Hub de Presets Comunitarios Cloud">🌐 Presets</button>
+            <button class="text-teal-300 hover:text-teal-200 font-bold flex items-center gap-1" title="Plegar / Desplegar Timeline VJ">⏱️ VJ</button>
+            <button class="text-amber-300 hover:text-amber-200 font-bold flex items-center gap-1" title="Escultura 3D STL/OBJ">🧊 3D</button>
+            <button class="text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1" title="Estudio de Creación Narrativa & Clips IA">🎬 Clips</button>
+            <button class="text-zinc-200 hover:text-amber-300 font-medium flex items-center gap-1" title="Captura 4K instantánea [P]">📸 4K</button>
+            <button class="text-zinc-200 hover:text-indigo-300 font-medium flex items-center gap-1" title="Alternar Órbita Automática de Cámara">🎥 Órbita</button>
+            <button class="text-zinc-200 hover:text-white font-medium flex items-center gap-1" title="Modo Pantalla Completa [F11]">⛶ Fullscreen</button>
+            <button class="px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/50 hover:bg-cyan-900 font-bold text-[10px] ml-1" title="Salir del Modo Studio Cinema y Volver a la Consola">Salir Cine ✕</button>
+        </div>
+    </div>
+
+    <script src="project-showcase.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            ProjectShowcase.init();
+        });
+    </script>
+</body>
+</html>

@@ -61,6 +61,10 @@
    - Serialización de estado visual determinista (Visual DNA): Escena 3D (1-14), 9 passes WebGL FX analógicos, modo de cámara, paleta de color y shaders GLSL.
    - Modal con 3 pestañas: Explorar Comunidad (feed con carga en directo a 1-clic y votaciones), Publicar mi Visual (con captura instantánea del canvas WebGL) y Mis Presets Locales (exportador .mvp).
    - Backend propio en server-hetzner/ (Node.js Express + SQLite WAL, <40MB RAM) empaquetado con Docker Compose para Hetzner.
+12. **Side Dock Acoplado al Visor 3D (*Features with Panel* - ScrollX UI / D-061):**
+   - Contenedor flexible split `#three-dock-container` que aloja el canvas Three.js (`#three-canvas-container`) y el panel lateral `#three-side-dock` (ancho 380-480px).
+   - Botones de la barra superior (`🌐 Cloud`, `🧊 Freeze 3D`, `🎬 Clips IA`) operan con alternancia (*toggle* on/off): abren la sección en el dock lateral manteniendo visible el visor 3D a ~65-70% de ancho sin recarga, o lo cierran restaurando el canvas al 100% mediante `triggerThreeResize()`.
+   - Translocación de DOM limpia desde sus modales padre sin duplicación de nodos ni fugas de memoria, con botón de pop-out (`⛶`) para maximizar a pantalla completa a demanda.
 
 ### Nodo de Audio (grafo)
 ```
@@ -364,25 +368,43 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
   - **Persistencia en Web Storage:** Claves `motor_bento_cards_order`, `motor_cockpit_tabs_order` y `motor_tier2_racks_order` con reordenación automática en el arranque `DOMContentLoaded`.
   - **Recálculo de Spotlight:** Invocación de `initSpotlightCards()` tras cada drop para sincronizar de inmediato las coordenadas físicas del foco lumínico.
 
+- ✅ **Preservación de Sticky Positioning en Cockpit Bar y Header frente a Spotlight CSS (D-057 / L-048):**
+  - **Corrección de Solapamiento Visual:** Exclusión de elementos con clase `sticky` del selector `.glass-panel` del sistema Spotlight (`.glass-panel:not(.sticky) { position: relative; overflow: hidden; }` y `.glass-panel.sticky { overflow: visible; }`).
+  - **Restitución del Flow DOM:** Impide que `position: relative` sobreescriba `position: sticky` en la barra modular de Cockpit y Header. Erradica el solapamiento de 40px sobre la columna izquierda y elimina el recorte en la cabecera de "Ingesta & Osciloscopio", verificado con CDP (`scripts/measure_layout.js`).
+
+- ✅ **Sistema de Tooltips HUD Flotantes ProjectShowcase con Física Lerp (D-058 / L-049):**
+  - **Portado Fiel de 21st.dev (`project-showcase`):** Reemplazo integral de los tooltips nativos monocromáticos del sistema operativo por tarjetas HUD ingrávidas aceleradas por GPU (`#mv-showcase-hud`), con física Lerp a 60 FPS ($\alpha = 0.20$), supresión automática y erradicación del atributo `title` nativo en todo el DOM vía `MutationObserver`.
+  - **Jerarquía Visual Cinemática:** Badge temático con dot pulsante (`● CLOUD HUB`, `● AUDIO ENGINE`, `● AI AGENT`, `● VJ TIMELINE`...), keycaps mecánicos estilo teclado (`PRESETS`, `PLAY`, `CAM`, `AUTO-VJ`, `F11`, `ESC`), títulos nítidos, descripción técnica operativa y pie con telemetría (`● READY • 60 FPS | CLICK PARA EJECUTAR`).
+  - **Anclaje Inteligente sobre Barras Inferiores:** Detección contextual de docks (`.studio-pill-dock` y `#fullscreen-playback-bar`) para proyectar el HUD obligatoriamente **ARRIBA** de los botones, flotando sobre el lienzo 3D WebGL sin recortarse ni tapar los mandos.
+  - **Verificación Empírica CDP:** Comprobado al 100% en vivo en `index.html` bajo Studio Cinema con el botón `🌐 Presets` ([test-screenshots/live-studio-mode-showcase.png](file:///c:/lyai-motorvisuales.site/test-screenshots/live-studio-mode-showcase.png)). Cero dependencias externas (Vanilla JS y CSS).
+
 ## Protocolo Hetzner — lyai-shared (ACTIVO desde 2026-10-02)
 > **REGLA PERMANENTE:** Todo componente, función JS, bloque CSS o snippet HTML nuevo que se añada **debe subirse también al servidor Hetzner** en `/opt/lyai/app/lyai-shared/`.
 
 ### Estructura de directorios `/opt/lyai/app/lyai-shared/`
-- `/components/` — Componentes UI reutilizables (HTML+CSS+JS standalone)
+- `/components/` — Componentes UI reutilizables (HTML+CSS+JS standalone y TSX / R3F)
 - `/scripts/` — Funciones JS standalone (DSP, SpotlightCard, FX bridges…)
 - `/styles/` — Bloques CSS standalone
 - `/assets/` — Recursos estáticos
 
 ### Conexión SSH
-- **Host:** `motorvisuales.site` | **Usuario:** `root` | **Clave:** `~/.ssh/id_ed25519`
-- **Estado:** Método de conexión pendiente de confirmar con el usuario (sesión anterior: `Permission denied (publickey)`).
+- **Host:** `178.63.165.87` (alias `lyai-pds`) | **Usuario:** `lyai` (canónico, no root) | **Clave:** `~/.ssh/id_ed25519`
+- **Estado:** 🟢 Conexión activa y validada empíricamente.
 
 ### Flujo de subida
 1. Validar localmente en [http://localhost:8088](http://localhost:8088)
-2. `scp`/`rsync` del fragmento al path en Hetzner (NO copiar el monolito `index.html` completo)
-3. Guardar path destino en DECISIONS.md bajo el ADR de D-054+
+2. Empaquetar y transferir vía SCP / SSH atómico (`tar -xzf` a `/opt/lyai/app/lyai-shared/components/`)
+3. Guardar path destino en [DECISIONS.md](file:///c:/lyai-motorvisuales.site/DECISIONS.md) bajo el ADR correspondiente.
 
 ## Próximas Ideas / Pendientes
+- [x] Bento Grid Hero Ingest & Transport Relocation (D-065): Ingesta I/O y Transporte & Faders elevados a la fila superior de reproducción con clave de persistencia v2.
+- [x] Subir y sincronizar catálogo completo de 33 componentes compartidos a `/opt/lyai/app/lyai-shared/components/` en Hetzner (D-060).
+- [x] Subir SpotlightCard D-054 a `/opt/lyai/app/lyai-shared/components/spotlight-card/` en Hetzner.
+- [x] Subir Footer Section D-055 a `/opt/lyai/app/lyai-shared/components/footer/` y `footer-section/` en Hetzner.
+- [x] Subir FilterTokenBar D-059 a `/opt/lyai/app/lyai-shared/components/filter-token-bar/` en Hetzner.
+- [x] Subir ProjectShowcase HUD D-058 a `/opt/lyai/app/lyai-shared/components/project-showcase/` en Hetzner.
+- [x] Subir DraggableWidgetGrid D-056 a `/opt/lyai/app/lyai-shared/components/draggable-widget-grid/` en Hetzner.
+- [x] ProjectShowcase HUD Tooltip System con física Lerp y erradicación de tooltips del SO (D-058).
 - [x] Draggable Widget Grid Reorganizer con PointerEvents nativos y persistencia en localStorage (D-056).
 - [x] Bento Grid Global + SpotlightCard System (D-054).
 - [x] Sistema de Vistas Dual para Audio Deck: Hardware Rack vs Bento Grid Butter.video (D-053).
@@ -390,9 +412,9 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
 - [x] Banner lateral izquierdo de menús en el Audio Deck (D-051).
 - [x] Rediseño del Audio Deck en 3 secciones (D-050).
 - [x] Gemini AI Shader Copilot en Split-View IDE (D-049).
-- [x] Footer Section animado estilo 21st.dev/Efferd (D-055) — Vanilla JS sin React/motion. Subido a `components/footer/footer.html`. Pendiente: rsync a `/opt/lyai/app/lyai-shared/components/footer/` en Hetzner una vez confirmado SSH.
-- [ ] Subir SpotlightCard D-054 a `/opt/lyai/app/lyai-shared/components/spotlight-card/` una vez confirmado SSH.
+- [ ] Integrar Robot Companion 3D (`robot-hero`) o Agentic Factory 3D como Universo Escénico en MotorVisuales.
 - [ ] Control DMX / ArtNet vía WebSockets para sincronizar luces de escenario.
 - [ ] Soporte GLTF/GLB importable por el usuario en los Universos Escénicos.
+
 
 

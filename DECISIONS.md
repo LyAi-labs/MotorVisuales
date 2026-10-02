@@ -3,6 +3,107 @@
 
 ---
 
+### D-061 — Side Dock Acoplado al Visor 3D (*Features with Panel* - ScrollX UI)
+- **Fecha:** 2026-10-03
+- **Estado:** ✅ Aceptada
+- **Contexto:** En el visor WebGL 3D, los botones de herramientas secundarias (`🌐 Cloud`, `🧊 Freeze 3D`, `🎬 Clips IA`) abrían previamente ventanas modales superpuestas a pantalla completa (`fixed inset-0 bg-black/85 backdrop-blur-md`), ocultando totalmente el renderizado Three.js y sacando al usuario del contexto visual en vivo. Además, los botones no permitían alternar el estado (*toggle*) para cerrar la vista.
+- **Decisión:** Implementar el patrón arquitectónico *Features with Panel* (inspirado en ScrollX UI):
+  1. Envolver el visor 3D en un contenedor flexible dividido (`#three-dock-container`), alojando el canvas Three.js (`#three-canvas-container`) y un panel lateral acoplado (`#three-side-dock`, ancho ~380-480px en pantallas grandes, responsive en móvil).
+  2. Al pulsar cualquier herramienta (`Cloud`, `Freeze 3D`, `Clips IA`), la sección activa se transloca dinámicamente desde su modal padre hacia el host del dock lateral (`#side-dock-content-host`) sin recrear ni destruir nodos DOM, preservando intacto el estado interno de los motores (`meshFreeze3DEngine`, `aiClipStudioEngine`, `communityVisualHub`).
+  3. Soporte bidireccional completo:
+     - **Toggle:** Pulsar de nuevo el botón activo cierra el panel y devuelve el visor al 100% de ancho ejecutando `triggerThreeResize()`.
+     - **Cambio de pestaña suave:** Alternar entre herramientas sin recargar.
+     - **Pop-out / Maximizar:** Botón `⛶` para expandir la herramienta activa a su modal de pantalla completa clásico si el usuario desea máxima superficie de trabajo.
+- **Consecuencias:**
+  - ✅ El usuario no pierde de vista la escena 3D ni la reactividad al sonido mientras configura o descarga presets, mallas o clips.
+  - ✅ Rendimiento WebGL intacto a 60 FPS sin asignaciones de memoria adicionales ni fugas por re-render.
+- **Trigger:** Al incorporar nuevas herramientas modulares vinculadas a la visualización 3D.
+
+### D-065 — Elevación de Módulos de Ingesta I/O y Transporte & Faders a la Zona de Reproducción Bento (Hero)
+- **Fecha:** 2026-10-03
+- **Estado:** ✅ Aceptada
+- **Contexto:** En la vista Bento Grid Global (`#bento-global-grid-container`), los controles de Ingesta I/O (micrófono, YouTube, captura de pestaña, archivos) y de Transporte & Faders (play/pause, timeline, volumen master, balances L/R y preamp) se encontraban relegados a la 3ª fila inferior tras los módulos de Stems y PostFX. Esto obligaba al operador a hacer scroll vertical continuo para iniciar o pausar pistas, seleccionar fuentes de audio o calibrar niveles durante la sesión de visuales.
+- **Decisión:**
+  1. **Reordenación estructural en el DOM Bento:**
+     - Mover **Card Ingesta I/O** (`#bento-card-ingest`) y **Card Transporte & Faders** (`#bento-card-faders`) a la 2ª fila inmediata tras el Analizador Espectral FFT y Pistas Master HQ, convirtiéndolas en elementos primarios de la zona de reproducción Hero.
+     - Asignarles un ancho ergonómico de `col-span-12 lg:col-span-6` a cada una para equilibrar la cuadrícula y otorgar mayor superficie interactiva a los botones de puertos I/O y faders de volumen estéreo.
+  2. **Persistencia versionada en localStorage:**
+     - Actualizar la clave de persistencia de reordenación a `motor_bento_cards_order_v2` para garantizar que todos los usuarios reciban el nuevo orden por defecto sin verse bloqueados por estados serializados antiguos en cache local.
+- **Consecuencias:**
+  - ✅ Acceso instantáneo y sin scroll a todas las fuentes de audio (Micrófono, YouTube, Pestaña del sistema, Carga de archivo, Sintetizador) y controles de reproducción (Scrubbing, Play/Pause, Master, Dual L/R).
+  - ✅ Flujo de trabajo ergonómico alineado con la consola de visuales en tiempo real.
+- **Trigger:** Al modificar la estructura, distribución o tarjetas por defecto de `#bento-global-grid-container`.
+
+### D-064 — Eliminación de Pantallas Blancas Prolongadas y Dinamismo Continuo en Visor 3D
+- **Fecha:** 2026-10-03
+- **Estado:** ✅ Aceptada
+- **Contexto:** En el visor 3D WebGL se presentaban intervalos prolongados de pantalla blanca pura ("todo blanco durante muchos segundos") y caídas bruscas de dinamismo en pasajes suaves. El perfilado del pipeline reveló 3 cuellos de botella:
+  1. El arquetipo `solar_inversion` en `aiFxDirector` mantenía `invertPass.uInvertAmount = 0.75` con una cadencia fija de 16 segundos, invirtiendo el vacío espacial negro a blanco puro cegador de forma persistente.
+  2. En `ScenicWorldEngine` (océano de Mercurio y cielo), ante onsets la intensidad de relámpagos se disparaba a `3.8 * fresnel` con luz puntual a `6.5` y el `UnrealBloomPass` se modulaba por encima de `2.4x`, desbordando el búfer HDR. Además, el flash DOM `#hud-drop-flash` mantenía opacidad al 75%.
+  3. `AudioNarrativeDirector` permitía que el tiempo fluido (`flowSpeed`) decayera a `0.3` ante silencios o niveles bajos de RMS, congelando el oleaje de Gerstner, la cámara cinematográfica y los megalitos.
+- **Decisión:**
+  1. **Sustitución de arquetipo:** Reemplazar `solar_inversion` por `obsidian_synthwave` (Bloom 1.15x, alto contraste, sin inversión continua) y limitar la reactividad de `fxInvertBaseAmount` a un tope seguro de `0.25`.
+  2. **Calibración HDR de shaders escénicos y post-procesado:**
+     - En Mercurio: relámpago atenuado de `3.8 * fresnel` a `1.5 * fresnel`, glint especular controlado (`pow` a 65, factor 2.2), luz de relámpago reducida de `6.5` a `2.8` y decaimiento acelerado (`lightningDecay = 0.72`).
+     - En `skyDome`: sol titánico calibrado a `pow 120.0` y relámpago volumétrico a `1.0`.
+     - En `masterRenderLoop`: clamping estricto de `bloomPass.strength` con `Math.min(2.2, rawBloom)` y onset boost reducido a `0.35`.
+     - En `#hud-drop-flash`: opacidad atenuada a `0.28` (70 ms) con control determinista de temporizador anti-concurrencia.
+  3. **Piso de fluidez y cinemática continua:**
+     - Elevar `instantDrive` base a `0.95` y `targetSpeed` mínima a `0.65` en `AudioNarrativeDirector` para asegurar oleaje, rotación de partículas y trayectorias de cámara vivas en todo momento sin cortes.
+- **Consecuencias:**
+  - ✅ Cero pantallas blancas deslumbrantes persistentes; contraste estético óptimo y visibilidad nítida en todas las escenas.
+  - ✅ Dinamismo cinematográfico continuo a 60 FPS garantizado, incluso durante intros y pasajes tenues.
+- **Trigger:** Al alterar arquetipos de `aiFxDirector`, pases de post-proceso Three.js o shaders escénicos en `ScenicWorldEngine`.
+
+### D-063 — Fidelidad Hi-Fi en Captura de Pestaña y Telemetría de Input Activo en Visualizadores
+- **Fecha:** 2026-10-03
+- **Estado:** ✅ Aceptada
+- **Contexto:** Al capturar audio de pestañas (YouTube/Suno) mediante `navigator.mediaDevices.getDisplayMedia`, los navegadores Chromium aplican por defecto filtros destructivos de telecomunicación (`echoCancellation: true`, `noiseSuppression: true`, `autoGainControl: true`), comprimiendo y deteriorando el ancho de banda estéreo como si fuera una llamada VoIP. Además, el preamp por defecto en `1.5x` saturaba la señal digital normalizada a 0 dBFS, y ni el Analizador Espectral Bento ni el HUD flotante del visor 3D mostraban de forma explícita qué entrada de audio estaba siendo inyectada y procesada.
+- **Decisión:**
+  1. **Constraints Hi-Fi transparentes:** En [index.html](file:///c:/lyai-motorvisuales.site/index.html#L7385-L7415), inyectar explícitamente `autoGainControl: false`, `echoCancellation: false`, `noiseSuppression: false`, `channelCount: 2`, `sampleRate: 48000`, `sampleSize: 16` tanto en el intento primario como en el fallback de captura de pantalla.
+  2. **Ganancia unitaria automática:** Ajustar el preamp a `1.0x` (`setLiveBoost(1.0)`) al iniciar captura de pestaña para impedir *clipping* contra el limitador.
+  3. **Telemetría visual de fuente activa:**
+     - Integrar un badge dinámico en la cabecera de la tarjeta Bento 1 (Analizador Espectral FFT) (`#bento-fft-source-badge`).
+     - Integrar un indicador `AUDIO:` en el HUD flotante superior izquierdo del Visor 3D (`#hud-audio-input-tag`).
+     - Añadir botón de acceso directo `🌐 Pestaña` en la barra flotante STUDIO CINEMA del viewport 3D.
+     - Sincronizar todos los indicadores reactivamente desde `updatePlaybackBar()`.
+- **Consecuencias:**
+  - ✅ Captura de música de YouTube y Suno a 48 kHz estéreo con máxima fidelidad acústica sin artefactos de voz ni saturación.
+  - ✅ Identificación visual unívoca de la fuente inyectada (`PESTAÑA SYS`, `MICRÓFONO LIVE`, `YOUTUBE STREAM`, `SYNTH DEMO`, `PISTA ARCHIVO`) en el analizador FFT y en el visor 3D.
+- **Trigger:** Al alterar restricciones de captura WebRTC/ScreenShare o telemetría de monitoreo visual.
+
+---
+
+### D-062 — Ergonomía Visual y Densidad de Información en Bento Studio Grid
+- **Fecha:** 2026-10-03
+- **Estado:** ✅ Aceptada
+- **Contexto:** En resoluciones estándar (1024px-1440px), las tarjetas Bento de 4 columnas (`#bento-card-ingest`, `#bento-card-faders`, `#bento-card-mer`) sufrían truncamiento severo de etiquetas esenciales (`[MIC] M...`, `[SYS] P...`, `AI ...`, `Russe..`), comprimían el nombre de la pista activa a pocas letras y desbordaban controles interactivos debido a márgenes rígidos y etiquetas redundantes.
+- **Decisión:** 
+  1. Flexibilizar la retícula Bento con clases adaptativas (`col-span-12 md:col-span-6 lg:col-span-4`) que previenen colapsos horizontales estrechos.
+  2. Sustituir `truncate` ciego por micro-etiquetas con badges integrados (`MIC`, `YT`, `SYS`, `FILE`, `SYN`, `CAM`), reduciendo padding vertical a `p-3` y adoptando fuentes `text-[10px]` legibles de alta densidad.
+  3. Reorganizar la cabecera de transporte de audio: display claro de título con `title` tooltip nativo, badges de preamplificación legibles (`1x`, `2.5x`, `4.5x`, `8x`) y controles duales L/R contrastados.
+  4. Rediseñar el encabezado del AI Director MER Pad con tipografía completa (*AI Director MER* / *Russell Circumplex Emocional*), pad de 105px con crosshair exacto y badges de estado y directiva legibles.
+- **Consecuencias:**
+  - ✅ Cero truncamiento de texto en pantallas de escritorio, portátiles y tablets.
+  - ✅ Accesibilidad visual inmediata sin sacrificar el estilo Cyberpunk/Minimalista ni provocar reflujos de DOM pesados.
+- **Trigger:** Al agregar o rediseñar widgets en la vista Bento Grid Studio.
+
+---
+
+### D-006 — Arquitectura Dual para Extracción de Código de 21st.dev
+- **Fecha:** 2026-10-02
+- **Estado:** ✅ Aceptada
+- **Contexto:** 21st.dev restringe el endpoint de instalación de componentes (`GET /api/v1/components/install/{user}/{slug}`) a usuarios autenticados con API Key / sesión. Los componentes necesarios para proyectos 3D/UI debían poder extraerse de forma determinista y sin fricción tanto con credenciales como de forma autónoma.
+- **Decisión:** Implementar un extractor dual en la skill `21st-extractor`:
+  1. Si `API_KEY_21ST` o `~/.config/21st/auth.json` existe: invoca el endpoint oficial del registro shadcn/21st y descarga los ficheros fuente originales.
+  2. Fallback autónomo público: procesa el stream RSC de Next.js (`self.__next_f`), descarga el código demo (`code.demo.<hash>.tsx`), el bundle de previsualización (`bundle.<hash>.html`) en `cdn.21st.dev`, extrae el CSS puro (`String.raw`), mapea los identificadores minificados de Three.js/React mediante las definiciones del runtime (`c(Symbol, "Name")`) y reconstruye el componente TypeScript íntegro.
+- **Consecuencias:**
+  - ✅ Extracción 100% determinista con o sin API key.
+  - ✅ Preserva modelos 3D, geometrías procedurales, shaders Fresnel y navegación interactiva.
+- **Trigger:** Al recuperar cualquier componente de 21st.dev o registries similares basados en Next.js RSC.
+
+---
+
 ### D-001 — Three.js local vs CDN
 - **Fecha:** 2026-09-19
 - **Estado:** ✅ Aceptada
@@ -1406,4 +1507,120 @@
   - ✅ **Cero librerías externas:** Eliminación de dependencias de terceros; 100% JavaScript Vanilla con API moderna de `PointerEvent`.
   - ✅ **Tolerancia a latencia:** Inserción directa en el DOM sin saltos ni pausas de Garbage Collection; coste de memoria $\mathcal{O}(N)$ con $N \le 10$.
   - ✅ **Persistencia completa:** El estado y la disposición visual elegida por el operador VJ se mantienen inalterados tras refrescar el navegador.
+
+---
+
+### D-057 — Preservación de Sticky Positioning en Barras de Navegación frente a SpotlightCard CSS
+- **Fecha:** 2026-10-02
+- **Estado:** ✅ Aceptada e Implementada
+- **Contexto:** Al extender el sistema de iluminación SpotlightCard (`::before` radial y `::after` borde) desde `.spotlight-card` a todos los paneles `.glass-panel` para unificar la estética de la consola, se introdujo una regla CSS `.spotlight-card, .glass-panel { position: relative; overflow: hidden; }`. Debido a la cascada de especificidad de CSS, esta regla sobreescribió la utilidad `.sticky` (`position: sticky`) de Tailwind en la barra modular de Cockpit (`#cockpit-tabs-container`) y en el `<header>`. Esto destruyó el comportamiento sticky, provocando que el contenedor `<main>` y la columna izquierda se solaparan verticalmente con el Cockpit (~40px) y recortaran la cabecera del panel de audio ("Ingesta & Osciloscopio").
+- **Decisión:**
+  1. Modificar el selector del Spotlight System para excluir explícitamente elementos sticky mediante la pseudo-clase `:not(.sticky)`:
+     ```css
+     .spotlight-card,
+     .glass-panel:not(.sticky) {
+         position: relative;
+         overflow: hidden;
+     }
+     ```
+  2. Añadir una regla de preservación explícita para asegurar que los elementos sticky mantengan visibilidad de desbordamiento sin recortar tooltips ni sombras:
+     ```css
+     .glass-panel.sticky {
+         overflow: visible;
+     }
+     ```
+  3. Validar empíricamente con mediciones de coordenadas vía Chrome DevTools Protocol (`scripts/measure_layout.js`):
+     - `header`: $0 \to 58\,\text{px}$
+     - `cockpit`: $58 \to 102.5\,\text{px}$ (`position: sticky`)
+     - `main`: $\text{top} = 102.5\,\text{px}$, $\text{padding-top} = 16\,\text{px}$
+     - `leftCol`: $\text{top} = 118.5\,\text{px}$
+- **Consecuencias:**
+  - ✅ Eliminación del solapamiento visual: la cabecera del panel izquierdo es 100% visible sin recorte.
+  - ✅ Comportamiento sticky intacto: el Header y el Cockpit se anclan secuencialmente durante el scroll sin ocultar contenido subyacente.
+  - ✅ Iluminación Spotlight Card activa en todos los paneles modulares y Bento Grid sin efectos secundarios de layout.
+
+---
+
+### D-058 — Sistema de Tooltips HUD Flotantes ProjectShowcase con Física Lerp y Supresión Universal de Tooltips Nativos
+- **Fecha:** 2026-10-02
+- **Estado:** ✅ Aceptada e Implementada
+- **Contexto:** Al hacer hover sobre botones o controles de la aplicación (como `🌐 Presets` en la barra flotante de Studio Cinema), el navegador mostraba el tooltip nativo del sistema operativo (un rectángulo plano monocromático, sin estilo, con retraso arbitrario de ~1s y sin jerarquía visual). El usuario solicitó reemplazarlo por una propuesta de diseño de alta fidelidad basada en [21st.dev project-showcase](https://21st.dev/@jatin-yadav05/components/project-showcase).
+- **Decisión:**
+  1. **Arquitectura Singleton HUD en DOM (`#mv-showcase-hud`):**
+     - Un único nodo DOM persistente inyectado en `document.body` con `pointer-events: none` y `will-change: transform`.
+     - Aceleración por GPU mediante `translate3d(x, y, 0) scale(s)`.
+  2. **Interpolación Suave Lerp a 60 FPS:**
+     - Posicionamiento desacoplado con factor $\alpha = 0.20$ para coordenadas y $\alpha = 0.22$ para escala.
+     - Cancelación automática de `requestAnimationFrame` cuando el HUD está invisible o estabilizado (0% de impacto en CPU en reposo).
+  3. **Supresión Universal y Erradicación del Tooltip Nativo del SO:**
+     - Detección de atributos `title`: transferencia instantánea a `dataset.mvTitle` y ejecución de `removeAttribute('title')`.
+     - `MutationObserver` activo en `document.body` para sanitizar cualquier elemento inyectado dinámicamente o mutación del atributo `title`.
+     - Soporte preferente para atributos estructurados: `data-tooltip-category`, `data-tooltip-title`, `data-tooltip-desc`, `data-tooltip-shortcut`, `data-tooltip-theme` y `data-tooltip-icon`.
+  4. **Anclaje Ergonómico e Inteligente de Viewport:**
+     - Clamping horizontal estricto a $\ge 12\,\text{px}$ de los márgenes de ventana.
+     - Detección contextual de docks inferiores: elementos pertenecientes a `.studio-pill-dock` o `#fullscreen-playback-bar` posicionan el HUD de forma obligatoria **ARRIBA** del elemento (`y = elRect.top - hudH - 14`), proyectándose limpiamente sobre la escena 3D WebGL sin tapar la barra ni desbordar la pantalla.
+  5. **Jerarquía Visual Temática 21st.dev:**
+     - Badge con LED luminoso y categoría técnica (`● CLOUD HUB`, `● AUDIO ENGINE`, `● AI AGENT`, etc.).
+     - Keycaps mecánicos estilo teclado (`PRESETS`, `PLAY`, `P`, `F11`, `ESC`).
+     - Tipografía cuidada, descripción operativa y telemetría de pie (`● READY • 60 FPS`).
+- **Consecuencias:**
+  - ✅ **Cero librerías externas:** 100% Vanilla JS y CSS con variables temáticas (`mv-hud-theme-sky`, `cyan`, `purple`, `amber`, `teal`, `rose`, `indigo`).
+  - ✅ **Eliminación total del tooltip feo del SO:** El atributo `title` nativo es interceptado y erradicado en todo el DOM.
+  - ✅ **Inmersión cinemática:** Experiencia de consola espacial y retroalimentación instantánea sin retardo artificial del navegador.
+
+---
+
+### D-059 — Sistema de Filtros por Tokens Componibles Estilo Linear / 21st.dev (`FilterTokenBar`)
+- **Fecha:** 2026-10-02
+- **Estado:** ✅ Aceptada e Implementada
+- **Contexto:** El Hub Comunitario de Presets de MotorVisuales (`#community-hub-modal`) dependía exclusivamente de un campo `<input>` de texto libre y dos botones de ordenación ("Top ❤️" y "Nuevos ⏱️"). Esto dificultaba la búsqueda quirúrgica de presets según características técnicas específicas: escenas 3D procedurales (`scene`), pases de efectos reactivos activos (`dna.fx`), autores VJ (`author`), popularidad (`likes`) y estilos (`tag`). El usuario solicitó adoptar el diseño de filtrado composable estilo Linear documentado en [21st.dev filter-token-bar](https://21st.dev/@laziekiki/components/filter-token-bar).
+- **Decisión:**
+  1. **Arquitectura Vanilla JS Autónoma e Inyección Encapsulada (`components/filter-token-bar.js`):**
+     - Clase `FilterTokenBar` (398 líneas) sin React, sin Framer Motion ni dependencias externas de npm.
+     - Inyección aislada de hoja de estilo `#filter-token-bar-styles` con paleta Cyberpunk Glassmorphic (`rgba(18, 20, 29, 0.94)`, bordes `rgba(255, 255, 255, 0.08)`, acentos `#38bdf8`, animaciones cubic-bezier a 60 FPS).
+     - Componentes estructurados del Token:
+       - Segmento Campo: `[ 🌌 Escena 3D | ... ]`
+       - Segmento Operador: `[ ... | es / incluye / mayor que | ... ]`
+       - Segmento Valor: `[ ... | 🌸 Bloom Lumínico / ⚡ Glitch | ✕ ]`
+     - Popovers contextuales anclados con cálculo espacial en tiempo real y auto-detección de bordes de viewport para prevenir desbordamientos.
+     - Roving search interactivo para filtrado instantáneo dentro de listas de opciones y soporte multi-select con checkboxes.
+  2. **Integración Reactiva en el Hub Comunitario (`CommunityVisualHub`):**
+     - Añadido contenedor anclado `#hub-filter-bar-row` con montaje `#hub-filter-token-bar-mount` entre la cabecera de pestañas y el grid de presets.
+     - Configuración de 5 campos técnicos especializados:
+       - `scene`: Escenas 3D (Abismo Boids 4K, Océano de Mercurio, Valle de Cristales, Cyber City, Nebulosa, Túnel, Cimática, Ferrofluido).
+       - `fx`: Pases FX activos analizando el ADN del preset (`item.dna.fx` para `bloom`, `glitch`, `chroma`, `kaleido`, `blur`, `crt`, `film`, `invert`, `pixel`).
+       - `author`: VJ o creador.
+       - `likes`: Umbral de votos de la comunidad ($\ge 10, \ge 25, \ge 40$).
+       - `tag`: Etiquetas estilísticas (`#bloom`, `#boids`, `#mercurio`, `#cristal`, `#vj`, `#cyberpunk`, `#reactivo`).
+     - Modificación de `renderExploreGrid()` para aplicar una pipeline de filtrado de intersección lógica (AND) entre los tokens activos y la búsqueda textual.
+  3. **Verificación Empírica Automatizada con Chrome DevTools Protocol:**
+     - `test_filter_token_bar.js`: Verificación unitaria de renderizado de chips, apertura de menús de selección de campo y valor, y emisión reactiva del predicado.
+     - `test_live_complete_filter_flow.js`: Validación en vivo sobre el monolito `index.html` en `http://localhost:8088/`:
+       - Clic simulado en `+ Filtro` $\to$ Selección de `Pase FX Activo` $\to$ Selección de `Glitch Digital`.
+       - Comprobación de que el grid se redujo exactamente a 1 preset coincidente (`Cyberpunk Dystopia & Glitch Transiente`).
+       - Clic en `Limpiar` $\to$ Restauración inmediata de los 4 presets de la comunidad.
+- **Consecuencias:**
+  - ✅ **Cero bloatware:** 100% JavaScript Vanilla en memoria contigua y con eventos delegados eficientes.
+  - ✅ **Ergonomía de filtrado profesional:** Selección granular con UX idéntica a Linear y 21st.dev.
+  - ✅ **Filtrado bidireccional:** Coexistencia fluida entre búsqueda textual, ordenación por fecha/votos y tokens composables.
+
+---
+
+### D-060 — Despliegue y Sincronización Integral de Componentes lyai-shared en Hetzner AX102
+- **Fecha:** 2026-10-02
+- **Estado:** ✅ Aceptada e Implementada
+- **Contexto:** Se requería sincronizar de forma atómica y completa la biblioteca modular de componentes de diseño compartidos (`lyai-shared`) hacia el servidor Hetzner de producción (`/opt/lyai/app/lyai-shared/components/`). Los componentes pendientes incluían el sistema de foco lumínico `spotlight-card` (D-054), el pie de página reactivo `footer` / `footer-section` (D-055), el reordenador por puntero nativo `draggable-widget-grid` (D-056), los tooltips flotantes HUD `project-showcase` (D-058), la barra de filtrado componible `filter-token-bar` (D-059), y los nuevos artefactos de diseño 3D (`robot-hero` y `agentic-factory-3d`).
+- **Decisión:**
+  1. **Autenticación Canónica SSH:**
+     - Establecida conexión no interactiva vía clave criptográfica Ed25519 (`~/.ssh/id_ed25519`) bajo el usuario de sistema canónico `lyai` en `178.63.165.87` (alias `lyai-pds`).
+     - Se descartó el intento previo con `root`, restringido por política de seguridad de la infraestructura.
+  2. **Pipeline de Transferencia Atómica mediante Tarball Comprimido:**
+     - En lugar de ejecutar decenas de sesiones SSH/SCP individuales propensas a timeout y fragmentación, se empaquetó el catálogo completo local (`C:\opt\lyai\app\lyai-shared\components\`) en un único flujo `components_upload.tar.gz` (1.30 MB).
+     - Transferencia directa vía `scp` a `/tmp/components_upload.tar.gz` (2.90s) y extracción en caliente con `tar -xzf` preservando la propiedad y permisos de grupo `lyai:lyai`.
+  3. **Resultado de Inventario Remoto:**
+     - Total de 33 componentes modulares alojados y verificados en `/opt/lyai/app/lyai-shared/components/`, incluyendo código fuente Vanilla JS, CSS desacoplado, bundles HTML autónomos y variantes TSX/React.
+- **Consecuencias:**
+  - ✅ **Sincronización 100% libre de errores:** Los 33 componentes residen con integridad binaria en el servidor Hetzner.
+  - ✅ **Cumplimiento de Directiva Hetzner:** La biblioteca `lyai-shared` queda formalmente establecida como la fuente única de verdad para componentes transversales entre MotorVisuales y las plataformas satélite.
+
 

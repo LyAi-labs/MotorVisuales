@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MotorVisuales — Linear-Style Filter Token Bar Demo (21st.dev Port)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #07090e;
+            color: #f4f4f5;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        .hud-glass {
+            background: rgba(13, 16, 26, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12 flex flex-col items-center justify-start space-y-8">
+
+    <!-- Header -->
+    <header class="max-w-4xl w-full text-center space-y-2">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/30 text-cyan-400 text-xs font-mono">
+            <span>⚡ COMPONENT PREVIEW</span>
+            <span>•</span>
+            <span>LINEAR-STYLE COMPOSE TOKENS</span>
+        </div>
+        <h1 class="text-3xl font-extrabold tracking-tight text-white">
+            Filter Token Bar — MotorVisuales
+        </h1>
+        <p class="text-sm text-zinc-400 max-w-xl mx-auto">
+            Port en Vanilla JS puro inspirado en <a href="https://21st.dev/@laziekiki/components/filter-token-bar" target="_blank" class="text-cyan-400 underline">21st.dev/@laziekiki/components/filter-token-bar</a>. Cero dependencias externas, reactividad a 60 FPS y tokens componibles <code class="text-zinc-300 font-mono text-xs">campo · operador · valor</code>.
+        </p>
+    </header>
+
+    <!-- Component Container Card -->
+    <main class="max-w-4xl w-full hud-glass rounded-2xl p-6 shadow-2xl space-y-6">
+        
+        <!-- Filter Bar Mount Point -->
+        <div class="space-y-2">
+            <div class="flex items-center justify-between text-xs text-zinc-400 font-mono">
+                <span class="uppercase tracking-wider font-semibold text-zinc-300 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                    <span>Barra de Filtros Activa</span>
+                </span>
+                <span id="active-filters-count" class="text-zinc-500">0 filtros aplicados</span>
+            </div>
+            
+            <div id="filter-bar-mount" class="p-3 bg-black/50 border border-white/[0.06] rounded-xl min-h-[48px] flex items-center"></div>
+        </div>
+
+        <!-- Debug JSON Output -->
+        <div class="p-3 bg-zinc-950/80 rounded-xl border border-white/5 space-y-1">
+            <span class="text-[10px] font-mono text-zinc-500 uppercase tracking-widest block">Estado del Predicado (JSON Reactivo)</span>
+            <pre id="filter-debug" class="text-[11px] font-mono text-cyan-300/90 overflow-x-auto whitespace-pre-wrap">[]</pre>
+        </div>
+
+        <!-- Filtered Items Grid -->
+        <div class="space-y-3 pt-2 border-t border-white/[0.08]">
+            <div class="flex items-center justify-between">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-300 font-mono">
+                    Presets Visuales Coincidentes (<span id="results-count">0</span>)
+                </h3>
+            </div>
+
+            <div id="presets-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                <!-- Se inyecta dinámicamente -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Load the Vanilla JS component -->
+    <script src="filter-token-bar.js"></script>
+
+    <script>
+        // Mock dataset of Visual Presets
+        const MOCK_PRESETS = [
+            { id: 'p1', name: 'Abyss Neon Pulse', scene: 'scenic_abyss_boids', category: 'rave', fx: ['bloom', 'glitch'], likes: 42, author: 'LyAi Labs', reactive: 'sub_bass' },
+            { id: 'p2', name: 'Cyber City Rain', scene: 'scenic_cyber_city', category: 'cyberpunk', fx: ['crt', 'bloom'], likes: 18, author: 'NeonDreamer', reactive: 'mid' },
+            { id: 'p3', name: 'Quantum Hyperspace', scene: 'scenic_quantum_tunnel', category: 'ambient', fx: ['kaleido', 'blur'], likes: 85, author: 'CosmicVoyager', reactive: 'high_air' },
+            { id: 'p4', name: 'Matrix Cyber Grid', scene: 'scenic_matrix_rain', category: 'cyberpunk', fx: ['glitch', 'crt'], likes: 12, author: 'VJ Glitcher', reactive: 'sub_bass' },
+            { id: 'p5', name: 'Fluid Solar Flares', scene: 'scenic_fluid_cosmos', category: 'psychedelic', fx: ['bloom', 'chroma'], likes: 64, author: 'LyAi Labs', reactive: 'extreme' },
+            { id: 'p6', name: 'Reactive Crystal Core', scene: 'scenic_audio_reactive_sphere', category: 'rave', fx: ['bloom', 'kaleido'], likes: 29, author: 'SoundArtist', reactive: 'mid' }
+        ];
+
+        // Definición de campos del FilterTokenBar
+        const FIELD_DEFS = [
+            {
+                id: 'scene',
+                label: 'Escena 3D',
+                icon: '🌌',
+                operators: [
+                    { value: 'is', label: 'es' },
+                    { value: 'is_not', label: 'no es' },
+                    { value: 'is_any', label: 'es cualquiera de', multi: true }
+                ],
+                options: [
+                    { value: 'scenic_abyss_boids', label: 'Abismo Boids', glyph: '🌌' },
+                    { value: 'scenic_cyber_city', label: 'Cyber City', glyph: '🏙️' },
+                    { value: 'scenic_quantum_tunnel', label: 'Túnel Cuántico', glyph: '🌀' },
+                    { value: 'scenic_matrix_rain', label: 'Matrix Rain', glyph: '🟩' },
+                    { value: 'scenic_fluid_cosmos', label: 'Cosmos Fluido', glyph: '🌊' },
+                    { value: 'scenic_audio_reactive_sphere', label: 'Esfera Reactiva', glyph: '🔮' }
+                ]
+            },
+            {
+                id: 'category',
+                label: 'Categoría VJ',
+                icon: '⚡',
+                operators: [
+                    { value: 'is', label: 'es' },
+                    { value: 'is_not', label: 'no es' },
+                    { value: 'is_any', label: 'es cualquiera de', multi: true }
+                ],
+                options: [
+                    { value: 'rave', label: 'Rave / Psytrance', glyph: '⚡' },
+                    { value: 'cyberpunk', label: 'Cyberpunk', glyph: '🌆' },
+                    { value: 'psychedelic', label: 'Psicodélico', glyph: '🍄' },
+                    { value: 'ambient', label: 'Ambient / Chill', glyph: '🌙' }
+                ]
+            },
+            {
+                id: 'fx',
+                label: 'Pase FX Activo',
+                icon: '✨',
+                operators: [
+                    { value: 'contains', label: 'incluye' },
+                    { value: 'not_contains', label: 'no incluye' },
+                    { value: 'is_any', label: 'incluye cualquiera', multi: true }
+                ],
+                options: [
+                    { value: 'bloom', label: 'Bloom Lumínico', glyph: '🌸' },
+                    { value: 'glitch', label: 'Glitch Digital', glyph: '⚡' },
+                    { value: 'crt', label: 'Monitor CRT Vintage', glyph: '📺' },
+                    { value: 'kaleido', label: 'Caleidoscopio', glyph: '🔷' },
+                    { value: 'blur', label: 'Desenfoque Radial', glyph: '💫' },
+                    { value: 'chroma', label: 'Aberración Cromática', glyph: '🌈' }
+                ]
+            },
+            {
+                id: 'reactive',
+                label: 'Banda Reactiva',
+                icon: '🎛️',
+                operators: [
+                    { value: 'is', label: 'es' },
+                    { value: 'is_any', label: 'es cualquiera de', multi: true }
+                ],
+                options: [
+                    { value: 'sub_bass', label: 'Sub & Bass (0-160Hz)', glyph: '🔊' },
+                    { value: 'mid', label: 'Mids & Voces (500-2kHz)', glyph: '🎙️' },
+                    { value: 'high_air', label: 'Highs & Brillo (>5kHz)', glyph: '✨' },
+                    { value: 'extreme', label: 'Reactividad Extrema', glyph: '🔥' }
+                ]
+            },
+            {
+                id: 'author',
+                label: 'Autor VJ',
+                icon: '👤',
+                operators: [
+                    { value: 'is', label: 'es' },
+                    { value: 'is_not', label: 'no es' }
+                ],
+                options: [
+                    { value: 'LyAi Labs', label: 'LyAi Labs', glyph: '🧬' },
+                    { value: 'NeonDreamer', label: 'NeonDreamer', glyph: '🌃' },
+                    { value: 'CosmicVoyager', label: 'CosmicVoyager', glyph: '🚀' },
+                    { value: 'VJ Glitcher', label: 'VJ Glitcher', glyph: '👾' },
+                    { value: 'SoundArtist', label: 'SoundArtist', glyph: '🎧' }
+                ]
+            }
+        ];
+
+        // Filtros iniciales de ejemplo
+        const INITIAL_FILTERS = [
+            {
+                id: 'init-1',
+                field: 'fx',
+                operator: 'contains',
+                values: ['bloom']
+            }
+        ];
+
+        // Función de filtrado del dataset
+        function applyFilters(filters) {
+            let filtered = [...MOCK_PRESETS];
+
+            filters.forEach(f => {
+                const vals = Array.isArray(f.values) ? f.values : [f.values].filter(Boolean);
+                if (vals.length === 0) return;
+
+                filtered = filtered.filter(item => {
+                    if (f.field === 'scene') {
+                        if (f.operator === 'is') return item.scene === vals[0];
+                        if (f.operator === 'is_not') return item.scene !== vals[0];
+                        if (f.operator === 'is_any') return vals.includes(item.scene);
+                    }
+                    if (f.field === 'category') {
+                        if (f.operator === 'is') return item.category === vals[0];
+                        if (f.operator === 'is_not') return item.category !== vals[0];
+                        if (f.operator === 'is_any') return vals.includes(item.category);
+                    }
+                    if (f.field === 'fx') {
+                        if (f.operator === 'contains') return item.fx.includes(vals[0]);
+                        if (f.operator === 'not_contains') return !item.fx.includes(vals[0]);
+                        if (f.operator === 'is_any') return vals.some(v => item.fx.includes(v));
+                    }
+                    if (f.field === 'reactive') {
+                        if (f.operator === 'is') return item.reactive === vals[0];
+                        if (f.operator === 'is_any') return vals.includes(item.reactive);
+                    }
+                    if (f.field === 'author') {
+                        if (f.operator === 'is') return item.author === vals[0];
+                        if (f.operator === 'is_not') return item.author !== vals[0];
+                    }
+                    return true;
+                });
+            });
+
+            renderGrid(filtered);
+            updateUI(filters, filtered);
+        }
+
+        function renderGrid(items) {
+            const grid = document.getElementById('presets-grid');
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full p-8 text-center bg-black/40 rounded-xl border border-white/5 space-y-1">
+                        <span class="text-2xl block">🔍</span>
+                        <p class="text-xs font-bold text-zinc-300">Ningún preset coincide con los filtros</p>
+                        <p class="text-[11px] text-zinc-500">Prueba a relajar los operadores o eliminar tokens.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = items.map(p => `
+                <div class="p-3 bg-zinc-900/80 border border-white/[0.08] hover:border-cyan-500/40 rounded-xl space-y-2 transition">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-zinc-100">${p.name}</h4>
+                        <span class="text-[9px] font-mono text-cyan-400 bg-cyan-950/70 px-1.5 py-0.5 rounded border border-cyan-500/30">❤️ ${p.likes}</span>
+                    </div>
+                    <div class="text-[10px] text-zinc-400 space-y-0.5 font-mono">
+                        <div>Escena: <span class="text-zinc-200">${p.scene}</span></div>
+                        <div>Autor: <span class="text-zinc-200">${p.author}</span></div>
+                        <div>Reactivo: <span class="text-indigo-300">${p.reactive}</span></div>
+                    </div>
+                    <div class="flex flex-wrap gap-1 pt-1 border-t border-white/[0.06]">
+                        ${p.fx.map(fx => `<span class="px-1.5 py-0.5 rounded bg-zinc-800 text-[9px] font-mono text-zinc-300">✨ ${fx}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateUI(filters, filtered) {
+            document.getElementById('active-filters-count').textContent = `${filters.length} filtro${filters.length === 1 ? '' : 's'} activo${filters.length === 1 ? '' : 's'}`;
+            document.getElementById('results-count').textContent = filtered.length;
+            document.getElementById('filter-debug').textContent = JSON.stringify(filters, null, 2);
+        }
+
+        // Inicializar el FilterTokenBar
+        const filterBar = new FilterTokenBar({
+            container: document.getElementById('filter-bar-mount'),
+            fields: FIELD_DEFS,
+            value: INITIAL_FILTERS,
+            onChange: (filters) => {
+                applyFilters(filters);
+            }
+        });
+
+        // Filtrado inicial
+        applyFilters(INITIAL_FILTERS);
+    </script>
+</body>
+</html>

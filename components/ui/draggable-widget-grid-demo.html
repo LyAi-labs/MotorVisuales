@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Draggable Widget Grid - Vanilla Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background-color: #0a0a0b;
+      color: #fafafa;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-6 sm:p-12 flex flex-col items-center justify-center">
+
+  <div class="w-full max-w-[1180px]">
+    <header class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+          <span>🍱</span> Draggable Widget Grid <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">Vanilla Zero-Bloat</span>
+        </h1>
+        <p class="text-sm text-neutral-400 mt-1">
+          Arrastra y reordena los módulos con el cursor (o mantén pulsado en móvil). Funciona con CSS Grid nativo y PointerEvents.
+        </p>
+      </div>
+      <div id="order-badge" class="text-xs font-mono bg-neutral-900 border border-neutral-800 px-3 py-1.5 rounded-lg text-neutral-300">
+        Orden: <span id="order-count">8</span> módulos activos
+      </div>
+    </header>
+
+    <!-- Contenedor del Widget Grid -->
+    <div id="widget-grid-container" class="w-full"></div>
+  </div>
+
+  <script src="draggable-widget-grid.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const WIDGETS = [
+        { id: 'runs', size: 'wide', label: 'Runs today' },
+        { id: 'health', size: 'sm', label: 'System status' },
+        { id: 'cost', size: 'sm', label: 'Total cost' },
+        { id: 'failures', size: 'sm', label: 'Errors' },
+        { id: 'traces', size: 'wide', label: 'Recent traces' },
+        { id: 'evals', size: 'sm', label: 'Eval score' },
+        { id: 'tools', size: 'wide', label: 'Tool calls' },
+        { id: 'models', size: 'wide', label: 'Token usage by model' }
+      ];
+
+      function renderContent(item) {
+        switch (item.id) {
+          case 'runs':
+            return `
+              <div class="p-4 sm:p-5 flex flex-col h-full justify-between">
+                <div class="flex justify-between items-center text-xs text-neutral-400">
+                  <span class="uppercase tracking-wider font-semibold">RUNS TODAY</span>
+                  <span class="text-emerald-400 font-mono">↑ 12% vs yesterday</span>
+                </div>
+                <div class="text-3xl font-light text-white my-2">1,317</div>
+                <div class="h-10 flex items-end gap-1">
+                  ${Array.from({ length: 28 }).map((_, i) => `
+                    <div class="flex-1 bg-blue-500/${(i % 5 === 0) ? '90' : (i % 3 === 0) ? '60' : '20'} rounded-sm" style="height: ${(Math.sin(i)*0.4 + 0.6) * 100}%"></div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          case 'health':
+            return `
+              <div class="p-4 flex flex-col h-full justify-between">
+                <div class="flex justify-between items-center text-xs text-neutral-400">
+                  <span class="uppercase tracking-wider font-semibold">STATUS</span>
+                  <span class="text-neutral-500">30d</span>
+                </div>
+                <div>
+                  <div class="text-2xl font-light text-white">99.98%</div>
+                  <div class="text-xs text-emerald-400 mt-1 flex items-center gap-1.5">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span> Operativo
+                  </div>
+                </div>
+                <div class="flex h-3 gap-0.5 mt-2">
+                  ${Array.from({ length: 20 }).map((_, i) => `
+                    <div class="flex-1 rounded-sm ${i === 6 ? 'bg-amber-400' : 'bg-neutral-700/60'}"></div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          case 'cost':
+            return `
+              <div class="p-4 flex flex-col h-full justify-between">
+                <div class="flex justify-between items-center text-xs text-neutral-400">
+                  <span class="uppercase tracking-wider font-semibold">TOTAL COST</span>
+                  <span class="text-emerald-400">↑ 8% MoM</span>
+                </div>
+                <div class="text-2xl font-light text-white">$186 <span class="text-xs text-neutral-500">MTD</span></div>
+                <div class="flex h-8 items-end gap-1">
+                  ${Array.from({ length: 12 }).map((_, i) => `
+                    <div class="flex-1 bg-blue-500/${i === 11 ? '100' : '30'} rounded-sm" style="height: ${(i + 3) * 7}%"></div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          case 'failures':
+            return `
+              <div class="p-4 flex flex-col h-full justify-between">
+                <div class="flex justify-between items-center text-xs text-neutral-400">
+                  <span class="uppercase tracking-wider font-semibold">ERRORS</span>
+                  <span class="text-neutral-500">24h</span>
+                </div>
+                <div class="text-2xl font-light text-white">29 <span class="text-xs text-rose-400">2.3% rate</span></div>
+                <div class="text-xs space-y-1 text-neutral-400 font-mono">
+                  <div class="flex justify-between"><span>timeout</span><span class="text-neutral-200">13</span></div>
+                  <div class="flex justify-between"><span>rate-limit</span><span class="text-neutral-200">7</span></div>
+                </div>
+              </div>
+            `;
+          case 'traces':
+            return `
+              <div class="p-4 sm:p-5 flex flex-col h-full justify-between">
+                <div class="flex justify-between items-center text-xs text-neutral-400">
+                  <span class="uppercase tracking-wider font-semibold">RECENT TRACES</span>
+                  <span class="text-emerald-400 flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Live</span>
+                </div>
+                <div class="text-2xl font-light text-white my-1">2.55s <span class="text-xs text-neutral-500">p50</span></div>
+                <div class="space-y-1.5 text-xs font-mono">
+                  <div class="flex items-center justify-between text-neutral-300">
+                    <span class="text-neutral-500">tr_844d69</span>
+                    <span>planner</span>
+                    <span class="text-neutral-400">3.46s</span>
+                  </div>
+                  <div class="flex items-center justify-between text-neutral-300">
+                    <span class="text-neutral-500">tr_233f29</span>
+                    <span>code_agent</span>
+                    <span class="text-neutral-400">2.37s</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          case 'evals':
+            return `
+              <div class="p-4 flex flex-col h-full justify-between">
+                <div class="flex justify-between items-center text-xs text-neutral-400">
+                  <span class="uppercase tracking-wider font-semibold">EVAL SCORE</span>
+                  <span class="text-emerald-400">↑ 0.03</span>
+                </div>
+                <div class="text-2xl font-light text-white">0.91</div>
+                <div class="text-xs space-y-1 text-neutral-400 font-mono">
+                  <div class="flex justify-between"><span>Faithfulness</span><span class="text-neutral-200">0.94</span></div>
+                  <div class="flex justify-between"><span>Relevancy</span><span class="text-neutral-200">0.89</span></div>
+                </div>
+              </div>
+            `;
+          case 'tools':
+            return `
+              <div class="p-4 sm:p-5 flex flex-col h-full justify-between">
+                <div class="flex justify-between items-center text-xs text-neutral-400">
+                  <span class="uppercase tracking-wider font-semibold">TOOL CALLS</span>
+                  <span class="text-neutral-500">24h</span>
+                </div>
+                <div class="text-2xl font-light text-white my-1">1,020</div>
+                <div class="space-y-1.5 text-xs font-mono">
+                  <div class="flex justify-between items-center">
+                    <span class="text-neutral-300">web_search</span>
+                    <div class="w-32 bg-neutral-800 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-blue-500 h-full w-[65%]"></div>
+                    </div>
+                    <span class="text-neutral-400">412</span>
+                  </div>
+                  <div class="flex justify-between items-center">
+                    <span class="text-neutral-300">code_exec</span>
+                    <div class="w-32 bg-neutral-800 h-1.5 rounded-full overflow-hidden">
+                      <div class="bg-blue-500/60 h-full w-[40%]"></div>
+                    </div>
+                    <span class="text-neutral-400">268</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          case 'models':
+            return `
+              <div class="p-4 sm:p-5 flex flex-col h-full justify-between">
+                <div class="flex justify-between items-center text-xs text-neutral-400">
+                  <span class="uppercase tracking-wider font-semibold">TOKEN USAGE</span>
+                  <span class="text-neutral-500">by model</span>
+                </div>
+                <div class="text-2xl font-light text-white my-1">12.3M <span class="text-xs text-neutral-500">tokens</span></div>
+                <div class="h-2 w-full flex rounded-full overflow-hidden gap-0.5">
+                  <div class="bg-blue-500 h-full w-[52%]"></div>
+                  <div class="bg-blue-400/60 h-full w-[27%]"></div>
+                  <div class="bg-blue-300/40 h-full w-[13%]"></div>
+                  <div class="bg-neutral-600 h-full w-[8%]"></div>
+                </div>
+              </div>
+            `;
+          default:
+            return `<div class="p-4 text-xs font-mono">${item.label || item.id}</div>`;
+        }
+      }
+
+      const container = document.getElementById('widget-grid-container');
+      const grid = new DraggableWidgetGridVanilla(container, {
+        items: WIDGETS,
+        maxColumns: 4,
+        cellSize: 215,
+        gap: 12,
+        radius: 20,
+        renderItem: renderContent,
+        onChange: (newItems) => {
+          document.getElementById('order-badge').classList.add('border-emerald-500/50');
+          setTimeout(() => {
+            document.getElementById('order-badge').classList.remove('border-emerald-500/50');
+          }, 600);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

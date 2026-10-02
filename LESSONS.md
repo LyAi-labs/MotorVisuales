@@ -3,6 +3,33 @@
 
 ---
 
+### L-007
+- **Tags:** #threejs #postprocessing #bloom #glsl #narrative-director #white-screen
+- **Síntoma:** El visor 3D se quedaba completamente blanco durante múltiples segundos y perdía dinamismo/fluidez en momentos de baja intensidad musical.
+- **Causa raíz:** 
+  1. Arquetipo `solar_inversion` en el director de FX activaba `invertPass` continuo (`uInvertAmount = 0.75`) durante 16 segundos enteros, invirtiendo fondos oscuros a blanco puro.
+  2. Moduladores de `UnrealBloomPass` sin clamp (`strength > 2.4`) combinados con relámpagos escénicos (`3.8 * fresnel` y luz puntual a `6.5`) y un flash DOM al 75% provocaban sobreexposición y clipping digital masivo en el búfer HDR.
+  3. `AudioNarrativeDirector` permitía una caída de `flowSpeed` hasta 0.3, ralentizando a paso casi estático las animaciones dependientes de tiempo.
+- **Solución:** 
+  1. Reemplazar `solar_inversion` por un arquetipo de alto contraste sin inversión persistente (`obsidian_synthwave`).
+  2. Acotar `bloomPass.strength` con `Math.min(2.2, ...)` y reducir luz puntual de relámpago a 2.8x con decaimiento ágil (`lightningDecay = 0.72`).
+  3. Establecer un suelo de fluidez autónoma (`instantDrive` base 0.95, `targetSpeed` mínima 0.65) en el director narrativo para garantizar dinamismo cinematográfico permanente a 60 FPS.
+- **Trigger:** Al diseñar pases de post-proceso, shaders escénicos reactivos o automatizaciones de VJ.
+
+---
+
+### L-006
+- **Tags:** #scraping #21st-dev #reverse-engineering #threejs #nextjs-rsc
+- **Síntoma:** Los endpoints de descarga de código de 21st.dev devuelven HTTP 401 ("Sign in required") para peticiones públicas no autenticadas.
+- **Causa raíz:** 21st.dev privatiza el bucket `components-code-private` en Cloudflare R2 y el endpoint `/api/v1/components/install/`, pero expone un bundle Vite standalone completo (`bundle.<hash>.html`) y el código demo (`code.demo.<hash>.tsx`) de forma pública en `cdn.21st.dev` para el iframe interactivo de previsualización.
+- **Solución:**
+  1. Extraer los hashes de assets analizando el stream RSC (`self.__next_f.push`) en el HTML del componente.
+  2. Descargar `bundle.<hash>.html` y `code.demo.<hash>.tsx`.
+  3. En `bundle.html`, el compilador Vite preserva el diccionario de nombres mediante llamadas a `c(Identificador, "NombreClase")` o `a(Identificador, "NombreClase")`, lo que permite mapear unívocamente clases de Three.js (`Vector3`, `RoundedBoxGeometry`, `PMREMGenerator`) y nombres de componentes (`RobotHero`, `GlassCapsule`, `AgenticFactory3D`).
+- **Trigger:** Al necesitar código fuente de componentes publicados en 21st.dev.
+
+---
+
 ### L-001
 - **Tags:** #threejs #rendering #camera
 - **Síntoma:** El Monolito y el Túnel desaparecen cuando la cámara hace zoom hasta entrar dentro de ellos
@@ -660,4 +687,89 @@
   2. **Umbral Euclidiano de discriminación:** Exigir un desplazamiento mínimo antes de activar el estado de arrastre (ej. `Math.hypot(ev.clientX - startX, ev.clientY - startY) > 6` píxeles) para preservar la respuesta táctil instantánea a clics estándar.
   3. **Recálculo de geometría lumínica:** Reinvocar `initSpotlightCards()` en el callback `pointerup` para refrescar los `getBoundingClientRect()` de todos los elementos reorganizados en el DOM.
 - **Trigger:** Al implementar sistemas de arrastre y soltar (drag & drop) en paneles de control con micro-controles interactivos o efectos de iluminación física reactiva.
+
+---
+
+### L-048
+- **Tags:** #css #sticky #glass-panel #spotlight-card #overflow-hidden #layout #stacking-context #cdp
+- **Síntoma:** El panel de la columna izquierda ("Ingesta & Osciloscopio" / `#sec-audio-bar`) aparece con su cabecera superior parcialmente recortada y solapada por la barra modular de Cockpit (~40px de solapamiento en `scrollY = 0`). Al hacer scroll, el contenido fluye de manera errática detrás de las barras sticky.
+- **Causa raíz:**
+  1. Al extender el sistema SpotlightCard a los paneles de cristal (`.spotlight-card, .glass-panel { position: relative; overflow: hidden; }`), el bloque `<style>` inyectado en el DOM con posterioridad al CDN de Tailwind sobreescribió `position: sticky` con `position: relative` en el elemento `#cockpit-tabs-container` y en `<header>`, debido a igualdad de especificidad (1 clase) y prevalencia por orden de cascada.
+  2. Al degradarse de `sticky` a `relative`, el Cockpit no se ancló correctamente y generó un desfase en el flow vertical del documento: `cockpit.bottom = 158.5px` mientras que el `<main>` comenzaba en `102.5px`, provocando que el contenedor grid y la columna izquierda (`top = 118.5px`) iniciaran 40px por encima de la base del Cockpit.
+- **Solución:**
+  1. Restringir la regla del spotlight a paneles que no tengan clase sticky usando el pseudo-selector `:not(.sticky)`:
+     ```css
+     .spotlight-card,
+     .glass-panel:not(.sticky) {
+         position: relative;
+         overflow: hidden;
+     }
+     .glass-panel.sticky {
+         overflow: visible;
+     }
+     ```
+  2. Esto restaura inmediatamente `position: sticky` en el Cockpit y Header, alineando el flujo de forma secuencial y matemática:
+     - `header`: 0 → 58px (`height: 58px`)
+     - `cockpit`: 58 → 102.5px (`height: 45px`, `position: sticky`)
+     - `main`: top 102.5px con `padding-top: 16px`
+     - `leftCol` / `#sec-audio-bar`: top 118.5px (exactamente `102.5 + 16px`), erradicando cualquier solapamiento o recorte visual.
+- **Trigger:** Al aplicar estilos base, pseudo-elementos o iluminación a clases genéricas que compartan elementos con `position: sticky`.
+
+---
+
+### L-049
+- **Tags:** #ui #ux #tooltips #showcase #pointer-events #lerp #cdp #dom #mutation-observer #title-suppression
+- **Síntoma:** Al pasar el cursor sobre botones o herramientas de la aplicación (e.g. `🌐 Presets` en la barra Studio Cinema), el navegador desplegaba el tooltip nativo rectangular gris/negro del sistema operativo (`title="..."`), sin diseño, con latencia artificial (~1000ms) y rompiendo la inmersión del entorno visual.
+- **Causa raíz:**
+  1. Los navegadores de escritorio (Chrome, Edge, Firefox, Safari) retienen el control nativo del tooltip siempre que exista el atributo estándar `title` en el nodo DOM o en cualquiera de sus ancestros. Los estilos CSS no pueden estilizar este popup nativo del sistema operativo.
+  2. Los tooltips flotantes tradicionales basados en hover puro (`div:hover .tooltip`) sufren de parpadeos (*flickering*), saltos abruptos de posición y recortes (*clipping*) por `overflow: hidden` en paneles contenedores.
+  3. En pruebas automatizadas CDP o entornos headless, medir las coordenadas de un elemento interactivo mientras se produce una animación de layout o resize de Three.js (como la expansión de Studio Mode) provoca que el elemento se desplace bajo el cursor estático, disparando eventos espurios de `pointerout`.
+- **Solución:**
+  1. **Singleton HUD Desacoplado en `document.body`:** Inyectar un único contenedor `#mv-showcase-hud` con `pointer-events: none` y `will-change: transform`, posicionado mediante GPU (`translate3d` + `scale`).
+  2. **Supresión Universal Proactiva y Reactiva:**
+     - En `init()`, recorrer el DOM y migrar `title` a `dataset.mvTitle`, ejecutando `removeAttribute('title')`.
+     - Activar un `MutationObserver` en `document.body` con `attributeFilter: ['title']` para neutralizar de inmediato cualquier `title` inyectado por scripts dinámicos o componentes de terceros.
+  3. **Física Lerp a 60 FPS con Autostop:** Utilizar interpolación exponencial $\vec{x}_{t+1} = \vec{x}_t + \alpha (\vec{x}_{\text{target}} - \vec{x}_t)$ ($\alpha = 0.20$) sobre `requestAnimationFrame`. Cancelar el RAF cuando el tooltip esté oculto o en reposo absoluto para garantizar 0% de uso de CPU.
+  4. **Anclaje Espacial Contextual para Barras Inferiores:** Si el elemento pertenece a un dock flotante (`.studio-pill-dock` o `#fullscreen-playback-bar`), forzar su anclaje **ARRIBA** del botón (`y = elRect.top - hudH - 14`), permitiendo que el HUD flote de manera ingrávida sobre el canvas 3D sin obstruir los controles adyacentes ni desbordar la ventana.
+  5. **Estabilización de Transición en Pruebas Automatizadas:** Esperar la convergencia total de las transiciones CSS y del resize de Three.js ($\ge 1200\,\text{ms}$) antes de despachar eventos de cursor sintéticos vía CDP.
+- **Trigger:** Al reemplazar popups nativos del navegador por HUDs flotantes con física, badges temáticos o keycaps interactivos en aplicaciones web de alta fidelidad.
+
+---
+
+### L-050
+- **Tags:** #ui-ux #filter-tokens #linear-style #combobox #popover-collision #vanilla-js #reactive-filtering #cdp #async-fetch
+- **Síntoma:** Al implementar un sistema de filtrado complejo por tokens estructurados (`campo · operador · valor`) dentro de un modal con scroll y tabs:
+  1. Los popovers contextuales se recortaban al montarse dentro de contenedores con `overflow-x: auto` o `overflow: hidden`.
+  2. Al seleccionar filtros antes de que la carga asíncrona de datos (`fetch`) terminase (o cayese en su fallback resiliente offline), la lista de presets se renderizaba como vacía de forma prematura.
+  3. Los menús de valores para listas (`fx`, `tags`) no permitían selección múltiple o búsqueda en vivo sin saturar la UI.
+- **Causa raíz:**
+  1. **Anidación de Overlays en Contenedores de Flujo:** Montar popovers desplegables dentro de la misma barra de chips hereda el contexto de apilamiento y los límites de recorte (`overflow: hidden`/`auto`) de la barra modular.
+  2. **Condición de Carrera en Inicialización Reactiva:** Si el componente de filtros emite su callback reactivo de estado inicial antes de que la promesa de datos del modelo (`fetchCommunityPresets`) complete su resolución (o timeout de red de 3500ms), el predicado se aplica sobre un array vacío `[]`.
+- **Solución:**
+  1. **Popovers Flotantes Desacoplados con Detección de Colisiones:** Montar los popovers directamente en `document.body` con `position: fixed`, calculando su posición dinámicamente mediante `getBoundingClientRect()` del chip ancla. Implementar auto-inversión horizontal (`left = rect.right - popW`) y vertical (`top = rect.top - popH - 6`) si el popover excede los bordes de la pantalla.
+  2. **Pipeline de Filtrado Combinado (AND) con Resiliencia:** En `renderExploreGrid()`, encadenar de forma secuencial y determinista:
+     - Evaluación de tokens activos (`tokenFilters.forEach` con normalización de arrays y operadores `is`, `is_not`, `is_any`, `contains`, `gt`, `lt`).
+     - Búsqueda textual por query sobre campos múltiples (`name`, `author`, `tags`, `scene`).
+     - Ordenación por votos o fecha.
+  3. **Auto-Cierre Limpio y Accesibilidad:** Cerrar popovers abiertos al presionar `Escape` o al hacer clic fuera (`pointerdown` delegado en `document`), y dotar a cada lista de opciones de un `<input class="ftb-popover-search">` con auto-focus instantáneo.
+- **Trigger:** Al construir barras de filtros composables estilo Linear / 21st.dev en aplicaciones vanilla JS con ventanas modales o racks densos.
+
+---
+
+### L-051
+- **Tags:** #hetzner #ssh #scp #rsync #publickey #tarball #devops #deployment #lyai-shared
+- **Síntoma:** Al intentar desplegar componentes compartidos o sincronizar carpetas hacia el servidor Hetzner de producción (`178.63.165.87` / `motorvisuales.site`) ejecutando `ssh root@motorvisuales.site` o `scp ... root@...`, la sesión falla con `Permission denied (publickey)`.
+- **Causa raíz:** Por política estricta de endurecimiento del sistema operativo (bastionado SSH) en el servidor AX102 de Hetzner:
+  1. El acceso interactivo y por clave pública del usuario `root` está deshabilitado (`PermitRootLogin no`).
+  2. La clave pública local `~/.ssh/id_ed25519` está autorizada exclusivamente para el usuario de sistema no privilegiado `lyai`.
+  3. Ejecutar transferencias recursivas archivo por archivo (`scp -r`) con cientos de archivos pequeños introduce latencia de handshake TCP acumulada y sobrecarga de I/O innecesaria.
+- **Solución:**
+  1. **Usuario Canónico Obligatorio:** Emplear siempre `lyai@178.63.165.87` (o el alias de host `lyai-pds` definido en `~/.ssh/config`), NUNCA `root`.
+  2. **Pipeline de Transferencia Atómica mediante Tarball Comprimido:**
+     - Empaquetar la carpeta completa localmente en un archivo comprimido único (`tar.gz`) con `tarfile` de Python o `tar.exe`.
+     - Subir el archivo único a `/tmp/` mediante `scp` (reduciendo la transferencia a $<3\,\text{s}$).
+     - Extraer en caliente en `/opt/lyai/app/lyai-shared/components/` vía `ssh lyai@178.63.165.87 "tar -xzf /tmp/... -C ... && rm /tmp/..."`.
+     - Garantizar que la propiedad permanezca bajo `lyai:lyai`.
+- **Trigger:** Al conectar vía SSH/SCP o desplegar artefactos y componentes compartidos en la infraestructura Hetzner.
+
 
