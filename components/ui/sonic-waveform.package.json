@@ -1,0 +1,30 @@
+{
+  "name": "@lyai/sonic-waveform",
+  "version": "1.0.0",
+  "description": "Sonic Waveform Hero & Real-Time Data Sonification Canvas component with dynamic mouse interaction and wave mathematics",
+  "main": "sonic-waveform.tsx",
+  "types": "sonic-waveform.tsx",
+  "dependencies": {
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.400.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.0 || ^19.0.0",
+    "@types/react-dom": "^18.0.0 || ^19.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "waveform",
+    "canvas",
+    "sonification",
+    "audio",
+    "visualizer",
+    "framer-motion",
+    "hero",
+    "shadcn"
+  ],
+  "author": "LyAi Labs",
+  "license": "MIT"
+}
