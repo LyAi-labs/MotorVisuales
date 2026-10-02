@@ -1,6 +1,24 @@
 # DECISIONS.md — Decisiones Técnicas de MotorVisuales
 > Decisiones de arquitectura específicas de este proyecto. Formato ADR.
 
+### D-066 — Integración de Componente Ergonómico IconLabelSubtextButton en Paneles de Ingesta (Bento & Rack)
+- **Fecha:** 2026-10-03
+- **Estado:** ✅ Aceptada
+- **Contexto:** En los paneles de selección de fuentes de audio (tanto en la tarjeta Bento `#bento-card-ingest` como en el Rack modular `#deck-sec-patchbay-content`), los botones de input utilizaban botones genéricos con tags simples en texto plano (`[MIC] Micrófono ANALOG`). Esto ofrecía baja jerarquía visual, difícil lectura del protocolo de audio subyacente y un área táctil reducida para operadores en vivo o dispositivos móviles.
+- **Decisión:**
+  1. Extraer y construir la versión nativa y React/TSX del componente `IconLabelSubtextButton` (`@ruixen.ui/icon-label-subtext-button` de 21st.dev).
+  2. Implementar los estilos CSS atómicos `.btn-ilsb` con variantes semánticas de color de bus (`.btn-ilsb-cyan`, `.btn-ilsb-red`, `.btn-ilsb-amber`, `.btn-ilsb-rose`) incorporando:
+     - Iconografía SVG vectorial nítida en contenedor redondeado.
+     - Tipografía de doble nivel: etiqueta primaria clara + subtexto técnico en tipografía monoespaciada con indicación del protocolo de ingesta (DSP ANALOG, STREAM 48k, LOOPBACK RAW, WAV/FLAC, PROCEDURAL 120, NDI/TEXTURA 3D, MUTE BYPASS).
+     - Elevación táctil al hover (`translateY(-1px)`), glow reactivo y soporte para micro-botones de configuración subordinados (⚙️ YouTube y Webcam).
+  3. Desplegar el patrón de forma unificada tanto en la Card Bento como en la matriz del Rack tradicional, preservando todos los IDs de enlace al grafo Web Audio (`btn-mic`, `btn-yt-mobile`, `btn-tab`, `file-input`, `btn-synth`, `btn-cam`, `btn-stop`).
+  4. Almacenar el componente canónico en `components/icon-label-subtext-button` para consumo del proyecto y sincronización con el repositorio compartido `lyai-shared`.
+- **Consecuencias:**
+  - ✅ Ergonomía y legibilidad técnica de nivel profesional en consola VJ y móvil.
+  - ✅ Cero librerías externas o dependencias pesadas: CSS puro acelerado por GPU y HTML semántico.
+  - ✅ Compatibilidad garantizada y sincronización idéntica entre ambas vistas de interfaz (Rack y Bento).
+- **Trigger:** Al actualizar controles de ingesta, matrices de patchbay o botones de control en la consola táctica.
+
 ---
 
 ### D-061 — Side Dock Acoplado al Visor 3D (*Features with Panel* - ScrollX UI)

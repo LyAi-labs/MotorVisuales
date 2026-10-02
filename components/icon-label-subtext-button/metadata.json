@@ -1,0 +1,12 @@
+{
+  "author": "ruixen.ui",
+  "slug": "icon-label-subtext-button",
+  "url": "https://21st.dev/@ruixen.ui/components/icon-label-subtext-button",
+  "dependencies": {},
+  "description": "The IconLabelSubtextButton is a custom shadcn/ui-based React component designed for actions that need extra context beyond a single label. Unlike a standard button, it combines an icon, a primary label, and a secondary subtext in a compact and accessible design. This makes it ideal for use cases like downloads (with file size info), uploads (with format hints), or exports (with row counts). It supports multiple variants (default, outline, ghost) and sizes (sm, md, lg) to adapt to different layouts. The button also has built-in states for loading (with a spinner) and success (with a check icon), plus an optional badge for notifications and an optional tooltip for additional context. By leveraging Tailwind utilities and shadcn/ui primitives, this component stays consistent with modern UI patterns while being flexible, reusable, and user-friendly.",
+  "name": "icon-label-subtext-button",
+  "demo_url": null,
+  "bundle_url": null,
+  "preview_url": "https://cdn.21st.dev/cdn-cgi/image/fit=scale-down,width=960,quality=75,format=webp/https://cdn.21st.dev/ruixen.ui/icon-label-subtext-button/default/preview.1758554993292.png",
+  "video_url": null
+}

@@ -23,10 +23,11 @@
 - Google Gemini API (`gemini-2.5-flash`)
 
 ### Módulos Principales
-1. **Matriz de Ingesta Master & Patchbay (Hardware Rack de 3 Secciones Colapsables, D-050):**
+1. **Matriz de Ingesta Master & Patchbay (Hardware Rack & Bento con IconLabelSubtextButton, D-050, D-065, D-066):**
+   - **IconLabelSubtextButton (D-066):** Componente de alta jerarquía visual (`.btn-ilsb`) en la matriz de Ingesta (`#bento-card-ingest` y `#deck-sec-patchbay-content`). Agrupa icono SVG en caja redondeada, etiqueta primaria en negrita y subtexto técnico con especificación del protocolo (Micrófono `DSP ANALOG`, YouTube `STREAM 48k`, Pestaña `LOOPBACK RAW`, Cargar Archivo `WAV/FLAC`, Sintetizador `PROCEDURAL 120`, Cámara `NDI/TEXTURA 3D`, Detener `CORTE INMEDIATO MUTE`).
    - **🎵 Pistas Master (`#btn-sec-masters`):** 3 Pistas Master de Referencia (`CH-01 // MORDAZA`, `CH-02 // TONTOS ÚTILES`, `CH-03 // SECTION 63 - YouTube Direct`) con micro-LEDs de estado `[ON AIR]` / `[STANDBY]`. **Inician plegadas por defecto** para optimizar el espacio vertical.
-   - **🔌 Input (`#btn-sec-patchbay`):** Matriz de 7 fuentes externas (Micrófono analógico, YouTube Móvil, Pestaña Loopback `suppressLocalAudioPlayback`, Carga Local WAV/FLAC, Sintetizador DSP Procedural, Webcam/NDI y Corte Mute de emergencia). Plegable a demanda mediante el botón **Input**.
-   - **🎚️ Reproductor & Faders (`#btn-sec-volbal`):** Transporte, scrubber interactivo, vúmetro en vivo con ganancia Hi-Fi/boost, fader Master general, control de canales L/R y monitoreo estéreo. Inicia desplegado.
+   - **🔌 Input (`#btn-sec-patchbay` / `#bento-card-ingest`):** Matriz de 7 fuentes externas (Micrófono analógico, YouTube Móvil con asistente ⚙️, Pestaña Loopback `suppressLocalAudioPlayback`, Carga Local WAV/FLAC, Sintetizador DSP Procedural, Webcam/NDI con calibrador ⚙️ y Corte Mute de emergencia).
+   - **🎚️ Reproductor & Faders (`#btn-sec-volbal` / `#bento-card-faders`):** Transporte, scrubber interactivo, vúmetro en vivo con ganancia Hi-Fi/boost, fader Master general, control de canales L/R y monitoreo estéreo. Inicia desplegado.
    - **Micro-Status Bar permanente:** Integrado en la cabecera del panel junto a `FFT 2048` (`[Mordaza • 100%]`), visible siempre sin scrollbar horizontal.
 2. **DSP — Banco de 8 Stems Biquad:**
    - Sub-Graves (<60Hz), Graves (60-250Hz), Medios-Bajos (250-500Hz), Medios (500-2kHz), Medios-Altos (2k-4kHz), Presencia (4k-6kHz), Agudos (6k-10kHz), Aire (>10kHz)

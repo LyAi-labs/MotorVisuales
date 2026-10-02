@@ -892,10 +892,114 @@
                             outline-offset: -2px;
                             background-color: rgba(34,211,238,0.06) !important;
                         }
-                        .cockpit-tab-dragging {
-                            opacity: 0.7;
-                            transform: scale(0.96);
+                        /* ─── IconLabelSubtextButton (21st.dev @ruixen.ui Port / D-066) ─── */
+                        .btn-ilsb {
+                            position: relative;
+                            display: inline-flex;
+                            align-items: center;
+                            gap: 0.55rem;
+                            border-radius: 0.85rem;
+                            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+                            outline: none;
+                            text-align: left;
+                            user-select: none;
+                            -webkit-user-select: none;
+                            cursor: pointer;
+                            background: rgba(18, 20, 29, 0.85);
+                            border: 1px solid rgba(255, 255, 255, 0.08);
+                            backdrop-filter: blur(8px);
+                            -webkit-backdrop-filter: blur(8px);
                         }
+                        .btn-ilsb:hover {
+                            transform: translateY(-1px);
+                            box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.5);
+                        }
+                        .btn-ilsb:active {
+                            transform: translateY(0.5px) scale(0.985);
+                        }
+                        .btn-ilsb-icon {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            border-radius: 0.55rem;
+                            flex-shrink: 0;
+                            transition: all 0.2s ease;
+                        }
+                        .btn-ilsb-text {
+                            display: flex;
+                            flex-direction: column;
+                            line-height: 1.15;
+                            min-width: 0;
+                            flex: 1;
+                        }
+                        .btn-ilsb-label {
+                            font-size: 11px;
+                            font-weight: 700;
+                            letter-spacing: -0.01em;
+                            color: #f4f4f5;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
+                        .btn-ilsb-subtext {
+                            font-size: 8.5px;
+                            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                            color: #71717a;
+                            letter-spacing: 0.02em;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            margin-top: 1px;
+                        }
+                        .btn-ilsb-badge {
+                            position: absolute;
+                            top: -4px;
+                            right: -4px;
+                            padding: 1px 4px;
+                            font-size: 7.5px;
+                            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+                            font-weight: 800;
+                            border-radius: 4px;
+                            line-height: 1;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+                        }
+
+                        /* Variantes cromáticas ILSB */
+                        .btn-ilsb-cyan:hover {
+                            border-color: rgba(34, 211, 238, 0.45);
+                            background: rgba(8, 47, 73, 0.4);
+                            box-shadow: 0 0 16px -3px rgba(34, 211, 238, 0.25);
+                        }
+                        .btn-ilsb-cyan:hover .btn-ilsb-label { color: #67e8f9; }
+                        .btn-ilsb-cyan:hover .btn-ilsb-subtext { color: #22d3ee; }
+
+                        .btn-ilsb-red:hover {
+                            border-color: rgba(239, 68, 68, 0.45);
+                            background: rgba(69, 10, 10, 0.4);
+                            box-shadow: 0 0 16px -3px rgba(239, 68, 68, 0.25);
+                        }
+                        .btn-ilsb-red:hover .btn-ilsb-label { color: #fca5a5; }
+                        .btn-ilsb-red:hover .btn-ilsb-subtext { color: #f87171; }
+
+                        .btn-ilsb-amber:hover {
+                            border-color: rgba(245, 158, 11, 0.45);
+                            background: rgba(69, 26, 3, 0.4);
+                            box-shadow: 0 0 16px -3px rgba(245, 158, 11, 0.25);
+                        }
+                        .btn-ilsb-amber:hover .btn-ilsb-label { color: #fcd34d; }
+                        .btn-ilsb-amber:hover .btn-ilsb-subtext { color: #fbbf24; }
+
+                        .btn-ilsb-rose {
+                            background: rgba(76, 5, 25, 0.35);
+                            border-color: rgba(244, 63, 94, 0.3);
+                        }
+                        .btn-ilsb-rose:hover {
+                            border-color: rgba(244, 63, 94, 0.6);
+                            background: rgba(136, 19, 55, 0.5);
+                            box-shadow: 0 0 18px -2px rgba(244, 63, 94, 0.35);
+                        }
+                        .btn-ilsb-rose .btn-ilsb-label { color: #fecdd3; }
+                        .btn-ilsb-rose .btn-ilsb-subtext { color: #fb7185; }
                     </style>
 
                     <!-- CONTENEDOR VISTA 1: RACK MODULAR TÁCTICO CON BANNER LATERAL IZQUIERDO -->
@@ -1027,51 +1131,113 @@
                                     <span class="text-[8px] font-mono text-cyan-300 bg-cyan-950/80 border border-cyan-500/40 px-1.5 py-0.2 rounded font-bold">CANAL: INPUT</span>
                                 </div>
                                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 text-xs font-mono">
-                                    <button onclick="startMicrophone()" id="btn-mic" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group">
-                                        <span class="text-[10px] text-cyan-400 font-bold shrink-0">[MIC]</span>
-                                        <span class="text-[11px] font-sans font-medium truncate">Micrófono</span>
-                                        <span class="text-[8px] text-zinc-500 shrink-0">ANALOG</span>
+                                    <!-- MIC: IconLabelSubtextButton en Rack -->
+                                    <button onclick="startMicrophone()" id="btn-mic" class="btn-ilsb btn-ilsb-cyan p-1.5 w-full justify-between" title="Capturar entrada analógica de micrófono">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <span class="btn-ilsb-icon w-6 h-6 bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 text-[10px]">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                                            </span>
+                                            <span class="btn-ilsb-text">
+                                                <span class="btn-ilsb-label text-[10px]">Micrófono</span>
+                                                <span class="btn-ilsb-subtext text-[7.5px]">DSP ANALOG</span>
+                                            </span>
+                                        </div>
+                                        <span class="text-[7.5px] font-mono text-cyan-400/80 bg-cyan-950/70 border border-cyan-500/20 px-1 py-0.2 rounded shrink-0">MIC</span>
                                     </button>
-                                    <div class="flex gap-1 min-w-0">
-                                        <button type="button" onclick="selectYouTubeMobileSource(); triggerHaptic(15);" id="btn-yt-mobile" class="flex-grow min-w-0 py-1.5 px-1.5 bg-zinc-900/90 hover:bg-red-950/40 text-red-300 hover:text-white rounded-lg border border-red-500/40 flex items-center justify-between gap-1 shadow-sm transition active:scale-[0.98]" title="Conectar o capturar audio de YouTube">
-                                            <span class="text-[10px] text-red-400 font-bold shrink-0">[YT]</span>
-                                            <span class="text-[11px] font-sans font-medium truncate">YouTube</span>
-                                            <span class="text-[8px] text-red-400/80 font-mono shrink-0 hidden xs:inline">ING</span>
+
+                                    <!-- YOUTUBE: IconLabelSubtextButton en Rack -->
+                                    <div class="flex gap-1 min-w-0 w-full">
+                                        <button type="button" onclick="selectYouTubeMobileSource(); triggerHaptic(15);" id="btn-yt-mobile" class="btn-ilsb btn-ilsb-red p-1.5 flex-1 min-w-0 justify-between" title="Conectar o capturar audio de YouTube">
+                                            <div class="flex items-center gap-1.5 min-w-0">
+                                                <span class="btn-ilsb-icon w-6 h-6 bg-red-950/80 border border-red-500/30 text-red-400 text-[10px]">
+                                                    <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                                </span>
+                                                <span class="btn-ilsb-text">
+                                                    <span class="btn-ilsb-label text-[10px]">YouTube</span>
+                                                    <span class="btn-ilsb-subtext text-[7.5px]">STREAM 48k</span>
+                                                </span>
+                                            </div>
+                                            <span class="text-[7.5px] font-mono text-red-400/80 bg-red-950/70 border border-red-500/20 px-1 py-0.2 rounded shrink-0 hidden xs:inline">YT</span>
                                         </button>
-                                        <button type="button" onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-7 h-auto py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.12] flex items-center justify-center text-xs shrink-0 transition active:scale-90" title="Opciones avanzadas e ingesta de YouTube">
+                                        <button type="button" onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-6 h-auto py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.12] flex items-center justify-center text-xs shrink-0 transition active:scale-90" title="Opciones avanzadas e ingesta de YouTube">
                                             <span>⚙️</span>
                                         </button>
                                     </div>
-                                    <button onclick="startTabCapture()" id="btn-tab" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition">
-                                        <span class="text-[10px] text-cyan-400 font-bold shrink-0">[SYS]</span>
-                                        <span class="text-[11px] font-sans font-medium truncate">Pestaña Audio</span>
-                                        <span class="text-[8px] text-zinc-500 shrink-0">LOOP</span>
+
+                                    <!-- SYS TAB: IconLabelSubtextButton en Rack -->
+                                    <button onclick="startTabCapture()" id="btn-tab" class="btn-ilsb btn-ilsb-cyan p-1.5 w-full justify-between" title="Capturar audio de pestaña del sistema sin pérdidas">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <span class="btn-ilsb-icon w-6 h-6 bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 text-[10px]">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                            </span>
+                                            <span class="btn-ilsb-text">
+                                                <span class="btn-ilsb-label text-[10px]">Pestaña</span>
+                                                <span class="btn-ilsb-subtext text-[7.5px]">LOOPBACK RAW</span>
+                                            </span>
+                                        </div>
+                                        <span class="text-[7.5px] font-mono text-cyan-400/80 bg-cyan-950/70 border border-cyan-500/20 px-1 py-0.2 rounded shrink-0">SYS</span>
                                     </button>
-                                    <label class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 cursor-pointer transition">
-                                        <span class="text-[10px] text-cyan-400 font-bold shrink-0">[FILE]</span>
-                                        <span class="text-[11px] font-sans font-medium truncate">Cargar Archivo</span>
-                                        <span class="text-[8px] text-zinc-500 shrink-0">LOCAL</span>
+
+                                    <!-- FILE UPLOAD: IconLabelSubtextButton en Rack -->
+                                    <label class="btn-ilsb btn-ilsb-cyan p-1.5 w-full justify-between cursor-pointer" title="Cargar archivo local de audio WAV, MP3 o FLAC">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <span class="btn-ilsb-icon w-6 h-6 bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 text-[10px]">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                            </span>
+                                            <span class="btn-ilsb-text">
+                                                <span class="btn-ilsb-label text-[10px]">Cargar Archivo</span>
+                                                <span class="btn-ilsb-subtext text-[7.5px]">WAV / FLAC / MP3</span>
+                                            </span>
+                                        </div>
+                                        <span class="text-[7.5px] font-mono text-cyan-400/80 bg-cyan-950/70 border border-cyan-500/20 px-1 py-0.2 rounded shrink-0">FILE</span>
                                         <input type="file" id="file-input" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
                                     </label>
-                                    <button onclick="toggleSynthDemo()" id="btn-synth" class="py-1.5 px-2 bg-zinc-900/90 hover:bg-zinc-800 text-amber-400 hover:text-amber-300 rounded-lg border border-white/[0.08] hover:border-amber-500/40 flex items-center justify-between gap-1 transition">
-                                        <span class="text-[10px] text-amber-400 font-bold shrink-0">[SYN]</span>
-                                        <span id="txt-synth" class="text-[11px] font-sans font-medium truncate">Synth Beat</span>
-                                        <span class="text-[8px] text-amber-500/80 shrink-0">PROC</span>
+
+                                    <!-- SYNTH: IconLabelSubtextButton en Rack -->
+                                    <button onclick="toggleSynthDemo()" id="btn-synth" class="btn-ilsb btn-ilsb-amber p-1.5 w-full justify-between" title="Generador procedural de síntesis DSP">
+                                        <div class="flex items-center gap-1.5 min-w-0">
+                                            <span class="btn-ilsb-icon w-6 h-6 bg-amber-950/80 border border-amber-500/30 text-amber-300 text-[10px]">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                                            </span>
+                                            <span class="btn-ilsb-text">
+                                                <span id="txt-synth" class="btn-ilsb-label text-[10px] text-amber-300">Synth Beat</span>
+                                                <span class="btn-ilsb-subtext text-[7.5px] text-amber-400/80">PROCEDURAL 120</span>
+                                            </span>
+                                        </div>
+                                        <span class="text-[7.5px] font-mono text-amber-400/80 bg-amber-950/70 border border-amber-500/20 px-1 py-0.2 rounded shrink-0">SYN</span>
                                     </button>
-                                    <div class="flex gap-1 min-w-0">
-                                        <button onclick="toggleLiveVideo()" id="btn-cam" class="flex-grow min-w-0 py-1.5 px-1.5 bg-zinc-900/90 hover:bg-cyan-950/40 text-cyan-300 hover:text-white rounded-lg border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-between gap-1 transition group" title="Activar/Desactivar Cámara en Vivo / NDI / Virtual Cam">
-                                            <span class="text-[10px] text-cyan-400 font-bold shrink-0">[CAM]</span>
-                                            <span class="text-[11px] font-sans font-medium truncate">Webcam</span>
-                                            <span id="cam-badge" class="text-[8px] text-zinc-500 group-hover:text-cyan-400 shrink-0 hidden xs:inline">OFF</span>
+
+                                    <!-- WEBCAM: IconLabelSubtextButton en Rack -->
+                                    <div class="flex gap-1 min-w-0 w-full">
+                                        <button onclick="toggleLiveVideo()" id="btn-cam" class="btn-ilsb btn-ilsb-cyan p-1.5 flex-1 min-w-0 justify-between" title="Activar/Desactivar Cámara en Vivo / NDI / Virtual Cam">
+                                            <div class="flex items-center gap-1.5 min-w-0">
+                                                <span class="btn-ilsb-icon w-6 h-6 bg-cyan-950/80 border border-cyan-500/30 text-cyan-300 text-[10px]">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                </span>
+                                                <span class="btn-ilsb-text">
+                                                    <span class="btn-ilsb-label text-[10px]">Webcam</span>
+                                                    <span class="btn-ilsb-subtext text-[7.5px]">NDI / TEXTURA 3D</span>
+                                                </span>
+                                            </div>
+                                            <span id="cam-badge" class="text-[7.5px] font-mono text-zinc-500 bg-zinc-900 border border-white/10 px-1 py-0.2 rounded shrink-0 hidden xs:inline">OFF</span>
                                         </button>
-                                        <button onclick="openVideoIngestModal()" class="w-7 h-auto py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center text-xs shrink-0 transition" title="Ajustes de Cámara, Chroma Key y Proyección 3D">
+                                        <button onclick="openVideoIngestModal()" class="w-6 h-auto py-1 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-lg border border-white/[0.08] flex items-center justify-center text-xs shrink-0 transition" title="Ajustes de Cámara, Chroma Key y Proyección 3D">
                                             <span>⚙️</span>
                                         </button>
                                     </div>
-                                    <button onclick="stopAudio()" id="btn-stop" class="col-span-2 sm:col-span-3 py-1.5 px-2 bg-zinc-900/90 hover:bg-rose-950/60 text-zinc-400 hover:text-rose-300 rounded-lg border border-white/[0.08] hover:border-rose-500/40 flex items-center justify-between gap-1 transition">
-                                        <span class="text-[10px] text-rose-400 font-bold">[MUTE]</span>
-                                        <span class="text-[11px] font-sans font-medium text-rose-300">Detener Audio</span>
-                                        <span class="text-[8px] text-rose-500/80">STOP</span>
+
+                                    <!-- STOP / MUTE: IconLabelSubtextButton en Rack -->
+                                    <button onclick="stopAudio()" id="btn-stop" class="btn-ilsb btn-ilsb-rose p-1.5 col-span-2 sm:col-span-3 w-full justify-between" title="Detener Audio y resetear fuentes">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <span class="btn-ilsb-icon w-6 h-6 bg-rose-950 border border-rose-500/40 text-rose-300 text-[10px]">
+                                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"/></svg>
+                                            </span>
+                                            <span class="btn-ilsb-text">
+                                                <span class="btn-ilsb-label text-[10.5px] text-rose-200">Detener Señal de Audio</span>
+                                                <span class="btn-ilsb-subtext text-[7.5px] text-rose-400/80">CORTE INMEDIATO MUTE</span>
+                                            </span>
+                                        </div>
+                                        <span class="text-[8px] font-mono font-bold text-rose-400 bg-rose-950/90 border border-rose-500/40 px-1.5 py-0.5 rounded">STOP ■</span>
                                     </button>
                                 </div>
                             </div>
@@ -1393,48 +1559,92 @@
                                 </span>
                             </div>
 
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 flex-1 content-start">
-                                <button onclick="startMicrophone()" class="py-1.5 px-2 bg-zinc-900/80 hover:bg-cyan-950/50 rounded-xl border border-zinc-800 hover:border-cyan-500/40 flex items-center gap-1.5 transition-all text-left">
-                                    <span class="text-[8px] font-mono text-cyan-400 font-bold bg-cyan-950/70 px-1 py-0.5 rounded border border-cyan-500/20 shrink-0">MIC</span>
-                                    <span class="text-[10px] text-zinc-200 font-medium">Micrófono</span>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 flex-1 content-start">
+                                <!-- MIC: IconLabelSubtextButton -->
+                                <button onclick="startMicrophone()" class="btn-ilsb btn-ilsb-cyan p-2 w-full" title="Capturar entrada analógica de micrófono o interfaz externa">
+                                    <span class="btn-ilsb-icon w-8 h-8 bg-cyan-950/80 border border-cyan-500/30 text-cyan-300">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+                                    </span>
+                                    <span class="btn-ilsb-text">
+                                        <span class="btn-ilsb-label">Micrófono</span>
+                                        <span class="btn-ilsb-subtext">DSP Analógico Directo</span>
+                                    </span>
                                 </button>
 
-                                <div class="flex gap-1">
-                                    <button onclick="selectYouTubeMobileSource(); triggerHaptic(15);" class="flex-1 py-1.5 px-2 bg-zinc-900/80 hover:bg-red-950/50 rounded-xl border border-red-500/30 hover:border-red-500/60 flex items-center gap-1.5 transition-all text-left">
-                                        <span class="text-[8px] font-mono text-red-400 font-bold bg-red-950/70 px-1 py-0.5 rounded border border-red-500/20 shrink-0">YT</span>
-                                        <span class="text-[10px] text-red-200 font-medium">YouTube</span>
+                                <!-- YOUTUBE: IconLabelSubtextButton con configuración integrada -->
+                                <div class="flex gap-1 w-full">
+                                    <button onclick="selectYouTubeMobileSource(); triggerHaptic(15);" class="btn-ilsb btn-ilsb-red p-2 flex-1 min-w-0" title="Audio streaming directo desde YouTube">
+                                        <span class="btn-ilsb-icon w-8 h-8 bg-red-950/80 border border-red-500/30 text-red-400">
+                                            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                                        </span>
+                                        <span class="btn-ilsb-text">
+                                            <span class="btn-ilsb-label">YouTube</span>
+                                            <span class="btn-ilsb-subtext">Streaming 48kHz HQ</span>
+                                        </span>
                                     </button>
-                                    <button onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-6 shrink-0 bg-zinc-900/80 hover:bg-zinc-800 rounded-xl border border-white/[0.08] flex items-center justify-center text-[10px] text-zinc-400 transition-all">⚙️</button>
+                                    <button onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-8 shrink-0 bg-zinc-900/90 hover:bg-zinc-800 rounded-xl border border-white/[0.08] hover:border-red-500/40 flex items-center justify-center text-xs text-zinc-400 hover:text-white transition-all shadow-sm" title="Configurar fuente de YouTube">⚙️</button>
                                 </div>
 
-                                <button onclick="startTabCapture()" class="py-1.5 px-2 bg-zinc-900/80 hover:bg-cyan-950/50 rounded-xl border border-zinc-800 hover:border-cyan-500/40 flex items-center gap-1.5 transition-all text-left">
-                                    <span class="text-[8px] font-mono text-cyan-400 font-bold bg-cyan-950/70 px-1 py-0.5 rounded border border-cyan-500/20 shrink-0">SYS</span>
-                                    <span class="text-[10px] text-zinc-200 font-medium">Pestaña</span>
+                                <!-- SYS TAB: IconLabelSubtextButton -->
+                                <button onclick="startTabCapture()" class="btn-ilsb btn-ilsb-cyan p-2 w-full" title="Capturar audio de pestaña del sistema sin pérdidas">
+                                    <span class="btn-ilsb-icon w-8 h-8 bg-cyan-950/80 border border-cyan-500/30 text-cyan-300">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                    </span>
+                                    <span class="btn-ilsb-text">
+                                        <span class="btn-ilsb-label">Pestaña Audio</span>
+                                        <span class="btn-ilsb-subtext">Loopback Hi-Fi Raw</span>
+                                    </span>
                                 </button>
 
-                                <label class="py-1.5 px-2 bg-zinc-900/80 hover:bg-cyan-950/50 rounded-xl border border-zinc-800 hover:border-cyan-500/40 flex items-center gap-1.5 cursor-pointer transition-all">
-                                    <span class="text-[8px] font-mono text-cyan-400 font-bold bg-cyan-950/70 px-1 py-0.5 rounded border border-cyan-500/20 shrink-0">FILE</span>
-                                    <span class="text-[10px] text-zinc-200 font-medium">Cargar Audio</span>
+                                <!-- FILE UPLOAD: IconLabelSubtextButton -->
+                                <label class="btn-ilsb btn-ilsb-cyan p-2 w-full cursor-pointer" title="Cargar archivo local de audio WAV, MP3 o FLAC">
+                                    <span class="btn-ilsb-icon w-8 h-8 bg-cyan-950/80 border border-cyan-500/30 text-cyan-300">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                    </span>
+                                    <span class="btn-ilsb-text">
+                                        <span class="btn-ilsb-label">Cargar Audio</span>
+                                        <span class="btn-ilsb-subtext">WAV, FLAC, MP3 local</span>
+                                    </span>
                                     <input type="file" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
                                 </label>
 
-                                <button onclick="toggleSynthDemo()" class="py-1.5 px-2 bg-zinc-900/80 hover:bg-amber-950/50 rounded-xl border border-zinc-800 hover:border-amber-500/40 flex items-center gap-1.5 transition-all text-left">
-                                    <span class="text-[8px] font-mono text-amber-400 font-bold bg-amber-950/70 px-1 py-0.5 rounded border border-amber-500/20 shrink-0">SYN</span>
-                                    <span class="text-[10px] text-amber-200 font-medium">Sintetizador</span>
+                                <!-- SYNTH: IconLabelSubtextButton -->
+                                <button onclick="toggleSynthDemo()" class="btn-ilsb btn-ilsb-amber p-2 w-full" title="Generador procedural de sintesis DSP">
+                                    <span class="btn-ilsb-icon w-8 h-8 bg-amber-950/80 border border-amber-500/30 text-amber-300">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+                                    </span>
+                                    <span class="btn-ilsb-text">
+                                        <span class="btn-ilsb-label">Sintetizador</span>
+                                        <span class="btn-ilsb-subtext">Procedural 120 BPM</span>
+                                    </span>
                                 </button>
 
-                                <div class="flex gap-1">
-                                    <button onclick="toggleLiveVideo()" class="flex-1 py-1.5 px-2 bg-zinc-900/80 hover:bg-cyan-950/50 rounded-xl border border-zinc-800 hover:border-cyan-500/40 flex items-center gap-1.5 transition-all text-left">
-                                        <span class="text-[8px] font-mono text-cyan-400 font-bold bg-cyan-950/70 px-1 py-0.5 rounded border border-cyan-500/20 shrink-0">CAM</span>
-                                        <span class="text-[10px] text-cyan-200 font-medium">Cámara</span>
+                                <!-- WEBCAM: IconLabelSubtextButton con configuración integrada -->
+                                <div class="flex gap-1 w-full">
+                                    <button onclick="toggleLiveVideo()" class="btn-ilsb btn-ilsb-cyan p-2 flex-1 min-w-0" title="Activar entrada de video en vivo o cámara NDI">
+                                        <span class="btn-ilsb-icon w-8 h-8 bg-cyan-950/80 border border-cyan-500/30 text-cyan-300">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                        </span>
+                                        <span class="btn-ilsb-text">
+                                            <span class="btn-ilsb-label">Cámara Video</span>
+                                            <span class="btn-ilsb-subtext">Webcam & Textura 3D</span>
+                                        </span>
                                     </button>
-                                    <button onclick="openVideoIngestModal()" class="w-6 shrink-0 bg-zinc-900/80 hover:bg-zinc-800 rounded-xl border border-white/[0.08] flex items-center justify-center text-[10px] text-zinc-400 transition-all">⚙️</button>
+                                    <button onclick="openVideoIngestModal()" class="w-8 shrink-0 bg-zinc-900/90 hover:bg-zinc-800 rounded-xl border border-white/[0.08] hover:border-cyan-500/40 flex items-center justify-center text-xs text-zinc-400 hover:text-white transition-all shadow-sm" title="Ajustes de video y chroma key">⚙️</button>
                                 </div>
 
-                                <button onclick="stopAudio()" class="col-span-2 sm:col-span-3 py-1.5 px-2.5 bg-rose-950/40 hover:bg-rose-900/60 rounded-xl border border-rose-500/30 hover:border-rose-500/60 flex items-center justify-between transition-all mt-0.5">
-                                    <span class="text-[8px] font-mono text-rose-400 font-bold bg-rose-950 px-1.5 py-0.5 rounded border border-rose-500/30">MUTE</span>
-                                    <span class="text-[10px] text-rose-200 font-semibold tracking-wide">Detener Señal de Audio</span>
-                                    <span class="text-[8px] text-rose-400/80 font-mono font-bold">STOP ■</span>
+                                <!-- STOP / MUTE: IconLabelSubtextButton de ancho completo -->
+                                <button onclick="stopAudio()" class="btn-ilsb btn-ilsb-rose p-2.5 col-span-1 sm:col-span-2 w-full justify-between" title="Cortar inmediatamente todas las señales de entrada">
+                                    <div class="flex items-center gap-2.5 min-w-0">
+                                        <span class="btn-ilsb-icon w-8 h-8 bg-rose-950 border border-rose-500/40 text-rose-300">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"/></svg>
+                                        </span>
+                                        <span class="btn-ilsb-text">
+                                            <span class="btn-ilsb-label text-rose-100">Detener Señal de Audio</span>
+                                            <span class="btn-ilsb-subtext text-rose-300/80">Corte General MUTE / Bypass DSP</span>
+                                        </span>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded-md font-mono text-[9px] font-bold bg-rose-950/90 border border-rose-500/40 text-rose-300">STOP ■</span>
                                 </button>
                             </div>
 
