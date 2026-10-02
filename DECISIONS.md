@@ -1320,6 +1320,44 @@
 
 
 
+---
+
+### D-054 — Bento Grid Global + SpotlightCard System: Workstation Asimétrica de 7 Tarjetas con Haz Cónico Reactivo
+- **Fecha:** 2026-10-02
+- **Estado:** ✅ Implementada
+- **Contexto:** 
+  1. La prueba de concepto de Bento Grid Studio en el Audio Deck (D-053) demostró el potencial visual de la estética contemporánea Butter.video y shadcn UI. Sin embargo, se limitaba a 4 tarjetas dentro de la ingesta de audio.
+  2. Se requería una workstation global unificada y modular que congregara en un único espacio Bento los módulos esenciales de producción: Análisis Espectral Hero, Pistas Master, Stems DSP de 8 bandas, Suite de 9 PostFX, Ingesta Patchbay, Transporte/Faders y el Director IA con pad Russell Circumplex (MER).
+  3. Adicionalmente, se necesitaba dotar a las tarjetas de un sistema de iluminación volumétrica háptica de vanguardia (SpotlightCard inspirado en 21st.dev) con haz cónico y borde perimetral que rastree el cursor en tiempo real sin dependencias de React ni sobrecarga en el render loop a 60 FPS.
+- **Decisiones técnicas:**
+  1. **Motor SpotlightCard en Vanilla JS + CSS Custom Properties:**
+     - Haz de luz interior en pseudo-elemento `::before` con `radial-gradient` cónico gobernado por `--mx` y `--my` (porcentajes relativos al tamaño de la tarjeta).
+     - Borde exterior iluminado en `::after` con técnica de máscara compuesta (`mask-composite: exclude` / `-webkit-mask-composite: destination-out`) y borde transparente de 1px.
+     - 7 variantes cromáticas temáticas: `spc-purple`, `spc-cyan`, `spc-amber`, `spc-emerald`, `spc-rose`, `spc-blue`, `spc-fuchsia`.
+     - Ciclo de vida con `AbortController` por tarjeta en `initSpotlightCards()`: cancela listeners previos y previene fugas de memoria en re-inicializaciones sucesivas. En `mouseleave`, resetea suavemente las coordenadas a `50%`.
+  2. **Grid Asimétrico Global de 12 Columnas (7 Cards):**
+     - **Card 1 (col-8, cyan):** Analizador Espectral Hero con canvas dedicado `#bentoWaveCanvas` (PCM Scope), indicador `60 FPS Locked` y cuadrícula de 6 descriptores acústicos (RMS, Centroide, Flux, ZCR, Rolloff y Onset).
+     - **Card 2 (col-4, purple):** Pistas Master HQ con 3 pistas directas (`CH 01 MORDAZA`, `CH 02 TONTOS ÚTILES`, `CH 03 SECTION 63`) y micro-LEDs de estado dinámico `[ON AIR]` / `[STANDBY]`.
+     - **Card 3 (col-8, emerald):** Stems DSP Live con 8 vúmetros analógicos verticales reactivos a los filtros Biquad (<60Hz a >10kHz) y acceso directo a exportación WAV.
+     - **Card 4 (col-4, fuchsia):** PostFX Suite con 9 pulsadores stomp-box interactivos (Bloom, AberrRGB, Glitch, Shockwave, CRT/VHS, Caleidoscopio, Film 35mm, Negativo, Pixel 8bit) sincronizados con los pases de EffectComposer.
+     - **Card 5 (col-4, cyan):** Matriz de Ingesta I/O con 7 accesos tácticos (Micrófono, YouTube con modal asistente, Pestaña Loopback, Carga WAV local, Sintetizador procedural, Webcam NDI y Mute de parada).
+     - **Card 6 (col-4, amber):** Transporte & Faders Estéreo con scrubber, loop, selector rápido de boost (1x/2.5x/4.5x/8x), fader Master general, potenciómetros de Canal L y Canal R y botón de monitoreo de auriculares.
+     - **Card 7 (col-4, rose):** AI Director MER con canvas interactivo bidireccional del modelo Russell Circumplex (Valence × Arousal), visualización de paleta cromática activa (Primario, Acento, Niebla) y arquetipo narrativo.
+  3. **Optimización del Render Loop Maestro (`masterRenderLoop`):**
+     - Throttle de $\times 0.5$ (ejecución exclusiva en fotogramas pares `(masterFpsFrames & 1) === 0`) para `updateBentoStemsLive()` y `drawBentoMerCanvas()`, operando a 30 FPS estables sin competir con el pipeline WebGL 3D.
+     - Early return inmediato si `#view-mode-bento` contiene la clase `hidden`, garantizando coste cero de CPU/GPU cuando el usuario utiliza la vista de Rack o trabaja en móvil.
+  4. **Puentes de Sincronización Bidireccional (`setFxState`, `syncBentoAudioDeckControls`):**
+     - Mapeo 1:1 entre interruptores stomp-box de Bento y los checkboxes y controladores de post-proceso de Three.js.
+     - Sincronización automática de estado de volumen, pistas y reproducción al conmutar entre vistas con persistencia en `localStorage.getItem('motor_audio_deck_mode')`.
+  5. **Componente Standalone:**
+     - Implementado en `components/spotlight-card.js` y `components/spotlight-card-demo.html` como módulo desacoplado listo para su despliegue en `/opt/lyai/app/lyai-shared/components/spotlight-card/`.
+- **Consecuencias:**
+  - ✅ Experiencia visual y de control cohesiva de nivel de producto comercial de alta gama.
+  - ✅ Interacción háptica y tridimensional fluida con iluminación física reactiva al cursor.
+  - ✅ Rendimiento determinista de 60 FPS sin asignaciones de memoria dinámicas en el bucle principal.
+  - ✅ Verificación empírica completa superada en `scripts/audit_bento_spotlight.js` con capturas de pantalla de alta resolución.
+
+---
 
 ### D-055 — Footer Section animado estilo 21st.dev/Efferd
 - **Fecha:** 2026-10-02

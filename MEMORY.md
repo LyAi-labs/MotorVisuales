@@ -337,11 +337,12 @@ Source → masterGainNode → mainAnalyser → DataTexture (uAudioTexture 512x2)
 
 - ✅ **Bento Grid Global + SpotlightCard System (D-054):**
   - **SpotlightCard CSS:** Haz de luz cónico reactivo al cursor via `::before` (fill interior) + `::after` (borde perimetral con `mask-composite: exclude`). Custom props `--mx`/`--my` en porcentajes. 7 variantes: `spc-purple`, `spc-cyan`, `spc-amber`, `spc-emerald`, `spc-rose`, `spc-blue`, `spc-fuchsia`.
-  - **`initSpotlightCards()` JS:** `AbortController` por tarjeta — cero fugas. Se llama en `DOMContentLoaded` y al activar el modo Bento.
+  - **`initSpotlightCards()` JS:** `AbortController` por tarjeta — cero fugas. Se llama en `DOMContentLoaded` y al activar el modo Bento. Resetea suavemente a `50%` en `mouseleave`.
   - **Bento Grid Global 12 columnas (7 cards asimétricos):** Hero FFT (col-8), Pistas Master (col-4), Stems DSP Live con 8 vúmetros (col-8), PostFX Suite 9 stomp-boxes (col-4), Ingesta I/O (col-4), Transporte+Faders (col-4), AI Director MER con canvas Russell Circumplex (col-4).
   - **Hooks render loop:** `updateBentoStemsLive()` + `drawBentoMerCanvas()` a 30 FPS (throttle ×½ en `masterRenderLoop`). Early-return si Bento oculto.
-  - **Stubs Bridge:** `setFxState()`, `toggleAllFx()`, `triggerAiArtDirection()` → sincronizan con funciones reales del motor.
-  - **Limpieza:** 380 líneas huérfanas del Bento D-053 eliminadas.
+  - **Stubs Bridge & Respaldo Funcional:** `setFxState()`, `toggleAllFx()`, `triggerAiArtDirection()` sincronizan con los checkboxes de EffectComposer (`fx-*-enable`) e invocan directamente los controladores de pase.
+  - **Verificación Automatizada CDP:** Suite [scripts/audit_bento_spotlight.js](file:///c:/lyai-motorvisuales.site/scripts/audit_bento_spotlight.js) validando conmutación reactiva, inyección física de `--mx`/`--my`, sincronización de stomp-boxes FX, renderizado de canvas MER y captura visual en alta fidelidad en [test-screenshots/bento_grid_global_7cards.png](file:///c:/lyai-motorvisuales.site/test-screenshots/bento_grid_global_7cards.png).
+  - **Componente standalone:** [components/spotlight-card.js](file:///c:/lyai-motorvisuales.site/components/spotlight-card.js) y [components/spotlight-card-demo.html](file:///c:/lyai-motorvisuales.site/components/spotlight-card-demo.html) listos para subir a `/opt/lyai/app/lyai-shared/components/spotlight-card/` en Hetzner.
 
 - ✅ **Footer Section animado estilo 21st.dev/Efferd (D-055):**
   - **Solo desktop (`lg:`):** Media query `min-width: 1024px` — invisible en móvil para preservar el layout 100dvh Zero-Scroll.

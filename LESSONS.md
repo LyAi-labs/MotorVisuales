@@ -629,11 +629,14 @@
   4. **Fallback Algorítmico Local:** Proveer 8 plantillas analíticas (Túnel Relativista, Bismuto PBR, Rosensweig FHD, Cimática de Chladni, Abismo Marino, Supernova, Malla Cuántica y Mandelbulb) garantizando que el usuario obtenga siempre un shader visualmente impactante a 60 FPS incluso sin conexión a Internet ni saldo en la API.
 - **Trigger:** Al desarrollar asistentes de código generativo para WebGL o motores de shaders procedurales en caliente.
 
+---
 
-
-
-
-
-
-
-
+### L-046
+- **Tags:** #syntax-error #ast #v8-parser #try-catch #orphan-brace #monolith #headless-cdp #bento-grid
+- **Síntoma:** Al interactuar con botones que invocan funciones globales de JS (como `btn-sec-masters` llamando a `toggleAudioDeckSection` o conmutadores Bento), la consola del navegador arroja `ReferenceError: toggleAudioDeckSection is not defined`, a pesar de que la función está explícitamente declarada en el código.
+- **Causa raíz:** Una llave de cierre huérfana `}` dentro de un bloque anidado en `DOMContentLoaded` provocó un `SyntaxError: Missing catch or finally after try`, haciendo que el motor V8 aborte el parseo del script completo antes de registrar las funciones en el ámbito global.
+- **Solución:**
+  1. Localizar la excepción de parseo mediante auditoría headless CDP (`Runtime.exceptionThrown`) que expone la línea exacta del fallo sintáctico.
+  2. Eliminar la llave redundante preservando el anidamiento canónico del bloque `try { if (...) { ... } } catch (_) {}`.
+  3. Validar con script de auditoría automatizada (`audit_bento_spotlight.js` y `audit_audio_deck.js`) garantizando cero excepciones en runtime y captura visual confirmada.
+- **Trigger:** Al detectar `ReferenceError` en funciones globales que existen en el código o tras editar bloques anidados en archivos monolíticos.

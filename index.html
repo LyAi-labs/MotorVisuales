@@ -1337,43 +1337,43 @@
                             </div>
 
                             <div class="grid grid-cols-2 gap-1.5 flex-1">
-                                <button onclick="startMicrophone()" class="py-2 px-2 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1.5 transition-all text-left">
-                                    <span class="text-[9px] font-mono text-cyan-400 font-bold">[MIC]</span>
-                                    <span class="text-[10px] text-zinc-300">Micrófono</span>
-                                    <span class="ml-auto text-[7px] text-zinc-600 font-mono">ANA</span>
+                                <button onclick="startMicrophone()" class="py-1.5 px-1.5 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1 transition-all text-left min-w-0">
+                                    <span class="text-[8px] font-mono text-cyan-400 font-bold shrink-0">[MIC]</span>
+                                    <span class="text-[10px] text-zinc-300 truncate">Micrófono</span>
+                                    <span class="ml-auto text-[7px] text-zinc-600 font-mono shrink-0 hidden xs:inline">ANA</span>
                                 </button>
-                                <div class="flex gap-1">
-                                    <button onclick="selectYouTubeMobileSource(); triggerHaptic(15);" class="flex-1 py-2 px-1.5 bg-zinc-900/70 hover:bg-red-950/40 rounded-xl border border-red-500/25 hover:border-red-500/50 flex items-center gap-1 transition-all">
-                                        <span class="text-[9px] font-mono text-red-400 font-bold">[YT]</span>
-                                        <span class="text-[10px] text-red-300">YouTube</span>
+                                <div class="flex gap-1 min-w-0">
+                                    <button onclick="selectYouTubeMobileSource(); triggerHaptic(15);" class="flex-1 min-w-0 py-1.5 px-1.5 bg-zinc-900/70 hover:bg-red-950/40 rounded-xl border border-red-500/25 hover:border-red-500/50 flex items-center gap-1 transition-all text-left">
+                                        <span class="text-[8px] font-mono text-red-400 font-bold shrink-0">[YT]</span>
+                                        <span class="text-[10px] text-red-300 truncate">YouTube</span>
                                     </button>
-                                    <button onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-7 bg-zinc-900 hover:bg-zinc-800 rounded-xl border border-white/[0.06] flex items-center justify-center text-[10px] transition-all text-zinc-400">⚙️</button>
+                                    <button onclick="openYouTubeMobileAssistant(); triggerHaptic(15);" class="w-6 shrink-0 bg-zinc-900 hover:bg-zinc-800 rounded-xl border border-white/[0.06] flex items-center justify-center text-[10px] transition-all text-zinc-400">⚙️</button>
                                 </div>
-                                <button onclick="startTabCapture()" class="py-2 px-2 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1.5 transition-all">
-                                    <span class="text-[9px] font-mono text-cyan-400 font-bold">[SYS]</span>
-                                    <span class="text-[10px] text-zinc-300">Pestaña</span>
-                                    <span class="ml-auto text-[7px] text-zinc-600 font-mono">LP</span>
+                                <button onclick="startTabCapture()" class="py-1.5 px-1.5 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1 transition-all min-w-0 text-left">
+                                    <span class="text-[8px] font-mono text-cyan-400 font-bold shrink-0">[SYS]</span>
+                                    <span class="text-[10px] text-zinc-300 truncate">Pestaña</span>
+                                    <span class="ml-auto text-[7px] text-zinc-600 font-mono shrink-0 hidden xs:inline">LP</span>
                                 </button>
-                                <label class="py-2 px-2 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1.5 cursor-pointer transition-all">
-                                    <span class="text-[9px] font-mono text-cyan-400 font-bold">[FILE]</span>
-                                    <span class="text-[10px] text-zinc-300">Cargar</span>
-                                    <span class="ml-auto text-[7px] text-zinc-600 font-mono">WAV</span>
+                                <label class="py-1.5 px-1.5 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1 cursor-pointer transition-all min-w-0">
+                                    <span class="text-[8px] font-mono text-cyan-400 font-bold shrink-0">[FILE]</span>
+                                    <span class="text-[10px] text-zinc-300 truncate">Cargar</span>
+                                    <span class="ml-auto text-[7px] text-zinc-600 font-mono shrink-0 hidden xs:inline">WAV</span>
                                     <input type="file" accept="audio/*" class="hidden" onchange="handleFileUpload(event)">
                                 </label>
-                                <button onclick="toggleSynthDemo()" class="py-2 px-2 bg-zinc-900/70 hover:bg-amber-950/40 rounded-xl border border-zinc-800/80 hover:border-amber-500/40 flex items-center gap-1.5 transition-all">
-                                    <span class="text-[9px] font-mono text-amber-400 font-bold">[SYN]</span>
-                                    <span class="text-[10px] text-amber-300">Synth</span>
-                                    <span class="ml-auto text-[7px] text-amber-600/80 font-mono">PRO</span>
+                                <button onclick="toggleSynthDemo()" class="py-1.5 px-1.5 bg-zinc-900/70 hover:bg-amber-950/40 rounded-xl border border-zinc-800/80 hover:border-amber-500/40 flex items-center gap-1 transition-all min-w-0 text-left">
+                                    <span class="text-[8px] font-mono text-amber-400 font-bold shrink-0">[SYN]</span>
+                                    <span class="text-[10px] text-amber-300 truncate">Synth</span>
+                                    <span class="ml-auto text-[7px] text-amber-600/80 font-mono shrink-0 hidden xs:inline">PRO</span>
                                 </button>
-                                <div class="flex gap-1">
-                                    <button onclick="toggleLiveVideo()" class="flex-1 py-2 px-1.5 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1 transition-all">
-                                        <span class="text-[9px] font-mono text-cyan-400 font-bold">[CAM]</span>
-                                        <span class="text-[10px] text-cyan-300">Cámara</span>
+                                <div class="flex gap-1 min-w-0">
+                                    <button onclick="toggleLiveVideo()" class="flex-1 min-w-0 py-1.5 px-1.5 bg-zinc-900/70 hover:bg-cyan-950/40 rounded-xl border border-zinc-800/80 hover:border-cyan-500/40 flex items-center gap-1 transition-all text-left">
+                                        <span class="text-[8px] font-mono text-cyan-400 font-bold shrink-0">[CAM]</span>
+                                        <span class="text-[10px] text-cyan-300 truncate">Cámara</span>
                                     </button>
-                                    <button onclick="openVideoIngestModal()" class="w-7 bg-zinc-900 hover:bg-zinc-800 rounded-xl border border-white/[0.06] flex items-center justify-center text-[10px] transition-all text-zinc-400">⚙️</button>
+                                    <button onclick="openVideoIngestModal()" class="w-6 shrink-0 bg-zinc-900 hover:bg-zinc-800 rounded-xl border border-white/[0.06] flex items-center justify-center text-[10px] transition-all text-zinc-400">⚙️</button>
                                 </div>
-                                <button onclick="stopAudio()" class="col-span-2 py-2 px-2 bg-zinc-900/70 hover:bg-rose-950/60 rounded-xl border border-zinc-800/80 hover:border-rose-500/40 flex items-center justify-between transition-all">
-                                    <span class="text-[9px] font-mono text-rose-400 font-bold">[MUTE]</span>
+                                <button onclick="stopAudio()" class="col-span-2 py-1.5 px-2 bg-zinc-900/70 hover:bg-rose-950/60 rounded-xl border border-zinc-800/80 hover:border-rose-500/40 flex items-center justify-between transition-all">
+                                    <span class="text-[8px] font-mono text-rose-400 font-bold">[MUTE]</span>
                                     <span class="text-[10px] text-rose-300 font-medium">Detener Señal</span>
                                     <span class="text-[7px] text-rose-500/80 font-mono">STOP</span>
                                 </button>
@@ -1401,12 +1401,12 @@
 
                             <!-- Transport bar -->
                             <div class="bg-zinc-950/90 p-2 rounded-xl border border-white/[0.05] space-y-1.5">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center gap-2 truncate">
+                                <div class="flex items-center justify-between gap-1.5">
+                                    <div class="flex items-center gap-1.5 min-w-0 flex-1">
                                         <button onclick="togglePlayPauseUserTrack()" id="bento-btn-play-pause-track" class="w-6 h-6 rounded-full bg-cyan-500 hover:bg-cyan-400 flex items-center justify-center font-bold text-black shadow transition shrink-0 text-xs">▶</button>
-                                        <div id="bento-track-title" class="font-mono text-[11px] text-cyan-300 truncate max-w-[140px]">Mordaza (tema.mp3)</div>
+                                        <div id="bento-track-title" class="font-mono text-[10px] text-cyan-300 truncate min-w-0">Mordaza (tema.mp3)</div>
                                     </div>
-                                    <label class="flex items-center gap-1 text-[9px] text-zinc-400 font-mono cursor-pointer">
+                                    <label class="flex items-center gap-1 text-[8px] text-zinc-400 font-mono cursor-pointer shrink-0">
                                         <span>LOOP</span>
                                         <input type="checkbox" id="bento-track-loop" checked onchange="toggleTrackLoop(this.checked); if(document.getElementById('track-loop')) document.getElementById('track-loop').checked = this.checked;" class="accent-cyan-400 rounded">
                                     </label>
@@ -1460,15 +1460,15 @@
                              CARD 7 ─ AI DIRECTOR MER (col-span-4)
                              ══════════════════════════════════════════════════════════════════ -->
                         <div class="col-span-12 lg:col-span-4 spotlight-card spc-rose bento-card-animate group relative p-3.5 rounded-2xl border border-white/[0.07] bg-[#080910]/95 hover:-translate-y-0.5 will-change-transform transition-all duration-300 flex flex-col gap-2.5">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-rose-950/70 border border-rose-500/25 text-rose-300 text-sm">🧠</div>
-                                    <div>
-                                        <h3 class="font-bold text-[13px] text-zinc-100 group-hover:text-rose-200 transition-colors">AI Director MER</h3>
-                                        <p class="text-[9px] font-mono text-zinc-500">Russell Circumplex · Gemini</p>
+                            <div class="flex items-center justify-between gap-1">
+                                <div class="flex items-center gap-1.5 min-w-0">
+                                    <div class="w-7 h-7 rounded-xl flex items-center justify-center bg-rose-950/70 border border-rose-500/25 text-rose-300 text-sm shrink-0">🧠</div>
+                                    <div class="min-w-0">
+                                        <h3 class="font-bold text-[12px] text-zinc-100 group-hover:text-rose-200 transition-colors truncate">AI Director MER</h3>
+                                        <p class="text-[8px] font-mono text-zinc-500 truncate">Russell Circumplex</p>
                                     </div>
                                 </div>
-                                <button onclick="triggerAiArtDirection()" class="text-[8px] font-mono px-1.5 py-0.5 rounded bg-rose-950/60 border border-rose-500/25 text-rose-300 hover:bg-rose-900/60 transition-colors">▶ Actualizar</button>
+                                <button onclick="triggerAiArtDirection()" class="text-[8px] font-mono px-2 py-0.5 rounded bg-rose-950/60 border border-rose-500/25 text-rose-300 hover:bg-rose-900/60 transition-colors shrink-0">▶ Update</button>
                             </div>
 
                             <!-- MER Pad visual compacto -->
@@ -26371,7 +26371,6 @@ void main() {
                         // '0' o null → mantener oculto (default del HTML)
                         secVj.classList.add('hidden');
                     }
-                    }
                 }
             } catch (_) {}
             // D-054: SpotlightCard — inicializar listeners de cursor en todas las tarjetas Bento
@@ -26386,15 +26385,15 @@ void main() {
         function setFxState(fxName, enabled) {
             // Mapeo a las checkboxes del panel PostFX clásico para mantener sincronía
             const fxIdMap = {
-                bloom:    'fx-bloom',
-                chroma:   'fx-chroma',
-                glitch:   'fx-glitch',
-                radial:   'fx-radial',
-                crt:      'fx-crt',
-                kaleid:   'fx-kaleid',
-                grain:    'fx-grain',
-                negative: 'fx-negative',
-                pixel:    'fx-pixel',
+                bloom:    'fx-bloom-enable',
+                chroma:   'fx-chroma-enable',
+                glitch:   'fx-glitch-enable',
+                radial:   'fx-blur-enable',
+                crt:      'fx-crt-enable',
+                kaleid:   'fx-kaleid-enable',
+                grain:    'fx-grain-enable',
+                negative: 'fx-negative-enable',
+                pixel:    'fx-pixel-enable',
             };
             const rackId = fxIdMap[fxName];
             if (rackId) {
@@ -26404,6 +26403,20 @@ void main() {
                     rackEl.dispatchEvent(new Event('change', { bubbles: true }));
                 }
             }
+            // Invocación directa del controlador de pase como respaldo
+            const fnMap = {
+                bloom:    typeof toggleBloomPass === 'function' ? toggleBloomPass : null,
+                chroma:   typeof toggleChromaPass === 'function' ? toggleChromaPass : null,
+                glitch:   typeof toggleGlitchPass === 'function' ? toggleGlitchPass : null,
+                radial:   typeof toggleRadialBlurPass === 'function' ? toggleRadialBlurPass : null,
+                crt:      typeof toggleCRTPass === 'function' ? toggleCRTPass : null,
+                kaleid:   typeof toggleKaleidoscopePass === 'function' ? toggleKaleidoscopePass : null,
+                grain:    typeof toggleFilmGrainPass === 'function' ? toggleFilmGrainPass : null,
+                negative: typeof toggleNegativeInvertPass === 'function' ? toggleNegativeInvertPass : null,
+                pixel:    typeof togglePixelatePass === 'function' ? togglePixelatePass : null,
+            };
+            if (fnMap[fxName]) fnMap[fxName](enabled);
+
             // Sincronizar el checkbox Bento correspondiente también
             const bentoEl = document.getElementById('fx-bento-' + fxName);
             if (bentoEl && bentoEl.checked !== enabled) {
